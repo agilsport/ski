@@ -1,7 +1,7 @@
 # ski
 ## Développement et Resources pour les logiciels skiFFS 
 
-![alt text](https://github.com/agilsport/ski/32x32_agil.png "Logo Agil") 
+![alt text](https://github.com/agilsport/ski/blob/main/32x32_agil.png "Logo Agil") 
 
 
 Here's our logo (hover to see the title text):
