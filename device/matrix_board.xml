@@ -1,0 +1,6 @@
+<templates>
+	<template name="ALP_FIS">
+		<field name="bib_running" color="255,255,0" row="0" col="0" lg="3" align="right" />
+		<field name="identity_running" color="255,255,0" row="0" col="0" lg="3" align="right" />
+	</template>
+</templates>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+	<panel name="config">
+		<padding all="2px"/>
+		<wnd name="statictext" style="ALIGN_RIGHT" />
+
+		<col value="1,1"/>
+		
+		<row value="auto"/>
+		<statictext col_start="1" label="URL" />
+		<textctrl col_start="2" name="url_trinum" />
+
+		<row value="auto"/>
+		<statictext col_start="1" label="Plateforme de Départ" />
+		<combobox col_start="2" name="combo_plateforme" />
+
+		<toolbar row="auto" col_start="1" col_end="0" name="tb" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT" />
+	</panel>
+	
+	<panel name="dashboard">
+		<padding all="2px"/>
+		<staticbox row="1" col="1" label="Message" name="sb_message">
+			<gridmessage row="1" col="1" parent="sb_message" name="message" />
+		</staticbox>
+	</panel>
+</root>

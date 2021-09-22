@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+	<panel name="config">
+		<padding all="2px"/>
+		<col w="1"/>
+		
+		<staticbox row="auto" col_start="1" col_end="0" label="Global">
+			<statictext row="auto" col="1" align="right" label="Langue des messages" />
+			<combobox col="1" name="language"/>
+		</staticbox>
+				
+		<staticbox row="auto" col_start="1" col_end="0" label="Envoi des données sur la cible">
+			<statictext row="auto" col="1" align="right" label="Cible" />
+			<combobox col="1" name="comboTarget" style="CB_READONLY"/>
+		</staticbox>
+
+		<staticbox row="auto" col_start="1" col_end="0" label="F.F.S.">
+			<statictext row="auto" col="1" align="right" label="Hostname" />
+			<textctrl col="1" name="ffs_hostname" />
+
+			<statictext row="auto" col_start="1" align="right" label="Cocher pour faire un test" />
+			<checkbox col_start="2" style="CHK_2STATE,ALIGN_LEFT" name="ffs_test" />
+		</staticbox>
+
+		<staticbox row="auto" col_start="1" col_end="0" label="F.I.S.">
+			<statictext row="auto" col="1" align="right" label="Hostname" />
+			<textctrl col="1" name="fis_hostname" />
+			
+			<statictext row="auto" col_start="1" align="right" label="Port" />
+			<combobox col_start="2" name="fis_port" />
+
+			<statictext row="auto" col_start="1" align="right" label="Mot de Passe" />
+			<textctrl col_start="2" name="fis_pwd" />
+		</staticbox>
+
+		<staticbox row="auto" col_start="1" col_end="0" label="E.S.F.">
+			<statictext row="auto" col="1" align="right" label="Hostname" />
+			<textctrl col="1" name="clubesf_hostname" />
+		</staticbox>
+
+		<staticbox row="auto" col_start="1" col_end="0" label="Perso">
+			<statictext row="auto" col="1" align="right" label="Hostname" />
+			<textctrl col="1" name="perso_hostname" />
+		</staticbox>
+
+		<toolbar row="auto" col_start="1" col_end="0" name="tb" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT" />
+	</panel>
+
+	<panel name="live">
+		<col w="1"/>
+		<padding all="2px"/>
+		<toolbar row="auto" col_start="1" col_end="0" name="tb" style="TB_FLAT|TB_HORIZONTAL" />
+		<staticbox row="1" col_start="1" col_end="0" label="Dossard">
+			<gridmessage name="gridmessage" />
+		</staticbox>
+	</panel>
+
+	<panel name="message">
+		<padding all="2px"/>
+		<col w="1,2"/>
+		<statictext row="auto" col_start="1" align="right" label="Message" />
+		<combotable col_start="2" name="message"/>
+	
+		<toolbar row="auto" col_start="1" col_end="0" name="tb" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT" />
+	</panel>
+
+	<panel name="meteo">
+		<padding all="2px"/>
+
+		<col w="2,3"/>
+		<statictext row="auto" col_start="1" align="right" label="Temps" />
+		<combotable col_start="2" name="weather"/>
+
+		<statictext row="auto" col_start="1" align="right" label="Température" />
+		<textctrl col_start="2" name="temperature"/>
+
+		<statictext row="auto" col_start="1" align="right" label="Température de la neige" />
+		<textctrl col_start="2" name="snowtemperature"/>
+
+		<statictext row="auto" col_start="1" align="right" label="Humidité 80 => 80%" />
+		<textctrl col_start="2" name="humidity"/>
+		
+		<statictext row="auto" col_start="1" align="right" label="Vent" />
+		<combotable col_start="2" name="wind"/>
+
+		<statictext row="auto" col_start="1" align="right" label="Neige" />
+		<combotable col_start="2" name="snowcondition"/>
+		
+		<toolbar row="auto" col_start="1" col_end="0" name="tb" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT" />
+	</panel>
+	
+	<messages>
+		<message en = "Forerunners on course" fr ="Ouvreurs en piste" />
+		<message en = "Waiting to start" fr = "En attente du depart" />
+		<message en = "Race in progress" fr = "En course" />
+		<message en = "Hold for course repair" fr = "Stop pour entretien du trace" />
+		<message en = "Hold because of an injury" fr = "Stop pour blessure" />
+		<message en = "Hold because of a weather issue" fr = "Stop en raison des conditions météo" />
+		<message en = "Rerun expected for bib No. " fr = "Autorisation de recourir pour le dossard No." />
+		<message en = "Provisory results" fr = "Résultats provisoires" />
+		<message en = "Run completed" fr = "Manche terminée" />
+		<message en = "Race completed" fr = "Course terminée" />
+		<message en = "Start of the event in less than 5 minutes" fr ="Départ de l'épreuve dans moins de 5 Min" />
+		<message en = "Opening of the track for recognition" fr ="Ouverture de la piste pour reconnaissance" />
+		<message en = "Track closure" fr ="Fermeture de la piste" />
+		<message en = "Warning - live timing on system B" fr ="Attention - live réalisé sur le système B" />
+	</messages>	
+
+	<weathers>
+		<weather code="sun" legend="Beau" />
+		<weather code="pcl" legend="Peu nuageux" />
+		<weather code="clo" legend="Nuageux" />
+		<weather code="sno" legend="Neigeux" />
+		<weather code="rai" legend="Pluie" />
+		<weather code="fog" legend="Brouillard" />
+		<weather code="clr" legend="Nuit claire" />
+	</weathers>
+
+	<winds>
+		<wind code="no" legend="Aucun" />
+		<wind code="lo" legend="Faible" />
+		<wind code="me" legend="Moyen" />
+		<wind code="hi" legend="Fort" />
+	</winds>
+
+	<snowconditions>
+		<snowcondition code="sft" legend="Douce" />
+		<snowcondition code="wt-pwd" legend="Poudreuse et humide" />
+		<snowcondition code="wt" legend="Humide" />
+		<snowcondition code="cmp" legend="Compacte" />
+		<snowcondition code="f-g" legend="Finement granuleuse" />
+		<snowcondition code="grn" legend="Granuleuse" />
+		<snowcondition code="hrd" legend="Dure" />
+		<snowcondition code="hrd-p" legend="Dure et compacte" />
+		<snowcondition code="hrd-p-v" legend="Variablement dure et compacte" />
+		<snowcondition code="icy" legend="Glacée"/>
+		<snowcondition code="p" legend="Compacte" />
+		<snowcondition code="ppwd" legend="Poudreuse compacte" />
+		<snowcondition code="pwd" legend="Poudreuse" />
+		<snowcondition code="sp-c" legend="Neige de printemps" />
+		<snowcondition code="salt" legend="Salée" />
+	</snowconditions>
+</root>

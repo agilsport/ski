@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+	<panel name="dashboard">
+		<pen border="0" />
+		<padding all="0px" />
+		<spacing all="1"/>
+		<row value="1"/>
+
+		<background mode="solid" color_start="white" color_end="white" />
+		<!-- <matrix col="1" /> -->
+		<wndtext col="1">''</wndtext>
+		<wndimage col="32px">'./res/32x32_satellite.png'</wndimage>
+		<wndimage col="16px" name="sat1">'./res/16x16_circle_green.png'</wndimage>
+		<wndimage col="16px" name="sat2">'./res/16x16_circle_green.png'</wndimage>
+		<wndimage col="16px" name="sat3">'./res/16x16_circle_green.png'</wndimage>
+		<wndimage col="16px" name="sat4">'./res/16x16_circle_green.png'</wndimage>
+		<wndimage col="16px" name="sat5">'./res/16x16_circle_green.png'</wndimage>
+		<wndimage col="16px" name="sat6">'./res/16x16_circle_green.png'</wndimage>
+		<wndimage col="16px" name="sat7">'./res/16x16_circle_green.png'</wndimage>
+		<wndimage col="16px" name="sat8">'./res/16x16_circle_green.png'</wndimage>
+
+		<wndimage col="32px">'./res/32x32_battery_half.png'</wndimage>
+		<wndtext col="32px" align="right">'D'</wndtext>
+		<wndimage col="16px" name="batd">'./res/16x16_circle_green.png'</wndimage>
+
+		<wndtext col="32px" align="right">'P'</wndtext>
+		<wndimage col="16px" name="batp">'./res/16x16_circle_green.png'</wndimage>
+
+		<wndtext col="32px" align="right">'A'</wndtext>
+		<wndimage col="16px" name="bata">'./res/16x16_circle_green.png'</wndimage>
+		<wndtext col="1">''</wndtext>
+	</panel>
+	
+	<panel name="synchro">
+		<padding all="2px"/>
+		<col value="3,2" />
+
+		<row value="auto" />
+		<statictext col_start="1" style="ALIGN_RIGHT" label="Heure de Synchro" />
+		<timepickerctrl col_start="2" name="time_synchro"/>
+
+		<row value="auto" />
+		<statictext col_start="1" style="ALIGN_RIGHT" label="Heure GPS" />
+		<wndtext col_start="2" name="clock_gps" bk_mode="solid" bk_color="black" align="center" font_color="green" font_name="Calibri" font_weight="bold" font_size="10" />
+
+		<row value="auto" />
+		<toolbar row="auto" col_start="1" col_end="0" name="tb" style="TB_FLAT,TB_HORIZONTAL,TB_TEXT" />
+	</panel>
+</root>
