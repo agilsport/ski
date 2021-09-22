@@ -4,14 +4,3 @@
 ___
 Les téléchargements Officiels sont téléchargeables sur la page [https://www.agil.fr/ski](https://www.agil.fr/ski)
 
-ligne 1
-Ligne 2
-
-Ligne 4
-
-Ligne 5
-
-Ligne 8
-
-
-
