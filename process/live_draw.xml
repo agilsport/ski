@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+	<panel name="config">
+		<padding all="2px"/>
+		<col value="1"/>
+		<row value="50px"/>
+		<matrix row="auto">
+			<col value="5,1,1,5"/>
+			<row value="40px" />
+			<statictext row="auto" col_start="2" align="right" label="Hostname"/>
+			<textctrl col_start="3" align="left" name="fis_hostname" style="TE_READONLY"/>
+			<statictext row="auto" col_start="2" align="right" label="Port"/>
+			<textctrl col_start="3" align="left" name="fis_port"/>
+			<statictext row="auto" col_start="2" align="right" label="Mot de Passe"/>
+			<textctrl col_start="3" align="left" name="fis_pwd"/>
+			<row value="20px"/>
+			<statictext col_start="2" align="right" cond="discipline=='AC'" label="Discipline en vitesse : " />
+			<textctrl col_start="3" align="left" cond="discipline=='AC'" name="discipline_vitesse"/>
+			<row value="20px"/>
+			<toolbar row="auto" col_start="1" name="tbconfig" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
+		</matrix>
+		<row value="1"/>
+	</panel>
+	<panel name="gridCE">
+		<padding all="2px"/>
+		<col value="50px,1,50px"/>
+		<row value="10px"/>
+		<grid row="1" col_start="2" name="tableau"/>
+		<row value="10px"/>
+		<matrix row="auto" col_start="2">
+			<row value="40px"/>
+			<col value="1+50px,1,4,4,1,1,1,1,1,1,1,1,1"/>
+			<wndtext row="30px" col_start="1" align="center"><background mode="solid" color="ltgray" />'Code_FIS' </wndtext>
+			<wndtext col_start="2" align="center"><background mode="solid" color="ltgray" />'Groupe' </wndtext>
+			<wndtext col_start="3" align="center"><background mode="solid" color="ltgray" />'Nom' </wndtext>
+			<wndtext col_start="4" align="center"><background mode="solid" color="ltgray" />'Prenom' </wndtext>
+			<wndtext col_start="5" align="center"><background mode="solid" color="ltgray" />'Sexe' </wndtext>
+			<wndtext col_start="6" align="center"><background mode="solid" color="ltgray" />'Année' </wndtext>
+			<wndtext col_start="7" align="center"><background mode="solid" color="ltgray" />'Nation' </wndtext>
+			<wndtext col_start="8" align="center"><background mode="solid" color="ltgray" />'ECSL Pts' </wndtext>
+			<wndtext col_start="9" align="center"><background mode="solid" color="ltgray" />'ECSL Clt' </wndtext>
+			<wndtext col_start="10" align="center"><background mode="solid" color="ltgray" />'FIS Pts' </wndtext>
+			<wndtext col_start="11" align="center"><background mode="solid" color="ltgray" />'FIS Clt' </wndtext>
+			<textctrl row="auto" col_start="1" align="left" name="code"/>
+			<textctrl col_start="2" align="left" name="groupe"/>
+			<textctrl col_start="3" align="left" name="nom" />
+			<textctrl col_start="4" align="left" name="prenom" />
+			<textctrl col_start="5" align="left" name="sexe" />
+			<textctrl col_start="6" align="left" name="an" />
+			<textctrl col_start="7" align="left" name="nation" />
+			<textctrl col_start="8" align="left" name="ecsl_points" />
+			<textctrl col_start="9" align="left" name="ecsl_rank" />
+			<textctrl col_start="10" align="left" name="points" />
+			<textctrl col_start="11" align="left" name="classement" />
+			<button col_start="12" align="left" name="ajouter" label="Ajouter"/>
+			<row value="10px"/>
+			<staticbox row_start="1" row_end="0" col_start="1" col_end="0" label="Recherche de coureur"/>
+		</matrix>
+		<row value="10px"/>
+		<matrix row="auto" col_start="2">
+			<row value="40px"/>
+			<col value="20px,1,1,4,4"/>
+			<wndtext row="auto" col_start="2" align="right" ><background mode="solid" color="ltgray" />'Séquences :'</wndtext>
+			<textctrl col_start="3" align="left" name="sequence" style="TE_READONLY"/>
+			<textctrl col_start="4" align="left" name="info" style="TE_READONLY"/>
+			<row value="10px"/>
+			<staticbox row_start="1" row_end="0" col_start="1" col_end="0" label="Informations sur la communication avec la FIS"/>
+		</matrix>
+		<toolbar row="auto" col_start="1" col_end="0" name="tbtableau" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT" />
+		<row value="20px"/>
+	</panel>
+	<panel name="gridFIS">
+		<padding all="2px"/>
+		<col value="50px,1,50px"/>
+		<row value="10px"/>
+		<grid row="1" col_start="2" name="tableau"/>
+		<row value="10px"/>
+		<matrix row="auto" col_start="2">
+			<row value="40px"/>
+			<col value="1+50px,1,4,4,1,1,1,4,1,1,1,1"/>
+			<wndtext row="30px" col_start="1" align="center"><background mode="solid" color="ltgray" />'Code_FIS' </wndtext>
+			<wndtext col_start="2" align="center"><background mode="solid" color="ltgray" />'Groupe' </wndtext>
+			<wndtext col_start="3" align="center"><background mode="solid" color="ltgray" />'Nom' </wndtext>
+			<wndtext col_start="4" align="center"><background mode="solid" color="ltgray" />'Prenom' </wndtext>
+			<wndtext col_start="5" align="center"><background mode="solid" color="ltgray" />'Année' </wndtext>
+			<wndtext col_start="6" align="center"><background mode="solid" color="ltgray" />'Nation' </wndtext>
+			<wndtext col_start="7" align="center"><background mode="solid" color="ltgray" />'Comité' </wndtext>
+			<wndtext col_start="8" align="center"><background mode="solid" color="ltgray" />'Club' </wndtext>
+			<wndtext col_start="9" align="center"><background mode="solid" color="ltgray" />'FIS Pts' </wndtext>
+			<wndtext col_start="10" align="center"><background mode="solid" color="ltgray" />'FIS Clt' </wndtext>
+			<textctrl row="auto" col_start="1" align="left" name="code"/>
+			<textctrl col_start="2" align="left" name="groupe"/>
+			<textctrl col_start="3" align="left" name="nom" />
+			<textctrl col_start="4" align="left" name="prenom" />
+			<textctrl col_start="5" align="left" name="an" />
+			<textctrl col_start="6" align="left" name="nation" />
+			<textctrl col_start="7" align="left" name="comite" />
+			<textctrl col_start="8" align="left" name="club" />
+			<textctrl col_start="9" align="left" name="points" />
+			<textctrl col_start="10" align="left" name="classement" />
+			<button col_start="11" align="left" name="ajouter" label="Ajouter"/>
+			<row value="10px"/>
+			<staticbox row_start="1" row_end="0" col_start="1" col_end="0" label="Recherche de coureur"/>
+		</matrix>
+		<row value="10px"/>
+		<matrix row="auto" col_start="2">
+			<row value="40px"/>
+			<col value="20px,1,1,4,4"/>
+			<wndtext row="auto" col_start="2" align="right" ><background mode="solid" color="ltgray" />'Séquences :'</wndtext>
+			<textctrl col_start="3" align="left" name="sequence" style="TE_READONLY"/>
+			<textctrl col_start="4" align="left" name="info" style="TE_READONLY"/>
+			<row value="10px"/>
+			<staticbox row_start="1" row_end="0" col_start="1" col_end="0" label="Informations sur la communication avec la FIS"/>
+		</matrix>
+		<toolbar row="auto" col_start="1" col_end="0" name="tbtableau" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT" />
+		<row value="20px"/>
+	</panel>
+	<panel name="message">
+		<padding all="2px"/>
+		<col value="1,2"/>
+		<statictext row="auto" col_start="1" align="right" label="Message"/>
+		<combobox col_start="2" name="message"/>
+		<toolbar row="auto" col_start="1" col_end="0" name="tb" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
+	</panel>
+	<panel name="discipline">
+		<padding all="2px"/>
+		<col value="5,1,1,5" />
+		<row value="auto" />
+		<statictext col_start="2" align="right" label="Discipline en vitesse : " />
+		<textctrl col_start="3" align="left" name="discipline"/>
+		<toolbar row="auto" col_start="1" col_end="0" name="tb" style="TB_FLAT,TB_HORIZONTAL,TB_TEXT" />
+	</panel>
+
+	<panel id="print">
+		<header>
+			<spacing all="0"/>
+			<padding all="0"/>
+			<col value="1"/>
+			<pen border="none"/>
+			<font name="Calibri" size="13" adjust="width" weight="bold"/>
+			<text row="2cm" align="center">params.Evenement_nom</text>
+		</header>
+		<first_header>
+			<font name="Calibri" size="11" adjust="width" weight="bold"/>
+			<text row="0.5cm" align="center">"Racers' Board for bib drawing"</text>
+		</first_header>
+		<footer>
+			<background mode="transparent"/>
+			<font name="Calibri" size="8" adjust="width" weight="normal"/>
+			<pen border="none"/>
+			<text row="auto" col="1" align="left"/>
+			<line col_start="1" col_end="0" pen_size="2" pen_color="dkgray" border="bottom"/>
+			<row value="auto"/>
+			<matrix col_start="1">
+				<row value="auto"/>
+				<text col="auto" align="left">app.GetName()..' Version '..app.GetVersion()..' / FFS'</text>
+				<image col="0.4cm" adjust="width" align="left">'./res/32x32_ffs.png'</image>
+				<text col="auto" align="left">' / Agil Informatique'</text>
+				<image col="0.4cm" adjust="width" align="left">'./res/32x32_agil.png'</image>
+				<text col="auto" align="left">'/ Ph.Guérindon '..os.date(' / Edition du %d-%m-%Y à %H:%M:%S')</text>
+				<text col="auto" align="left">' / version du script : '..params.Version</text>
+			</matrix>
+		</footer>
+		<label>
+			<font name="Calibri" size="9" adjust="width" weight="bold"/>
+			<pen border="all"/>
+			<row value="0.5cm"/>
+			<col value="1,1,1,1,1,5,1,1,1" />
+			<background mode="transparent"/>
+			<text row="auto" col_start="2" align="center">'Bib'</text>
+			<text col_start="3" align="center">'Rank'</text>
+			<text col_start="4" align="center">'Group'</text>
+			<text col_start="5" align="center">'Code'</text>
+			<text col_start="6" align="center">'Identity'</text>
+			<text col_start="7" align="center">'Nation'</text>
+			<text col_start="8" cond="params.EstCE == 0" align="center">'FIS Pts'</text>
+		</label>
+		<body>
+			<pen border="all"/>
+			<col value="1,1,1,1,1,5,1,1,1" />
+			<call option="couleur_alternee" file="./edition/options.xml"/>
+			<row value="0.5cm"/>
+			<font name="Calibri" size="9" adjust="width" color="black" weight="normal"/>
+			<text col_start="2" align="center" cond="body:GetCellInt('Dossard', row) &gt; 0">$(Dossard)</text>
+			<text col_start="2" align="center" cond="body:GetCellInt('Dossard', row) == 0">''</text>
+			<text col_start="3" align="center">$(Rang_tirage)</text>
+			<text col_start="4" align="center">$(Groupe_tirage)</text>
+			<text col_start="5" align="center">$(Code_coureur):sub(4)</text>
+			<text col_start="6" align="left">$(Nom)..' '..$(Prenom)</text>
+			<text col_start="7" align="center">$(Nation)</text>
+			<text col_start="8" cond="params.EstCE == 0" align="center">$(FIS_pts)</text>
+		</body>
+	</panel>
+</root>
