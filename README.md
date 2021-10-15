@@ -2,7 +2,7 @@
 ## Développement et Resources pour les logiciels de Ski 
 
 ## Périphériques (Devices)
-3 Familles de périphériques 
+4 Familles de périphériques 
 - 1 : Chronomètres et Appareil de Mesure
 - 2 : Afficheur et Présentation
 - 3 : Outils et Tableau de bord
