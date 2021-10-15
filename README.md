@@ -15,7 +15,10 @@ Généralement développé en LUA
 ## Edition 
 Sous dossier /edition du répertoire principal
 <br>
-Chaque activité a son fichier dédié : editionXXX.xml (exemple editionALP.xml pour l'activité ALP=Alpin)
+Pour chaque activité :
+- 1: editionXXX.xml => Edition Officielle (exemple editionALP.xml pour l'activité ALP=Alpin)
+- 2 : editionXXX.suppl.xml => Edition Suppléméntaire
+- 3 : editionXXX.perso.YYY.xml => Editions personnelles 
 <br>
  
 ## XML (Import - Export)
