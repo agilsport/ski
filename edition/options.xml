@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Options Générales pour les Edition Ski !-->
+<edition>
+
+	<!-- Compteur Nation -->
+	<option id="count_nation">
+		<lua>body:SetCounter('Nation');</lua>
+		<matrix row="auto" col_start="1" col_end="0"> 
+			<col value="8cm,1" />"
+			<text row="auto" col_start="2" align="left" cond="body:GetCounter('Nation'):GetNbRows() &gt; 1" ><font size="11"/>'( nombre de nations : '..body:GetCounter('Nation'):GetNbRows()..' )'</text>
+		</matrix>
+	</option>
+
+	<!-- Compteur inscrits - classés -->
+	<option id="count_partant">
+		<lua>
+			nb_classes = 0; 
+			for row=0, body:GetNbRows()-1 do
+				if body:GetCellInt('Clt', row) > 0 then nb_classes = nb_classes + 1 end
+			end
+		</lua>
+		<matrix row="auto" col_start="1" col_end="0"> 
+			<col value="8cm,1" />"
+			<text row="auto" col_start="2" align="left" cond="entite == 'FIS'"><font size="11"/>'(inscrits : '..body:GetNbRows()..' - classés : '..nb_classes..')'</text>
+		</matrix>
+	</option>
+
+	<!-- Stat Classement  -->
+	<option id="stat_ranking_auto">
+		<spacing all="0"/>
+		<background mode="transparent"/>
+		<font name="Calibri" size="14" adjust="max" weight="bold"/>
+	
+		<!-- <column name="Tps_status">chrono.Status(body:GetCellInt('Tps', row))</column> -->
+		<lua>body:SetCounter('Tps_status')</lua>
+		<matrix row="auto" col_start="1" col_end="0" >
+			<row value="auto" />
+			<row value="auto" />
+			<lua>tCounterStatus = body:GetCounter('Tps_status')</lua>
+			<lua>for i=0, tCounterStatus:GetNbRows()-1 do</lua>
+				<text row_start="1" col="1" align="center" cond="entite == 'FFS'">ranking.Code(tCounterStatus:GetCell(0,i))..' - '..ranking.Label(tCounterStatus:GetCell(0,i))..'='..tCounterStatus:GetCell(1,i) </text>
+				<text row_start="2" col="1" align="center" font_size_step="-2" cond="entite == 'FIS'">ranking.CodeInter(tCounterStatus:GetCell(0,i))..' - '..ranking.LabelInter(tCounterStatus:GetCell(0,i))..'='..tCounterStatus:GetCell(1,i) </text>
+			<lua>end</lua>
+			<row value="1.5cm"/>
+		</matrix>
+	</option>
+
+	<!-- Couleur Alternée  -->
+	<option id="couleur_alternee">
+		<font name="Calibri" size="9" adjust="best" weight="normal"/>
+		<lua>_context_border = _context_border or true</lua>
+		<pen cond="_context_border" color="black" border = "1"/>
+		<pen cond="not _context_border" color="black" border = "0"/>
+
+		<lua>if group == 'body' then</lua>
+			<!-- body -->
+			<background color="white" mode="solid" cond="row%2 == 0"/>
+			<background color="ltgray" mode="solid" cond="row%2 == 1"/>
+			<font color="black" weight="normal" adjust="best" />
+		<lua>elseif group == 'label' then</lua>
+			<!-- label -->
+			<background color="white" mode="solid" />
+			<font color="black" weight="bold" adjust="best" />
+		<lua>end</lua>
+	</option>
+	
+	<option id="color_alternate">
+		<lua>color_alternate = color_alternate or {}</lua>
+		<lua>color_alternate.pen_color = color_alternate.pen_color or 'black'</lua>
+		<lua>color_alternate.pen_border = color_alternate.pen_border or 1</lua>
+		
+		<lua>color_alternate.bk_color0 = color_alternate.bk_color0 or 'white'</lua>
+		<lua>color_alternate.bk_color1 = color_alternate.bk_color1 or 'ltgray'</lua>
+		<lua>color_alternate.bk_color_label = color_alternate.bk_label or 'white'</lua>
+		
+		<pen color="(color_alternate.pen_color)" border="color_alternate.pen_border" />
+
+		<lua>if group == 'body' then</lua>
+			<!-- body -->
+			<background color="white" mode="solid" cond="row%2 == 0"/>
+			<background color="ltgray" mode="solid" cond="row%2 == 1"/>
+			<font color="black" weight="normal" adjust="best" />
+		<lua>elseif group == 'label' then</lua>
+			<!-- label -->
+			<background color="white" mode="solid" />
+			<font color="black" weight="bold" adjust="best" />
+		<lua>end</lua>
+	</option>
+	
+	
+	<option id="identite">
+	<lua>Prenom_NOM = $(Prenom):sub(1,1):upper()..$(Prenom):sub(2):lower()..'  '..$(Nom):upper()</lua>
+	<lua>NOM_Prenom = $(Nom):upper()..' '..$(Prenom):sub(1,1):upper()..$(Prenom):sub(2):lower()$(Nom):upper()</lua>
+	<lua>NOM_PRENOM = $(Identite):upper()</lua>
+	<lua>nom_prenom = $(Identite):lower()</lua>
+	</option>
+	
+	<option id="identiteOfficiel">
+		<lua>
+			function GetIdentiteOfficiels(Poste)
+				return	
+					base:GetOfficiel(Poste, 'Nom'):upper()..' '..
+					base:GetOfficiel(Poste, 'Prenom'):sub(1,1):upper()..
+					base:GetOfficiel(Poste, 'Prenom'):sub(2):lower()..' '..
+					base:GetOfficiel(Poste, 'Nation'):Parenthesis();
+			end
+		</lua>
+	</option>
+	
+	<!-- Affichage heure de départ de l'épreuve en mass start option a rajouter  -->  
+	<option id="Ligne_H_depart">
+		<spacing all="0"/>
+		<background mode="transparent"/>
+		<font name="Calibri" size="10" adjust="max" weight="bold"/>
+		<row value="auto" />
+		<line col_start="1" col_end="0" pen_color="dkgray" border="top" />
+		<matrix row="0.4cm" col_start="1" col_end="0" >
+			<text col_start="1" col_end="0" align="center" cond="type_edition=='lst_' and discipline:In('MASS','POURS-D', 'FP')">'H. Théorique de Depart de l\'épreuve : '..$(Epreuve.Heure_depart)</text>
+		<!-- <row h="0.5cm" cond="type_edition=='lst_' and discipline:In('MASS','POURS-D', 'FP')"/> -->
+		</matrix>
+		<row value="auto" />
+		<line col_start="1" col_end="0" pen_color="dkgray" border="top" />
+		<row value="0.2cm" />
+	</option>
+	
+	<!-- Signature DT -->
+	<option id="signature_dt">
+		<lua>dt_code = base:GetOfficiel('TECHNICALDELEGATE', 'Code_coureur'):sub(4)</lua>
+		<lua cond="dt_code:len() ~= 0">dt = GetIdentiteOfficiels('TechnicalDelegate')..' - '..dt_code</lua>
+	
+		<row value="0.8cm" />
+		<row value="auto" />
+		<matrix col_start="1" col_end="0"> 
+			<col value="8cm" />"
+			<text row="auto" col="1" align="left"><font size="14"/>'Le délégué technique'</text>
+			<text row="auto" col_start="2" align="left"><font size="15"/>dt</text>
+		</matrix>
+	</option>
+	
+	<!-- option permetant de calculer le nb d'inscrit / classes / abs / abd / dsq / Nt bandeau fixe-->
+	<option id="stat_ranking">
+		<spacing all="0"/>
+		<background mode="transparent"/>
+		<font name="Calibri" size="10" adjust="max" weight="bold"/>
+	
+		<row value="auto" />
+		<line col_start="1" col_end="0" pen_color="dkgray" border="top" />
+		
+		<row value="0.2cm" />
+	
+		<matrix row="auto" col_start="1" col_end="0" >
+		
+			<row value="auto" />
+			<lua>if $(Evenement.Code_entite) == 'FIS' then</lua>
+			<text col="1" align="center">'Inscrits: '..body:GetNbRows()</text>
+			<text col="1" align="center">'Classés: '..body:GetCounterValue('Tps_status', 'ok')</text>
+			<text col="1" align="center">'DNS: '..body:GetCounterValue('Tps_status', 'dns')</text>
+			<text col="1" align="center">'DNF: '..body:GetCounterValue('Tps_status', 'dnf')</text>
+			<text col="1" align="center">'DSQ: '..body:GetCounterValue('Tps_status', 'dsq')</text>
+			<text col="1" align="center">'Non traités: '..body:GetCounterValue('Tps_status', 'ko')</text>
+			<lua>else</lua>
+			<text col="1" align="center">'Inscrits: '..body:GetNbRows()</text>
+			<text col="1" align="center">'Classés: '..body:GetCounterValue('Tps_status', 'ok')</text>
+			<text col="1" align="center">'Absents: '..body:GetCounterValue('Tps_status', 'dns')</text>
+			<text col="1" align="center">'Abandons: '..body:GetCounterValue('Tps_status', 'dnf')</text>
+			<text col="1" align="center">'Disqualifiés: '..body:GetCounterValue('Tps_status', 'dsq')</text>
+			<text col="1" align="center">'Non traités: '..body:GetCounterValue('Tps_status', 'ko')</text>
+			<lua>end</lua>
+			<row value="0.2cm"/>
+		</matrix>
+		<row value="auto" />
+		<line col_start="1" col_end="0" pen_color="dkgray" border="top" />
+		
+		<row value="0.2cm" />
+	</option>	
+	
+	<!-- option permettant de calculer le nb d'inscrit / classes / abs / abd / dsq / Nt pour le Saut à Ski -->
+	<option id="stat_ranking_saut">
+		<spacing all="0"/>
+		<background mode="transparent"/>
+		<font name="Calibri" size="10" adjust="max" weight="bold"/>
+	
+		<row value="auto" />
+		<line col_start="1" col_end="0" pen_color="dkgray" border="top" />
+		
+		<row value="0.2cm" />
+
+		<matrix row="auto" col_start="1" col_end="0" >
+			<row value="auto" />
+			<text col="1" align="center">'Inscrits: '..body:GetNbRows()</text>
+			<text col="1" align="center">'Classés: '..body:GetCounterValue('Pts_ordre', chrono.Order(chrono.OK))</text>
+			<text col="1" align="center">'Absents: '..body:GetCounterValue('Pts_ordre', chrono.Order(chrono.DNS))</text>
+			<text col="1" align="center">'Abandons: '..body:GetCounterValue('Pts_ordre', chrono.Order(chrono.DNF))</text>
+			<text col="1" align="center">'Disqualifiés: '..body:GetCounterValue('Pts_ordre', chrono.Order(chrono.DSQ))</text>
+			<text col="1" align="center">'Non traités: '..body:GetCounterValue('Pts_ordre', chrono.Order(chrono.KO))</text>
+			<row value="0.2cm"/>
+		</matrix>
+		<row value="auto" />
+		<line col_start="1" col_end="0" pen_color="dkgray" border="top" />
+		
+		<row value="0.2cm" />
+	</option>	
+
+	<option id="comite_origine">
+		<lua>
+		function GetComiteOrigine(code, comite_inscription)
+			tCoureur = base:GetTable('Coureur');
+			base:TableLoad(tCoureur, "Select * From Coureur Where Code_coureur = '"..code.."'");
+			if comite_inscription == tCoureur:GetCell('Code_comite', 0) then
+				return comite_inscription;
+			else
+				return comite_inscription..' - '..tCoureur:GetCell('Code_comite', 0);
+			end
+		end
+		</lua>
+	</option>
+</edition>
+

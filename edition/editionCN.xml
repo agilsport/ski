@@ -1,0 +1,701 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Editions Activité "CN" !-->
+<edition>
+	<menu>
+		<menu title="Listes des Participants " image="./res/24x24_login.png">
+			<menu title="Par Nation" image="./res/16x16_saut.png" header="Liste des participants par Nation" id="parti_club"/>
+			<menu title="Par Comité" image="./res/16x16_saut.png" header="Liste des participants par Comité" id="parti_CR"/>
+			<menu title="Par Club" image="./res/16x16_saut.png" header="Liste des participants par Club" id="parti_club"/>
+			<menu title="Par Ordre de Points" image="./res/16x16_saut.png" header="Liste des participants par Ordre de Points" id="participants_points"/>
+		</menu>
+		<menu title="Listes de Départ " image="./res/24x24_information.png">
+			<menu title="Liste de Départ Saut Combiné" image="./res/16x16_admin.png" id="startlist" header="Résultats Manche 1"/>
+			<menu title="Liste de Départ Fond Gundersen" image="./res/16x16_admin.png" id="startlistFondPoursuite" header="Résultats Manche 1"/>
+			<menu title="Liste de Départ Inversée" image="./res/16x16_admin.png" id="startlist_Manche2_Inv" header="Résultats Manche 1"/>			
+			<menu title="Par Nation" image="./res/16x16_admin.png" header="Liste de départ par Nation" id="startlist_club"/>
+			<menu title="Par Comité" image="./res/16x16_admin.png" header="Liste des participants par Comité" id="participants_comite"/>
+			<menu title="Par Club" image="./res/16x16_admin.png" header="Liste des participants par Club" id="participants_club"/>
+		</menu>
+		<menu title="Résultats" image="./res/32x32_ranking.png">
+			<menu title="Résultats Manche Saut" image="./res/16x16_ranking.png" id="res_manche1" header="Résultats Manche 1"/>
+			<menu title="Calcul de la Pénalite " image="./res/16x16_ranking.png" id="result_officiel" />
+			<menu title="Résultats Officiels (Saut)" image="./res/16x16_ranking.png" id="res_officiel" />
+			<menu title="Résultats Final Combiné" image="./res/16x16_ranking.png" id="res_final_combine" />
+			<menu title="Résultats Fond Mass Start" image="./res/16x16_ranking.png" id="res_fond_mass_start" />
+			<menu title="Résultats Final Combiné Mass Start" image="./res/16x16_ranking.png" id="res_final_combine_mass_start" />
+		</menu>
+	</menu>
+	
+	<!-- footer standard !-->
+	<footer>
+		<background mode="transparent"/>
+		<font name="Calibri" size="8" adjust="best" weight="normal"/>
+		<pen border="none" />
+
+		<lua>entite = entite or $(Evenement.Code_entite)</lua>
+		<lua>info = $(Epreuve.Date_epreuve,'%2D/%2M/%4Y')..' / '..$(Evenement.Station)..' ('</lua>
+		<lua cond="entite=='FIS'">info = info..$(Evenement.Code_nation)..'-'</lua>
+		<lua>info = info..$(Evenement.Code_comite).. ') / '..$(Evenement.Organisateur)</lua>
+		<text row="auto" col="1" align="left">info</text>
+		<text align="right" font_weight="bold" cond="entite=='FIS'">$(Epreuve.Fichier_transfert_int)..' (Liste n°'..$(Evenement.Code_liste)..')'</text>
+		<text align="right" font_weight="bold" cond="entite=='FFS'">$(Epreuve.Fichier_transfert)..' (Liste n°'..$(Evenement.Code_liste)..')'</text>
+		<line col_start="1" col_end="0" pen_size="2" pen_color="dkgray" border="bottom"/>
+		<!-- <text row="auto" align="left"><pen border="top" />app.GetName()..' Version '..app.GetVersion()..' (FFS - ESF - Agil Informatique) - '..os.date('Edité le %d-%m-%Y à %H:%M:%S')</text> -->
+		
+		<row value="auto" />
+		<matrix col_start="1">
+			<row value="auto"/>
+			<text col="auto" align="left">app.GetName()..' Version '..app.GetVersion()..' / FFS'</text>
+			<image col="0.4cm" adjust="width" align="left">'./res/32x32_ffs.png'</image>
+			<text col="auto" align="left" adjust="width">' / ESF'</text>
+			<image col="0.4cm" adjust="width" align="left">'./res/32x32_esf.png'</image>
+			<text col="auto" align="left">' / Agil Informatique'</text>
+			<image col="0.4cm" adjust="width" align="left">'./res/32x32_agil.png'</image>
+			<text col="auto" align="left">os.date(' / Edité le %d-%m-%Y à %H:%M:%S')</text>
+		</matrix>	
+		<text align="right">string.format('Page %d/%s',editor:GetPageCurrent(), editor:GetPageCountLabel())</text>
+		<line col_start="1" col_end="0" border="top" />
+		<text row="auto" align="left" cond="editor:GetPageCurrent() == 1">$(Evenement.Commentaire)</text>
+	</footer>
+
+	<!-- header standard !-->
+	<header>
+		<spacing all="0"/>
+		<background mode="transparent"/>
+		<font name="Calibri" size="14" adjust="max" weight="bold"/>
+		<text row="auto" col="1" align="center">$(Evenement.Nom)</text>
+		<text row="auto" align="center">$(Discipline.Libelle)</text>
+		<text row="auto" align="center">$(Categorie{$(Epreuve.Code_categorie)}.Libelle)..' - '..$(Sexe{$(Epreuve.Sexe)}.Libelle)</text>
+		<text row="auto" align="center" cond="title" >title</text>
+		<text row="auto" align="center" cond="title_filter">title_filter</text>
+		<row value="0.5cm"/>
+	</header>
+
+	<!-- first_header standard !-->
+	<first_header>
+		<background mode="transparent"/>
+		<font name="Calibri" size="9"  weight="normal"/>
+		<pen border="none" />
+	
+		<lua>type_edition = id:sub(1,4)</lua>
+		<lua>entite = $(Evenement.Code_entite)</lua>
+		<lua>discipline = $(Epreuve.Code_discipline)</lua>
+		<col value="3,7,2, 0.2cm,2,7,2, 0.2cm,4,4,1" />
+
+		<row value="auto" />
+		<text col_start="1" col_end="3" align="center" underlined="1" font_size_step="1" font_weight="bold">'JURY DE COMPETITION'</text>
+		<text col_start="5" col_end="7" align="center" underlined="1" font_size_step="1" font_weight="bold">'JUGES'</text>
+		<text col_start="9" col_end="11" align="center" underlined="1" font_size_step="1" font_weight="bold">'RENSEIGNEMENTS'</text>
+		<row value="0.1cm" />
+
+		<row value="auto" />
+		<text col_start="1" align="left">'DT :'</text>
+		<text col_start="2" align="left">base:GetOfficiel('TechnicalDelegate', 'Nom')..' '..base:GetOfficiel('TechnicalDelegate', 'Prenom')</text>
+		<text col_start="3" align="right">base:GetOfficiel('TechnicalDelegate', 'Nation'):Parenthesis()</text>
+		
+		<text col_start="5" align="left" >'Juge A :'</text>
+		<text col_start="6" align="left" >base:GetOfficiel('ffs_control_saut', 'Nom', 1)..' '..base:GetOfficiel('ffs_control_saut', 'Prenom', 1)</text>
+		<text col_start="7" align="right">base:GetOfficiel('ffs_control_saut', 'Nation', 1):Parenthesis()</text>
+	
+		<text col_start="9" align="left">'HS :'</text>
+		<text col_start="10" col_end="0" align="right" >$(Epreuve_Nordique.Point_jury, '%.1f')</text>
+	
+		<row value="auto" />
+		<text col_start="1" align="left">'DTA :'</text>
+		<text col_start="2" align="left">base:GetOfficiel('TECHNICALDELEGATEASSISTANT', 'Nom')..' '..base:GetOfficiel('TECHNICALDELEGATEASSISTANT', 'Prenom')</text>
+		<text col_start="3" align="right">base:GetOfficiel('TECHNICALDELEGATEASSISTANT', 'Nation'):Parenthesis()</text>		
+		
+		<text col_start="5" align="left" >'Juge B :'</text>
+		<text col_start="6" align="left" >base:GetOfficiel('ffs_control_saut', 'Nom', 2)..' '..base:GetOfficiel('ffs_control_saut', 'Prenom', 2)</text>
+		<text col_start="7" align="right">base:GetOfficiel('ffs_control_saut', 'Nation', 2):Parenthesis()</text>
+
+		<text col_start="9" align="left">'Point K :'</text>
+		<text col_start="10" col_end="0" align="right" >$(Epreuve_Nordique.Point_k):Suffix('.0')</text>
+
+		<row value="auto" />
+		<text col_start="1" align="left">'DE :'</text>
+		<text col_start="2" align="left">base:GetOfficiel('RACEDIRECTOR', 'Nom')..' '..base:GetOfficiel('RACEDIRECTOR', 'Prenom')</text>
+		<text col_start="3" align="right">base:GetOfficiel('RACEDIRECTOR', 'Nation'):Parenthesis()</text>
+		
+		<text col_start="5" align="left" >'Juge C :'</text>
+		<text col_start="6" align="left" >base:GetOfficiel('ffs_control_saut', 'Nom', 3)..' '..base:GetOfficiel('ffs_control_saut', 'Prenom', 3)</text>
+		<text col_start="7" align="right">base:GetOfficiel('ffs_control_saut', 'Nation', 3):Parenthesis()</text>
+		
+		<text col_start="9" align="left">'Pts/M :'</text>
+		<text col_start="10" col_end="0" align="right" >$(Epreuve_Nordique.Point_metre, '%.1f')</text>
+		
+		<row value="auto" />
+		<text col_start="1" align="left">'FFS :'</text>
+		<text col_start="2" align="left">base:GetOfficiel('COORDINATOR', 'Nom')..' '..base:GetOfficiel('COORDINATOR', 'Prenom')</text>
+		<text col_start="3" align="right">base:GetOfficiel('COORDINATOR', 'Nation'):Parenthesis()</text>
+		
+		<text col_start="5" align="left" >'Juge D :'</text>
+		<text col_start="6" align="left" >base:GetOfficiel('ffs_control_saut', 'Nom', 4)..' '..base:GetOfficiel('ffs_control_saut', 'Prenom', 4)</text>
+		<text col_start="7" align="right">base:GetOfficiel('ffs_control_saut', 'Nation', 4):Parenthesis()</text>
+
+		<text col_start="9" align="left">'Distance (CN):'</text>
+		<text col_start="10" col_end="0" align="right" >$(Epreuve.Distance):Suffix(' Km')</text>
+		
+		<row value="auto" />
+		<text col_start="1" align="left">'Fond (CN) :'</text>
+		<text col_start="2" align="left">base:GetOfficiel('ChiefCompetition', 'Nom')..' '..base:GetOfficiel('ChiefCompetition', 'Prenom')</text>
+		<text col_start="3" align="right">base:GetOfficiel('ChiefCompetition', 'Nation'):Parenthesis()</text>
+		
+		<text col_start="5" align="left" >'Juge E :'</text>
+		<text col_start="6" align="left" >base:GetOfficiel('ffs_control_saut', 'Nom', 5)..' '..base:GetOfficiel('ffs_control_saut', 'Prenom', 5)</text>
+		<text col_start="7" align="right">base:GetOfficiel('ffs_control_saut', 'Nation', 5):Parenthesis()</text>
+
+		<text col_start="9" align="left">'Pts minute (CN):'</text>
+		<!-- Modif FS -Remplace style -->
+		<text col_start="10" col_end="0" align="right" >$(Epreuve_Nordique.Point_suppl)</text>
+		<!-- Modif FS -Remplace style -->
+
+		<!-- <lua>if $(Epreuve_Nordique.Style) == 'L' then Style = 'Libre' </lua> -->
+		<!-- <lua>elseif $(Epreuve_Nordique.Style) == 'C' then Style = 'Classique' </lua> -->
+		<!-- <lua>elseif $(Epreuve_Nordique.Style) == 'X' then Style = 'Classique + Libre' </lua> -->
+		<!-- <lua>elseif $(Epreuve_Nordique.Style) == 'Y' then Style = 'Libre + Classique' end </lua> -->
+		<text col_start="10" col_end="0" align="right" >Style</text>
+		
+		<!-- mise en place de ligne verticale -->
+		<line col_start="4" row_start="-5" row_end="0" pen_color="dkgray" border="mid_vert" />
+		<line col_start="8" row_start="-5" row_end="0" pen_color="dkgray" border="mid_vert" />
+		
+		<row value="auto" />
+		<!-- <lua>NumClub = $(Evenement.Code_club):sub(2,5)</lua> -->
+		<!-- <lua>NomClub = $(Club{NumClub}.Nom_complet)</lua> -->
+		<!-- Voir pour faire afficher le nom du club complet		 -->
+		<!-- <text col_start="1" col_end="4" align="left">'Club organisateur : '..$(Evenement.Club)</text> -->
+		<!-- <text col_start="6" col_end="10" align="left" >'Organisateur : '..$(Evenement.Organisateur) </text> -->
+		<!-- retour a la ligne de 0.1cm		 -->
+		<row value="0.2cm" />
+		
+		<!-- <row value="auto" /> -->
+		<!-- <text col_start="1" align="left">'Météo : '..$(Epreuve_Nordique.Meteo)</text> -->
+		<!-- <text col_start="2" align="left">'Liste : '..$(Evenement.Code_liste)</text> -->
+		<!-- <text col_start="5" col_end="6" align="left" >'Codex Epreuve : '..$(Epreuve.Fichier_transfert) </text> -->
+		<!-- <text col_start="8" col_end="9" align="left" >'Coéfficient F : '..$(Discipline.Facteur_f)</text> -->
+		<!-- <text col_start="10" align="left" cond="params.title=='Résultats Officiels'" >'Penalité : '..$(Epreuve.Penalite_appliquee)</text> -->
+		<!-- <text col_start="10" col_end="0" align="right" ></text> -->
+		<!-- <line col_start="1" col_end="0" pen_color="dkgray" border="top" /> -->
+		<!-- <row value="0.1cm" /> -->
+		<!-- <line col_start="1" col_end="0" pen_color="dkgray" border="top" cond="type_edition=='lst_' and discipline:In('MASS','POURS-D', 'FP')"/> -->
+		<!-- <row value="0.1cm" /> -->
+		<!-- <row value="auto" /> -->
+		<!-- <text col_start="1" col_end="11" align="center" cond="type_edition=='lst_' and discipline:In('MASS','POURS-D', 'FP')">'H. Théorique de Depart de l\'épreuve : '..$(Epreuve.Heure_depart)</text> -->
+		<!-- <row value="0.5cm" cond="type_edition=='lst_' and discipline:In('MASS','POURS-D', 'FP')"/> -->
+		
+		<!-- affichage du Compteur des classés si c'est un resultat -->
+		<lua>if type_edition == 'res_' then</lua>
+			<call option="stat_ranking" cond="editor:GetPageCurrent() == 1" file="./edition/options.xml"/>
+		<lua>end </lua>
+	</first_header>
+
+		<!-- Liste des Participants par CR!-->
+	<report id="parti_CR" title="Liste des Participants par Comité" first_header="0">
+		<lua>entite = $(Evenement.Code_entite)</lua>
+		<lua>body:SetCounter('Comite')</lua>
+		<order key="Comite, Nom,Prenom" />
+		
+		<rupture key="Comite">
+			<before>
+				<font size="16"/>
+				<row value="0.5cm" />
+				<lua>codeComite = $(Comite)</lua>
+				<text row="auto" col="1">codeComite..' ('..body:GetCounterValue('Comite', codeComite)..')'</text>
+			</before>
+		</rupture>
+
+		<body>
+			<call option="couleur_alternee" file="./edition/options.xml" />
+
+			<row value="auto"/>
+			<text col="7" align="center" label="Code"><font size="8" cond="group =='body'"/>$(Code_coureur):sub(4)</text>
+			<text col="20" align="left" label="Nom - Prénom" font_weight="bold" font_size_step="1">$(Identite)</text> 
+			<text col="2" align="center" label="S.">$(Sexe)</text>
+			<text col="4" align="center" label="An">$(An)</text>
+			<text col="7" align="center" label="Cat.">$(Categ)</text>
+			<text col="4" align="center" label="Nat" cond="entite == 'FIS'">$(Nation)</text>
+			<text col="3" align="center" label="CS">$(Comite)</text>
+			<text col="12" align="center" label="Club">$(Club)</text>
+			<text col="7" align="right" label="Point">$(Point)</text>
+			
+			<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
+		</body>
+	</report>
+	
+	<!-- Liste des Participants par Club!-->
+	<report id="parti_club" title="Liste des Participants par Club" first_header="0">
+		<lua>entite = $(Evenement.Code_entite)</lua>
+		<lua>body:SetCounter('Club')</lua>
+		<order key="Club, Nom,Prenom" />
+		
+		<rupture key="Club">
+			<before>
+				<font size="16"/>
+				<row value="0.5cm" />
+				<lua>codeClub = $(Club)</lua>
+				<text row="auto" col="1">codeClub..' ('..body:GetCounterValue('Club', codeClub)..')'</text>
+			</before>
+		</rupture>
+
+		<body>
+			<call option="couleur_alternee" file="./edition/options.xml" />
+
+			<row value="auto"/>
+			<text col="7" align="center" label="Code"><font size="8" cond="group =='body'"/>$(Code_coureur):sub(4)</text>
+			<text col="20" align="left" label="Nom - Prénom" font_weight="bold" font_size_step="1">$(Identite)</text> 
+			<text col="2" align="center" label="S.">$(Sexe)</text>
+			<text col="4" align="center" label="An">$(An)</text>
+			<text col="7" align="center" label="Cat.">$(Categ)</text>
+			<text col="4" align="center" label="Nat" cond="entite == 'FIS'">$(Nation)</text>
+			<text col="3" align="center" label="CS">$(Comite)</text>
+			<text col="12" align="center" label="Club">$(Club)</text>
+			<text col="7" align="right" label="Point">$(Point)</text>
+			
+			<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
+		</body>
+	</report>
+
+	<!-- Liste de Départ Saut CN-->
+	<report id="startlist" title="Liste de Départ" >
+		<lua>entite = $(Evenement.Code_entite)</lua>
+		<order key="Dossard, Nom,Prenom" />
+		
+		<body>
+			<call option="couleur_alternee" file="./edition/options.xml" />
+
+			<row value="auto"/>
+			<text col="7" align="center" label="Dossard" font_weight="bold" font_size_step="1">$(Dossard)</text>
+			<text col="7" align="center" label="Code"><font size="8" cond="group =='body'"/>$(Code_coureur):sub(4)</text>
+			<text col="20" align="left" label="Nom - Prénom" font_weight="bold" font_size_step="1">$(Identite)</text> 
+			<text col="2" align="center" label="S.">$(Sexe)</text>
+			<text col="4" align="center" label="An">$(An)</text>
+			<text col="7" align="center" label="Cat.">$(Categ)</text>
+			<text col="4" align="center" label="Nat" cond="entite == 'FIS'">$(Nation)</text>
+			<text col="3" align="center" label="CS">$(Comite)</text>
+			<text col="12" align="center" label="Club">$(Club)</text>
+			<text col="7" align="right" label="Point">$(Point)</text>
+			<text col="10" align="right" label="" />
+			
+			<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
+		</body>
+	</report>
+		
+	
+	<!-- Liste de Départ Fond Poursuite-->
+	<report id="startlistFondPoursuite" title="Liste de Départ" >
+		<lua>entite = $(Evenement.Code_entite)</lua>
+		<order key="Dossard, Nom,Prenom" />
+		
+		<body>
+			<call option="couleur_alternee" file="./edition/options.xml" />
+
+			<row value="auto"/>
+			<text col="7" align="center" label="Dossard" font_weight="bold" font_size_step="1">$(Dossard)</text>
+			<text col="7" align="center" label="Code"><font size="8" cond="group =='body'"/>$(Code_coureur):sub(4)</text>
+			<text col="20" align="left" label="Nom - Prénom" font_weight="bold" font_size_step="1">$(Identite)</text> 
+			<text col="2" align="center" label="S.">$(Sexe)</text>
+			<text col="4" align="center" label="An">$(An)</text>
+			<text col="7" align="center" label="Cat.">$(Categ)</text>
+			<text col="4" align="center" label="Nat" cond="entite == 'FIS'">$(Nation)</text>
+			<text col="3" align="center" label="CS">$(Comite)</text>
+			<text col="12" align="center" label="Club">$(Club)</text>
+			<text col="7" align="right" label="P.Saut">$(PtsClt)</text>
+			<text col="10" align="right" label="H.Départ">$(EcartFond)</text>
+			
+			<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
+		</body>
+	</report>
+	
+	<!-- Liste de départ Manche 2 Inversée !-->
+	<report id="startlist_Manche2_Inv" title="Liste de Départ Manche 2">
+		<order key="Clt1 desc, Note_ordre1, Dossard" />
+		<lua>
+			function Div10(lg)
+				local value = tonumber(lg) or 0;
+				if value == 0 then 
+					return '';
+				else
+					return string.format('%.1f', lg/10);
+				end
+			end
+			
+			function FmtNote(note, ordre)
+				if tonumber(ordre) == chrono.Order(chrono.DNF) then return 'ABD'
+				elseif tonumber(ordre) == chrono.Order(chrono.DSQ) then return 'DSQ'
+				elseif tonumber(ordre) == chrono.Order(chrono.DNS) then return 'ABS'
+				else return note; 
+				end
+			end
+		</lua>
+	
+		<body>
+			<call option="couleur_alternee" file="./edition/options.xml" />
+			
+			<font size="9" />
+
+			<spacing horz="6" vert="5" />
+			<padding all="0px" />
+			<background mode="transparent"/>
+	
+			<row value="auto"/>
+			<row value="auto"/>
+	
+			<text col="4" row_start="1" row_end="0" label="C.M1"/>
+			<text col_start="0" row_start="1" align="center" font_weight="bold" font_size_step="1" border="0">$(Clt1)</text>
+			<!-- text col_start="0" row_start="2" align="center" font_size_step="-2" border="0">$(Cltc1)..'/'..$(Categ)</text !-->
+			
+			<text col="4" row_start="1" row_end="0" align="center" font_weight="bold" label="Dos">$(Dossard)</text>
+		
+			<text col="25" row_start="1" row_end="0"/>
+			<text col_start="0" row_start="1" align="left" font_weight="bold" border="0" label="Nom - Prénom" label_align="left">$(Identite)</text>
+			<text col_start="0" row_start="1" align="right" border="0" label="CR" label_align="right">$(Comite)</text>
+			<!-- text col_start="0" row_start="2" align="left" font_size_step="-2" border="0" label="Code" label_align="left">$(Code_coureur)</text>
+			<text col_start="0" row_start="2" align="right" font_size_step="-1" border="0" label="Club" label_align="right">$(Club)</text !-->
+			
+			<text col="4" row_start="1" row_end="0" label="Vit." align="center">Div10($(Vitesse1))</text>
+			
+			<spacing horz="8" vert="5" />
+			<text col="7" row_start="1" row_end="0" label="Plt/Comp"/>
+			<text col_start="0" row_start="1" row_end="0" align="left" border="0">$(Plateforme1)</text>
+			<text col_start="0" row_start="1" row_end="0" align="right" border="0">$(NoteCompensation1, '%.1f')</text>
+	
+			<spacing horz="6" vert="5" />
+			<text col="4" row_start="1" row_end="0"  align="right" label="LG">Div10($(Longueur1))</text>
+			<text col="4" row_start="1" row_end="0"  align="right" label="P.Lg">$(NoteLongueur1)</text>
+
+			<text col="15" row_start="1" row_end="0" />
+			<matrix col_start="0" row_start="1" row_end="0">
+				<col w="1,1,1,1,1"/>
+				<row h="1,1"/>
+				
+				<font size_step="-1" />
+				<pen border="0" />
+				<spacing horz="2" />
+				<text col_start="1" col_end="0" row_start="1" row_end="0" font_size_step="2" align="center" label="Notes Juges" />
+				<text col_start="1" row_start="1" row_end="0" align="center" >$(NoteA1)</text>
+				<text col_start="2" row_start="1" row_end="0" align="center" >$(NoteB1)</text>
+				<text col_start="3" row_start="1" row_end="0" align="center" >$(NoteC1)</text>
+				<text col_start="4" row_start="1" row_end="0" align="center" >$(NoteD1)</text>
+				<text col_start="5" row_start="1" row_end="0" align="center" >$(NoteE1)</text>
+				
+				<font size_step="1" />
+				<pen border="1" />
+				<spacing horz="6" />
+			</matrix>
+			
+			<font size_step="0" />			
+			<text col="4" row_start="1" row_end="0" align="right" label="Style" >$(NoteStyle1)</text>
+			<text col="4" row_start="1" row_end="0" align="right" label="Pts">FmtNote($(Note1),$(Note_ordre1))</text>
+		</body>
+	</report>
+	
+	<!-- res_manche1 : Resultat Manche 1 !-->
+	<report id="res_manche1">
+		<order key="Clt1, Note_ordre1, Dossard" />
+		<lua>
+			function Div10(lg)
+				local value = tonumber(lg) or 0;
+				if value == 0 then 
+					return '';
+				else
+					return string.format('%.1f', lg/10);
+				end
+			end
+			
+			function FmtNote(note, ordre)
+				if tonumber(ordre) == chrono.Order(chrono.DNF) then return 'ABD'
+				elseif tonumber(ordre) == chrono.Order(chrono.DSQ) then return 'DSQ'
+				elseif tonumber(ordre) == chrono.Order(chrono.DNS) then return 'ABS'
+				else return note; 
+				end
+			end
+		</lua>
+	
+		<body>
+			<call option="couleur_alternee" file="./edition/options.xml" />
+			
+			<font size="9" />
+
+			<spacing horz="6" vert="5" />
+			<padding all="0px" />
+			<background mode="transparent"/>
+	
+			<row value="auto"/>
+			<row value="auto"/>
+	
+			<text col="4" row_start="1" row_end="0" label="C.M1"/>
+			<text col_start="0" row_start="1" align="center" font_weight="bold" font_size_step="1" border="0">$(Clt1)</text>
+			<text col_start="0" row_start="2" align="center" font_size_step="-2" border="0">$(Cltc1)..'/'..$(Categ)</text>
+			
+			<text col="4" row_start="1" row_end="0" align="center" font_weight="bold" label="Dos">$(Dossard)</text>
+		
+			<text col="25" row_start="1" row_end="0"/>
+			<text col_start="0" row_start="1" align="left" font_weight="bold" border="0" label="Nom - Prénom" label_align="left">$(Identite)</text>
+			<text col_start="0" row_start="1" align="right" border="0" label="CR" label_align="right">$(Comite)</text>
+			<text col_start="0" row_start="2" align="left" font_size_step="-2" border="0" label="Code" label_align="left">$(Code_coureur)</text>
+			<text col_start="0" row_start="2" align="right" font_size_step="-1" border="0" label="Club" label_align="right">$(Club)</text>
+			
+			<text col="4" row_start="1" row_end="0" label="Vit." align="center">Div10($(Vitesse1))</text>
+			
+			<spacing horz="8" vert="5" />
+			<text col="7" row_start="1" row_end="0" label="Plt/Comp"/>
+			<text col_start="0" row_start="1" row_end="0" align="left" border="0">$(Plateforme1)</text>
+			<text col_start="0" row_start="1" row_end="0" align="right" border="0">$(NoteCompensation1, '%.1f')</text>
+	
+			<spacing horz="6" vert="5" />
+			<text col="4" row_start="1" row_end="0"  align="right" label="LG">Div10($(Longueur1))</text>
+			<text col="4" row_start="1" row_end="0"  align="right" label="P.Lg">$(NoteLongueur1)</text>
+
+			<text col="15" row_start="1" row_end="0" />
+			<matrix col_start="0" row_start="1" row_end="0">
+				<col w="1,1,1,1,1"/>
+				<row h="1,1"/>
+				
+				<font size_step="-1" />
+				<pen border="0" />
+				<spacing horz="2" />
+				<text col_start="1" col_end="0" row_start="1" row_end="0" font_size_step="2" align="center" label="Notes Juges" />
+				<text col_start="1" row_start="1" row_end="0" align="center" >$(NoteA1)</text>
+				<text col_start="2" row_start="1" row_end="0" align="center" >$(NoteB1)</text>
+				<text col_start="3" row_start="1" row_end="0" align="center" >$(NoteC1)</text>
+				<text col_start="4" row_start="1" row_end="0" align="center" >$(NoteD1)</text>
+				<text col_start="5" row_start="1" row_end="0" align="center" >$(NoteE1)</text>
+				
+				<font size_step="1" />
+				<pen border="1" />
+				<spacing horz="6" />
+			</matrix>
+			
+			<font size_step="0" />			
+			<text col="4" row_start="1" row_end="0" align="right" label="Style" >$(NoteStyle1)</text>
+			<text col="4" row_start="1" row_end="0" align="right" label="Pts">FmtNote($(Note1),$(Note_ordre1))</text>
+			<text col="6" row_start="1" row_end="0" align="right" label="Ec.Fond">$(EcartFond)</text>
+		</body>
+	</report>
+
+	<!-- result_officiel !-->
+	<report id="res_officiel">
+		<order key="Clt, Dossard" />
+		<lua>
+			function Div10(lg)
+				local value = tonumber(lg) or 0;
+				if value == 0 then 
+					return '';
+				else
+					return string.format('%.1f', lg/10);
+				end
+			end
+		</lua>
+	
+		<body>
+			<call option="couleur_alternee" file="./edition/options.xml" />
+			
+			<font size="9" />
+
+			<spacing horz="6" vert="5" />
+			<padding all="0px" />
+			<background mode="transparent"/>
+	
+			<row value="auto"/>
+			<row value="auto"/>
+	
+			<text col="4" row_start="1" row_end="0" label="Clt"/>
+			<text col_start="0" row_start="1" align="center" font_weight="bold" font_size_step="1" border="0">$(Clt)</text>
+			<text col_start="0" row_start="2" align="center" font_size_step="-2" border="0">$(Cltc)..'/'..$(Categ)</text>
+			
+			<text col="4" row_start="1" row_end="0" align="center" font_weight="bold" label="Dos">$(Dossard)</text>
+		
+			<text col="25" row_start="1" row_end="0"/>
+			<text col_start="0" row_start="1" align="left" font_weight="bold" border="0" label="Nom - Prénom" label_align="left">$(Identite)</text>
+			<text col_start="0" row_start="1" align="right" border="0" label="CR" label_align="right">$(Comite)</text>
+			<text col_start="0" row_start="2" align="left" font_size_step="-2" border="0" label="Code" label_align="left">$(Code_coureur)</text>
+			<text col_start="0" row_start="2" align="right" font_size_step="-1" border="0" label="Club" label_align="right">$(Club)</text>
+			
+			<text col="4" row_start="1"  row_end="0" label="Vit." />
+			<text col_start="0" row_start="1" align="right"  border="0" >Div10($(Vitesse1))</text>
+			<text col_start="0" row_start="2" align="right"  border="0" >Div10($(Vitesse2))</text>
+			
+			<spacing horz="8" vert="5" />
+			<text col="7" row_start="1" row_end="0" label="Plt/Comp"/>
+			<text col_start="0" row_start="1" align="left" border="0">$(Plateforme1)</text>
+			<text col_start="0" row_start="1" align="right" border="0">$(NoteCompensation1, '%.1f')</text>
+			<text col_start="0" row_start="2" align="left" border="0">$(Plateforme2)</text>
+			<text col_start="0" row_start="2" align="right" border="0">$(NoteCompensation2, '%.1f')</text>
+	
+						<spacing horz="6" vert="5" />
+			<text col="4" row_start="1" row_end="0"/>
+			<text col_start="0" row_start="1" align="right" border="0" label="Long">Div10($(Longueur1))</text>
+			<text col_start="0" row_start="2" align="right" border="0" label="('(m)')">Div10($(Longueur2))</text>
+
+			<text col="4" row_start="1" row_end="0" />
+			<text col_start="0" row_start="1" align="right" border="0" label="Long">$(NoteLongueur1)</text>
+			<text col_start="0" row_start="2" align="right" border="0" label="('(pts)')">$(NoteLongueur2)</text>
+
+			<text col="15" row_start="1" row_end="0" />
+			<matrix col_start="0" row_start="1" row_end="0">
+				<col w="1,1,1,1,1"/>
+				<row h="1,1"/>
+				
+				<font size_step="-1" />
+				<pen border="0" />
+				<spacing horz="2" />
+				<text col_start="1" col_end="0" row_start="1" font_size_step="2" align="center" label="Notes Juges" />
+				<text col_start="1" row_start="1" align="center" >$(NoteA1)</text>
+				<text col_start="2" row_start="1" align="center" >$(NoteB1)</text>
+				<text col_start="3" row_start="1" align="center" >$(NoteC1)</text>
+				<text col_start="4" row_start="1" align="center" >$(NoteD1)</text>
+				<text col_start="5" row_start="1" align="center" >$(NoteE1)</text>
+				
+				<text col_start="1" row_start="2" align="center" label="A">$(NoteA2)</text>
+				<text col_start="2" row_start="2" align="center" label="B">$(NoteB2)</text>
+				<text col_start="3" row_start="2" align="center" label="C">$(NoteC2)</text>
+				<text col_start="4" row_start="2" align="center" label="D">$(NoteD2)</text>
+				<text col_start="5" row_start="2" align="center" label="E">$(NoteE2)</text>
+				
+				<font size_step="1" />
+				<pen border="1" />
+				<spacing horz="6" />
+			</matrix>
+			
+				<font size_step="0" />			
+			<text col="4" row_start="1" row_end="0" />
+			<text col_start="0" row_start="1" align="right" border="0" label="Pts">$(NoteStyle1)</text>
+			<text col_start="0" row_start="2" align="right" border="0" label="Style">$(NoteStyle2)</text>
+
+			<text col="4" row_start="1" row_end="0" label="Pts"/>
+			<text col_start="0" row_start="1" align="right" border="0">$(Note1)</text>
+			<text col_start="0" row_start="2" align="right" border="0">$(Note2)</text>
+			
+			<text col="4" row_start="1" row_end="0"/>
+			<text col_start="0" row_start="1" align="center" border="0" label="Clt1">$(Clt1)</text>
+			<text col_start="0" row_start="2" align="center" border="0" label="Clt2">$(Clt2)</text>
+	
+			<text col="4" row_start="1" row_end="0" align="right" font_weight="bold" label="Total">$(PtsClt, '%.1f')</text>
+			<text col="4" row_start="1" row_end="0" align="right" font_size_step="-2" label="P.CSE">$(Pts, '%.2f')</text>
+
+		</body>
+	</report>
+	
+	<report id="res_final_combine" title="Résultats Combiné Nordique" >
+		<order key="Clt_total, Dossard" />
+		
+		<body>
+			<call option="couleur_alternee" file="./edition/options.xml" />
+
+			<row value="auto"/>
+			<row value="auto"/>
+
+			<spacing horz="6" vert="5" />
+			<padding all="0px" />
+			<background mode="transparent"/>			
+
+			<text col="4" row_start="1" row_end="0" label="Clt" />
+			<text col_start="0" row_start="1" align="center" font_weight="bold" font_size_step="1" border="0">$(Clt_total)</text>
+			<text col_start="0" row_start="2" align="center" font_size_step="-2" border="0">$(Cltc_total)..'/'..$(Categ)</text>
+			
+			<text col="4" row_start="1" row_end="0" align="center" label="Dos">$(Dossard)</text>
+			
+			<!-- <text col="7" align="center" label="Code"><font size="8" cond="group =='body'"/>$(Code_coureur):sub(4)</text> -->
+			
+			
+			<text col="30" row_start="1" row_end="0"/>
+			<text col_start="0" row_start="1" align="left" font_weight="bold" border="0" label="Nom - Prénom" label_align="left">$(Identite)</text>
+			<text col_start="0" row_start="1" align="right" border="0" label="CR" label_align="right">$(Comite)</text>
+			<text col_start="0" row_start="2" align="left" font_size_step="-2" border="0" label="Code" label_align="left">$(Code_coureur)</text>
+			<text col_start="0" row_start="2" align="right" font_size_step="-1" border="bottom" label="Club" label_align="right">$(Club)</text>
+			
+			<!-- <text col="5" align="center" label="Année">$(An)</text> -->
+			<spacing horz="6" vert="5" />
+			<text col="6" row_start="1" row_end="0" align="right" label="Pts Saut">$(PtsClt, '%.1f')</text>
+			<text col="4" row_start="1" row_end="0" align="center" label="Clt">$(Clt_saut)</text>
+			<text col="6" row_start="1" row_end="0" align="right" label="Ecart">$(Ecart_depart1)</text>
+			<text col="6" row_start="1" row_end="0" align="right" label="Tps Fond">$(Tps_fond)</text>
+			<text col="4" row_start="1" row_end="0" align="center" label="Clt">$(Clt_fond)</text>
+			<text col="8" row_start="1" row_end="0" align="right" label="Tps Total" font_size_step="1">$(Tps_total)</text>
+			<text col="8" row_start="1" row_end="0" align="right" label="Ecart Total" font_size_step="1">$(Ecart_total)</text>
+			<text col="8" row_start="1" row_end="0" align="right" label="P.CSE" font_size_step="1">$(Pts_total)</text>
+			
+			<line col_start="0" row_start="0" pen_size="4" border="bottom" cond="not_context_border"/>
+		</body>
+	</report>
+
+	<!-- Resultat à l'issue de l'Epreuve de la Mass start -->
+	<report id="res_fond_mass_start" title="Résultats Combiné Nordique Mass Start" >
+		<lua>base:SetCombineNordiqueMassStartPointSaut(body)</lua>
+		<column name="Tps_status">chrono.Status(body:GetCellInt('Tps_fond', row))</column>
+		<order key="Clt_fond, Dossard" />
+		
+		<body>
+			<call option="couleur_alternee" file="./edition/options.xml" />
+
+			<row value="auto"/>
+			<row value="auto"/>
+
+			<spacing horz="6" vert="5" />
+			<padding all="0px" />
+			<background mode="transparent"/>			
+
+			<text col="4" row_start="1" row_end="0" label="Clt" />
+			<text col_start="0" row_start="1" align="center" font_weight="bold" font_size_step="1" border="0">$(Clt_fond)</text>
+			<text col_start="0" row_start="2" align="center" font_size_step="-2" border="0">$(Cltc_fond)..'/'..$(Categ)</text>
+			
+			<text col="4" row_start="1" row_end="0" align="center" label="Dos">$(Dossard)</text>
+			
+			<text col="30" row_start="1" row_end="0"/>
+			<text col_start="0" row_start="1" align="left" font_weight="bold" border="0" label="Nom - Prénom" label_align="left">$(Identite)</text>
+			<text col_start="0" row_start="1" align="right" border="0" label="CR" label_align="right">$(Comite)</text>
+			<text col_start="0" row_start="2" align="left" font_size_step="-2" border="0" label="Code" label_align="left">$(Code_coureur)</text>
+			<text col_start="0" row_start="2" align="right" font_size_step="-1" border="bottom" label="Club" label_align="right">$(Club)</text>
+			
+			<text col="8" row_start="1" row_end="0" align="right" label="Temps" font_size_step="1">$(Tps_fond)</text>
+			<text col="8" row_start="1" row_end="0" align="right" label="Ecart" font_size_step="1">$(Diff_fond)</text>
+			<text col="8" row_start="1" row_end="0" align="right" label="P.Saut" font_size_step="1">$(Pts_mass_start)</text>
+			
+			<line col_start="0" row_start="0" pen_size="4" border="bottom" cond="not_context_border"/>
+		</body>
+	</report>
+	
+	<!-- Resultat Final Combine Mode Mass start -->
+	<report id="res_final_combine_mass_start" title="Résultats Combiné Nordique (Mode Mass Start)" >
+		<lua>base:SetCombineNordiqueMassStartTotal(body)</lua>
+		<column name="Tps_status">chrono.Status(body:GetCellInt('Tps_fond', row))</column>
+		<order key="Clt_total, Dossard" />
+		
+		<body>
+			<call option="couleur_alternee" file="./edition/options.xml" />
+
+			<row value="auto"/>
+			<row value="auto"/>
+
+			<spacing horz="6" vert="5" />
+			<padding all="0px" />
+			<background mode="transparent"/>			
+
+			<text col="4" row_start="1" row_end="0" label="Clt" />
+			<text col_start="0" row_start="1" align="center" font_weight="bold" font_size_step="1" border="0">$(Clt_total)</text>
+			<text col_start="0" row_start="2" align="center" font_size_step="-2" border="0">$(Cltc_total)..'/'..$(Categ)</text>
+			
+			<text col="4" row_start="1" row_end="0" align="center" label="Dos">$(Dossard)</text>
+			
+			<text col="30" row_start="1" row_end="0"/>
+			<text col_start="0" row_start="1" align="left" font_weight="bold" border="0" label="Nom - Prénom" label_align="left">$(Identite)</text>
+			<text col_start="0" row_start="1" align="right" border="0" label="CR" label_align="right">$(Comite)</text>
+			<text col_start="0" row_start="2" align="left" font_size_step="-2" border="0" label="Code" label_align="left">$(Code_coureur)</text>
+			<text col_start="0" row_start="2" align="right" font_size_step="-1" border="bottom" label="Club" label_align="right">$(Club)</text>
+			
+			<text col="7" row_start="1" row_end="0" align="right" label="Tps.Fond" >$(Tps_fond)</text>
+			<text col="6" row_start="1" row_end="0" align="right" label="P.Fond">$(Pts_mass_start)</text>
+			<text col="6" row_start="1" row_end="0" align="right" label="C.Fond" >$(Clt_fond)</text>
+
+			<text col="7" row_start="1" row_end="0" align="right" label="P.Saut">$(PtsClt)</text>
+			<text col="6" row_start="1" row_end="0" align="right" label="C.Saut">$(Clt)</text>
+			
+			<text col="9" row_start="1" row_end="0" align="right" label="P.Total" font_size_step="1">$(Pts_total)</text>
+			
+			<line col_start="0" row_start="0" pen_size="4" border="bottom" cond="not_context_border"/>
+		</body>
+	</report>
+	
+</edition>
+

@@ -1,0 +1,468 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Editions Entité "ESF" !-->
+<edition>
+	<menu>
+		<menu title="Ouvreurs Alpins" image="./res/32x32_ranking.png">
+			<menu title="Par Groupe" image="./res/16x16_admin.png" id="alpin_groupe" action="ouvreur_esf_alpin" />
+			<menu title="Par E.S.F" image="./res/16x16_admin.png" id="alpin_esf" action="ouvreur_esf_alpin"/>
+			<menu title="Liste Intermédiaire par ordre Alpha" image="./res/16x16_admin.png" id="alpin_intermediaire" action="ouvreur_esf"/>
+			<menu title="Liste Intermédiaire Par ESF" image="./res/16x16_admin.png" id="alpin_intermediaire" action="ouvreur_esf"/>
+		</menu>
+		<menu title="Ouvreurs Skiercross " image="./res/24x24_information.png">
+			<menu title="Par Groupe" image="./res/16x16_admin.png" id="sx_groupe" action="ouvreur_esf_sx" />
+			<menu title="Par E.S.F" image="./res/16x16_admin.png" id="sx_esf" action="ouvreur_esf_sx"/>
+		</menu>
+		
+		<menu title="Ouvreurs Snowboardcross " image="./res/24x24_information.png">
+			<menu title="Par Groupe" image="./res/16x16_admin.png" id="surf_groupe" action="ouvreur_esf_surf" />
+			<menu title="Par E.S.F" image="./res/16x16_admin.png" id="surf_esf" action="ouvreur_esf_surf"/>
+		</menu>
+		
+		<menu title="Ouvreurs Fond" image="./res/24x24_information.png" >
+			<menu title="Par Groupe" image="./res/16x16_admin.png" id="fond_groupe" action="ouvreur_esf_fond" />
+			<menu title="Par E.S.F" image="./res/16x16_admin.png" id="fond_esf" action="ouvreur_esf_fond"/>
+		</menu>
+
+		<menu title="Table Ouvreur Finale" image="./res/32x32_ranking.png">
+			<menu title="Par Ordre Alpha" image="./res/16x16_admin.png" id="ouvreur_alpha" action="ouvreur_esf" />
+			<menu title="Par E.S.F" image="./res/16x16_admin.png" id="ouvreur_esf" action="ouvreur_esf"/>
+		</menu>
+		
+		<menu title="Challenge Point-Ski d'Or" image="./res/32x32_ranking.png">
+			<menu title="Trophée Banque Pop " image="./res/16x16_admin.png" id="tbp" action="tbp_point_skidor" action_choix="1" action_sexe="T"  action_perf_max="5"/>
+			<menu title="Trophée Banque Pop Stagiaires" image="./res/16x16_admin.png" id="tbp" action="tbp_point_skidor" action_choix="1" action_sexe="T" action_stagiaire="1" action_perf_max="3"/>
+
+			<menu title="Qualification Stagiaires" image="./res/16x16_admin.png" id="tbp" action="tbp_point_skidor" action_choix="2" action_sexe="T" action_stagiaire="1" action_perf_max="3"/>
+
+			<menu title="BSB Hommes" image="./res/16x16_admin.png" id="tbp" action="tbp_point_skidor" action_choix="3" action_sexe="M" action_perf_max="3"/>
+			<menu title="BSB Dames"  image="./res/16x16_admin.png" id="tbp" action="tbp_point_skidor" action_choix="3" action_sexe="F" action_perf_max="3"/>
+		</menu>
+
+	</menu>
+	
+	<!-- footer standard !-->
+	<footer>
+		<background mode="transparent"/>
+		<font name="Calibri" size="8" adjust="best" weight="normal"/>
+		<pen border="none" />
+
+		<text row="auto" col="1" align="left">'Ouvreurs'</text>
+		<line col_start="1" col_end="0" pen_size="2" pen_color="dkgray" border="bottom"/>
+		
+		<row value="auto" />
+		<matrix col_start="1">
+			<row value="auto"/>
+			<text col="auto" align="left">app.GetName()..' Version '..app.GetVersion()..' / ESF'</text>
+			<image col="0.4cm" adjust="width" align="left">'./res/32x32_esf.png'</image>
+			<text col="auto" align="left">' / Agil Informatique'</text>
+			<image col="0.4cm" adjust="width" align="left">'./res/32x32_agil.png'</image>
+			<text col="auto" align="left">os.date(' / Edité le %d-%m-%Y à %H:%M:%S')</text>
+		</matrix>	
+		<text align="right">string.format('Page %d/%s',editor:GetPageCurrent(), editor:GetPageCountLabel())</text>
+		<line col_start="1" col_end="0" border="top" />
+	</footer>
+
+	<!-- header standard !-->
+	<header>
+		<spacing all="0"/>
+		<background mode="transparent"/>
+		<font name="Calibri" size="14" adjust="max" weight="bold"/>
+		<text row="auto" align="center" cond="title" >title</text>
+		<row value="0.5cm"/>
+	</header>
+
+	<!-- Ouvreurs Alpins par Groupe ... -->
+	<report id="alpin_groupe" title="Liste des Ouvreurs Alpins Saison 2020-2021" >
+		<paper orientation="landscape" />
+		<order key="Pts Asc, Nom, Prenom" />
+
+		<rupture key="Groupe">
+			<before>
+				<font size="14"/>
+				<row value="0.4cm"/>
+				<text row="auto" col="1" >$(Groupe)</text>
+			</before>
+		</rupture>
+
+		<body>
+			<call option="couleur_alternee" file="./edition/options.xml" />
+			<font size="9" adjust="none"/>
+
+			<!-- <row value="0.6cm"/> -->
+			<lua>if $(Diplome) ~= 'SA' and $(Diplome) ~= 'SN' and $(Diplome) ~= 'SE' and $(Matric):len() &gt; 0 then </lua>
+			<row value="0.6cm"/>
+			<text col="9" align="center" label="CS" font_size_step="-1">$(Code_coureur)</text>
+			<text col="24" align="left" label="Nom - Prénom" font_weight="bold">$(Nom)..' '..$(Prenom)</text>
+			<text col="2" align="center" label="S." font_size_step="-1">$(Sexe)</text>
+			<text col="4" align="center" label="An" font_size_step="-1">$(Naissance)</text>
+			<text col="4" align="center" label="Dipl." font_size_step="-1">$(Diplome)</text>
+			<text col="20" align="center" label="E.S.F." font_size_step="-1">$(Ecole)</text>
+			<text col="7" align="center" label="Groupe" font_weight="bold">$(Groupe)</text>
+			<text col="5" align="right" label="Point">$(Pts)</text>
+			<text col="2" align="center" label="P.">$(Pen)</text>
+			<text col="40" align="center" label="Info" adjust="best" font_size_step="-2">$(Info)</text>
+			<lua>end</lua>
+		</body>
+	</report>
+	
+	<!-- Ouvreurs Alpins par ESF ... -->
+	<report id="alpin_esf" title="Liste des Ouvreurs Alpins Saison 2020-2021" >
+		<order key="Esf, Nom, Prenom" />
+
+		<rupture key="Esf">
+			<before>
+				<font size="14"/>
+				<row value="0.4cm"/>
+				<text row="auto" col="1" >$(Ecole)..' ('..$(Esf)..')'</text>
+			</before>
+		</rupture>
+
+		<body>
+			<call option="couleur_alternee" file="./edition/options.xml" />
+			<font size="9" adjust="none"/>
+
+			<lua>if $(Diplome) ~= 'SA' and $(Diplome) ~= 'SN' and $(Diplome) ~= 'SE' and $(Matric):len() &gt; 0 then </lua>
+			<row value="auto"/>
+			<text col="5" align="center" label="N°Carte" font_size_step="-1">$(Matric)</text>
+			<text col="22" align="left" label="Nom - Prénom" font_weight="bold">$(Nom)..' '..$(Prenom)</text>
+			<text col="2" align="center" label="S.">$(Sexe)</text>
+			<text col="4" align="center" label="An">$(Naissance)</text>
+			<text col="4" align="center" label="Dipl.">$(Diplome)</text>
+			<text col="7" align="center" label="Groupe" font_weight="bold">$(Groupe)</text>
+			<text col="6" align="right" label="Point">$(Pts)</text>
+			<text col="30" align="center" label="Info" adjust="best" font_size_step="-2">$(Info)</text>
+			<lua>end</lua>
+		</body>
+	</report>
+	
+	<!-- Ouvreurs Snowboard par Groupe ... -->
+	<report id="surf_groupe" title="Liste des Ouvreurs Snowboard Saison 2020-2021" >
+		<paper orientation="landscape" />
+		<order key="Pts Asc, Nom, Prenom" />
+
+		<rupture key="Groupe">
+			<before>
+				<font size="14"/>
+				<row value="0.4cm"/>
+				<text row="auto" col="1" >$(Groupe)</text>
+			</before>
+		</rupture>
+
+		<body>
+			<call option="couleur_alternee" file="./edition/options.xml" />
+			<font size="9" adjust="none"/>
+
+			<!-- <row value="0.6cm"/> -->
+			<lua>if $(Diplome) ~= 'SA' and $(Diplome) ~= 'SN' and $(Diplome) ~= 'SE' and $(Matric):len() &gt; 0 then </lua>
+			<row value="0.6cm"/>
+			<text col="9" align="center" label="CS" font_size_step="-1">$(Code_coureur)</text>
+			<text col="24" align="left" label="Nom - Prénom" font_weight="bold">$(Nom)..' '..$(Prenom)</text>
+			<text col="2" align="center" label="S." font_size_step="-1">$(Sexe)</text>
+			<text col="4" align="center" label="An" font_size_step="-1">$(Naissance)</text>
+			<text col="4" align="center" label="Dipl." font_size_step="-1">$(Diplome)</text>
+			<text col="20" align="center" label="E.S.F." font_size_step="-1">$(Ecole)</text>
+			<text col="7" align="center" label="Groupe" font_weight="bold">$(Groupe)</text>
+			<text col="5" align="right" label="Point">$(Pts)</text>
+			<text col="2" align="center" label="P.">$(Pen)</text>
+			<text col="40" align="center" label="Info" adjust="best" font_size_step="-2">$(Info)</text>
+			<lua>end</lua>
+		</body>
+	</report>
+
+	<!-- Ouvreurs Snowboard par ESF ... -->
+	<report id="surf_esf" title="Liste des Ouvreurs Snowboard Saison 2020-2021" >
+		<order key="Esf, Nom, Prenom" />
+
+		<rupture key="Esf">
+			<before>
+				<font size="14"/>
+				<row value="0.4cm"/>
+				<text row="auto" col="1" >$(Ecole)..' ('..$(Esf)..')'</text>
+			</before>
+		</rupture>
+
+		<body>
+			<call option="couleur_alternee" file="./edition/options.xml" />
+			<font size="9" adjust="none"/>
+
+			<lua>if $(Diplome) ~= 'SA' and $(Diplome) ~= 'SN' and $(Diplome) ~= 'SE' and $(Matric):len() &gt; 0 then </lua>
+			<row value="auto"/>
+			<text col="5" align="center" label="N°Carte" font_size_step="-1">$(Matric)</text>
+			<text col="22" align="left" label="Nom - Prénom" font_weight="bold">$(Nom)..' '..$(Prenom)</text>
+			<text col="2" align="center" label="S.">$(Sexe)</text>
+			<text col="4" align="center" label="An">$(Naissance)</text>
+			<text col="4" align="center" label="Dipl.">$(Diplome)</text>
+			<text col="7" align="center" label="Groupe" font_weight="bold">$(Groupe)</text>
+			<text col="6" align="right" label="Point">$(Pts)</text>
+			<text col="30" align="center" label="Info" adjust="best" font_size_step="-2">$(Info)</text>
+			<lua>end</lua>
+		</body>
+	</report>
+
+	<!-- Ouvreurs SX par Groupe ... -->
+	<report id="sx_groupe" title="Liste des Ouvreurs Skiercross Saison 2020-2021" >
+		<paper orientation="landscape" />
+		<order key="Pts Asc, Nom, Prenom" />
+
+		<rupture key="Groupe">
+			<before>
+				<font size="14"/>
+				<row value="0.4cm"/>
+				<text row="auto" col="1" >$(Groupe)</text>
+			</before>
+		</rupture>
+
+		<body>
+			<call option="couleur_alternee" file="./edition/options.xml" />
+			<font size="9" adjust="none"/>
+
+			<!-- <row value="0.6cm"/> -->
+			<lua>if $(Diplome) ~= 'SA' and $(Diplome) ~= 'SN' and $(Diplome) ~= 'SE' and $(Matric):len() &gt; 0 then </lua>
+			<row value="0.6cm"/>
+			<text col="9" align="center" label="CS" font_size_step="-1">$(Code_coureur)</text>
+			<text col="24" align="left" label="Nom - Prénom" font_weight="bold">$(Nom)..' '..$(Prenom)</text>
+			<text col="2" align="center" label="S." font_size_step="-1">$(Sexe)</text>
+			<text col="4" align="center" label="An" font_size_step="-1">$(Naissance)</text>
+			<text col="4" align="center" label="Dipl." font_size_step="-1">$(Diplome)</text>
+			<text col="20" align="center" label="E.S.F." font_size_step="-1">$(Ecole)</text>
+			<text col="7" align="center" label="Groupe" font_weight="bold">$(Groupe)</text>
+			<text col="5" align="right" label="Point">$(Pts)</text>
+			<text col="2" align="center" label="P.">$(Pen)</text>
+			<text col="40" align="center" label="Info" adjust="best" font_size_step="-2">$(Info)</text>
+			<lua>end</lua>
+		</body>
+	</report>
+
+	<!-- Ouvreurs SnowbSXoard par ESF ... -->
+	<report id="sx_esf" title="Liste des Ouvreurs Skiercross Saison 2020-2021" >
+		<order key="Esf, Nom, Prenom" />
+
+		<rupture key="Esf">
+			<before>
+				<font size="14"/>
+				<row value="0.4cm"/>
+				<text row="auto" col="1" >$(Ecole)..' ('..$(Esf)..')'</text>
+			</before>
+		</rupture>
+
+		<body>
+			<call option="couleur_alternee" file="./edition/options.xml" />
+			<font size="9" adjust="none"/>
+
+			<lua>if $(Diplome) ~= 'SA' and $(Diplome) ~= 'SN' and $(Diplome) ~= 'SE' and $(Matric):len() &gt; 0 then </lua>
+			<row value="auto"/>
+			<text col="5" align="center" label="N°Carte" font_size_step="-1">$(Matric)</text>
+			<text col="22" align="left" label="Nom - Prénom" font_weight="bold">$(Nom)..' '..$(Prenom)</text>
+			<text col="2" align="center" label="S.">$(Sexe)</text>
+			<text col="4" align="center" label="An">$(Naissance)</text>
+			<text col="4" align="center" label="Dipl.">$(Diplome)</text>
+			<text col="7" align="center" label="Groupe" font_weight="bold">$(Groupe)</text>
+			<text col="6" align="right" label="Point">$(Pts)</text>
+			<text col="30" align="center" label="Info" adjust="best" font_size_step="-2">$(Info)</text>
+			<lua>end</lua>
+		</body>
+	</report>
+	
+	<!-- Ouvreurs Fond par ESF ... -->
+	<report id="fond_groupe" title="Liste des Ouvreurs Fond Saison 2020-2021" >
+		<paper orientation="landscape" />
+		<order key="Pts Asc, Nom, Prenom" />
+
+		<rupture key="Groupe">
+			<before>
+				<font size="14"/>
+				<row value="0.4cm"/>
+				<text row="auto" col="1" >$(Groupe)</text>
+			</before>
+		</rupture>
+
+		<body>
+			<call option="couleur_alternee" file="./edition/options.xml" />
+			<font size="9" adjust="none"/>
+
+			<row value="auto"/>
+			<text col="5" align="center" label="N°Carte" font_size_step="-1">$(Code_coureur)</text>
+			<text col="22" align="left" label="Nom - Prénom" font_weight="bold">$(Nom)..' '..$(Prenom)</text>
+			<text col="2" align="center" label="S.">$(Sexe)</text>
+			<text col="4" align="center" label="An">$(Naissance)</text>
+			<text col="4" align="center" label="Dipl.">$(Diplome_nordique)</text>
+			<text col="7" align="center" label="Groupe" font_weight="bold">$(Groupe)</text>
+			<text col="6" align="right" label="Point">$(Pts)</text>
+			<text col="30" align="center" label="Info" adjust="best" font_size_step="-2">$(Info)</text>
+		</body>
+	</report>
+	
+	<!-- Ouvreurs Fond par ESF ... -->
+	<report id="fond_esf" title="Liste des Ouvreurs Fond Saison 2020-2021" >
+		<order key="Esf, Nom, Prenom" />
+
+		<rupture key="Esf">
+			<before>
+				<font size="14"/>
+				<row value="0.4cm"/>
+				<text row="auto" col="1" >$(Ecole)..' ('..$(Esf)..')'</text>
+			</before>
+		</rupture>
+
+		<body>
+			<call option="couleur_alternee" file="./edition/options.xml" />
+			<font size="9" adjust="none"/>
+
+			<lua>if $(Diplome) ~= 'SA' and $(Diplome) ~= 'SN' and $(Diplome) ~= 'SE' and $(Matric):len() &gt; 0 then </lua>
+			<row value="auto"/>
+			<text col="5" align="center" label="N°Carte" font_size_step="-1">$(Matric)</text>
+			<text col="22" align="left" label="Nom - Prénom" font_weight="bold">$(Nom)..' '..$(Prenom)</text>
+			<text col="2" align="center" label="S.">$(Sexe)</text>
+			<text col="4" align="center" label="An">$(Naissance)</text>
+			<text col="4" align="center" label="Dipl.">$(Diplome)</text>
+			<text col="7" align="center" label="Groupe" font_weight="bold">$(Groupe)</text>
+			<text col="6" align="right" label="Point">$(Pts)</text>
+			<text col="30" align="center" label="Info" adjust="best" font_size_step="-2">$(Info)</text>
+			<lua>end</lua>
+		</body>
+	</report>
+
+	<!-- Ouvreurs Intermédiaire ... -->
+	<report id="alpin_intermediaire" title="Liste des Ouvreurs Alpin Intermédiaires" >
+		<paper orientation="landscape" />
+
+		<filter remove="1">$(Diplome) ~= 'SA' and $(Diplome) ~= 'SN' and $(Diplome) ~= 'SE' and $(Matric):len() &gt; 0 and $(Pen_alpin) == '+' </filter> 
+
+		<order key="Nom, Prenom" />
+
+		<body>
+			<call option="couleur_alternee" file="./edition/options.xml" />
+			<font size="9" adjust="none"/>
+
+			<row value="auto"/>
+			<text col="5" align="center" label="N°Carte" font_size_step="-1">$(Code)</text>
+			<text col="20" align="left" label="Nom - Prénom" font_weight="bold">$(Nom)..' '..$(Prenom)</text>
+			<text col="20" align="center" label="ESF">$(Ecole)</text>
+			<text col="4" align="center" label="Dipl.">$(Diplome)</text>
+			<text col="2" align="center" label="S.">$(Sexe)</text>
+			<text col="4" align="center" label="An">$(Naissance)</text>
+			<text col="6" align="center" label="Alpin">$(Handicap_alpin)</text>
+			<text col="3" align="center" label="Pen.">$(Pen_alpin)</text>
+			<text col="30" align="left" label="Information" font_size_step="-1">$(Info_alpin)</text>
+		</body>
+	</report>
+	
+	<!-- Ouvreurs par ordre alphabétique ... -->
+	<report id="ouvreur_alpha" title="Liste des Ouvreurs par Ordre Alphabérique" >
+		<paper orientation="portrait" />
+		<order key="Nom, Prenom, Esf" />
+
+		<body>
+			<call option="couleur_alternee" file="./edition/options.xml" />
+			<font size="9" adjust="none"/>
+
+			<lua>if $(Diplome) ~= 'SA' and $(Diplome) ~= 'SN' and $(Diplome) ~= 'SE' and $(Matric):len() &gt; 0 then </lua>
+			<row value="auto"/>
+			<text col="5" align="center" label="N°Carte" font_size_step="-1">$(Code)</text>
+			<text col="22" align="left" label="Nom - Prénom" font_weight="bold">$(Nom)..' '..$(Prenom)</text>
+			<text col="20" align="center" label="E.S.F." font_weight="bold" font_size_step="-1">$(Ecole)</text>
+			<text col="2" align="center" label="S.">$(Sexe)</text>
+			<text col="4" align="center" label="An">$(Naissance)</text>
+			<text col="8" align="center" label="Alpin">$(Handicap_alpin)</text>
+			<text col="4" align="center" label="Pen.">$(Pen_alpin)</text>
+			<text col="8" align="center" label="Sx">$(Handicap_sx)</text>
+			<text col="8" align="center" label="Snowboard">$(Handicap_surf)</text>
+			<text col="4" align="center" label="Pen.">$(Pen_surf)</text>
+			<text col="8" align="center" label="Fond">$(Handicap_fond)</text>
+			<lua>end</lua>
+		</body>
+	</report>
+	
+	<!-- Ouvreurs par ESF ... -->
+	<report id="ouvreur_esf" title="Liste des Ouvreurs par E.S.F." >
+		<paper orientation="portrait" />
+		<order key="Esf, Nom, Prenom" />
+
+		<rupture key="Esf">
+			<before>
+				<font size="14"/>
+				<row value="0.4cm"/>
+				<text row="auto" col="1" >$(Ecole)..' ('..$(Esf)..')'</text>
+			</before>
+		</rupture>
+
+		<body>
+			<call option="couleur_alternee" file="./edition/options.xml" />
+			<font size="9" adjust="none"/>
+
+			<lua>if $(Diplome) ~= 'SA' and $(Diplome) ~= 'SN' and $(Diplome) ~= 'SE' and $(Matric):len() &gt; 0 then </lua>
+			<row value="auto"/>
+			<text col="5" align="center" label="N°Carte" font_size_step="-1">$(Code)</text>
+			<text col="22" align="left" label="Nom - Prénom" font_weight="bold">$(Nom)..' '..$(Prenom)</text>
+			<text col="2" align="center" label="S.">$(Sexe)</text>
+			<text col="4" align="center" label="An">$(Naissance)</text>
+			<text col="8" align="center" label="Alpin">$(Handicap_alpin)</text>
+			<text col="4" align="center" label="Pen.">$(Pen_alpin)</text>
+			<text col="8" align="center" label="Sx">$(Handicap_sx)</text>
+			<text col="8" align="center" label="Snowboard">$(Handicap_surf)</text>
+			<text col="4" align="center" label="Pen.">$(Pen_surf)</text>
+			<text col="8" align="center" label="Fond">$(Handicap_fond)</text>
+			<lua>end</lua>
+		</body>
+	</report>
+
+	<!-- 1=Trophée Banque Populaire - 2=Qualification Stagiaire - 3=Bank Slalom Boarder ... -->
+	<!-- <report id="tbp" title="Trophée banque Populaire - Simulation Formule des Points Ski d'Or" label="0"> -->
+	<report id="tbp" label="0">
+		<order key="Sexe, Pts Desc, Nom, Prenom" />
+		<lua>
+			title = 'Simulation Formule des Points Ski d\'Or';
+			if params.action_choix == '1' then title = 'Trophée Banque Populaire - Simulation Formule des Points Ski d\'Or'
+			elseif params.action_choix == '2' then title = 'Qualification Stagiaire - Simulation Formule des Points Ski d\'Or'
+			elseif params.action_choix == '3' then title = 'Bank Slalom Boarder - Simulation Formule des Points Ski d\'Or'
+			end
+		</lua>
+		<rupture key="Sexe">
+			<before>
+				<pagebreak cond="row ~= 0" />
+				<font size="14"/>
+				<row value="0.4cm"/>
+				<text row="auto" col="1" cond="$(Sexe) == 'M'" align="center">'RESULTATS HOMMES'</text>
+				<text row="auto" col="1" cond="$(Sexe) == 'F'" align="center">'RESULTATS DAMES'</text>
+			</before>
+		</rupture>
+		
+		<body>
+			<font size="10" adjust="none"/>
+			<pen color="black" border="1" />
+			<background mode="solid" />
+
+			<row h="auto"/>
+			<text col="5" align="right" font_weight="bold" bk_color="red" font_color="white">$(Clt)</text>
+			<text col="24" align="left" font_weight="bold" font_size_step="1">$(Nom)..' '..$(Prenom)</text>
+			<text col="24" align="left">$(Equipe)</text>
+			<text col="4" align="center">$(Groupe)</text>
+			<text col="5" align="center">$(Categ)</text>
+			<text col="7" align="right" font_weight="bold" bk_color="red" font_color="white">$(Pts)</text>
+			
+			<!-- <text col="6" align="right" label="Ev1">$(Pts_ev1)</text> -->
+			<!-- <text col="6" align="right" label="Ev2">$(Pts_ev2)</text> -->
+			<!-- <text col="6" align="right" label="Ev3">$(Pts_ev3)</text> -->
+			
+			<row h="auto"/>
+			<matrix col_start="2" col_end="0">
+				<col w="8,30,5,6" />
+				<font size_step="-1" />
+				<lua>
+					code_coureur = $(Code_coureur);
+					for i=1,#performance[code_coureur] do
+				</lua>
+					<row h="auto"/>
+					<text col_start="1" align="center">'Perf n°'..tostring(i)</text>
+					<text col_start="2" align="left">performance[code_coureur][i].Nom</text>
+					<text col_start="3" align="right">performance[code_coureur][i].Clt</text>
+					<text col_start="4" align="right">performance[code_coureur][i].Pts</text>
+				<lua>end</lua>
+			</matrix> 
+	
+			<row value="0.3cm"/>
+			
+		</body>
+	</report>
+</edition>
+
