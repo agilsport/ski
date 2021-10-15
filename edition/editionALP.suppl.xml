@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Editions Supplémentaires "ALP" !-->
+<edition>
+	<menu>
+		<menu title="Editions Supplémentaires" image="./res/32x32_options.png">
+			<menu title="Regroupement de coureurs" image="./res/16x16_compute.png" lua="./edition/editionRegroupement.lua" />
+			<menu title="Edition du Timing Report FIS" image="./res/16x16_fis.png" id="timing_report" lua="./edition/editionTR_FIS.lua" />
+			<menu title="Calcul d'un temps manuel" image="./res/16x16_calc.png" id="temps_manuel" lua="./edition/tempsManuel.lua" />
+			<menu title="formulaire d'inscription FIS" image="./res/16x16_fis.png">
+				<menu title="Gestion des officiels" image="./res/16x16_fis.png" impression="0" gestion="1" lua="./edition/entryFIS_ALP.lua" />
+				<menu title="Edition du formulaire" image="./res/16x16_fis.png" impression="1" gestion="0" lua="./edition/entryFIS_ALP.lua" />
+			</menu>
+			<menu title="Rapport d'accident" image="./res/16x16_pdf.png" action="open ./edition/Rapport_Accident.pdf" />
+		</menu>
+		<menu title="Outils - Scripts LUA spécifiques" image="./res/32x32_options.png">
+			<menu title="Double Tirage au sort des dossards (RIS)" image="./res/32x32_ranking.png" lua="./process/dossardDoubleTirage.lua" />
+		</menu>
+		<menu title="Coupes d'Europe et FIS" image="./res/32x32_juges.png">
+			<menu title="Construction et Envoi du tableau des coureurs à la FIS" image="./res/16x16_ranking.png" lua="./process/live_draw.lua"/>
+		</menu>
+		
+	</menu>
+</edition>
+
