@@ -1,0 +1,395 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<root>
+
+<!-- Ré-Organisation des colonnes -->
+<panel name="grid_arrange_columns">
+	<padding all="2px"/>
+	
+	<row h="1" />
+	<grid col="1" name="available_columns" />
+	<matrix col="150px">
+		<button row="auto" col_start="1" col_end="0" label="Ajouter (F5)" name="btn_add"/>
+		<button row="auto" col_start="1" col_end="0" label="Supprimer (F6)" name="btn_remove"/>
+	</matrix>
+	<grid col="1" name="visible_columns" />
+	<matrix col="150px">
+		<button row="auto" col_start="1" col_end="0" label="Monter (F7)" name="btn_up"/>
+		<button row="auto" col_start="1" col_end="0" label="Descendre (F8)" name="btn_down"/>
+	</matrix>
+
+	<row h="auto" />
+	<toolbar col_start="1" col_end="0" name="tb" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT" />
+</panel>
+
+<!-- Collage Spécial Grille -->
+<panel name="grid_paste">
+	<padding all="2px"/>
+	
+	<row h="auto" />
+	<staticbox col="1" label="Séparateur"> 
+		<row h="auto" />
+		<radiobutton col="1" name="radio_delimiter_tab" label="Tabulation" style="RB_GROUP|ALIGN_RIGHT" />
+		<radiobutton col="1" name="radio_delimiter_semicolon" label="Point Virgule" style="ALIGN_RIGHT" />
+		<radiobutton col="1" name="radio_delimiter_special" label="Autre" style="ALIGN_RIGHT" />
+		<textctrl col="-24" name="delimiter_special" value="|" />
+	</staticbox>
+	<staticbox col="1" label="Options"> 
+		<col w="1"/>
+		<checkbox row="auto" name="check_label" label="Utilisation de la première ligne pour les entêtes" style="CHK_2STATE|ALIGN_LEFT" />
+		<checkbox row="auto" name="check_row" label="Suppression des lignes vides" style="CHK_2STATE|ALIGN_LEFT" />
+	</staticbox>
+
+	<row h="1" />
+	<grid col_start="1" col_end="0" name="grid_paste" />
+
+	<row h="auto" />
+	<toolbar col_start="1" col_end="0" name="tb" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT" />
+</panel>
+
+<!-- Grille - Filtre -->
+<panel name="grid_filter">
+	<padding all="2px"/>
+
+	<searchctrl row="auto" col="1" name="search" style="TE_LEFT" />
+	<grid row="1" col_start="1" col_end="0" name="grid" />
+	<toolbar row="auto" col_start="1" col_end="0" name="tb" style="TB_FLAT|TB_HORIZONTAL" />
+</panel>
+
+<!-- Calculatrice -->
+<panel name="calculator">
+	<padding all="2px"/>
+	<col w="2,3" />
+	
+	<row h="auto"/>
+	<radiobutton col_start="1" name="radio_hour_start" label="Heure de Départ" style="RB_GROUP|ALIGN_RIGHT" />
+	<textctrl col_start="2" name="hour_start" style="TE_LEFT" />
+
+	<row h="auto"/>
+	<radiobutton col_start="1" name="radio_hour_finish" label="Heure d\'Arrivée" style="ALIGN_RIGHT" />
+	<textctrl col_start="2" name="hour_finish" style="TE_LEFT" />
+
+	<row h="auto"/>
+	<radiobutton col_start="1" name="radio_time" label="Temps" style="ALIGN_RIGHT" />
+	<textctrl col_start="2" name="time" style="TE_LEFT" />
+	
+	<row h="auto" />
+	<toolbar col_start="1" col_end="0" name="tb" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT" />
+</panel>
+
+<!-- Chrono : Redirection - Duplication -->
+<panel name="chrono_config">
+	<padding all="2px"/>
+	<col w="1,1" />
+	
+	<row h="1" />
+	<staticbox col_start="1" label="Redirection" name="sb_redirection"> 
+	</staticbox>
+
+	<staticbox col_start="2" label="Duplication" name="sb_duplication"> 
+	</staticbox>
+	
+	<checkbox row="auto" col_start="1" col_end="0" name="check_bib" label="Prise en compte du Dossard en Base de Temps" style="CHK_2STATE|ALIGN_LEFT" />	
+	<toolbar row="auto" col_start="1" col_end="0" name="tb" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT" />
+</panel>
+
+<panel name="chrono_config_redirection">
+	<padding all="4px"/>
+	<col w="1" />
+	
+	<grid row="1" col_start="1" col_end="0" name="grid" />
+
+	<staticbox row="auto" col_start="1" col_end="0" label="Entrée - Sortie"> 
+		<combobox col="1" row="auto" name="combo_input" style="ALIGN_LEFT"/>
+		<statictext col="auto" syle="ALIGN_CENTER" label="En" />
+		<combobox col="1" name="combo_output" style="ALIGN_LEFT"/>
+	</staticbox>
+	
+	<toolbar row="auto" col_start="1" col_end="0" name="tb" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT" />
+</panel>
+
+<!-- Chrono : Configuration Point de Passage -->
+<panel name="chrono_config_passage">
+	<padding all="4px"/>
+	<wnd name="statictext" style="ALIGN_RIGHT" />
+	<col w="1,1" />
+
+	<row h="auto"/>
+	<statictext col_start="1" label="Gestion des Dossards" />
+	<combobox col_start="2" name="combo_bib" style="ALIGN_LEFT"/>
+
+	<row h="auto"/>
+	<statictext col_start="1" label="Ordre des Passages" />
+	<checkbox col_start="2" name="check_order" label="Descendant" style="CHK_2STATE|ALIGN_LEFT" />
+
+	<row h="auto"/>
+	<statictext col_start="1" label="Son" />
+	<textctrlbutton col_start="2" name="btn_sound" style="TE_LEFT" />
+	
+	<row h="auto"/>
+	<statictext col_start="1" label="Duplication" />
+	<spinctrl col_start="2" name="spin_duplication" style="ALIGN_RIGHT|SP_ARROW_KEYS"/>
+
+	<row h="auto"/>
+	<statictext col_start="1" label="Passage Max par Dossard" />
+	<spinctrl col_start="2" name="spin_bib_count_max" style="ALIGN_RIGHT|SP_ARROW_KEYS"/>
+
+	<toolbar row="auto" col_start="1" col_end="0" name="tb" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT" />
+</panel>
+
+<!-- tooltip single_text  -->
+<tooltip name="single_text">
+	<lua>
+		single_text = single_text or '';
+		single_image = single_image or '';
+	</lua>
+	<background mode='transparent'/>
+	<padding all='0px'/>
+	<row h="auto"/>
+	<image col="32px" adjust="none" align="center" spacing="0" cond="single_image:len() ~= 0">single_image</image> 
+	<text col="auto" spacing="2" align="center">single_text</text>
+</tooltip>
+
+<!-- Feu Point de Passage Chrono -->
+<tooltip name="chrono_feu">
+	<background mode="transparent" />
+	<padding all='0px'/>
+	<col w="32px, auto" />
+	<font name="Calibri" size="12" weight="bold" />
+	
+	<matrix row="auto" col_start="1" col_end="0">
+		<matrix row="auto" col="1"/>
+		<text col="auto" spacing="2">'Gestion des Feux : Raccourci clavier'</text>
+		<text col="auto" spacing="2" font_color="dkred" font_size_step="1">'Ctrl-F'</text>
+		<matrix col="1"/>
+	</matrix>
+
+	<font size="11" weight="normal" />
+	<image col_start="1" row="32px" adjust="none" spacing="0">'./res/chrono32x32_accept.png'</image> 
+	<text col_start="2" spacing="2">'Feu Vert => Les impulsions sont prises en comptes avec affectation des dossards'</text>
+	
+	<image col_start="1" row="32px" adjust="none" spacing="0">'./res/chrono32x32_orange.png'</image> 
+	<text col_start="2" spacing="2">'Feu Orange => Les impulsions sont prises en comptes sans affectation de dossard'</text>
+
+	<image col_start="1" row="32px" adjust="none" spacing="0">'./res/chrono32x32_stop.png'</image> 
+	<text col_start="2" spacing="2">'Feu Rouge => Les impulsions sont ignorées'</text>
+</tooltip>
+
+<!-- vpe Configuration -->
+<panel name="vpe_configuration">
+	<padding all="2px"/>
+	<propertygridmanager row="1" col="1" name="pg" style="PG_BOLD_MODIFIED|PG_SPLITTER_AUTO_CENTER|PG_TOOLBAR" />
+	<toolbar row="auto" col_start="1" col_end="0" name="tb" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT" />
+</panel>
+
+<!-- vpe Configuration Body -->
+<panel name="vpe_configuration_body">
+	<padding all="2px"/>
+	<grid row="1" col="1" name="grid" />
+	<toolbar row="auto" col_start="1" col_end="0" name="tb" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT" />
+</panel>
+
+<!-- vpe Property -->
+<panel name="vpe_property">
+	<padding all="2px"/>
+	<propertygridmanager row="1" col="1" name="pg" style="PG_BOLD_MODIFIED|PG_SPLITTER_AUTO_CENTER" />
+</panel>
+
+<panel name="vpe_display_board_config">
+	<padding all="2px"/>
+	<wnd name="statictext" style="ALIGN_RIGHT" />
+
+	<col value="3,2"/>
+
+	<row value="auto" />
+	<statictext col_start="1" label="Ligne(s)" />
+	<textctrl col_start="2" name="row" style="TE_RIGHT" />
+	
+	<row value="auto" />
+	<statictext col_start="1" label="Colonne(s)" />
+	<textctrl col_start="2" name="col" style="TE_RIGHT" />
+
+	<row value="auto" />
+	<statictext col_start="1" label="Cible" />
+	<combobox col_start="2" name="target" style="ALIGN_LEFT"/>
+
+	<row value="auto" />
+	<statictext col_start="1" label="Mode" />
+	<combobox col_start="2" name="mode" style="ALIGN_LEFT"/>
+
+	<row value="auto" />
+	<statictext col_start="1" label="Temps Tournant" />
+	<combobox col_start="2" name="running_time" style="ALIGN_LEFT"/>
+
+	<row value="auto" />
+	<statictext col_start="1" label="Temps d\'affichage à l\'Arrivée en millisecondes" />
+	<textctrl col_start="2" name="delay_finish" style="TE_RIGHT" />
+
+	<row value="auto" />
+	<statictext col_start="1" label="Temps d\'affichage à l\'Inter en millisecondes" />
+	<textctrl col_start="2" name="delay_inter" style="TE_RIGHT" />
+
+	<row value="auto" />
+	<statictext col_start="1" label="Défilement Liste en millisecondes" />
+	<textctrl col_start="2" name="delay_list" style="TE_RIGHT" />
+
+	<row value="auto" />
+	<statictext col_start="1" label="Option Arrivée" />
+	<combobox col_start="2" name="option_finish" style="ALIGN_LEFT"/>
+	
+	<row value="auto" />
+	<statictext col_start="1" label="Bloc Unités" />
+	<textctrl col_start="2" name="bloc_unit" style="TE_RIGHT" />
+
+	<row value="auto" />
+	<toolbar col_start="1" col_end="0" name="tb" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT" />
+</panel>
+
+<panel name="vpe_display_board_message">
+	<padding all="2px"/>
+	<wnd name="statictext" style="ALIGN_RIGHT" />
+	
+	<col value="1"/>
+	<staticbox col_start="1" col_end="0" label="Message" > 
+			<textctrl row="1" name="message" style="TE_MULTILINE" />
+	</staticbox>
+	
+	<row value="auto" />
+	<staticbox col_start="1" col_end="0" label="Couleur"> 
+		<statictext row="auto" col="3" label="Ligne 1" />
+		<colourpickerctrl col="2" name="color1" />
+		
+		<statictext row="auto" col_start="1" label="Ligne 2" />
+		<colourpickerctrl col_start="2" name="color2" />
+
+		<statictext row="auto" col_start="1" label="Ligne 3" />
+		<colourpickerctrl col_start="2" name="color3" />
+	</staticbox>
+
+	<row value="auto" />
+	<toolbar col_start="1" col_end="0" name="tb" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT" />
+</panel>
+
+<panel name="tour_duel_select">
+	<padding all="4px"/>
+	<wnd name="statictext" style="ALIGN_RIGHT" />
+	<col w="1,1,1,1" />
+
+	<row h="auto"/>
+	<statictext col_start="1" label="Tour Min" />
+	<spinctrl col_start="2" name="tour_min" style="ALIGN_RIGHT|SP_ARROW_KEYS"/>
+	<statictext col_start="3" label="Max" />
+	<spinctrl col_start="4" name="tour_max" style="ALIGN_RIGHT|SP_ARROW_KEYS"/>
+
+	<row h="auto"/>
+	<statictext col_start="1" label="Duel Min" />
+	<spinctrl col_start="2" name="duel_min" style="ALIGN_RIGHT|SP_ARROW_KEYS"/>
+	<statictext col_start="3" label="Max" />
+	<spinctrl col_start="4" name="duel_max" style="ALIGN_RIGHT|SP_ARROW_KEYS"/>
+	
+	<checkbox row="auto" col_start="1" col_end="0" name="check_portrait" label="Mode Portrait" style="CHK_2STATE|ALIGN_LEFT" />
+	
+	<toolbar row="auto" col_start="1" col_end="0" name="tb" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT" />
+</panel>
+
+<panel name="duel">
+	<font name="calibri" weight="bold" size="10" color="black" align="center"/>
+	<pen border="1" />
+	<padding all="0px" />
+	<spacing horz="2" />
+
+	<lua>
+		height_label_tour = height_label_tour or 18;
+		height_separator_duel = height_separator_duel or 2;
+		height_couloir = height_couloir or 20;
+
+		width_duel = width_duel or 600;
+		width_separaror_duel = width_separaror_duel or 20;
+		
+		nb_tour = GetNbTour();
+		presentation = presentation or 'club';
+	</lua>
+	
+	<row h="1"/>
+	<lua>for tour=1,nb_tour do</lua>
+		<col w="1"/>
+	<lua>end</lua>
+
+	<lua>for tour=1,nb_tour do</lua>
+		<matrix col_start="(tour)">
+			<col p="width_duel" />
+			<col c="width_separaror_duel" />
+			<lua>nb_duel = GetNbDuel(tour)</lua>
+
+			<row c="height_label_tour" />
+			<background mode="solid" color="ltgray" >
+				<wndtext col_start="1" font_color="red" font_size_step="1" border="1">GetLabelTour(tour)</wndtext>
+			</background>
+
+			<row c="height_separator_duel" />
+
+			<lua>for duel=1,nb_duel do</lua>
+				
+				<row h="1" />
+				<row h="4" cond="tour == nb_tour and duel == 1" />
+				
+				<lua>nb_couloir = GetNbCouloir(tour, duel)</lua>
+				<row c="(nb_couloir+1)*height_couloir"/>
+
+				<matrix col_start="1">
+					<col w="(GetLabelDuelWidth(tour,duel))" /> <!-- btn -->
+					<col w="3,4,20" /> <!-- couloir, bib, identity -->
+					<col cond="presentation == 'team'" w="15" />
+					<col cond="presentation == 'club'" w="4,12" />
+					<col cond="presentation == 'nation'" w="4" />
+					<col cond="presentation == 'progression'" w="10" />
+					<col w="10,4" /> <!-- time, rk -->
+					
+					<row h="1"/>
+					<background mode="solid" color="yellow">
+						<font size_step="-1">
+							<wndtext col_start="2">'C.'</wndtext>
+							<wndtext col_start="3">'Dos'</wndtext>
+							<wndtext col_start="4">'Identité'</wndtext>
+							<wndtext col_start="5" cond="presentation == 'nation'">'Nat'</wndtext>
+							<wndtext col_start="5" cond="presentation == 'team'">'Equipe'</wndtext>
+							<wndtext col_start="5" cond="presentation == 'progression'">'Progression'</wndtext>
+							<wndtext col_start="5" cond="presentation == 'club'">'CS'</wndtext>
+							<wndtext col_start="6" cond="presentation == 'club'">'Club'</wndtext>
+							<wndtext col_start="-1">'Temps'</wndtext>
+							<wndtext col_start="0">'Clt'</wndtext>
+						</font>
+					</background>
+					
+					<background mode="solid" color="white">
+						<lua>for couloir=1,nb_couloir do</lua>
+							<row h="1"/>
+							<lua>local label = string.format('_%-d_%-d_%-d', tour, duel, couloir)</lua>
+							<wndtext col_start="2" font_color="yellow" bk_color="black" pen_color="dkgray">couloir</wndtext>
+							<wndtext col_start="3" name="('bib'..label)" align="right">GetText(tour, duel, couloir, 'Dossard')</wndtext>
+							<wndtext col_start="4" name="('identity'..label)" align="left">GetText(tour, duel, couloir, 'Identite')</wndtext>
+							
+							<wndtext col_start="5" name="('nation'..label)" cond="presentation == 'nation'">GetText(tour, duel, couloir, 'Nation')</wndtext>
+							<wndtext col_start="5" name="('team'..label)" cond="presentation == 'team'">GetText(tour, duel, couloir, 'Equipe')</wndtext>
+							<wndtext col_start="5" name="('progression'..label)" cond="presentation == 'progression'">GetLabelProgression(tour, duel, couloir)</wndtext>
+							
+							<wndtext col_start="5" name="('cr'..label)" cond="presentation == 'club'">GetText(tour, duel, couloir, 'Comite')</wndtext>
+							<wndtext col_start="6" name="('club'..label)" cond="presentation == 'club'">GetText(tour, duel, couloir, 'Club')</wndtext>
+
+							<textctrlbutton col_start="-1" name="('time'..label)" style="TE_RIGHT"/>
+							<wndtext col_start="0" name="('rk'..label)" bk_color="dkred" font_color="white" align="right" />
+						<lua>end</lua>
+					</background>
+					<button col_start="1" row_start="1" row_end="0" label="(GetLabelDuel(tour, duel))" style="TE_LEFT" name="(string.format('btn_duel_%-d_%-d', tour, duel))" />
+				</matrix>
+
+				<row c="height_separator_duel" />
+				
+				<row h="1" />
+				<row h="4" cond="tour == nb_tour and duel == nb_duel" />
+			<lua>end</lua>
+		</matrix>
+	<lua>end</lua>
+	<!-- <lua>app.GetAuiFrame():MessageBox("This is the end !", "Info");</lua> -->
+</panel>
+
+</root>
