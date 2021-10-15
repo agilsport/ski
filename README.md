@@ -15,7 +15,8 @@ Généralement développé en LUA
 ## Edition 
 Sous dossier /edition du répertoire principal
 <br>
-Chaque activité a son fichier dédié : edition<codeActivite>.xml (editionALP.xml pour l'activité ALP=Alpin)
+Chaque activité a son fichier dédié : editionXXX.xml (exemple editionALP.xml pour l'activité ALP=Alpin)
+<br>
  
 ## XML (Import - Export)
 Sous dossier /xml du répertoire principal
