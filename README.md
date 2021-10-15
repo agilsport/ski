@@ -13,12 +13,14 @@ Sous dossier /device du répertoire principal
 Généralement développé en LUA
 
 ## Edition 
-#Sous dossier /edition du répertoire principal
-
-#chaque activité a son fichier dédié : edition<codeActivite>.xml (editionALP.xml pour l'activité ALP=Alpin)
- 
+Sous dossier /edition du répertoire principal
+<br>
+Chaque activité a son fichier dédié : edition<codeActivite>.xml (editionALP.xml pour l'activité ALP=Alpin)
  
 ## XML (Import - Export)
+Sous dossier /xml du répertoire principal
+<br>
+Prise en charge des normes XML FIS, FFS et ESF pour l'importation et l'exportation des compétitions.
 
 ___
 Les téléchargements Officiels sont téléchargeables sur la page [https://www.agil.fr/ski](https://www.agil.fr/ski) 
