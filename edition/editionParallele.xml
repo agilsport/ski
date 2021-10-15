@@ -1,0 +1,330 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Editions Parallele !-->
+<edition>
+	<menu>
+	</menu>
+
+	<!-- footer standard !-->
+	<footer>
+		<background mode="transparent"/>
+		<font name="Calibri" size="8" adjust="best" weight="normal"/>
+		<pen border="none" />
+
+		<lua>entite = entite or $(Evenement.Code_entite)</lua>
+		<lua>info = $(Epreuve.Date_epreuve,'%2D/%2M/%4Y')..' / '..$(Evenement.Station)..' ('</lua>
+		<lua cond="entite=='FIS'">info = info..$(Evenement.Code_nation)..'-'</lua>
+		<lua>info = info..$(Evenement.Code_comite).. ') / '..$(Evenement.Organisateur)</lua>
+		<text row="auto" col="1" align="left">info</text>
+		<text align="right" font_weight="bold" cond="entite=='FIS'">$(Epreuve.Fichier_transfert_int)..' (Liste n°'..$(Evenement.Code_liste)..')'</text>
+		<text align="right" font_weight="bold" cond="entite=='FFS'">$(Epreuve.Fichier_transfert)..' (Liste n°'..$(Evenement.Code_liste)..')'</text>
+		<line col_start="1" col_end="0" pen_size="2" pen_color="dkgray" border="bottom"/>
+		<!-- <text row="auto" align="left"><pen border="top" />app.GetName()..' Version '..app.GetVersion()..' (FFS - ESF - Agil Informatique) - '..os.date('Edité le %d-%m-%Y à %H:%M:%S')</text> -->
+		
+		<row value="auto" />
+		<matrix col_start="1">
+			<row value="auto"/>
+			<text col="auto" align="left">app.GetName()..' Version '..app.GetVersion()..' / FFS'</text>
+			<image col="0.4cm" adjust="width" align="left">'./res/32x32_ffs.png'</image>
+			<text col="auto" align="left" adjust="width">' / ESF'</text>
+			<image col="0.4cm" adjust="width" align="left">'./res/32x32_esf.png'</image>
+			<text col="auto" align="left">' / Agil Informatique'</text>
+			<image col="0.4cm" adjust="width" align="left">'./res/32x32_agil.png'</image>
+			<text col="auto" align="left">os.date(' / Edité le %d-%m-%Y à %H:%M:%S')</text>
+		</matrix>	
+		<text align="right">string.format('Page %d/%s',editor:GetPageCurrent(), editor:GetPageCountLabel())</text>
+		<line col_start="1" col_end="0" border="top" />
+		<text row="auto" align="left" cond="editor:GetPageCurrent() == 1">$(Evenement.Commentaire)</text>
+	</footer>
+
+	<!-- header standard !-->
+	<header>
+		<spacing all="0"/>
+		<background mode="transparent"/>
+		<font name="Calibri" size="14" adjust="max" weight="bold"/>
+		<text row="auto" col="1" align="center">$(Evenement.Nom)</text>
+		<text row="auto" align="center">$(Discipline.Libelle)</text>
+		<text row="auto" align="center">$(Categorie{$(Epreuve.Code_categorie)}.Libelle)..' - '..$(Sexe{$(Epreuve.Sexe)}.Libelle)</text>
+		<text row="auto" align="center" cond="title" >title</text>
+		<text row="auto" align="center" cond="title_filter">title_filter</text>
+		<row value="0.5cm"/>
+	</header>
+
+	<!-- KO-SYSTEM liste -->
+	<report id="kosystem_liste" title="Résultats Officiels" first_header="0">
+
+		<order key="Clt, Dossard" />
+
+		<rupture key="Ordre_niveau">
+			<before>
+				<font size="16"/>
+				<row value="0.5cm" />
+				<lua>
+					label_tour = ''; 
+					ordre = body:GetCellInt('Ordre_niveau', row, 0);
+					if ordre % 10 == 0 then 
+						label_tour = GetTourLabel(math.floor(ordre/10));
+					else 
+						label_tour = 'Petite Finale';
+					end
+				</lua>
+				<text row="auto" col="1">label_tour</text>
+			</before>
+		</rupture>
+
+		<label>
+			<call option="couleur_alternee" file="./edition/options.xml" />
+
+			<row value="auto"/>
+			<text col="6" align="center" font_weight="bold" font_size_step="1">'Clt'</text>
+			<text col="5" align="center">'Dos.'</text>
+			<text col="20" align="center" font_weight="bold">'Identité'</text> 
+			<text col="14" align="center" label="Club">'Club'</text>
+			
+			<lua>for tour=1,nb_tour do </lua>
+				<text col="12" align="center">GetTourLabel(tour)</text>
+			<lua>end</lua>
+			
+		</label>
+
+		<body>
+			<call option="couleur_alternee" file="./edition/options.xml" />
+
+			<row value="auto"/>
+			<text col="6" align="right" font_weight="bold" font_size_step="1">$(Clt)</text>
+			<text col="5" align="center">$(Dossard)</text>
+			<text col="20" align="left" font_weight="bold">$(Identite)</text> 
+			<text col="14" align="center" >$(Club)</text>
+
+			<lua>
+				for tour=1,nb_tour do
+					txt_time = '';
+					status = body:GetCell('Status_tour'..tostring(tour), row);
+					if status == 'O' then
+						txt_time = body:GetCell('Tps1_chrono_tour'..tostring(tour), row, format_time)..
+									' ['..body:GetCell('Tps1_tour'..tostring(tour), row, format_diff)..']';
+					end
+			</lua>
+				<text col="12" align="center">txt_time</text>
+			<lua>end</lua>
+
+			<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
+		</body>
+	</report>
+	
+	
+	<!-- Team-Event Total liste -->
+	<report id="team_event_total_liste" title="Résultats Officiels" first_header="0">
+		<paper orientation="landscape" />
+		<order key="Clt, Dossard" />
+
+		<rupture key="Ordre_niveau">
+			<before>
+				<font size="16"/>
+				<row value="0.5cm" />
+				<lua>
+					label_tour = ''; 
+					ordre = body:GetCellInt('Ordre_niveau', row, 0);
+					if ordre % 10 == 0 then 
+						label_tour = GetTourLabel(math.floor(ordre/10));
+					else 
+						label_tour = 'Petite Finale';
+					end
+				</lua>
+				<text row="auto" col="1">label_tour</text>
+			</before>
+		</rupture>
+
+		<label>
+			<call option="couleur_alternee" file="./edition/options.xml" />
+
+			<row value="auto"/>
+			<text col="6" align="center" font_weight="bold" font_size_step="1">'Clt'</text>
+			<text col="4" align="center">'Dos.'</text>
+			<text col="18" align="center" font_weight="bold">'Equipe'</text> 
+			<text col="18" align="center" font_weight="bold">'Equipier'</text> 
+			
+			<lua>for tour=1,nb_tour do </lua>
+				<text col="12" align="center">GetTourLabel(tour)</text>
+			<lua>end</lua>
+			
+		</label>
+
+		<body>
+			<call option="couleur_alternee" file="./edition/options.xml" />
+
+			<row value="auto"/>
+			<row value="auto"/>
+			<row value="auto"/>
+			<row value="auto"/>
+			
+			<text col="6" row_start="1" row_end="0" align="right" font_weight="bold" font_size_step="1">$(Clt)</text>
+			<text col="4" row_start="1" row_end="0" align="center">$(Dossard)</text>
+			<text col="18" row_start="1" row_end="0" align="left" font_weight="bold">$(Identite)</text> 
+			<matrix col="18" row_start="1" row_end="0">
+				<col value="1"/>
+				<lua>code_coureur = $(Code_coureur)</lua>
+				<text row ="1" align="left" font_weight="bold" font_size_step="-1">GetEquipier(code_coureur, 'A')</text> 
+				<text row ="1" align="left" font_weight="bold" font_size_step="-1">GetEquipier(code_coureur, 'B')</text> 
+				<text row ="1" align="left" font_weight="bold" font_size_step="-1">GetEquipier(code_coureur, 'C')</text> 
+				<text row ="1" align="left" font_weight="bold" font_size_step="-1">GetEquipier(code_coureur, 'D')</text> 
+			</matrix>
+	
+			<lua>
+				for tour=1,nb_tour do
+					txt_time1 = '';
+					txt_time2 = '';
+					txt_time3 = '';
+					txt_time4 = '';
+					status = body:GetCell('Status_tour'..tostring(tour), row);
+					if status == 'O' then
+						txt_time1 = body:GetCell('Tps1_chrono_tour'..tostring(tour), row, format_time)..
+									' ['..body:GetCell('Tps1_tour'..tostring(tour), row, format_diff)..']';
+						txt_time2 = body:GetCell('Tps2_chrono_tour'..tostring(tour), row, format_time)..
+									' ['..body:GetCell('Tps2_tour'..tostring(tour), row, format_diff)..']';
+						txt_time3 = body:GetCell('Tps3_chrono_tour'..tostring(tour), row, format_time)..
+									' ['..body:GetCell('Tps3_tour'..tostring(tour), row, format_diff)..']';
+						txt_time4 = body:GetCell('Tps4_chrono_tour'..tostring(tour), row, format_time)..
+									' ['..body:GetCell('Tps4_tour'..tostring(tour), row, format_diff)..']';
+					end
+			</lua>
+				<text row_start="1" col="12" align="center">txt_time1</text>
+				<text row_start="2" align="center">txt_time2</text>
+				<text row_start="3" align="center">txt_time3</text>
+				<text row_start="4" align="center">txt_time4</text>
+			<lua>end</lua>
+
+			<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
+		</body>
+	</report>
+	
+	<!-- parallele_liste -->
+	<report id="parallele_liste" title="Résultats Officiels" first_header="0">
+
+		<order key="Clt, Dossard" />
+
+		<rupture key="Ordre_niveau">
+			<before>
+				<font size="16"/>
+				<row value="0.5cm" />
+				<lua>label_tour = ''</lua>
+				<lua>if $(Ordre_niveau) == '50' then label_tour = 'Finale' end</lua>
+				<lua>if $(Ordre_niveau) == '49' then label_tour = 'Petite Finale' end</lua>
+				<lua>if $(Ordre_niveau) == '40' then label_tour = '1/2 Finale' end</lua>
+				<lua>if $(Ordre_niveau) == '30' then label_tour = '1/4 Finale' end</lua>
+				<lua>if $(Ordre_niveau) == '20' then label_tour = '1/8 Finale' end</lua>
+				<lua>if $(Ordre_niveau) == '10' then label_tour = '1/16 Finale' end</lua>
+				<text row="auto" col="1">label_tour</text>
+			</before>
+		</rupture>
+
+		<body>
+			<call option="couleur_alternee" file="./edition/options.xml" />
+
+			<row value="auto"/>
+			<text col="6" align="right" label="Clt" font_weight="bold" font_size_step="1">$(Clt)</text>
+			<text col="5" align="center" label="Dos.">$(Dossard)</text>
+			<text col="20" align="left" label="Nom - Prénom" font_weight="bold">$(Identite)</text> 
+			<text col="4" align="center" label="Nat">$(Nation)</text>
+
+			<lua>ordre_niveau = 50</lua>
+			<lua>if group == 'body'then ordre_niveau = body:GetCellInt('Ordre_niveau', row) end</lua>
+
+			<text col="12" align="center" label="T.1">$(Tps_chrono_tour1)..' ['..$(Tps_tour1)..']'</text>
+
+			<lua>txt_time = ''</lua>
+			<lua>if ordre_niveau &gt;= 20 then txt_time = $(Tps_chrono_tour2)..' ['..$(Tps_tour2)..']' end </lua>
+			<text col="12" align="center" label="T.2">txt_time</text>
+
+			<lua>txt_time = ''</lua>
+			<lua>if ordre_niveau &gt;= 30 then txt_time = $(Tps_chrono_tour3)..' ['..$(Tps_tour3)..']' end </lua>
+			<text col="12" align="center" label="T.2">txt_time</text>
+
+			<lua>txt_time = ''</lua>
+			<lua>if ordre_niveau &gt;= 40 then txt_time = $(Tps_chrono_tour4)..' ['..$(Tps_tour4)..']' end </lua>
+			<text col="12" align="center" label="T.2">txt_time</text>
+
+			<lua>txt_time = ''</lua>
+			<lua>if ordre_niveau &gt;= 49 then txt_time = $(Tps_chrono_tour5)..' ['..$(Tps_tour5)..']' end </lua>
+			<text col="12" align="center" label="T.2">txt_time</text>
+
+			<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
+		</body>
+	</report>
+
+	<!-- Parallele_tableau -->
+	<report id="parallele_tableau" title="Résultats Officiels" header="0" first_header="0" footer="0">
+		<paper orientation="landscape" />
+		<margin top="80" bottom="80" left="80" right="80" />
+
+		<end>
+			<lua>nb_tour = nb_tour or 4</lua>
+			<lua>height_bloc = height_bloc or 115</lua>
+			<lua>width_bloc = width_bloc or 560</lua>
+			<lua>nb_duel_max = 2^(nb_tour-1)</lua>
+			<lua>spacing_bloc = 0</lua>
+			<lua>height_total = (height_bloc + 2*spacing_bloc)*nb_duel_max</lua>
+			<lua>width_total = (width_bloc + 8)*nb_tour</lua>
+			<font name="calibri" size="9" />
+
+			<lua>for tour=1,nb_tour do</lua>
+				<matrix>
+					<lua>nb_duel = 2^(nb_tour-tour)</lua>
+					<lua>nb_run = GetNbRun(tour)</lua>
+
+					<lua>height = (height_bloc + 2*spacing_bloc)*nb_duel</lua>
+					<lua>padding_duel = math.floor((height_total - height)/(2*nb_duel))</lua>
+					<!-- <lua>app.GetAuiMessage():AddLine('padding_duel='..padding_duel);</lua> -->
+
+					<!-- Ajout de la Finale B ... -->
+					<lua>if tour == nb_tour and nb_duel == 1 then nb_duel = 2 end</lua>
+			
+					<lua>for t=1,tour do </lua>
+						<col w="(width_bloc..'px')" />
+						<col w="8px" />
+					<lua>end</lua>
+					
+					<lua>for duel=1,nb_duel do</lua>
+					
+						<lua>duel_name = 'Duel '..duel</lua>
+						<lua>if tour == nb_tour and duel == 1 then duel_name = 'FINALE ' end</lua>
+						<lua>if tour == nb_tour and duel == 2 then duel_name = 'FINALE B' end</lua>
+						
+						<row h="(tostring(padding_duel)..'px')"/>
+						<matrix row="(height_bloc..'px')" col_start="-1">
+							<row h="('1,1,'..spacing_bloc..'px')" />
+							<col w="5,18" />	<!-- bib, identity -->
+							<lua>for r=1,nb_run do</lua>
+								<col w="7" /> <!-- run -->
+							<lua>end</lua>
+							
+							<background mode="solid" color_start="ltgray" color_end="ltgray"/>
+							<pen border="1" color="gray" />
+							
+							<!-- left : bib, identity, run ... -->
+							<background mode="solid" color_start="white" color_end="white"/>
+							<pen border="1" color="black"/>
+							<text row_start="1" col_start="1" align="right" font_weight="bold" >GetCellLeft(tour, duel, 1, 'Dossard')</text>
+							<text row_start="1" col_start="2" align="center" font_size_step="-2" >GetCellLeft(tour, duel, 1, 'Nom')</text>
+							<lua>for r=1,nb_run do</lua>
+								<text row_start="1" col_start="(2+r)" align="center" font_size_step="-2">GetTime(tour, duel, 'L', r)</text>
+							<lua>end</lua>
+
+							<!-- right : bib, identity, run ... -->
+							<text row_start="2" col_start="1" align="right" font_weight="bold">GetCellRight(tour, duel, 1, 'Dossard')</text>
+							<text row_start="2" col_start="2" align="center" font_size_step="-2">GetCellRight(tour, duel, 1, 'Nom')</text>
+							<lua>for r=1,nb_run do</lua>
+								<text row_start="2" col_start="(2+r)" align="center" font_size_step="-2">GetTime(tour, duel, 'R', r)</text>
+							<lua>end</lua>
+						</matrix>
+
+						<!-- Finale B juste en dessous de la Finale A ... -->
+						<lua>if tour == nb_tour and duel == 1 then padding_duel = 4 end</lua>
+						
+						<row value="(padding_duel..'px')"/>
+					<lua>end</lua>
+				</matrix>
+			<lua>end</lua>
+		</end>
+	</report>
+</edition>
+
