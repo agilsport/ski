@@ -13,8 +13,10 @@ Sous dossier /device du répertoire principal
 Généralement développé en LUA
 
 ## Edition 
-Sous dossier /edition du répertoire principal
-chaque activité a son fichier dédié : edition<codeActivite>.xml (editionALP.xml pour l'activité ALP=Alpin)
+#Sous dossier /edition du répertoire principal
+
+#chaque activité a son fichier dédié : edition<codeActivite>.xml (editionALP.xml pour l'activité ALP=Alpin)
+ 
  
 ## XML (Import - Export)
 
