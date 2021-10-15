@@ -2,16 +2,6 @@
 ## Développement et Resources pour les logiciels de Ski 
 
 ## Périphériques (Devices)
-tititi
-t
-t
-
-t
-t
-t
-t
-
-
 
 ## Edition 
 
