@@ -9,9 +9,7 @@
 - 4 : Live et Réseau
 
 Sous dossier /device du répertoire principal
-Principalement développé en LUA :
-  Métatable device avec les fonctions device.GetInformation(), device.OnRead()
-  
+Généralement développé en LUA
 
 ## Edition 
 
