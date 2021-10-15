@@ -5,7 +5,7 @@ dofile('./interface/device.lua');
 -- Information : Numéro de Version, Nom, Interface
 function device.GetInformation()
 	return { 
-		version = 2.7, 
+		version = 2.8, 
 		name = 'AGIL FFSSKI', 
 		class = 'chrono', 
 		interface = { { type='tcp', hostname = '192.168.1.10', port = 7264 } } 
