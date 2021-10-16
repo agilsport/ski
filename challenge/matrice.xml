@@ -1,0 +1,1302 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Matrice Individuelle PG -->
+<!-- <background mode="gradient_line_vert" color_start="white" color_end="ltgray" /> -->
+<root title="Matrice individuelle" script="matrice_individuelle.lua" config="OnConfiguration">
+	<defaults>
+		<comboActivite>ALP</comboActivite>
+		<comboEntite>FFS</comboEntite>
+		<comboGarderInfQuota>Non</comboGarderInfQuota>
+		<comboTypePoint>Points place</comboTypePoint>
+		<comboOrientation>Portrait</comboOrientation>
+		<comboSortie>Sur papier seul</comboSortie>
+		<comboTriSortie>Classement</comboTriSortie>
+		<comboAbdDsq>Non</comboAbdDsq>
+		<comboTpsDuDernier>Non</comboTpsDuDernier>
+		<numPtsPresence>0</numPtsPresence>
+		<comboPresentationCourses>Présentation horizontale type Ski Chrono Tour (par défaut)</comboPresentationCourses>
+		<comboPrendreBloc1>Classement général</comboPrendreBloc1>
+		<comboPrendreBloc2>Classement général</comboPrendreBloc2>
+		<coefDefautCourseBloc1>100</coefDefautCourseBloc1>
+		<coefDefautCourseBloc2>100</coefDefautCourseBloc2>
+		<coefDefautMancheBloc1>100</coefDefautMancheBloc1>
+		<coefDefautMancheBloc2>100</coefDefautMancheBloc2>
+		<texteLargeurLarge>1,5</texteLargeurLarge>
+		<texteLargeurEtroite>1</texteLargeurEtroite>
+		<texteMargeHaute1>1</texteMargeHaute1>
+		<texteMargeHaute2>1</texteMargeHaute2>
+		<texteImprimerDeparts>Non</texteImprimerDeparts>
+		<texteFontSize>8</texteFontSize>
+		<texteLigne2Texte>Nombre de courses :</texteLigne2Texte>
+		<texteImprimerHeader>Non</texteImprimerHeader>
+		<texteCodeComplet>Non</texteCodeComplet>
+		<texteImprimerClubLong>Non</texteImprimerClubLong>
+		<texteFiltreSupplementaire>Non</texteFiltreSupplementaire>
+		<EvenementSupport>0,0</EvenementSupport>
+	</defaults>
+	<combisaut>
+		<facteur_f>350</facteur_f>
+		<valeur_c>60</valeur_c>
+		<point_k>25</point_k>
+		<points_metre>2.5</points_metre>
+	</combisaut>
+	<panel name="wait">
+		<col value="1"/>
+		<row value="20px,30px,30px" />
+		<wndtext row_start="2" font_size="10" align="center">"Calculs et préparation de l'impression en cours."</wndtext>
+		<wndtext row_start="3" font_size="10" align="center">"Merci de patienter."</wndtext>
+	</panel>
+	<panel name="sauveok">
+		<col value="1"/>
+		<row value="200px"/>
+		<statictext font_size="10" style="ALIGN_CENTER" label="Enregistrement des paramètres" />
+	</panel>
+	<panel name="selectionmultiple">
+		<lua>nbrows = tonumber(params.Rows);
+		nbrows1 = math.ceil(nbrows / 2);
+		</lua>
+		<col value="1,1,50px"/>
+		<row value="30px"/>
+		<matrix row="auto" col_start="1">
+			<col value="20px,1,10"/>
+			<lua>for i = 1, nbrows1 do</lua>
+			<textctrl row="auto" col_start="3" name="('reg'..i)" style="TE_READONLY"/>
+			<checkbox col_start="2" name="('chk'..i)" style="CHK_2STATE|ALIGN_LEFT"/>
+			<lua>end</lua>
+		</matrix>
+		<matrix row="auto" col_start="2" row_start="-1">
+			<col value="20px,1,10"/>
+			<lua>depart = nbrows1 + 1;
+		   for i = depart, nbrows do</lua>
+			<textctrl row="auto" col_start="3" name="('reg'..i)" style="TE_READONLY"/>
+			<checkbox col_start="2" name="('chk'..i)" style="CHK_2STATE|ALIGN_LEFT"/>
+			<lua>end</lua>
+		</matrix>
+		<row value="50px"/>
+		<toolbar row="auto" col_start="1" col_end="0" name="tb" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
+		<row value="1"/>
+	</panel>
+	<panel name="matriceconfig">
+		<wnd name="statictext" style="ALIGN_RIGHT" />
+		<padding all="3px"/>
+		<col value="3,4"/>
+		<row value="30px"/>
+		<matrix col_start="1" row="auto">
+			<col value="3,4,20px"/>
+			<statictext row="auto" col_start="1" label="Titre" />
+			<textctrl col_start="2" name="Titre" style="TE_MULTILINE|TE_READONLY"/>
+			<statictext row="auto" col_start="1" label="Saison"/>
+			<combotable col_start="2" name="Saison" style="CB_READONLY"/>
+			<statictext row="auto" col_start="1" label="Entite"/>
+			<combotable col_start="2" name="comboEntite" style="CB_READONLY"/>
+			<statictext row="auto" col_start="1" label="Activite"/>
+			<combotable col_start="2" name="comboActivite" style="CB_READONLY"/>
+			<statictext row="auto" col_start="1" label="Sexe des coureurs"/>
+			<combobox col_start="2" name="comboSexe" style="CB_READONLY"/>
+			<statictext row="auto" col_start="1" label="Garder les non classés"/>
+			<combotable col_start="2" name="comboGarderInfQuota" style="CB_READONLY"/>
+			<statictext row="auto" col_start="1" label="Nb départ mini pour être classé"/>
+			<textctrl col_start="2" name="numDepartMini"/>
+			<statictext row="auto" col_start="1" label="Imprimer Abd ou Dsq"/>
+			<combotable col_start="2" name="comboAbdDsq" style="CB_READONLY"/>
+			<statictext row="auto" col_start="1" label="Les ABD, DSQ et ABS prennent le temps\ndu dernier avec un malus"/>
+			<combotable col_start="2" name="comboTpsDuDernier" style="CB_READONLY"/>
+			<statictext row="auto" col_start="1" label="ABD/DSQ : malus en points si la valeur \nest &gt;= 10, sinon malus en secondes"/>
+			<textctrl col_start="2" name="numMalusAbdDsq"/>
+			<statictext row="auto" col_start="1" label="ABS : malus en points si la valeur \nest &gt;= 10, sinon malus en secondes"/>
+			<textctrl col_start="2" name="numMalusAbs"/>
+			<statictext row="auto" col_start="1" label="Regroupement des courses"/>
+			<combotable col_start="2" name="comboRegroupement"/>
+			<statictext row="auto" col_start="1" label="Trier le résultat par"/>
+			<combobox col_start="2" name="comboTriSortie" style="CB_READONLY"/>
+			<statictext row="auto" col_start="1" label="Présentation des courses"/>
+			<combobox col_start="2" name="comboPresentationCourses" style="CB_READONLY"/>
+			<statictext row="auto" col_start="1" label="Mode portrait ou paysage"/>
+			<combobox col_start="2" name="comboOrientation" style="CB_READONLY"/>
+			<statictext row="auto" col_start="1" label="Arrêter les calculs après la course"/>
+			<combobox col_start="2" name="numArretCalculApres" style="CB_READONLY"/>
+			<row value="5px"/>
+		</matrix>
+		<matrix col_start="2" row_start="2">
+			<col value="1,1,5px"/>
+			<statictext row="auto" col_start="1" label="Type de points"/>
+			<combobox col_start="2" name="comboTypePoint" style="CB_READONLY"/>
+			<statictext row="auto" col_start="1" label="Choix de la grille"/>
+			<combobox col_start="2" name="comboGrille" style="CB_READONLY"/>
+			<statictext row="auto" col_start="1" label="Point présence"/>
+			<combobox col_start="2" name="numPtsPresence" style="CB_READONLY"/>
+			<statictext row="auto" col_start="1" label="Seuil de participation pour \navoir la totalité des points"/>
+			<textctrl col_start="2" name="numMinimumArrivee"/>
+			<statictext row="auto" col_start="1" label="sinon, indiquer le Coef de réduction en %"/>
+			<textctrl col_start="2" name="coefReduction"/>
+			<statictext row="auto" col_start="1" label="Nombre de Points Totaux mini pour être classé "/>
+			<textctrl col_start="2" name="numPtsMini"/>
+			<statictext row="auto" col_start="1" label="Points FFS Maximum pour entrer dans le classement "/>
+			<textctrl col_start="2" name="numPtsMaxi"/>
+			<row value="5px"/>
+			<matrix col_start="1" col_end="2" row="auto">
+				<row value="5px"/>
+				<col value="1,1,1,1"/>
+				<statictext row="auto" col_start="1" col_end="2" style="ALIGN_CENTER" label="Pour les courses du groupe 1"/>
+				<statictext row="auto" row_start="-1" col_start="3" col_end="4" style="ALIGN_CENTER" label="Pour les courses du bloc 2"/>
+				<statictext row="auto" col_start="1" col_end="2" style="ALIGN_CENTER" label="Points à prendre"/>
+				<statictext row="auto" row_start="-1" col_start="3" col_end="4" style="ALIGN_CENTER" label="Points à prendre"/>
+				<combobox row="auto" col_start="1" col_end="2" name="comboPrendreBloc1" style="ALIGN_CENTER|CB_READONLY"/>
+				<combobox row="auto" row_start="-1" col_start="3" col_end="4" name="comboPrendreBloc2" style="ALIGN_CENTER|CB_READONLY"/>
+				<statictext row="auto" col_start="1" col_end="4" style="ALIGN_CENTER" label="Indiquer les Coefficients (en %) à appliquer par défaut. \nIls pourront être redéfinis pour chacune des courses."/>
+				<statictext row="auto" col_start="1" label="Sur les courses"/>
+				<textctrl row="auto" row_start="-1" col_start="2" name="coefDefautCourseBloc1" />
+				<textctrl row="auto" row_start="-2" col_start="3" name="coefDefautCourseBloc2" />
+				<statictext row="auto" col_start="1" label="Sur les manches"/>
+				<textctrl row="auto" row_start="-1" col_start="2" name="coefDefautMancheBloc1" />
+				<textctrl row="auto" row_start="-2" col_start="3" name="coefDefautMancheBloc2" />
+				<statictext row="auto" col_start="1" col_end="4" style="ALIGN_CENTER" label="% du temps en plus du vainqueur au-delà duquel on ne peut plus marquer de points."/>
+				<textctrl row="auto" col_start="2" name="coefPourcentageMaxiBloc1" align="left"/>
+				<textctrl row="auto" row_start="-1" col_start="3" name="coefPourcentageMaxiBloc2"/>
+				<row value="5px"/>
+			</matrix>
+		</matrix>
+		<row value="10px"/>
+		<staticbox row_start="1" row_end="0" col_start="1" col_end="2" label="Paramètres généraux de la matrice"/>
+		<row value="1"/>
+		<toolbar row="auto" col_start="1" col_end="0" name="tbedit1" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
+		<row value="50px"/>
+	</panel>
+	<panel name="configplagepoints">
+		<padding all="3px"/>
+		<pen border="0"/>
+		<col value="2,1,1,2"/>
+		<row value="50px"/>
+		<statictext row="auto" col_start="2" label="Code Entité de la liste"/>
+		<combobox col_start="3" name="comboListe0Entite" style="CB_READONLY"/>
+		<statictext row="auto" col_start="2" label="Choix du classement"/>
+		<combobox col_start="3" name="comboListe0Classement" style="CB_READONLY"/>
+		<statictext row="auto" col_start="2" label="Choix de la liste"/>
+		<combobox col_start="3" name="comboListe0" style="CB_READONLY"/>
+		<statictext row="auto" col_start="2" label="Limite basse de points"/>
+		<textctrl col_start="3" name="numPtsBas"/>
+		<statictext row="auto" col_start="2" label="Limite haute de points"/>
+		<textctrl col_start="3" name="numPtsHaut"/>
+		<row value="10px"/>
+		<staticbox row_start="1" row_end="0" col_start="1" col_end="0" label="Filtrage supplémentaire des concurrents par points"/>
+		<row value="1"/>
+		<toolbar row="auto" col_start="1" col_end="0" name="tbconfigplagepoints" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
+		<row value="50px"/>
+	</panel>
+	<panel name="configparamcolor">
+		<lua>dofile('./interface/adv.lua');
+			colordisciplines = colordisciplines or params.colordisciplines;
+		</lua>
+		<row value="20px"/>
+		<col value="1,1,1"/>
+		<matrix row="auto" col_start="2">
+			<row value="50px"/>
+			<col value="1,200px,200px,20px,1"/>
+			<padding all="3px"/>
+			<statictext row="30px" col_start="2" style="ALIGN_CENTER" label="Dis."/>
+			<statictext col_start="3" style="ALIGN_CENTER" label="Couleur"/>
+			<pen size="1" border="all"/>
+			<lua>for i = 1, #colordisciplines do
+					color = 'rgb '..colordisciplines[i].Color;
+			</lua>
+			<textctrl row="auto" col_start="2" name="('discipline'..i)" style="TE_CENTER|TE_READONLY"/>
+			<wndtext col_start="3" name="('bgc'..i)">
+				<background mode="solid" color="(color)"/>
+			</wndtext>
+			<checkbox col_start="4" name="('chk'..i)" style="CHK_2STATE|ALIGN_LEFT"/>
+			<lua>end</lua>
+			<!-- <row value="50px"/> -->
+		</matrix>
+		<row value="50px"/>
+		<staticbox row_start="1" row_end="0" col_start="2" col_end="2" label="Paramétrage des couleurs"/>
+		<toolbar row="auto" col_start="1" name="tbconfigparam" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
+		<row value="1"/>
+	</panel>
+	<panel name="configparamcolorpodium">
+		<lua>dofile('./interface/adv.lua');
+			colorpodium = 'rgb '..params.colorpodium;
+		</lua>
+		<row value="20px"/>
+		<col value="1,1,1"/>
+		<matrix row="auto" col_start="2">
+			<row value="30px"/>
+			<col value="1,200px,50px,1"/>
+			<padding all="10px"/>
+			<statictext row="auto" col_start="1" col_end="0" style="ALIGN_CENTER" label="Couleur des caractères du podium"/>
+			<wndtext row="auto" col_start="2" name="podium">
+				<background mode="solid" color="(colorpodium)"/>
+			</wndtext>
+			<checkbox col_start="3" name="chkpodium" style="CHK_2STATE|ALIGN_LEFT"/>
+		</matrix>
+		<row value="50px"/>
+		<staticbox row_start="1" row_end="0" col_start="2" col_end="2" label="Paramétrage des couleurs"/>
+		<toolbar row="auto" col_start="1" name="tbconfigparam" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
+		<row value="1"/>
+	</panel>
+	<panel name="texte">
+		<row value="0.5cm"/>
+		<col value="1,3,2"/>
+		<pen border="0"/>
+		<padding all="3px"/>
+		<matrix col_start="2" row="auto">
+			<col value="3,2" />
+			<statictext row="auto" col_start="1" label="Imprimer le titre "/>
+			<combotable col_start="2" name="texteImprimerHeader" style="CB_READONLY"/>
+			<statictext row="auto" col_start="1" label="Marge haute / page 1 en cm : "/>
+			<textctrl col_start="2" name="texteMargeHaute1"/>
+			<statictext row="auto" col_start="1" label="Marge haute / page x en cm : "/>
+			<textctrl col_start="2" name="texteMargeHaute2"/>
+			<statictext row="auto" col_start="1" label="Imprimer nom complet du club : "/>
+			<combotable col_start="2" name="texteImprimerClubLong" style="CB_READONLY"/>
+			<statictext row="auto" col_start="1" label="Taille des caractères : "/>
+			<textctrl col_start="2" name="texteFontSize"/>
+			<statictext row="auto" col_start="1" label="Choix du calque actif : "/>
+			<combobox col_start="2" name="texteImprimerLayer" style="CB_READONLY"/>
+			<statictext row="auto" col_start="1" label="Choix des pages : "/>
+			<combobox col_start="2" name="texteImprimerLayerPage" style="CB_READONLY"/>
+			<statictext row="auto" col_start="1" label="Largeur en cm des colonnes des temps : "/>
+			<combobox col_start="2" name="texteLargeurLarge" style="CB_READONLY"/>
+			<statictext row="auto" col_start="1" label="Largeur en cm des autres colonnes : "/>
+			<combobox col_start="2" name="texteLargeurEtroite" style="CB_READONLY"/>
+			<statictext row="auto" col_start="1" label="Imprimer le nombre des départs : "/>
+			<combotable col_start="2" name="texteImprimerDeparts" style="CB_READONLY"/>
+			<statictext row="auto" col_start="1" label="Imprimer le tableau des Critères de calcul : "/>
+			<combotable col_start="2" name="texteImprimerStatCourses" style="CB_READONLY"/>
+			<statictext row="auto" col_start="1" label="Texte à mettre en ligne 2 de celui-ci : "/>
+			<textctrl col_start="2" name="texteLigne2Texte"/>
+			<statictext row="auto" col_start="1" label="Imprimer le Code coureur complet : "/>
+			<combotable col_start="2" name="texteCodeComplet" style="CB_READONLY"/>
+			<statictext row="auto" col_start="1" label="Présenter un filtrage supplémentaire avant les calculs : "/>
+			<combotable col_start="2" name="texteFiltreSupplementaire" style="CB_READONLY"/>
+			<statictext row="auto" col_start="1" col_end="0" label="Nombre de colonnes utilisées pour la présentation des courses en mode horizontal : "/>
+			<combobox row="auto" col_start="2" name="texteNbColPresCourses" style="ALIGN_CENTER|CB_READONLY"/>
+		</matrix>
+		<row value="15px"/>
+		<!-- <staticbox col_start="1" col_end="2" row_start="1" row_end="0" label="Paramétrage supplémentaire des impressions"/> -->
+		<row value="1"/>
+		<toolbar row="auto" col_start="1" col_end="0" name="tbtexte" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
+		<row value="50px"/>
+	</panel>
+	<panel name="configcolonnes">
+		<row value="30px"/>
+		<col value="2,2,2,3,3,3"/>
+		<pen border="0"/>
+		<padding all="3px"/>
+		<statictext row="auto" col_start="1" style="ALIGN_CENTER" label="Colonnes à imprimer"/>
+		<statictext col_start="2" style="ALIGN_CENTER" label="Label"/>
+		<statictext col_start="3" style="ALIGN_CENTER" label="Alignement"/>
+		<lua>for i = 1, 14 do</lua>
+		<checkbox row="auto" col_start="1" name="('chk'..i)" label="Code coureur" cond="i==1" style="CHK_2STATE|ALIGN_RIGHT"/>
+		<checkbox row="auto" col_start="1" name="('chk'..i)" label="Identité" cond="i==2" style="CHK_2STATE|ALIGN_RIGHT"/>
+		<checkbox row="auto" col_start="1" name="('chk'..i)" label="Sexe" cond="i==3" style="CHK_2STATE|ALIGN_RIGHT"/>
+		<checkbox row="auto" col_start="1" name="('chk'..i)" label="An" cond="i==4" style="CHK_2STATE|ALIGN_RIGHT"/>
+		<checkbox row="auto" col_start="1" name="('chk'..i)" label="Catégorie" cond="i==5" style="CHK_2STATE|ALIGN_RIGHT"/>
+		<checkbox row="auto" col_start="1" name="('chk'..i)" label="Nation" cond="i==6" style="CHK_2STATE|ALIGN_RIGHT"/>
+		<checkbox row="auto" col_start="1" name="('chk'..i)" label="Comité" cond="i==7" style="CHK_2STATE|ALIGN_RIGHT"/>
+		<checkbox row="auto" col_start="1" name="('chk'..i)" label="Club" cond="i==8" style="CHK_2STATE|ALIGN_RIGHT"/>
+		<checkbox row="auto" col_start="1" name="('chk'..i)" label="Groupe" cond="i==9" style="CHK_2STATE|ALIGN_RIGHT"/>
+		<checkbox row="auto" col_start="1" name="('chk'..i)" label="Equipe" cond="i==10" style="CHK_2STATE|ALIGN_RIGHT"/>
+		<checkbox row="auto" col_start="1" name="('chk'..i)" label="Critère" cond="i==11" style="CHK_2STATE|ALIGN_RIGHT"/>
+		<checkbox row="auto" col_start="1" name="('chk'..i)" label="Pts / liste 1" cond="i==12" style="CHK_2STATE|ALIGN_RIGHT"/>
+		<checkbox row="auto" col_start="1" name="('chk'..i)" label="Pts / liste 2" cond="i==13" style="CHK_2STATE|ALIGN_RIGHT"/>
+		<checkbox row="auto" col_start="1" name="('chk'..i)" label="Delta" cond="i==14" style="CHK_2STATE|ALIGN_RIGHT"/>
+		<textctrl col_start="2" name="('label'..i)"/>
+		<combobox col_start="3" name="('align'..i)" style="CB_READONLY"/>
+		<lua>end</lua>
+		<statictext row_start="-3" col_start="4" style="ALIGN_CENTER" label="Liste"/>
+		<statictext row_start="-3" col_start="5" style="ALIGN_CENTER" label="Classement choisi"/>
+		<combotable row_start="-2" col_start="4" name="comboListe1" style="CB_READONLY"/>
+		<combotable row_start="-2" col_start="5" name="comboListe1Classement" style="CB_READONLY"/>
+		<combotable row_start="-1" col_start="4" name="comboListe2" style="CB_READONLY"/>
+		<combotable row_start="-1" col_start="5" name="comboListe2Classement" style="CB_READONLY"/>
+		<statictext col_start="4" label="Pour la technique ou la vitesse, primauté : "/>
+		<combobox col_start="5" name="comboListePrimaute" style="CB_READONLY"/>
+		<row value="15px"/>
+		<staticbox col_start="1" col_end="6" row_start="1" row_end="0" label="Paramétrage des colonnes"/>
+		<row value="1"/>
+		<toolbar row="auto" col_start="1" col_end="6" name="tbconfigcolonnes" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
+		<row value="50px"/>
+	</panel>
+	<panel name="configcolonnes2">
+		<row value="30px"/>
+		<col value="100px,1,1,1,100px"/>
+		<pen border="0"/>
+		<padding all="5px"/>
+		<row value="20px"/>
+		<matrix row="auto" col_start="2" col_end="2">
+			<col value="2,1,20px"/>
+			<row value="20px"/>
+			<statictext row="auto" col_start="1" label="Colonne  "/>
+			<statictext col_start="4" style="ALIGN_CENTER" label="Intitulé"/>
+			<checkbox row="auto" col_start="1" style="CHK_2STATE,ALIGN_RIGHT" name="1chk1" label="Classement général"/>
+			<checkbox row="auto" col_start="1" style="CHK_2STATE,ALIGN_RIGHT" name="1chk2" label="Temps Total"/>
+			<checkbox row="auto" col_start="1" style="CHK_2STATE,ALIGN_RIGHT" name="1chk3" label="Ecart de temps"/>
+			<checkbox row="auto" col_start="1" style="CHK_2STATE,ALIGN_RIGHT" name="1chk4" label="Points au Général"/>
+			<checkbox row="auto" col_start="1" style="CHK_2STATE,ALIGN_RIGHT" name="1chk5" label="Classement des manches"/>
+			<checkbox row="auto" col_start="1" style="CHK_2STATE,ALIGN_RIGHT" name="1chk6" label="Temps des manches"/>
+			<checkbox row="auto" col_start="1" style="CHK_2STATE,ALIGN_RIGHT" name="1chk7" label="Ecart de temps des manches"/>
+			<checkbox row="auto" col_start="1" style="CHK_2STATE,ALIGN_RIGHT" name="1chk8" label="Points des manches"/>
+			<checkbox row="auto" col_start="1" style="CHK_2STATE,ALIGN_RIGHT" name="1chk9" label="Points du total"/>
+			<checkbox row="auto" col_start="1" style="CHK_2STATE,ALIGN_RIGHT" name="1chk10" label="Classement / Bloc1"/>
+			<checkbox row="auto" col_start="1" style="CHK_2STATE,ALIGN_RIGHT" name="1chk11" label="Points / Bloc 1"/>
+			<lua>for i = 1, 11 do</lua>
+				<textctrl row_start="(i-11)" col_start="2" style="TE_CENTER" name="('1label'..i)"/>
+			<lua>end</lua>
+		</matrix>
+		<row value="10px"/>
+		<staticbox col_start="2" col_end="2" row_start="2" row_end="0" label="Courses du bloc 1"/>
+		<matrix row_start="3" col_start="3">
+			<col value="2,1"/>
+			<row value="20px"/>
+			<checkbox row="auto" col_start="1" style="CHK_2STATE,ALIGN_RIGHT" name="2chk1" label="Classement général"/>
+			<checkbox row="auto" col_start="1" style="CHK_2STATE,ALIGN_RIGHT" name="2chk2" label="Temps Total"/>
+			<checkbox row="auto" col_start="1" style="CHK_2STATE,ALIGN_RIGHT" name="2chk3" label="Ecart de temps"/>
+			<checkbox row="auto" col_start="1" style="CHK_2STATE,ALIGN_RIGHT" name="2chk4" label="Points au Général"/>
+			<checkbox row="auto" col_start="1" style="CHK_2STATE,ALIGN_RIGHT" name="2chk5" label="Classement des manches"/>
+			<checkbox row="auto" col_start="1" style="CHK_2STATE,ALIGN_RIGHT" name="2chk6" label="Temps des manches"/>
+			<checkbox row="auto" col_start="1" style="CHK_2STATE,ALIGN_RIGHT" name="2chk7" label="Ecart de temps des manches"/>
+			<checkbox row="auto" col_start="1" style="CHK_2STATE,ALIGN_RIGHT" name="2chk8" label="Points des manches"/>
+			<checkbox row="auto" col_start="1" style="CHK_2STATE,ALIGN_RIGHT" name="2chk9" label="Points du total"/>
+			<row value="20px"/>
+			<statictext row="auto" col_start="1" col_end="0" label="Les en-têtes de colonnes sont les mêmes pour\nles courses du bloc 1 et du bloc 2." style="ALIGN_CENTER"/>
+		</matrix>
+		<row value="15px"/>
+		<staticbox col_start="3" col_end="3" row_start="2" row_end="-1" label="Courses du bloc 2"/>
+		<matrix row_start="3" col_start="4">
+			<col value="2,1"/>
+			<row value="20px"/>
+			<checkbox row="auto" col_start="1" style="CHK_2STATE,ALIGN_RIGHT" name="3chk1" label="Classement général"/>
+			<checkbox row="auto" col_start="1" style="CHK_2STATE,ALIGN_RIGHT" name="3chk2" label="Longueur du saut"/>
+			<checkbox row="auto" col_start="1" style="CHK_2STATE,ALIGN_RIGHT" name="3chk3" label="Classement saut"/>
+			<checkbox row="auto" col_start="1" style="CHK_2STATE,ALIGN_RIGHT" name="3chk4" label="Points du saut"/>
+			<checkbox row="auto" col_start="1" style="CHK_2STATE,ALIGN_RIGHT" name="3chk5" label="Temps alpin"/>
+			<checkbox row="auto" col_start="1" style="CHK_2STATE,ALIGN_RIGHT" name="3chk6" label="Classement alpin"/>
+			<checkbox row="auto" col_start="1" style="CHK_2STATE,ALIGN_RIGHT" name="3chk7" label="Points alpins"/>
+			<checkbox row="auto" col_start="1" style="CHK_2STATE,ALIGN_RIGHT" name="3chk8" label="Points du total"/>
+			<row value="50px"/>
+			<statictext row="auto" col_start="1" col_end="0" style="ALIGN_CENTER" label="Pénalisation en points course \nde la manche de saut : " />
+			<matrix col_start="1" row="auto">
+				<col value="1,1"/>
+				<textctrl row="auto" style="TE_CENTER" col_start="2" name="numPenalisationSaut" />
+			</matrix>
+		</matrix>
+		<row value="15px"/>
+		<staticbox col_start="4" col_end="4" row_start="2" row_end="-2" label="Combi - Saut"/>
+		<staticbox col_start="1" col_end="0" row_start="1" row_end="0" label="Sélection des colonnes à imprimer"/>
+		<row value="10px"/>
+		<toolbar row_start="0" col_start="1" col_end="0" name="tbconfigcolonnes2" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
+		<row value="50px"/>
+	</panel>
+	<panel name="configcolonnes3">
+		<col value="1,1,1,1,4"/>
+		<pen border="0"/>
+		<padding all="2px"/>
+		<row value="15px"/>
+		<row value="50px"/>
+		<statictext row="auto" col_start="1" label="Nom de la colonne"/>
+		<combobox col_start="2" style="CB_READONLY" name="colonne"/>
+		<lua>for i = 1, 20 do</lua>
+		<textctrl col_start="3" style="TE_READONLY" name="('val'..i)"/>
+		<combobox col_start="4" name="('align'..i)"/>
+		<row value="auto"/>
+		<lua>end</lua>
+		<row value="15px"/>
+		<staticbox col_start="1" col_end="0" row_start="2" row_end="0" label="Alignement spéciaux"/>
+		<row value="1"/>
+		<toolbar row="auto" col_start="1" name="tbconfigcolonnes3" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
+		<row value="50px"/>
+	</panel>
+	<panel name="analyse">
+		<lua>dofile('./interface/adv.lua');</lua>
+		<col value="200px,1,200px"/>
+		<pen border="0"/>
+		<padding all="5px"/>
+		<row value="30px"/>
+		<matrix col_start="2" row="auto">
+			<row value="40px"/>
+			<col value="1,1,1,2,1,1,1,2,1"/>
+			<statictext row="auto" col_start="1" col_end="4" label="Prendre les points de la liste "/>
+			<combotable col_start="5" name="analyseGaucheListe" style="ALIGN_LEFT|CB_READONLY" />
+			<statictext row="60px" col_start="1" col_end="0" style="ALIGN_CENTER" label="(params.txt_label)"/>
+			<statictext row="auto" col_start="1" col_end="4" label="Discipline choisie : "/>
+			<combobox col_start="5" name="analyseGaucheDiscipline" style="ALIGN_LEFT|CB_READONLY" />
+			<row value="10px"/>
+			<statictext row="140px" col_start="1" col_end="0" style="ALIGN_CENTER" label="On sépare les critères les uns des autres par le signe +.\nUn critère peut comprendre plusieurs sous-critères de type ET / OU.\nSi on met une * dans le choix de la discipline, on prendra en compte toutes les courses sans distinction.\nSi le premier critère n\'est pas rempli, il faut valider le critère suivant et ainsi de suite.\nOn ne peut pas mixier les ET avec les OU dans le même critère."/>
+			<lua>for i = 1, 10 do</lua>
+				<statictext row="auto" col_start="2" label="faire"/>
+				<combobox col_start="1" name="('etou'..i)" cond="i &gt; 1"/>
+				<textctrl col_start="3" name="('gfaire'..i)"/>
+				<statictext col_start="4" style="TE_CENTER" label="fois dans les"/>
+				<textctrl col_start="5" style="TE_CENTER" name="('gxpremiers'..i)"/>
+				<statictext col_start="6" label="premiers"/>
+				<statictext col_start="7" style="ALIGN_CENTER" label="en"/>
+				<combobox col_start="8" name="('discipline'..i)" style="CB_READONLY" />
+			<lua>end</lua>
+			<staticbox row_start="1" row_end="0" col_start="1" col_end="0" label="Critères à valider en cascade"/>
+		</matrix>
+		<row value="15px"/>
+		<staticbox row_start="1" row_end="0" col_start="1" col_end="0" label="Critères d\'analyse statistique des performances"/>
+		<row value="1"/>
+		<toolbar row="auto" col_start="1" col_end="0" name="tbanalyse" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
+		<row value="50px"/>
+	</panel>
+	<panel name="criteretype1">
+		<lua>imageclear = params.imageclear;</lua>
+		<col value="2,1,1,1,60px,1"/>
+		<pen border="0"/>
+		<padding all="5px"/>
+		<row value="15px"/>
+		<row value="5px"/>
+		<wndimage row="60px" col_start="5" adjust="best">'./res/32x32_clear.png'</wndimage>
+		<statictext col_start="1" style="ALIGN_CENTER" label="Disciplines choisies"/>
+		<statictext col_start="2" style="ALIGN_CENTER" label="Disciplines proposées"/>
+		<statictext col_start="3" style="ALIGN_CENTER" label="En prendre"/>
+		<statictext col_start="4" style="ALIGN_CENTER" label="Nombre\nEx : 5 ou 75% ou 2/3 ou 5 sur 9"/>
+		<lua>for i = 0, 14 do</lua>
+			<textctrl row="auto" col_start="1" name="('disciplineschoisies'..i)" style="TE_RIGHT"/>
+			<combobox col_start="2" name="('disciplinesproposees'..i)" style="CB_READONLY"/>
+			<combobox col_start="3" name="('prendre'..i)" style="CB_READONLY"/>
+			<textctrl col_start="4" name="('combien'..i)"/>
+			<checkbox col_start="5" name="('chk'..i)" style="ALIGN_LEFT" />
+		<lua>end</lua>
+		<row value="15px"/>
+		<staticbox row_start="1" row_end="0" col_start="1" col_end="0" label="Critères de calculs simples"/>
+		<row value="1"/>
+		<toolbar row="auto" col_start="1" col_end="0" name="tbcriteretype1" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
+		<row value="50px"/>
+	</panel>
+	<panel name="criteretype2">
+		<lua>numTypeCritere = tonumber(numTypeCritere) or 2;</lua>
+		<col value="20px,1,15px,1,20px"/>
+		<row value="15px"/>
+		<row value="15px"/>
+		<pen border="0"/>
+		<padding all="1px"/>
+		<matrix row="auto" col_start="2">
+			<col value="2,1,1,1"/>
+			<statictext row="50px" col_start="1" col_end="4" style="ALIGN_CENTER" label="Prendre des courses du bloc 1"/>
+			<statictext row="auto" col_start="1" style="ALIGN_CENTER" label="Disciplines choisies"/>
+			<statictext col_start="2" style="ALIGN_CENTER" label="Disciplines proposées"/>
+			<statictext col_start="3" style="ALIGN_CENTER" label="En prendre"/>
+			<statictext col_start="4" style="ALIGN_CENTER" label="Nombre\nEx : 5 ou 75% ou 2/3"/>
+			<lua>for i = 0, 5 do</lua>
+			<textctrl row="auto" col_start="1" name="('disciplineschoisiesa'..i)" style="TE_RIGHT"/>
+			<combobox col_start="2" name="('disciplinesproposeesa'..i)" style="CB_READONLY"/>
+			<combobox col_start="3" name="('prendrea'..i)" style="CB_READONLY"/>
+			<textctrl col_start="4" name="('combiena'..i)"/>
+			<lua>end</lua>
+		</matrix>
+		<row value="15px"/>
+		<matrix row_start="3" col_start="4">
+			<col value="2,1,1,1"/>
+			<statictext row="50px" col_start="1" col_end="4" style="ALIGN_CENTER" label="Prendre des courses du bloc 2"/>
+			<statictext row="auto" col_start="1" style="ALIGN_CENTER" label="Disciplines choisies"/>
+			<statictext col_start="2" style="ALIGN_CENTER" label="Disciplines proposées"/>
+			<statictext col_start="3" style="ALIGN_CENTER" label="En prendre"/>
+			<statictext col_start="4" style="ALIGN_CENTER" label="Nombre\nEx : 5 ou 75% ou 2/3"/>
+			<lua>for i = 0, 5 do</lua>
+			<textctrl row="auto" col_start="1" name="('disciplineschoisiesb'..i)" style="TE_RIGHT"/>
+			<combobox col_start="2" name="('disciplinesproposeesb'..i)" style="CB_READONLY"/>
+			<combobox col_start="3" name="('prendreb'..i)" style="CB_READONLY"/>
+			<textctrl col_start="4" name="('combienb'..i)"/>
+			<lua>end</lua>
+		</matrix>
+		<row value="50px"/>
+		<lua>if numTypeCritere &lt; 3 then</lua>
+		<matrix row="auto" col_start="2">
+			<col value="2,1,1,1"/>
+			<statictext row="50px" col_start="1" col_end="4" style="ALIGN_CENTER" label="Prendre des manches indépendantes dans le bloc 1"/>
+			<statictext row="auto" col_start="1" style="ALIGN_CENTER" label="Disciplines choisies"/>
+			<statictext col_start="2" style="ALIGN_CENTER" label="Disciplines proposées"/>
+			<statictext col_start="3" style="ALIGN_CENTER" label="En prendre"/>
+			<statictext col_start="4" style="ALIGN_CENTER" label="Nombre\nEx : 5 ou 75% ou 2/3"/>
+			<lua>for i = 0, 5 do</lua>
+			<textctrl row="auto" col_start="1" name="('disciplineschoisiesc'..i)" style="TE_RIGHT"/>
+			<combobox col_start="2" name="('disciplinesproposeesc'..i)" style="CB_READONLY"/>
+			<combobox col_start="3" name="('prendrec'..i)" style="CB_READONLY"/>
+			<textctrl col_start="4" name="('combienc'..i)"/>
+			<lua>end</lua>
+		</matrix>
+		<matrix row="auto" row_start="-1" col_start="4">
+			<col value="2,1,1,1"/>
+			<statictext row="50px" col_start="1" col_end="4" style="ALIGN_CENTER" label="Prendre des manches indépendantes dans le bloc 2"/>
+			<statictext row="auto" col_start="1" style="ALIGN_CENTER" label="Disciplines choisies"/>
+			<statictext col_start="2" style="ALIGN_CENTER" label="Disciplines proposées"/>
+			<statictext col_start="3" style="ALIGN_CENTER" label="En prendre"/>
+			<statictext col_start="4" style="ALIGN_CENTER" label="Nombre\nEx : 5 ou 75% ou 2/3"/>
+			<lua>for i = 0, 5 do</lua>
+			<textctrl row="auto" col_start="1" name="('disciplineschoisiesd'..i)" style="TE_RIGHT"/>
+			<combobox col_start="2" name="('disciplinesproposeesd'..i)" style="CB_READONLY"/>
+			<combobox col_start="3" name="('prendred'..i)" style="CB_READONLY"/>
+			<textctrl col_start="4" name="('combiend'..i)"/>
+			<lua>end</lua>
+		</matrix>
+		<row value="15px"/>
+		<staticbox row_start="2" row_end="0" col_start="2" label="Courses du bloc 1"/>
+		<staticbox row_start="2" row_end="0" col_start="4" label="Courses du bloc 2"/>
+		<lua>else</lua>
+		<row value="20px"/>
+		<matrix row="auto" col_start="2" col_end="4">
+			<col value="2,1,1,1"/>
+			<statictext row="auto" col_start="1" col_end="4" style="ALIGN_CENTER" label="Prendre des manches indépendantes des blocs"/>
+			<row value="15px"/>
+			<statictext row="auto" col_start="1" style="ALIGN_CENTER" label="Disciplines choisies"/>
+			<statictext col_start="2" style="ALIGN_CENTER" label="Disciplines proposées"/>
+			<statictext col_start="3" style="ALIGN_CENTER" label="En prendre"/>
+			<statictext col_start="4" style="ALIGN_CENTER" label="Nombre\nEx : 5 ou 75% ou 2/3"/>
+			<lua>for i = 0, 5 do</lua>
+			<textctrl row="auto" col_start="1" name="('disciplineschoisiesx'..i)" style="TE_RIGHT"/>
+			<combobox col_start="2" name="('disciplinesproposeesx'..i)" style="CB_READONLY"/>
+			<combobox col_start="3" name="('prendrex'..i)" style="CB_READONLY"/>
+			<textctrl col_start="4" name="('combienx'..i)"/>
+			<lua>end</lua>
+		</matrix>
+		<row value="15px"/>
+		<staticbox row_start="-6" row_end="-3" col_start="1" col_end="2" label="Courses du bloc 1"/>
+		<staticbox row_start="-6" row_end="-3" col_start="3" col_end="5" label="Courses du bloc 2"/>
+		<staticbox row_start="-2" row_end="0" col_start="1" col_end="0" label="Manches indépendantes des blocs"/>
+		<lua>end</lua>
+		<row value="1"/>
+		<toolbar row="auto" col_start="1" col_end="0" name="tbcriteretype2" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
+		<row value="50px"/>
+	</panel>
+	<panel name="ajoutercoureurs">
+		<pen border="0"/>
+		<padding all="2px"/>
+		<col value="1, 1, 1"/>
+		<row value="50px"/>
+		<matrix col_start="2" row="auto">
+			<col value="1,4,1" />
+			<statictext row="auto" col_start="1" style="ALIGN_CENTER" label="Code coureur"/>
+			<statictext col_start="2" style="ALIGN_CENTER" label="Identite"/>
+			<statictext col_start="3" style="ALIGN_CENTER" label="Points alloués"/>
+			<row value="15px"/>
+			<lua>for i = 0, 14 do</lua>
+			<textctrl row="auto" col_start="1" name="('code'..i)" style="TE_READONLY"/>
+			<textctrl col_start="2" name="('identite'..i)" style="TE_READONLY"/>
+			<textctrl col_start="3" name="('xpoints'..i)"/>
+			<lua>end</lua>
+			<row value="15px"/>
+			<toolbar col_start="2" name="tbajoutercoureurs" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
+			<row value="50px"/>
+		</matrix>
+		<row value="15px"/>
+		<staticbox row_start="1" row_end="0" col_start="1" col_end="3" label="Ajouter des coureurs absents"/>
+		<row value="1"/>
+	</panel>
+	<panel name="voirlescourses">
+		<col value="20px,1+40px,1,1,2,10,20px"/>
+		<padding all="1px"/>
+		<row value="20px"/>
+		<statictext row="auto" col_start="2" label="Cliquer pour voir"/>
+		<statictext col_start="3" style="ALIGN_CENTER" label="Date"/>
+		<statictext col_start="4" style="ALIGN_CENTER" label="Codex"/>
+		<statictext col_start="5" style="ALIGN_CENTER" label="Station"/>
+		<statictext col_start="6" style="ALIGN_CENTER" label="* (si paramétrage spécifique)     [Code - Discipline - Bloc] Evenement"/>
+		<lua>for i = 0, 19 do</lua>
+		<textctrl row="auto" col_start="3" style="TE_READONLY|TE_CENTER" name="('date'..i)"/>
+		<textctrl col_start="4" style="TE_READONLY|TE_CENTER" name="('codex'..i)"/>
+		<textctrl col_start="5" style="TE_READONLY|TE_LEFT" name="('station'..i)"/>
+		<textctrl col_start="6" style="TE_READONLY|TE_LEFT" name="('evenement'..i)"/>
+		<checkbox col_start="2" style="CHK_2STATE|ALIGN_RIGHT" name="('chk'..i)"/>
+		<lua>end</lua>
+		<row value="1"/>
+		<toolbar row="auto" col_start="1" col_end="5" name="tbvoirlescourses" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
+		<row value="50px"/>
+	</panel>
+	<panel name="coursex">
+		<col value="1,2,1"/>
+		<pen border="0"/>
+		<padding all="5px"/>
+		<spacing all="10"/>
+		<row value="15px"/>
+		<row value="20px"/>
+		<textctrl row="150px" col_start="2" name="titre" style="TE_MULTILINE|TE_READONLY"/>
+		<statictext col_start="1" label="Titre"/>
+		<statictext row="auto" col_start="1" label="Date"/>
+		<textctrl col_start="2" name="date" style="TE_READONLY"/>
+		<statictext row="auto" col_start="1" label="Station"/>
+		<textctrl col_start="2" name="station" style="TE_READONLY"/>
+		<statictext row="auto" col_start="1" label="Discipline"/>
+		<textctrl col_start="2" name="discipline" style="TE_READONLY"/>
+		<statictext row="auto" col_start="1" label="Bloc"/>
+		<combobox col_start="2" name="numBloc" style="TE_READONLY"/>
+		<statictext row="auto" col_start="1" label="Course obligatoire"/>
+		<combotable col_start="2" name="comboObligatoire" style="TE_READONLY"/>
+		<statictext row="auto" col_start="1" label="Sauter cette course"/>
+		<combotable col_start="2" name="comboSkip" style="TE_READONLY"/>
+		<statictext row="auto" col_start="1" label="Coef de la course"/>
+		<textctrl col_start="2" name="coefCourse"/>
+		<statictext col_start="3" style="ALIGN_LEFT" label="%"/>
+		<statictext row="auto" col_start="1" label="Coef des manches"/>
+		<textctrl col_start="2" name="coefManche"/>
+		<statictext col_start="3" style="ALIGN_LEFT" label="%"/>
+		<statictext row="auto" col_start="1" label="Grille de la course"/>
+		<combobox col_start="2" name="comboGrille" style="TE_READONLY"/>
+		<statictext row="auto" col_start="1" label="Points à prendre"/>
+		<combobox col_start="2" name="comboPrendre" style="TE_READONLY"/>
+		<row value="15px"/>
+		<staticbox row_start="1" row_end="0" col_start="1" col_end="3" label="Paramétrage propre à la course"/>
+		<row value="1"/>
+		<toolbar row="auto" col_start="1" col_end="3" name="tbcoursex" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
+		<row value="50px"/>
+	</panel>
+	<panel name="coursesupport">
+		<col value="1,1"/>
+		<pen border="0"/>
+		<padding all="3px"/>
+		<row value="20px"/>
+		<matrix row="auto" row_start="2" col_start="1" col_end="1">
+			<row value="15px"/>
+			<col value="1,2"/>
+			<statictext row="50px" col_start="1" col_end="2" style="ALIGN_CENTER" label="Seuls les coureurs figurant sur cette course seront inclus dans le classement"/>
+			<statictext row="auto" col_start="1" label="Code"/>
+			<textctrl col_start="2" name="gauchecode"/>
+			<statictext row="100px" col_start="1" label="Titre"/>
+			<textctrl col_start="2" name="gauchetitre" style="TE_MULTILINE, TE_READONLY"/>
+			<checkbox row="auto" col_start="2" style="CHK_2STATE|ALIGN_LEFT" name="gauchechksupport" label="Cocher pour activer ce paramétrage d\'inclusion"/>
+			<row value="15px"/>
+			<statictext row="50px" col_start="1" col_end="2" style="ALIGN_CENTER" label="Copier le contenu des colonnes de cette course dans toutes celles du Challenge"/>
+			<statictext row="auto" col_start="1" style="ALIGN_CENTER" label="Recopier le contenu de la colonne"/>
+			<statictext col_start="2" style="ALIGN_CENTER" label="dans la colonne"/>
+			<combobox row="auto" col_start="1" name="gauchesource1" style="CB_READONLY"/>
+			<combobox col_start="2" name="gauchedestination1" style="CB_READONLY"/>
+			<combobox row="auto" col_start="1" name="gauchesource2" style="CB_READONLY"/>
+			<combobox col_start="2" name="gauchedestination2" style="CB_READONLY"/>
+			<combobox row="auto" col_start="1" name="gauchesource3" style="CB_READONLY"/>
+			<combobox col_start="2" name="gauchedestination3" style="CB_READONLY"/>
+			<row value="50px"/>
+			<staticbox row_start="1" row_end="0" col_start="1" col_end="2" label="Course d\'inclusion"/>
+		</matrix>
+		<matrix row="auto" row_start="2" col_start="2">
+			<row value="15px"/>
+			<col value="1,2"/>
+			<statictext row="50px" col_start="1" col_end="2" style="ALIGN_CENTER" label="Tous les coureurs figurant sur cette course seront exclus du classement"/>
+			<statictext row="auto" col_start="1" label="Code"/>
+			<textctrl col_start="2" name="droitecode"/>
+			<statictext row="100px" col_start="1" label="Titre"/>
+			<textctrl col_start="2" name="droitetitre" style="TE_MULTILINE, TE_READONLY"/>
+			<checkbox row="auto" col_start="2" style="CHK_2STATE|ALIGN_LEFT" name="droitechksupport" label="Cocher pour activer ce paramétrage d\'exclusion"/>
+			<row value="15px"/>
+			<statictext row="50px" col_start="1" col_end="2" style="ALIGN_CENTER" label="Copier le contenu des colonnes de cette course dans toutes celles du Challenge"/>
+			<statictext row="auto" col_start="1" style="ALIGN_CENTER" label="Recopier le contenu de la colonne"/>
+			<statictext col_start="2" style="ALIGN_CENTER" label="dans la colonne"/>
+			<combobox row="auto" col_start="1" name="droitesource1" style="CB_READONLY"/>
+			<combobox col_start="2" name="droitedestination1" style="CB_READONLY"/>
+			<combobox row="auto" col_start="1" name="droitesource2" style="CB_READONLY"/>
+			<combobox col_start="2" name="droitedestination2" style="CB_READONLY"/>
+			<combobox row="auto" col_start="1" name="droitesource3" style="CB_READONLY"/>
+			<combobox col_start="2" name="droitedestination3" style="CB_READONLY"/>
+			<row value="50px"/>
+			<staticbox row_start="1" row_end="0" col_start="1" col_end="2" label="Course d\'exclusion"/>
+		</matrix>
+		<row value="1"/>
+		<toolbar row="auto" col_start="1" col_end="2" name="tbcoursesupport" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
+		<row value="50px"/>
+	</panel>
+	<panel name="copycolonne">
+		<pen border="0"/>
+		<padding all="5px"/>
+		<row value="20px"/>
+		<col value="15px,1,15px"/>
+		<statictext row="30px" col_start="2" style="ALIGN_LEFT" label="Choisissez une course ou laissez à blanc."/>
+		<matrix row="auto" col_start="2">
+			<col value="1,5"/>
+			<statictext row="auto" col_start="1" style="ALIGN_CENTER" label="N° de la course"/>
+			<statictext col_start="2" style="ALIGN_CENTER" label="Titre"/>
+			<textctrl row="auto" col_start="1" name="copycoursecode"/>
+			<textctrl col_start="2" name="copycoursetitre" style="TE_MULTILINE, TE_READONLY"/>
+		</matrix>
+		<matrix row="auto" col_start="2">
+			<col value="1,1,1"/>
+			<statictext row="30px" col_start="1" col_end="3" style="ALIGN_CENTER" label="N.B. Ceci s\'appliquera à toutes les courses de la matrice"/>
+			<statictext row="auto" col_start="1" style="ALIGN_CENTER" label="Copier la colonne"/>
+			<statictext col_start="2" style="ALIGN_CENTER" label="Placer ceci"/>
+			<statictext col_start="3" style="ALIGN_CENTER" label="Dans la colonne"/>
+			<combobox row="auto" col_start="1" name="copycolsource" style="CB_READONLY"/>
+			<textctrl col_start="2" name="copydata"/>
+			<combobox col_start="3" name="copycoldestination" style="CB_READONLY"/>
+		</matrix>
+		<row value="1"/>
+		<toolbar row="auto" col_start="1" col_end="0" name="tbcopycolonne" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
+		<row value="50px"/>
+	</panel>
+	<panel name="scriptlua">
+		<pen border="0"/>
+		<padding all="5px"/>
+		<row value="100px"/>
+		<row value="15px"/>
+		<col value="1,1,1,1"/>
+		<statictext row="50px" col_start="2" col_end="3" style="ALIGN_CENTER" label="Script à lancer immédiatement"/>
+		<textctrl row="auto" col_start="2" name="script1" style="TE_READONLY"/>
+		<button col_start="3" name="bscript1" label=".../..."/>
+		<row value="15px"/>
+		<statictext row="50px" col_start="2" col_end="3" style="ALIGN_CENTER" label="Script à lancer avant chaque calcul"/>
+		<textctrl row="auto" col_start="2" name="script2" style="TE_READONLY"/>
+		<button col_start="3" name="bscript2" label=".../..."/>
+		<row value="15px"/>
+		<staticbox row_start="2" row_end="0" col_start="2" col_end="3" label="Recherche des scripts LUA à lancer"/>
+		<row value="1"/>
+		<toolbar row="auto" col_start="1" col_end="0" name="tbscriptlua" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
+		<row value="50px"/>
+	</panel>
+	<panel name="inscription">
+		<pen border="0"/>
+		<padding all="5px"/>
+		<col value="15px,1,2,2,15px"/>
+		<row value="100px"/>
+		<row value="15px"/>
+		<row value="50px"/>
+		<checkbox row="auto" col_start="3" style="CHK_2STATE|ALIGN_LEFT" name="presents" label="Prendre uniquement les présents à la dernière course"/>
+		<checkbox row="auto" col_start="3" style="CHK_2STATE|ALIGN_LEFT" name="garderdossards" label="Conserver les dossards de la dernière course"/>
+		<statictext row="auto" col_start="2" label="Dernière course : "/>
+		<textctrl col_start="3" name="inscriptionapres" style="TE_READONLY"/>
+		<statictext row="auto" col_start="2" label="Type de tirage des dossard"/>
+		<combobox col_start="3" name="typetirage" style="CB_READONLY"/>
+		<statictext row="auto" col_start="2" label="Valeur du bibo éventuel"/>
+		<textctrl col_start="3" name="bibo"/>
+		<row value="15px"/>
+		<staticbox row_start="2" row_end="0" col_start="1" col_end="0" label="Générer un fichier inscription à partir des coureurs du Challenge"/>
+		<row value="1"/>
+		<toolbar row="auto" col_start="1" col_end="0" name="tbinscription" style="TB_FLAT|TB_HORIZONTAL,TB_TEXT"/>
+		<row value="50px"/>
+	</panel>
+	<panel id="printanalyse">
+		<lua>dofile('./interface/adv.lua');
+			 dofile('./edition/functionPG.lua'); 
+			 tEvenement_Matrice = base:GetTable('Evenement_Matrice');
+			 tMatrice_Courses = base:GetTable('_Matrice_Courses');
+			 tEvenement_Matrice = base:GetTable('Evenement_Matrice');
+			 analyseGaucheListe = GetValuePG('analyseGaucheListe', 'FAU');
+			 analyseGaucheDiscipline = GetValuePG('analyseGaucheDiscipline', '');
+			 AnalysePerformances(params.Code_evenement);
+		</lua>
+		<header>
+			<padding all="1px"/>
+			<spacing all="2"/>
+			<col value="1"/>
+			<pen border="none"/>
+			<font name="Calibri" size="13" adjust="width" weight="bold"/>
+			<text row="3cm" align="center">params.Titre..'\n'..params.LigneTitre..'\nLes critères s\'appliquent en cascade (si un critère n\'est pas rempli, on passe au suivant).'</text>
+			<row value="0.4cm"/>
+			<font name="Calibri" size="12" adjust="width" weight="bold"/>
+			<lua>for i = 1, #arAnalyse do</lua>
+			<text row="auto">'Critère '..i..' : '..arAnalyse[i].String</text>
+			<lua>end</lua>
+			<row value="0.5cm"/>
+		</header>
+		<footer>
+			<background mode="transparent"/>
+			<font name="Calibri" size="8" adjust="width" weight="normal"/>
+			<pen border="none"/>
+			<text row="auto" col="1" align="left"/>
+			<line col_start="1" col_end="0" pen_size="2" pen_color="dkgray" border="bottom"/>
+			<row value="auto"/>
+			<matrix col_start="1">
+				<row value="auto"/>
+				<text col="auto" align="left">app.GetName()..' Version '..app.GetVersion()..' / FFS'</text>
+				<image col="0.4cm" adjust="width" align="left">'./res/32x32_ffs.png'</image>
+				<text col="auto" align="left">' / Agil Informatique'</text>
+				<image col="0.4cm" adjust="width" align="left">'./res/32x32_agil.png'</image>
+				<text col="auto" align="left">os.date(' / Edition du %d-%m-%Y à %H:%M:%S')</text>
+				<text col="auto" align="left">' / sript LUA version '..params.Version</text>
+			</matrix>
+			<text align="right">string.format('Page %d/%s',editor:GetPageCurrent(), editor:GetPageCountLabel())</text>
+			<line col_start="1" col_end="0" border="top"/>
+			<!-- <text row="auto" style="ALIGN_LEFT" cond="editor:GetPageCurrent() == 1">$(Evenement.Commentaire)</text> -->
+		</footer>
+		<label>
+			<padding all="0"/>
+			<spacing all="10"/>
+			<pen border="all"/>
+			<background color="white" mode="solid"/>
+			<font name="Calibri" size="9" adjust="width" weight="bold"/>
+			<col value="1,3cm,2cm,2cm,2cm,4cm,1.2cm,1.2cm,1.2cm,1.2cm,1.2cm"/>
+			<text row="auto" col_start="1" align="center">'Identité'</text>
+			<text col_start="2" align="center">'Pts liste '..params.Liste</text>
+			<text col_start="3" align="center">'Année'</text>
+			<text col_start="4" align="center">'Categorie'</text>
+			<text col_start="5" align="center">'Comité'</text>
+			<text col_start="6" align="center">'Club'</text>
+			<text col_start="7" align="center">'Crit.1'</text>
+			<text col_start="8" align="center">'Crit.2'</text>
+			<text col_start="9" align="center">'Crit.3'</text>
+			<text col_start="10" align="center">'Crit.4'</text>
+			<text col_start="11" align="center">'Crit.5'</text>
+		</label>
+		<body>
+			<need h="1.5cm" />
+			<lua>if row == 0 then nbcritere1 = 0;nbcritere2 = 0;nbcritere3 = 0;nbcritere4 = 0;nbcritere5 = 0; end</lua>
+			<padding all="0"/>
+			<!-- <spacing all="10" /> -->
+			<pen border="all"/>
+			<col value="1,3cm,2cm,2cm,2cm,4cm,1.2cm,1.2cm,1.2cm,1.2cm,1.2cm"/>
+			<font name="Calibri" size="10" adjust="width" weight="normal"/>
+			<lua>if group == 'body' then</lua>
+			<background color="white" mode="solid" cond="row%2 == 0"/>
+			<background color="ltgray" mode="solid" cond="row%2 == 1"/>
+			<lua>end</lua>
+			<lua>if body:GetCellInt('Analyse_groupe',row) &lt; 999 then</lua>
+			<lua>analyse1 = body:GetCellInt('Analyse1',row); if analyse1 &gt; 0 then nbcritere1 = nbcritere1 + 1; end</lua>
+			<lua>analyse2 = body:GetCellInt('Analyse2',row); if analyse2 &gt; 0 then nbcritere2 = nbcritere2 + 1; end</lua>
+			<lua>analyse3 = body:GetCellInt('Analyse3',row); if analyse3 &gt; 0 then nbcritere3 = nbcritere3 + 1; end</lua>
+			<lua>analyse4 = body:GetCellInt('Analyse4',row); if analyse4 &gt; 0 then nbcritere4 = nbcritere4 + 1; end</lua>
+			<lua>analyse5 = body:GetCellInt('Analyse5',row); if analyse5 &gt; 0 then nbcritere5 = nbcritere5 + 1; end</lua>
+			<text row="auto" col_start="1" col_end="0">''</text>
+			<text row_start="-1" col_start="1">
+				<background mode="transparent"/>$(Identite)</text>
+			<text row_start="-1" col_start="2" style="ALIGN_CENTER" cond="body:GetCellInt('Clt_last_discipline', row) &gt;0">
+				<background mode="transparent"/>$(Pts_last_discipline)..' ('..$(Clt_last_discipline)..')'</text>
+			<text row_start="-1" col_start="2" style="ALIGN_CENTER" cond="body:GetCellInt('Clt_last_discipline', row) == 0">
+				<background mode="transparent"/>''</text>
+			<text row_start="-1" col_start="3" align="(GetAlignCol('An', body:GetCell('An', row)))">
+				<background mode="transparent"/>$(An)</text>
+			<text row_start="-1" col_start="4" align="(GetAlignCol('Categ', body:GetCell('Categ', row)))">
+				<background mode="transparent"/>$(Categ)</text>
+			<text row_start="-1" col_start="5" align="(GetAlignCol('Comite', body:GetCell('Comite', row)))">
+				<background mode="transparent"/>$(Comite)</text>
+			<text row_start="-1" col_start="6" align="left">
+				<background mode="transparent"/>$(Club)</text>
+			<text row_start="-1" col_start="7" style="ALIGN_CENTER" cond="analyse1 &gt; 0">
+				<background mode="transparent"/>analyse1..' x'</text>
+			<text row_start="-1" col_start="7" style="ALIGN_CENTER" cond="analyse1 == -1">
+				<background mode="transparent"/>''</text>
+			<text row_start="-1" col_start="8" style="ALIGN_CENTER" cond="analyse2 &gt; 0">
+				<background mode="transparent"/>analyse2..' x'</text>
+			<text row_start="-1" col_start="8" style="ALIGN_CENTER" cond="analyse2 == -1">
+				<background mode="transparent"/>''</text>
+			<text row_start="-1" col_start="9" style="ALIGN_CENTER" cond="analyse3 &gt; 0">
+				<background mode="transparent"/>analyse3..' x'</text>
+			<text row_start="-1" col_start="9" style="ALIGN_CENTER" cond="analyse3 == -1">
+				<background mode="transparent"/>''</text>
+			<text row_start="-1" col_start="10" style="ALIGN_CENTER" cond="analyse4 &gt; 0">
+				<background mode="transparent"/>analyse4..' x'</text>
+			<text row_start="-1" col_start="10" style="ALIGN_CENTER" cond="analyse4 == -1">
+				<background mode="transparent"/>''</text>
+			<text row_start="-1" col_start="11" style="ALIGN_CENTER" cond="analyse5 &gt; 0">
+				<background mode="transparent"/>analyse5..' x'</text>
+			<text row_start="-1" col_start="11" style="ALIGN_CENTER" cond="analyse5 == -1">
+				<background mode="transparent"/>''</text>
+			<lua>end</lua>
+		</body>
+		<end>
+			<col value="1"/>
+			<row value="0.5cm"/>
+			<font name="Calibri" size="12" weight="bold"/>
+			<text row="auto" cond="nbcritere1 &gt; 0">nbcritere1..' coureurs ont rempli le critère n° 1.'</text>
+			<text row="auto" cond="nbcritere2 &gt; 0">nbcritere2..' coureurs ont rempli le critère n° 2.'</text>
+			<text row="auto" cond="nbcritere3 &gt; 0">nbcritere3..' coureurs ont rempli le critère n° 3.'</text>
+			<text row="auto" cond="nbcritere4 &gt; 0">nbcritere4..' coureurs ont rempli le critère n° 4.'</text>
+			<text row="auto" cond="nbcritere5 &gt; 0">nbcritere5..' coureurs ont rempli le critère n° 5.'</text>
+			<text row="0.5cm">(nbcritere1 + nbcritere2 + nbcritere3 + nbcritere4 + nbcritere5)..' coureurs en tout rentrent dans le(s) critère(s).'</text>
+		</end>
+	</panel>
+	<panel id="print">
+		<lua>dofile('./interface/adv.lua');
+			dofile('./edition/functionPG.lua');
+			tEvenement = base:GetTable('Evenement');
+			tEvenement_Matrice = base:GetTable('Evenement_Matrice');
+			tMatrice_Courses = base:GetTable('_Matrice_Courses');
+			texteCodeComplet = GetValuePG ("texteCodeComplet", 'Non');
+			texteLigne2Texte = GetValuePG('texteLigne2Texte', 'Nombre de courses :');
+			texteNbColPresCourses = tonumber(GetValuePG ("texteNbColPresCourses", 3));
+			comboOrientation = GetValuePG('comboOrientation', 'Portrait');
+			comboEntite = GetValuePG('comboEntite', 'FFS');
+			texteImprimerStatCourses = GetValuePG('texteImprimerStatCourses', 'Oui');
+			liste1 = GetValuePG('comboListe1', '');
+			liste2 = GetValuePG('comboListe2', '');
+			liste1Classement = GetValuePG('comboListe1Classement', '');
+			liste2Classement = GetValuePG('comboListe2Classement', '');
+			comboListePrimaute = GetValuePG('comboListePrimaute', 'classement');
+			texteImprimerClubLong = GetValuePG('texteImprimerClubLong', 'Non');
+			largeur_large = GetValuePG('texteLargeurLarge', '1.5');
+			largeur_large = string.gsub(largeur_large, ',', '.')..'cm';
+			largeur_etroite = GetValuePG('texteLargeurEtroite', '1');
+			largeur_etroite = string.gsub(largeur_etroite, ',', '.');
+			largeur_total = tonumber(largeur_etroite) + 0.5;
+			largeur_total = string.gsub(largeur_total, ',', '.')..'cm';
+			largeur_etroite = largeur_etroite..'cm';
+			colorDiscipline = InitColorDiscipline();
+			colorpodium = InitColorPodium();
+			InitPrnColonnes();
+			if comboEntite == 'FFS' then liste1Classement = 'toutes disciplines'; liste2Classement = 'toutes disciplines'; end
+			if comboEntite == 'FIS' and liste1Classement:len() &lt; 5 then liste1Classement = liste1Classement:sub(3,4); end
+			if comboEntite == 'FIS' and liste2Classement:len() &lt; 5 then liste2Classement = liste2Classement:sub(3,4); end
+			bolGetDisciplinesFait = false;
+		</lua>
+		<header>
+			<lua>if params.ImprimerHeader == 'Oui' then</lua>
+				<spacing all="0"/>
+				<padding all="0"/>
+				<col value="1"/>
+				<pen border="none"/>
+				<font name="Calibri" size="13" adjust="width" weight="bold"/>
+				<text row="3cm" align="center">tEvenement:GetCell('Nom', 0)</text>
+			<lua>end</lua>
+		</header>
+		<first_header />
+		<footer>
+			<lua>liste1 = liste1 or ''; liste2 = liste2 or '';</lua>
+			<background mode="transparent"/>
+			<font name="Calibri" size="8" adjust="width" weight="normal"/>
+			<pen border="none"/>
+			<text row="auto" col="1" align="left"/>
+			<line col_start="1" col_end="0" pen_size="2" pen_color="dkgray" border="bottom"/>
+			<row value="auto"/>
+			<matrix col_start="1">
+				<row value="auto"/>
+				<text col="auto" align="left">app.GetName()..' Version '..app.GetVersion()..' / FFS'</text>
+				<image col="0.4cm" adjust="width" align="left">'./res/32x32_ffs.png'</image>
+				<text col="auto" align="left">' / Agil Informatique'</text>
+				<image col="0.4cm" adjust="width" align="left">'./res/32x32_agil.png'</image>
+				<text col="auto" align="left">'/ Ph.Guérindon '..os.date(' / Edition du %d-%m-%Y à %H:%M:%S')</text>
+				<text col="auto" align="left">'/ version '..params.Version..' des matrices'</text>
+			</matrix>
+			<text align="right">string.format('Page %d/%s',editor:GetPageCurrent(), editor:GetPageCountLabel())</text>
+			<line col_start="1" col_end="0" border="top"/>
+			<lua>params.PrendreBloc1 = string.gsub(params.PrendreBloc1, 'Idem', 'A la manche');if params.Bloc2 == false then prendre = params.PrendreBloc1..' / bloc 1, '..params.Criteres1 else params.PrendreBloc2 = string.gsub(params.PrendreBloc2, 'Idem', 'A la manche');prendre = params.PrendreBloc1..' / bloc 1 '..params.Criteres1..' +  '..params.PrendreBloc2..' / bloc 2, '..params.Criteres2 end</lua>
+			<text row="auto" col_start="1" col_end="0" align="left">prendre</text>
+			<lua>txt1 = '';if params.DepartMini &gt; 0 then txt1 = 'Nb de départ mini pour être classé : '..params.DepartMini..'.\n'; end</lua>
+			<lua>if params.ParticipationMini &gt; 0 then txt1 = txt1..'Participation mini aux courses pour avoir la totalité des points : '..params.ParticipationMini..'\n'; end</lua>
+			<lua>if liste1:len() &gt; 0 then txt1 = txt1..'Points et Classement sur la liste '..liste1..' en '..liste1Classement..' avec primauté '..comboListePrimaute; end</lua>
+			<lua>if liste2:len() &gt; 0 then txt1 = txt1..' | Points  et Classement sur la liste '..liste2..' en '..liste2Classement..' avec primauté '..comboListePrimaute; end</lua>
+
+			<text row="auto" style="ALIGN_LEFT" cond="tEvenement:GetCell('Commentaire', 0):len() &gt; 0 and txt1:len() == 0">$(tEvenement.Commentaire)</text>
+			<text row="auto" style="ALIGN_LEFT" cond="txt1:len() &gt; 0">
+				<font adjust="both" weight="normal"/>$(Evenement.Commentaire)..' - N.B. '..txt1</text>
+			<text row="auto" style="ALIGN_LEFT" cond="params.CoefMaxiBlocs:len() &gt; 65">params.CoefMaxiBlocs</text>
+		</footer>
+		<label>
+			<lua>if texteNbColPresCourses == 5 then</lua>
+				<col value="8cm,0.5cm,1" />
+			<lua>else</lua>
+				<col value="8cm,1cm,1" />
+			<lua>end</lua>
+			<pen border="all"/>
+			<lua>row_start = 0;
+				if string.find(params.Presentation,'horizontale') then
+					if texteImprimerStatCourses == 'Oui' then
+						sommeSur = 0; sommeCombien = 0;
+						if bolGetDisciplinesFait == false then
+							bolGetDisciplinesFait = true;
+							arDiscipline = GetDisciplines(params.Table_critere);
+						end
+						row_start = -1; col_start = 3
+						if params.Criteres1 == nil then enlever = 0; else enlever = 1; end</lua>
+						<spacing all="10"/>
+						<matrix row="auto" col_start="1">
+							<font weight="bold" size="(params.FontSize)"/>
+							<pen border="all" size="5" color="red"/>
+							<text row="auto" col="1" align="right">'Disciplines'</text>
+							<text row="auto" align="right">texteLigne2Texte</text>
+							<text row="auto" cond="params.Criteres1 ~= nil">'Retenues pour le Clt.'</text>
+							<lua>for i = 1, #arDiscipline do
+									discipline = arDiscipline[i].Discipline;
+									rgbx = colorDiscipline[discipline];</lua>
+									<text row_start="(-2 - enlever)" style="ALIGN_CENTER" col="auto">
+										<background color="(rgbx)" mode="solid"/>arDiscipline[i].Discipline</text>
+									<text row_start="(0 - enlever)" align="center">
+										<background color="(rgbx)" mode="solid"/>arDiscipline[i].Sur</text>
+									<text row_start="0" style="ALIGN_CENTER"  cond="params.Criteres1 ~= nil">
+										<background color="(rgbx)" mode="solid"/>arDiscipline[i].Combien</text>
+									<lua>sommeSur = sommeSur + tonumber(arDiscipline[i].Sur);
+										sommeCombien = sommeCombien + tonumber(arDiscipline[i].Combien);
+								end</lua>
+								<text row_start="(-1 - enlever)" col="auto" align="center">'Tot'</text>
+								<text row_start="(0 - enlever)" align="center">sommeSur</text>
+								<text row_start="0" style="ALIGN_CENTER" cond="params.Criteres1 ~= nil">sommeCombien</text>
+						</matrix>
+				<lua>elseif params.Criteres1 ~= nil and params.Criteres1:len() &gt; 15 then</lua>
+					<pen border="none"/>
+					<font weight="bold"/>
+					<text row="auto" col_start="1" col_end="0" cond="params.Criteres1:len() &gt; 0">params.Criteres1</text>
+					<text row="auto" col_start="1" col_end="0" cond="params.Criteres1:len() &gt; 0">params.Criteres2</text>
+				<lua>row_start = row_start -2;
+					end
+				end</lua>
+				<text row="auto" col_start="1" col_end="0" cond="params.PenalisationSaut:len() &gt; 0"><pen border="none"/><font weight="bold"/>params.PenalisationSaut</text>
+			<lua>if string.find(params.Presentation,'horizontale') then
+					nb_ligne = math.ceil(tMatrice_Courses:GetNbRows() / texteNbColPresCourses);
+					nb_cell = nb_ligne * texteNbColPresCourses;
+					col_start = 6 - texteNbColPresCourses;</lua>
+					<col value="1" />
+					<matrix row="auto" col_start="3" col_end="0" row_start="(row_start)">
+						<col value="1,1,1,1,1"/>
+						<font size="(params.FontSize-1)" weight="bold"/>
+						<row value="auto" count="(nb_ligne)"/>
+						<pen border="all"/>
+						<lua>row_start = 1;
+							for i = 1, nb_cell do
+								discipline = tMatrice_Courses:GetCell('Code_discipline', i-1);
+								rgbx = colorDiscipline[discipline];</lua>
+							<text row_start="(row_start)" col_start="(col_start)" cond="discipline:len() &gt; 0 and texteImprimerStatCourses == 'Oui'">
+								<background mode="solid" color="(rgbx)"/>(i)..' '..tMatrice_Courses:GetCell('Station', i-1)..' '..string.sub(tMatrice_Courses:GetCell('Date_epreuve', i-1),1,-6)</text>
+							<text row_start="(row_start)" col_start="(col_start)" cond="discipline:len() &gt; 0 and texteImprimerStatCourses == 'Non'">
+								<background mode="solid" color="(rgbx)"/>(i)..'   '..tMatrice_Courses:GetCell('Code_discipline', i-1)..' '..tMatrice_Courses:GetCell('Station', i-1)..' '..string.sub(tMatrice_Courses:GetCell('Date_epreuve', i-1),1,-6)</text>
+							<text row_start="(row_start)" col_start="(col_start)" cond="discipline:len() == 0">''</text>
+							<lua>row_start = row_start + 1;
+								if row_start &gt; nb_ligne then
+									row_start = 1;
+									col_start = col_start + 1;
+								end
+							end</lua>
+					</matrix>
+			<lua>end</lua>
+			<row value="0.3cm"/>
+			<matrix row="auto" col_start="1" col_end="0">
+				<background mode="transparent"/>
+				<pen border="none"/>
+				<font name="Calibri" size="(params.FontSize)" adjust="width" weight="bold"/>
+				<row value="auto"/>
+				<lua>if not string.find(params.Presentation,'horizontale') then</lua>
+						<row value="3cm" cond="row1haut == true"/>
+						<row value="auto" cond="row1haut == false"/>
+						<row value="auto"/>
+						<row value="auto"/>
+				<lua>end</lua>
+				<background color="white" mode="solid"/>
+				<pen border="all"/>
+				<lua>cltplus = '1'</lua>
+				<lua>codeplus = '1+0.2cm'</lua>
+				<lua>identiteplus = '4'</lua>
+				<lua>sexeplus = '1';if ColAlign['Sexe'] then sexeplus = '1+10px'; end</lua>
+				<lua>anplus = '1';if ColAlign['An'] then anplus = '1+20px'; end</lua>
+				<lua>categplus = '1';if ColAlign['Categ'] then categplus = '1+15px'; end</lua>
+				<lua>nationplus = '1';if ColAlign['Nation'] then nationplus = '1+15px'; end</lua>
+				<lua>comiteplus = '1';if ColAlign['Comite'] then comiteplus = '1+15px'; end</lua>
+				<lua>clubcourtplus = '2'</lua>
+				<lua>clublongplus = '4'</lua>
+				<lua>gecplus = '2'</lua>
+				<lua>listeplus = '2'</lua>
+				<text row="auto" col="(cltplus)" align="center">'Clt.'</text>
+				<text col="(codeplus)" style="ALIGN_CENTER" cond="prnColonne.Code_coureur.Imprimer == 1">prnColonne.Code_coureur.Label</text>
+				<text col="(identiteplus)" style="ALIGN_CENTER" cond="prnColonne.Identite.Imprimer == 1">prnColonne.Identite.Label</text>
+				<text col="(sexeplus)" style="ALIGN_CENTER" cond="prnColonne.Sexe.Imprimer == 1">prnColonne.Sexe.Label</text>
+				<text col="(anplus)" style="ALIGN_CENTER" cond="prnColonne.An.Imprimer == 1">prnColonne.An.Label</text>
+				<text col="(categplus)" style="ALIGN_CENTER" cond="prnColonne.Categ.Imprimer == 1">prnColonne.Categ.Label</text>
+				<text col="(nationplus)" style="ALIGN_CENTER" cond="prnColonne.Nation.Imprimer == 1">prnColonne.Nation.Label</text>
+				<text col="(comiteplus)" style="ALIGN_CENTER" cond="prnColonne.Comite.Imprimer == 1">prnColonne.Comite.Label</text>
+				<text col="(clubcourtplus)" style="ALIGN_CENTER" cond="prnColonne.Club.Imprimer == 1 and texteImprimerClubLong == 'Non'">prnColonne.Club.Label</text>
+				<text col="(clublongplus)" style="ALIGN_CENTER" cond="prnColonne.Club.Imprimer == 1 and texteImprimerClubLong ~= 'Non'">prnColonne.Club.Label</text>
+				<text col="(gecplus)" style="ALIGN_CENTER" cond="prnColonne.Groupe.Imprimer == 1">prnColonne.Groupe.Label</text>
+				<text col="(gecplus)" style="ALIGN_CENTER" cond="prnColonne.Equipe.Imprimer == 1">prnColonne.Equipe.Label</text>
+				<text col="(gecplus)" style="ALIGN_CENTER" cond="prnColonne.Critere.Imprimer == 1">prnColonne.Critere.Label</text>
+				<text col="(listeplus)" style="ALIGN_CENTER" cond="prnColonne.Liste1.Imprimer == 1">prnColonne.Liste1.Label..' '..liste1</text>
+				<text col="(listeplus)" style="ALIGN_CENTER" cond="prnColonne.Liste2.Imprimer == 1">prnColonne.Liste2.Label..' '..liste2</text>
+				<text col="(listeplus)" style="ALIGN_CENTER" cond="prnColonne.Delta.Imprimer == 1">prnColonne.Delta.Label</text>
+				<text col="(largeur_total)" align="center">
+					<background color="LtYellow" mode="solid"/>'Total'</text>
+				<lua>for i = 0, tMatrice_Courses:GetNbRows() -1 do
+						idxcourse = i + 1;
+						code_discipline = arCourses[idxcourse].Discipline;
+						col_start = tMatrice_Courses:GetCellInt('Col_start', i);
+						nb_col = tMatrice_Courses:GetCellInt('Nb_col', i);
+						rgbx = colorDiscipline[code_discipline];
+						if code_discipline ~= 'CS' then</lua>
+							<text col="(largeur_etroite)" style="ALIGN_CENTER" cond="prnColonne.Clt[idxcourse].Imprimer == 1">
+								<background color="(rgbx)" mode="solid" cond="string.find(params.Presentation,'horizontale')"/>idxcourse..' '..prnColonne['Clt'].Label</text>
+							<text col="(largeur_large)" style="ALIGN_CENTER" cond="prnColonne.Tps[idxcourse].Imprimer == 1">
+								<background color="(rgbx)" mode="solid" cond="string.find(params.Presentation,'horizontale')"/>idxcourse..' '..prnColonne['Tps'].Label</text>
+							<text col="(largeur_etroite)" style="ALIGN_CENTER" cond="prnColonne.Diff[idxcourse].Imprimer == 1">
+								<font adjust="both"/>
+								<background color="(rgbx)" mode="solid" cond="string.find(params.Presentation,'horizontale')"/>idxcourse..' '..prnColonne['Diff'].Label</text>
+							<text col="(largeur_etroite)" style="ALIGN_CENTER" cond="prnColonne.Pts[idxcourse].Imprimer == 1 and nb_col == 1">
+								<background color="(rgbx)" mode="solid" cond="string.find(params.Presentation,'horizontale')"/>idxcourse</text>
+							<text col="(largeur_etroite)" style="ALIGN_CENTER" cond="prnColonne.Pts[idxcourse].Imprimer == 1 and nb_col &gt; 1">
+								<background color="(rgbx)" mode="solid" cond="string.find(params.Presentation,'horizontale')"/>idxcourse..' '..prnColonne['Pts'].Label</text>
+						<lua>else</lua>
+							<text col="(largeur_etroite)" style="ALIGN_CENTER" cond="prnCombiSaut.Cltcs.Imprimer == 1">
+								<background color="(rgbx)" mode="solid" cond="string.find(params.Presentation,'horizontale')"/>idxcourse..' '..prnCombiSaut.Cltcs.Label</text>
+							<text col="(largeur_etroite)" style="ALIGN_CENTER" cond="prnCombiSaut.Lng_saut.Imprimer == 1">
+								<background color="(rgbx)" mode="solid" cond="string.find(params.Presentation,'horizontale')"/>idxcourse..' '..prnCombiSaut.Lng_saut.Label</text>
+							<text col="(largeur_etroite)" style="ALIGN_CENTER" cond="prnCombiSaut.Clt_saut.Imprimer == 1">
+								<background color="(rgbx)" mode="solid" cond="string.find(params.Presentation,'horizontale')"/>idxcourse..' '..prnCombiSaut.Clt_saut.Label</text>
+							<text col="(largeur_etroite)" style="ALIGN_CENTER" cond="prnCombiSaut.Pts_saut.Imprimer == 1">
+								<background color="(rgbx)" mode="solid" cond="string.find(params.Presentation,'horizontale')"/>idxcourse..' '..prnCombiSaut.Pts_saut.Label</text>
+							<text col="(largeur_etroite)" style="ALIGN_CENTER" cond="prnCombiSaut.Tps_alpin.Imprimer == 1">
+								<background color="(rgbx)" mode="solid" cond="string.find(params.Presentation,'horizontale')"/>idxcourse..' '..prnCombiSaut.Tps_alpin.Label</text>
+							<text col="(largeur_etroite)" style="ALIGN_CENTER" cond="prnCombiSaut.Clt_alpin.Imprimer == 1">
+								<background color="(rgbx)" mode="solid" cond="string.find(params.Presentation,'horizontale')"/>idxcourse..' '..prnCombiSaut.Clt_alpin.Label</text>
+							<text col="(largeur_etroite)" style="ALIGN_CENTER" cond="prnCombiSaut.Pts_alpin.Imprimer == 1">
+								<background color="(rgbx)" mode="solid" cond="string.find(params.Presentation,'horizontale')"/>idxcourse..' '..prnCombiSaut.Pts_alpin.Label</text>
+							<text col="(largeur_etroite)" align="center">
+								<background color="(rgbx)" mode="solid" cond="string.find(params.Presentation,'horizontale')"/>'Points'</text>
+							<text col="(largeur_etroite)" style="ALIGN_CENTER" cond="prnCombiSaut.Ptstotalcs.Imprimer == 1">
+								<background color="(rgbx)" mode="solid" cond="string.find(params.Presentation,'horizontale')"/>idxcourse..' '..prnCombiSaut.Ptstotalcs.Label</text>
+						<lua>end
+						for run = 1, arCourses[idxcourse].Nb_run do
+							suffixe = run;
+							if arCourses[idxcourse].Nb_run == 1 then
+								suffixe = '';						
+							end		
+							if code_discipline ~= 'CS' then</lua>
+				<text col="(largeur_large)" style="ALIGN_CENTER" cond="prnColonne.Tpsrun[idxcourse].Imprimer == 1">
+					<background color="(rgbx)" mode="solid" cond="string.find(params.Presentation,'horizontale')"/>prnColonne['Tpsrun'].Label..suffixe</text>
+				<text col="(largeur_etroite)" style="ALIGN_CENTER" cond="prnColonne.Ptsrun[idxcourse].Imprimer == 1">
+					<background color="(rgbx)" mode="solid" cond="string.find(params.Presentation,'horizontale')"/>prnColonne['Ptsrun'].Label..suffixe</text>
+				<text col="(largeur_etroite)" style="ALIGN_CENTER" cond="prnColonne.Diffrun[idxcourse].Imprimer == 1">
+					<background color="(rgbx)" mode="solid" cond="string.find(params.Presentation,'horizontale')"/>prnColonne['Diffrun'].Label..suffixe</text>
+				<text col="(largeur_etroite)" style="ALIGN_CENTER" cond="prnColonne.Cltrun[idxcourse].Imprimer == 1">
+					<background color="(rgbx)" mode="solid" cond="string.find(params.Presentation,'horizontale')"/>prnColonne['Cltrun'].Label..suffixe</text>
+				<lua>end
+						end</lua>
+				<text col="(largeur_etroite)" style="ALIGN_CENTER" cond="code_discipline ~= 'CS' and prnColonne.Ptstotal[idxcourse].Imprimer == 1">
+					<background color="(rgbx)" mode="solid" cond="string.find(params.Presentation,'horizontale')"/>prnColonne['Ptstotal'].Label</text>
+				<text col_start="(col_start)" col_end="0" row_start="-3" style="ALIGN_CENTER" cond="string.find(params.Presentation,'horizontale')">
+					<background color="(rgbx)" mode="solid"/>'('..GetSetDiscipline(i)..')'</text>
+				<lua>if not string.find(params.Presentation,'horizontale') then</lua>
+				<text col_start="(col_start)" col_end="0" row_start="-3">
+					<background color="(rgbx)" mode="solid" cond="string.find(params.Presentation,'opaque')"/>''</text>
+				<text col_start="(col_start)" col_end="0" row_start="-2" align="center">
+					<background color="(rgbx)" mode="solid" cond="string.find(params.Presentation,'opaque')"/>
+					<font color="(rgbx)" cond="string.find(params.Presentation,'transparent')"/>string.sub(tMatrice_Courses:GetCell('Date_epreuve', i), 1,-6)</text>
+				<text col_start="(col_start)" col_end="0" row_start="-1" align="center">
+					<background color="(rgbx)" mode="solid" cond="params.Presentation:find('opaque') or params.Presentation:find('transparent')"/>
+					<font color="(rgbx)" cond="string.find(params.Presentation,'transparent')"/>GetSetDiscipline(i)</text>
+				<lua>if arCourses[idxcourse].Nb_col &gt; 4 then</lua>
+				<text col_start="(col_start)" col_end="0" row_start="-3" font_orientation="0" align="center">
+					<background mode="transparent"/>
+					<font color="(rgbx)" cond="string.find(params.Presentation,'transparent')"/>tMatrice_Courses:GetCell('Station', i)</text>
+				<lua>elseif arCourses[idxcourse].Nb_col &gt; 2 then</lua>
+				<text col_start="(col_start)" col_end="0" row_start="-2" font_orientation="50">
+					<background mode="transparent"/>
+					<font color="(rgbx)" cond="string.find(params.Presentation,'transparent')"/>'      '..tMatrice_Courses:GetCell('Station', i)</text>
+				<lua>else</lua>
+				<text col_start="(col_start)" col_end="0" row_start="-2" font_orientation="90">
+					<background mode="transparent"/>
+					<font color="(rgbx)" cond="string.find(params.Presentation,'transparent')"/>'      '..tMatrice_Courses:GetCell('Station', i)</text>
+				<lua>end</lua>
+				<lua>else</lua>
+				<text col_start="(col_start)" col_end="(col_start + arCourses[idxcourse].Nb_col)" row_start="-1" align="center">
+					<background color="(rgbx)" cond="not params.Presentation:find('transparent')" mode="solid"/>
+					<font color="(rgbx)" cond="string.find(params.Presentation,'transparent')"/>GetSetDiscipline(i)</text>
+				<lua>end</lua>
+				<text col="(largeur_etroite)" style="ALIGN_CENTER" font_weight="bold" cond="bloc1_last == i and prnBloc1['EtapeClt'].Imprimer == 1">
+					<background color="LtYellow" mode="solid"/>'Clt Bloc1'</text>
+				<text col="(largeur_etroite)" style="ALIGN_CENTER" font_weight="bold" cond="bloc1_last == i and prnBloc1['EtapePts'].Imprimer == 1">
+					<background color="LtYellow" mode="solid"/>'Pts Bloc1'</text>
+				<text col_start="-1" col_end="0" row_start="-4" row_end="-1" style="ALIGN_CENTER" font_weight="bold" cond="bloc1_last == i and prnBloc1['EtapePts'].Imprimer == 1">
+					<background color="LtYellow" mode="solid"/>'Pts maxi du bloc 1\n'..params.PtsMaxiBloc1</text>
+				<lua>end</lua>
+				<text col="(largeur_etroite)" style="ALIGN_CENTER" cond="GetValuePG('texteImprimerDeparts','') == 'Oui'">'Dép.'</text>
+			</matrix>
+		</label>
+		<body>
+			<pen border="all"/>
+			<call option="couleur_alternee" file="./edition/options.xml"/>
+			<row value="auto"/>
+			<font name="Calibri" size="(params.FontSize)" adjust="width" color="black" weight="normal"/>
+			<text col="(cltplus)" align="center">
+				<font weight="bold" size_step="1" color="(colorpodium)" cond="body:GetCellInt('Clt', row) &lt; 4"/>
+				<font weight="bold" cond="body:GetCellInt('Clt', row) &gt; 3"/>
+				$(Clt)</text>
+			<text col="(codeplus)" style="ALIGN_CENTER" cond="prnColonne.Code_coureur.Imprimer == 1 and texteCodeComplet == 'Non'"><font weight="bold" color="(colorpodium)" size_step="1" adjust="width" cond="body:GetCellInt('Clt', row) &lt; 4"/>string.sub($(Code_coureur),4)</text>
+			<text col="(codeplus)" style="ALIGN_CENTER" cond="prnColonne.Code_coureur.Imprimer == 1 and texteCodeComplet ~= 'Non'"><font weight="bold" color="(colorpodium)"  size_step="1" adjust="width" cond="body:GetCellInt('Clt', row) &lt; 4"/>$(Code_coureur)</text>
+			<text col="(identiteplus)" style="ALIGN_LEFT" cond="prnColonne.Identite.Imprimer == 1"><font weight="bold" color="(colorpodium)" size_step="1" adjust="width" cond="body:GetCellInt('Clt', row) &lt; 4"/>$(Identite)</text>
+			<text col="(sexeplus)" align="(GetAlignCol('Sexe', body:GetCell('Sexe', row)))" cond="prnColonne.Sexe.Imprimer == 1"><font weight="bold" color="(colorpodium)" size_step="1" adjust="width" cond="body:GetCellInt('Clt', row) &lt; 4"/>$(Sexe)</text>
+			<text col="(anplus)" align="(GetAlignCol('An', body:GetCell('An', row)))" cond="prnColonne.An.Imprimer == 1"><font weight="bold" color="(colorpodium)" size_step="1" adjust="width" cond="body:GetCellInt('Clt', row) &lt; 4"/>$(An)</text>
+			<text col="(categplus)" align="(GetAlignCol('Categ', body:GetCell('Categ', row)))" cond="prnColonne.Categ.Imprimer == 1"><font weight="bold" color="(colorpodium)" size_step="1" adjust="width" cond="body:GetCellInt('Clt', row) &lt; 4"/>$(Categ)</text>
+			<text col="(nationplus)" align="(GetAlignCol('Nation', body:GetCell('Nation', row)))" cond="prnColonne.Nation.Imprimer == 1"><font weight="bold" color="(colorpodium)" size_step="1" adjust="width" cond="body:GetCellInt('Clt', row) &lt; 4"/>$(Nation)</text>
+			<text col="(comiteplus)" align="(GetAlignCol('Comite', body:GetCell('Comite', row)))" cond="prnColonne.Comite.Imprimer == 1"><font weight="bold" color="(colorpodium)" size_step="1" adjust="width" cond="body:GetCellInt('Clt', row) &lt; 4"/>$(Comite)</text>
+			<text col="(clubcourtplus)" style="ALIGN_LEFT" cond="prnColonne.Club.Imprimer == 1 and texteImprimerClubLong == 'Non'"><font weight="bold" color="(colorpodium)" size_step="1" adjust="width" cond="body:GetCellInt('Clt', row) &lt; 4"/>$(Club)</text>
+			<text col="(clublongplus)" style="ALIGN_LEFT" cond="prnColonne.Club.Imprimer == 1 and texteImprimerClubLong == 'Oui'"><font weight="bold" color="(colorpodium)" size_step="1" adjust="width" cond="body:GetCellInt('Clt', row) &lt; 4"/>$(Club_long)</text>
+			<text col="(gecplus)" align="(prnColonne.Groupe.Align)" cond="prnColonne.Groupe.Imprimer == 1"><font weight="bold" color="(colorpodium)" size_step="1" adjust="width" cond="body:GetCellInt('Clt', row) &lt; 4"/>$(Groupe)</text>
+			<text col="(gecplus)" align="(prnColonne.Equipe.Align)" cond="prnColonne.Equipe.Imprimer == 1"><font weight="bold" color="(colorpodium)" size_step="1" adjust="width" cond="body:GetCellInt('Clt', row) &lt; 4"/>$(Equipe)</text>
+			<text col="(gecplus)" align="(prnColonne.Critere.Align)" cond="prnColonne.Critere.Imprimer == 1"><font weight="bold" color="(colorpodium)" size_step="1" adjust="width" cond="body:GetCellInt('Clt', row) &lt; 4"/>$(Critere)</text>
+			<text col="(listeplus)" style="ALIGN_CENTER" cond="prnColonne.Liste1.Imprimer == 1 and body:GetCellInt('Clt_liste1', row) &lt; 999999"><font weight="bold" color="(colorpodium)" size_step="1" adjust="width" cond="body:GetCellInt('Clt', row) &lt; 4"/>$(Pts_liste1)..' ('..$(Clt_liste1)..')'</text>
+			<text col="(listeplus)" style="ALIGN_CENTER" cond="prnColonne.Liste1.Imprimer == 1 and body:GetCellInt('Clt_liste1', row) == 999999">''</text>
+			<text col="(listeplus)" style="ALIGN_CENTER" cond="prnColonne.Liste2.Imprimer == 1 and body:GetCellInt('Clt_liste2', row) &lt; 999999"><font weight="bold" color="(colorpodium)" size_step="1" adjust="width" cond="body:GetCellInt('Clt', row) &lt; 4"/>$(Pts_liste2)..' ('..$(Clt_liste2)..')'</text>
+			<text col="(listeplus)" style="ALIGN_CENTER" cond="prnColonne.Liste2.Imprimer == 1 and body:GetCellInt('Clt_liste2', row) == 999999">''</text>
+			<text col="(listeplus)" style="ALIGN_CENTER" cond="prnColonne.Delta.Imprimer == 1"><font weight="bold" color="ltred" size_step="1" adjust="width" cond="body:GetCellInt('Clt', row) &lt; 4"/>$(Delta)</text>
+			<text col="(largeur_total)" align="center">
+				<font weight="bold" size_step="1" cond="body:GetCellInt('Clt', row) &lt; 4"/>
+				<font weight="bold" cond="body:GetCellInt('Clt', row) &gt; 3"/>
+				<background color="LtYellow" mode="solid"/><font weight="bold" cond="body:GetCellInt('Clt', row) &lt; 4"/>EvaluatePts(row, nil, 'Pts', nil)</text>
+			<lua>for i = 0, tMatrice_Courses:GetNbRows() -1 do
+					idxcourse = i + 1;
+					code_discipline = arCourses[idxcourse].Discipline;
+					selection = body:GetCell('Selection'..idxcourse, row);
+					rgbx = colorDiscipline[code_discipline];
+			</lua>
+				<lua>if code_discipline == 'CS' then</lua>
+					<lua>sigma = -1;
+						pts_course_saut = body:GetCellDouble('Pts'..idxcourse..'_run1', row);
+						pts_course_alpin = body:GetCellDouble('Pts'..idxcourse..'_run2', row);
+						if pts_course_saut &gt;= 0 and pts_course_alpin &gt;= 0 then
+							sigma = pts_course_saut + pts_course_alpin
+						end</lua>
+					 <!-- Cltcs,1|Lng_saut,1|Clt_saut,1|Pts_saut,1|Tps_alpin,1|Clt_alpin,1|Pts_alpin,1|Ptstotalcs,1 -->
+						<text col="(largeur_etroite)" style="ALIGN_CENTER" cond="prnCombiSaut.Cltcs.Imprimer == 1">EvaluateClt(body:GetCellInt('Clt'..idxcourse, row, -1))</text>
+						<text col="(largeur_etroite)" style="ALIGN_CENTER" cond="prnCombiSaut.Lng_saut.Imprimer == 1">body:GetCell('Lng'..idxcourse..'_saut', row)</text>
+						<text col="(largeur_etroite)" style="ALIGN_CENTER" cond="prnCombiSaut.Clt_saut.Imprimer == 1 and body:GetCellInt('Clt'..idxcourse..'_run1', row) &gt; 0">body:GetCellInt('Clt'..idxcourse..'_run1', row)</text>
+						<text col="(largeur_etroite)" style="ALIGN_CENTER" cond="prnCombiSaut.Clt_saut.Imprimer == 1 and body:GetCellInt('Clt'..idxcourse..'_run1', row) == 0">''</text>
+						<text col="(largeur_etroite)" style="ALIGN_CENTER" cond="prnCombiSaut.Pts_saut.Imprimer == 1 and body:GetCellDouble('Pts'..idxcourse..'_run1', row) &gt;= 0">body:GetCellDouble('Pts'..idxcourse..'_run1', row)</text>
+						<text col="(largeur_etroite)" style="ALIGN_CENTER" cond="prnCombiSaut.Pts_saut.Imprimer == 1 and body:GetCellDouble('Pts'..idxcourse..'_run1', row) &lt; 0">''</text>
+						
+						<text col="(largeur_etroite)" style="ALIGN_CENTER" cond="prnCombiSaut.Tps_alpin.Imprimer == 1">body:GetCell('Tps'..idxcourse..'_run2', row)</text>
+						<text col="(largeur_etroite)" style="ALIGN_CENTER" cond="prnCombiSaut.Clt_alpin.Imprimer == 1 and body:GetCellInt('Clt'..idxcourse..'_run2', row) &gt; 0">body:GetCell('Clt'..idxcourse..'_run2', row)</text>
+						<text col="(largeur_etroite)" style="ALIGN_CENTER" cond="prnCombiSaut.Clt_alpin.Imprimer == 1 and body:GetCellInt('Clt'..idxcourse..'_run2', row) &lt;= 0">''</text>
+
+						<text col="(largeur_etroite)" style="ALIGN_CENTER" cond="prnCombiSaut.Pts_alpin.Imprimer == 1 and body:GetCellInt('Clt'..idxcourse..'_run2', row) &gt; 0">body:GetCellDouble('Pts'..idxcourse..'_run2', row)</text>
+						<text col="(largeur_etroite)" style="ALIGN_CENTER" cond="prnCombiSaut.Pts_alpin.Imprimer == 1 and body:GetCellInt('Clt'..idxcourse..'_run2', row) &lt;= 0">''</text>
+						<text col="(largeur_etroite)" style="ALIGN_CENTER" cond="sigma &gt;= 0 and sigma &lt; 10000">sigma</text>					
+						<text col="(largeur_etroite)" style="ALIGN_CENTER" cond="sigma &lt; 0 or sigma &gt;= 10000">''</text>					
+						<text col="(largeur_etroite)" style="ALIGN_CENTER" cond="prnCombiSaut.Ptstotalcs.Imprimer == 1 and body:GetCellInt('Clt'..idxcourse, row) &gt;0 ">
+							<font color="red" size_step="1" cond="string.find(selection, 'G')"/>
+							EvaluatePts(row, idxcourse, 'Pts'..idxcourse..'_total', params.AbdDsq)</text>					
+						<text col="(largeur_etroite)" style="ALIGN_CENTER" cond="prnCombiSaut.Ptstotalcs.Imprimer == 1 and body:GetCellInt('Clt'..idxcourse, row) &lt;=0">''</text>					
+				<lua>else</lua>
+						<text col="(largeur_etroite)" style="ALIGN_CENTER" cond="prnColonne.Clt[idxcourse].Imprimer == 1">EvaluateClt(body:GetCellInt('Clt'..idxcourse, row, -1))</text>
+						<text col="(largeur_large)" style="ALIGN_CENTER" cond="prnColonne.Tps[idxcourse].Imprimer == 1">EvaluateTps(row, 'Tps'..idxcourse, params.AbdDsq)</text>
+						<text col="(largeur_etroite)" style="ALIGN_CENTER" cond="prnColonne.Diff[idxcourse].Imprimer == 1"><font adjust="both"/>EvaluateDiff(body:GetCellInt('Tps'..idxcourse..'_diff', row))</text>
+						<text col="(largeur_etroite)" style="ALIGN_CENTER" cond="prnColonne.Pts[idxcourse].Imprimer == 1">
+							<font color="(rgbx)" size_step="1" cond="string.find(selection, 'G') and string.find(params.Presentation,'transparent')"/>
+							<font color="red" size_step="1" cond="string.find(selection, 'G') and not string.find(params.Presentation,'transparent')" />
+							<font color="(colorpodium)" cond="string.find(selection,'Pts'..idxcourse..'G') and string.find(selection, 'Z')"/>
+							EvaluatePts(row, idxcourse, 'Pts'..idxcourse, params.AbdDsq)</text>
+					<lua>for run = 1, arCourses[idxcourse].Nb_run do</lua>
+							<text col="(largeur_large)" style="ALIGN_CENTER" cond="prnColonne.Tpsrun[idxcourse].Imprimer == 1">
+								<font color="(rgbx)" cond="string.find(params.Presentation,'transparent')"/>
+								<font color="red" cond="not string.find(params.Presentation,'transparent')"/>
+									EvaluateTps(row, 'Tps'..idxcourse..'_run'..run, params.AbdDsq)</text>
+							<text col="(largeur_etroite)" style="ALIGN_CENTER" cond="prnColonne.Ptsrun[idxcourse].Imprimer == 1">
+								<font color="(rgbx)" size_step="1" cond="string.find(params.Presentation,'transparent') and string.find(selection, 'Pts'..idxcourse..'_run'..run)"/>
+								<font color="red" size_step="1" cond="not string.find(params.Presentation,'transparent') and string.find(selection, 'Pts'..idxcourse..'_run'..run)"/>
+								EvaluatePts(row, idxcourse, 'Pts'..idxcourse..'_run'..run, params.AbdDsq)</text>
+							<text col="(largeur_etroite)" style="ALIGN_CENTER" cond="prnColonne.Diffrun[idxcourse].Imprimer == 1"><font adjust="both"/>'g'..EvaluateDiff(body:GetCellInt('Tps'..idxcourse..'_run'..run..'_diff', row))</text>
+							<text col="(largeur_etroite)" style="ALIGN_CENTER" cond="prnColonne.Cltrun[idxcourse].Imprimer == 1">
+								<font color="(rgbx)" cond="string.find(params.Presentation,'transparent')"/>
+								EvaluateClt(body:GetCellInt('Clt'..idxcourse..'_run'..run, row, -1))</text>
+					<lua>end</lua>
+				<lua>end</lua>
+				<text col="(largeur_etroite)" style="ALIGN_CENTER" cond="code_discipline ~= 'CS' and prnColonne.Ptstotal[idxcourse].Imprimer == 1">
+					<font color="red" size_step="1" cond="string.find(body:GetCell('Selection'..idxcourse, row), 'Pts'..idxcourse..'_total') and not string.find(params.Presentation,'transparent')"/>
+					<font weight="bold" color="(rgbx)" cond="string.find(body:GetCell('Selection'..idxcourse, row), 'Pts'..idxcourse..'_total') and string.find(params.Presentation,'transparent')"/>
+						EvaluatePts(row, idxcourse, 'Pts'..idxcourse..'_total', params.AbdDsq)</text>
+				<text col="(largeur_etroite)" style="ALIGN_CENTER" font_weight="bold" cond="bloc1_last == i and prnBloc1['EtapeClt'].Imprimer == 1 and body:GetCellDouble('Pts_bloc1', row) &gt;= 0">
+					<background color="LtYellow" mode="solid"/>EvaluateClt(body:GetCellInt('Clt_bloc1', row, -1))</text>
+				<text col="(largeur_etroite)" style="ALIGN_CENTER" font_weight="bold" cond="bloc1_last == i and prnBloc1['EtapeClt'].Imprimer == 1 and body:GetCellDouble('Pts_bloc1', row) &lt; 0">
+					<background color="LtYellow" mode="solid"/>''</text>
+				<text col="(largeur_etroite)" style="ALIGN_CENTER" font_weight="bold" cond="bloc1_last == i and prnBloc1['EtapePts'].Imprimer == 1">
+					<background color="LtYellow" mode="solid"/>EvaluateVal(body:GetCell('Pts_bloc1', row))</text>
+			<lua>end</lua>
+			<text col="(largeur_etroite)" style="ALIGN_CENTER" font_weight="bold" cond="GetValuePG('texteImprimerDeparts','') == 'Oui'">body:GetCell('Nb_depart', row)</text>
+		</body>
+	</panel>
+</root>
+<!-- Evenement_Matrice Syntaxe à respecter -->
+<!-- Cle = Evenement_selection, Valeur = 12,34,56 => Permet de connaitre les Evenements à prendre en compte pour le Challenge ici 12, 34, 56 -->
+<!-- Cle = Evenement_support, Valeur = 152,156 => Evenements à prendre en compte en plus pour les sauvegardes -->
+<!-- Cle = Evenement_filtre, Valeur = Ep.Code_discipline = 'SL' And Ev.Code_comite In ('MB', 'SA') => Permet de Présenter les Evenements filtrés potentiellement selectionnables -->
+<!-- Cle = Evenement_ordre, Valeur = Ep.Date_epreuve, Ev.Code DESC => Ordre pour la Présentation -->
+<!-- Cle = XML, Valeur = matrice_individuelle.xml => /skiffs/challenge/matrice_individuelle.XML -->
+<!-- Comme il y a un dossier Edition , il y a un dossier challenge -->
+<!-- Si suppression d'une course on doit maintenant vérifier qu'elle n'est pas dans un challenge -->
+<!-- CREATE TABLE `Evenement_Matrice` ( -->
+<!-- `Code_evenement` INT(11) NOT NULL, -->
+<!-- `Cle` CHAR(50) NOT NULL, -->
+<!-- `Valeur` VARCHAR(4096) NULL DEFAULT NULL, -->
+<!-- PRIMARY KEY (`Code_evenement`, `Cle`) -->
+<!-- ) -->
+<!-- COLLATE='latin1_swedish_ci' -->
+<!-- ENGINE=MyISAM -->
+<!-- ; -->

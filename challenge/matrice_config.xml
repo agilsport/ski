@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root Titre="Fichier XML de configuration des couleurs des disciplines">
+  <colors>
+    <SL>0 255 255</SL>
+    <GS>255 0 255</GS>
+    <GS1>255 0 255</GS1>
+    <SG>0 255 0</SG>
+    <DH>255 255 0</DH>
+    <SC>255 170 0</SC>
+    <CS>192 192 192</CS>
+  </colors>
+  <podium>0 0 255</podium>
+</root>
