@@ -35,6 +35,11 @@ Sous dossier /process du répertoire principal
 <br>
 Développements spécifiques en LUA
 
+## Challenge
+Sous dossier /challenge du répertoire principal
+<br>
+Scripts de création des Matrices de classement
+
 ## Resources
 Sous dossier /res du répertoire principal
 <br>
