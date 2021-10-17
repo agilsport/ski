@@ -84,6 +84,8 @@
 	<chrono code="ALG.090.14" label="Timy3 WP" company="ALGE" year="2029" />
 	
 	<chrono code="DIG.087.14" label="MASTER 3" company="DIGITECH" year="2029" />
+	
+	<chrono code="EMI.001T.20" label="ETS2" company="EMIT" year="2035" />
 
 	<chrono code="FDS.001T.20" label="TBox" company="FDS-TIMING" year="2035" info= "With external printer" />
 	
