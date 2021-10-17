@@ -85,8 +85,6 @@
 	
 	<chrono code="DIG.087.14" label="MASTER 3" company="DIGITECH" year="2029" />
 
-	<chrono code="EMI.001T.20" label="ETS2" company="EMIT" year="2035" />
-
 	<chrono code="FDS.001T.20" label="TBox" company="FDS-TIMING" year="2035" info= "With external printer" />
 	
 	<chrono code="LON.003T.10" label="TL5005" company="LONGINES" year="2025" />
@@ -809,7 +807,7 @@
 <panel name="concurrent_identite">
 	<padding all="2px"/>
 	<wnd name="statictext" style="ALIGN_RIGHT" />
-	<col w="1,2,1,2,1,2"/>
+	<col w="1,2,1,2,1,3"/>
 	
 	<row h="auto"/>
 	<statictext col_start="1" label="Code" font_color="red" font_weight="bold" />
@@ -818,33 +816,33 @@
 
 	<row h="auto"/>
 	<statictext col_start="1" label="Nom" font_color="red" font_weight="bold" />
-	<searchctrl col_start="2" col_end="0" name="nom" validator="Resultat.Nom"/>
+	<searchctrl col_start="2" col_end="0" name="Nom" validator="Resultat.Nom"/>
 
 	<row h="auto"/>
 	<statictext col_start="1" label="Prénom" font_color="red" font_weight="bold"/>
-	<searchctrl col_start="2" col_end="0" name="prenom" validator="Resultat.Prenom"/>
+	<searchctrl col_start="2" col_end="0" name="Prenom" validator="Resultat.Prenom"/>
 
 	<row h="auto"/>
 	<statictext col_start="1" label="Sexe" font_color="red" font_weight="bold"/>
-	<combobox col_start="2" name="sexe" validator="Resultat.Sexe"/>
+	<combobox col_start="2" name="Sexe" validator="Resultat.Sexe"/>
 	<statictext col_start="3" label="An" font_color="red" font_weight="bold"/>
-	<textctrl col_start="4" name="an" validator="Resultat.An"/>
+	<textctrl col_start="4" name="An" validator="Resultat.An"/>
 	<statictext col_start="5" label="Cat" font_color="red" font_weight="bold" />
-	<searchctrlbutton col_start="6" col_end="0" name="categ" validator="Resultat.Categ"/>
+	<searchctrlbutton col_start="6" col_end="0" name="Categ" validator="Resultat.Categ"/>
 	
 	<row h="auto"/>
 	<statictext col_start="1" label="Point" font_color="orange" />
-	<textctrl col_start="2" name="point" validator="Resultat.Point"/>
+	<textctrl col_start="2" name="Point" validator="Resultat.Point"/>
 	<statictext col_start="3" label="Distance" font_color="orange" />
-	<searchctrlbutton col_start="4" col_end="0" name="distance" validator="Resultat.Distance"/>
+	<searchctrlbutton col_start="4" col_end="0" name="Distance" validator="Resultat.Distance"/>
 	
 	<row h="auto"/>
 	<statictext col_start="1" label="Nation" />
-	<searchctrlbutton col_start="2" name="nation" validator="Resultat.Nation"/>
+	<searchctrlbutton col_start="2" name="Nation" validator="Resultat.Nation"/>
 	<statictext col_start="3" label="Comité" />
-	<searchctrlbutton col_start="4" name="comite" validator="Resultat.Comite"/>
+	<searchctrlbutton col_start="4" name="Comite" validator="Resultat.Comite"/>
 	<statictext col_start="5" label="Club" />
-	<searchctrlbutton col_start="6" col_end="0" name="club" validator="Resultat.Club"/>
+	<searchctrlbutton col_start="6" col_end="0" name="Club" validator="Resultat.Club"/>
 </panel>
 
 <!-- concurrent_information -->
@@ -855,27 +853,29 @@
 
 	<row h="auto"/>
 	<statictext col_start="1" label="Equipe" />
-	<searchctrlbutton col_start="2" col_end="0" name="equipe" validator="Resultat.Equipe"/>
+	<searchctrlbutton col_start="2" col_end="0" name="Equipe" validator="Resultat.Equipe"/>
 
 	<row h="auto"/>
 	<statictext col_start="1" label="Groupe" />
-	<searchctrlbutton col_start="2" col_end="0" name="groupe" validator="Resultat.Groupe"/>
+	<searchctrlbutton col_start="2" col_end="0" name="Groupe" validator="Resultat.Groupe"/>
 	
 	<row h="auto"/>
 	<statictext col_start="1" label="Critère" />
-	<searchctrlbutton col_start="2" col_end="0" name="critere" validator="Resultat.Critere"/>
-	
-	<row h="auto"/>
-	<statictext col_start="1" label="Moniteur" />
-	<textctrl col_start="2" name="code_mon" validator="Resultat.Code_mon"/>
-	<searchctrlbutton col_start="3" col_end="0" name="moniteur" validator="Resultat.Moniteur"/>
+	<searchctrlbutton col_start="2" col_end="0" name="Critere" validator="Resultat.Critere"/>
 
 	<row h="auto"/>
 	<statictext col_start="1" label="Centre" />
-	<searchctrlbutton col_start="2" col_end="3" name="centre" validator="Resultat.Centre"/>
-	<statictext col_start="4" label="Niveau" />
-	<spinctrl col_start="5" name="ordre_niveau" style="ALIGN_RIGHT|SP_ARROW_KEYS" validator="Resultat.Ordre_niveau" />
-	<searchctrlbutton col_start="6" name="niveau" validator="Resultat.Niveau"/>
+	<searchctrlbutton col_start="2" col_end="0" name="Centre" validator="Resultat.Centre"/>
+
+	<row h="auto"/>
+	<statictext col_start="1" label="Moniteur" />
+	<textctrl col_start="2" name="Code_mon" style="TE_RIGHT" validator="Resultat.Code_mon"/>
+	<searchctrlbutton col_start="3" col_end="0" name="Moniteur" validator="Resultat.Moniteur"/>
+
+	<row h="auto"/>
+	<statictext col_start="1" label="Niveau" />
+	<textctrl col_start="2" name="Ordre_niveau" style="TE_RIGHT" validator="Resultat.Ordre_niveau" />
+	<searchctrlbutton col_start="3" col_end="0" name="Niveau" validator="Resultat.Niveau"/>
 
 	<!-- <matrix col_start="2" col_end="0" fit_inside="1"> -->
 		<!-- <row h="auto"/> -->
@@ -894,30 +894,30 @@
 
 	<row h="auto"/>
 	<statictext col_start="1" label="Email" />
-	<textctrl col_start="2" col_end="0" name="email" validator="Resultat_Adresse.Email"/>
+	<textctrl col_start="2" col_end="0" name="Email" validator="Resultat_Adresse.Email"/>
 
 	<row h="auto"/>
 	<statictext col_start="1" label="Adresse" />
-	<textctrl col_start="2" col_end="0" name="adresse1" validator="Resultat_Adresse.Adresse1"/>
+	<textctrl col_start="2" col_end="0" name="Adresse1" validator="Resultat_Adresse.Adresse1"/>
 
 	<row h="auto"/>
-	<textctrl col_start="2" col_end="0" name="adresse2" validator="Resultat_Adresse.Adresse2"/>
+	<textctrl col_start="2" col_end="0" name="Adresse2" validator="Resultat_Adresse.Adresse2"/>
 
 	<row h="auto"/>
 	<statictext col_start="1" label="Code Postal" />
-	<textctrl col_start="2" name="code_postal" validator="Resultat_Adresse.Code_postal"/>
+	<textctrl col_start="2" name="Code_postal" validator="Resultat_Adresse.Code_postal"/>
 	<statictext col_start="3" label="Ville" />
-	<textctrl col_start="4" col_end="0" name="ville" validator="Resultat_Adresse.Ville"/>
+	<textctrl col_start="4" col_end="0" name="Ville" validator="Resultat_Adresse.Ville"/>
 
 	<row h="auto"/>
 	<statictext col_start="1" label="Pays" />
-	<textctrl col_start="2" col_end="0" name="pays" validator="Resultat_Adresse.Pays"/>
+	<textctrl col_start="2" col_end="0" name="Pays" validator="Resultat_Adresse.Pays"/>
 
 	<row h="auto"/>
 	<statictext col_start="1" label="Tél.Fixe" />
-	<textctrl col_start="2" name="tel" validator="Resultat_Adresse.Tel"/>
+	<textctrl col_start="2" name="Tel" validator="Resultat_Adresse.Tel"/>
 	<statictext col_start="3" label="Tél.Portable" />
-	<textctrl col_start="4" col_end="0" name="tel_portable" validator="Resultat_Adresse.Tel_portable"/>
+	<textctrl col_start="4" col_end="0" name="Tel_portable" validator="Resultat_Adresse.Tel_portable"/>
 </panel>
 
 <!-- Filtrage des Epreuves -->
@@ -1163,6 +1163,15 @@
 	<row h="auto"/>
 	<statictext col_start="1" label="Pénalité de l\'Epreuve" />
 	<textctrl col_start="2" name="penalite_appliquee" style="TE_RIGHT|TE_READONLY" />
+
+	<row value="auto" />
+	<toolbar col_start="1" col_end="0" name="tb" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT" />
+</panel>
+
+<!-- Vérification des licences FFS -->
+<panel name="verif_licence_ffs">
+	<padding all="2px" />
+	<grid row="1" col="1" name="grid" />
 
 	<row value="auto" />
 	<toolbar col_start="1" col_end="0" name="tb" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT" />

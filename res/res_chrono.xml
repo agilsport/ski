@@ -31,7 +31,7 @@
 		<radiobutton col="1" name="radio_delimiter_tab" label="Tabulation" style="RB_GROUP|ALIGN_RIGHT" />
 		<radiobutton col="1" name="radio_delimiter_semicolon" label="Point Virgule" style="ALIGN_RIGHT" />
 		<radiobutton col="1" name="radio_delimiter_special" label="Autre" style="ALIGN_RIGHT" />
-		<textctrl col="-24" name="delimiter_special" value="|" />
+		<textctrl col="-24" name="delimiter_special" />
 	</staticbox>
 	<staticbox col="1" label="Options"> 
 		<col w="1"/>
