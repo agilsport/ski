@@ -1471,7 +1471,8 @@ function BuildTablesDraw()	-- on ajoute ou on supprime des enregistrements dans 
 			row = tResultat_Info_Tirage:AddRow();
 			tResultat_Info_Tirage:SetCell('Code_evenement', row, draw.code_evenement);
 			tResultat_Info_Tirage:SetCell('Code_coureur', row, tResultat:GetCell('Code_coureur', i));
-			tResultat_Info_Tirage:SetCell('Groupe_tirage', row, 9);
+			tResultat_Info_Tirage:SetCell('Groupe_tirage', row, 5);
+			tResultat_Info_Tirage:SetCell('Statut', row, 'UF');
 			tResultat_Info_Tirage:SetCell('FIS_pts', row, pts);
 			tResultat_Info_Tirage:SetCell('FIS_clt', row, rank);
 			tResultat_Info_Tirage:SetCell('FIS_SG_pts', row, pts_SG);
