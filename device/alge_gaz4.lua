@@ -1,4 +1,4 @@
--- ALGE Timy
+-- ALGE Gaz4
 dofile('./interface/include.lua');
 dofile('./interface/device.lua');
 

@@ -172,12 +172,13 @@
 	<officiel code="ChiefCompetition" label="Chef de piste (CN)" label_inter="Chief Competition" activite="SAUT,CN" required="1" />
 	<officiel code="ffs_control_saut" label="Juge de saut" label_inter="Jumping judge" activite="SAUT,CN" required="5" />
 	<officiel code="EQUIPMENTCONTROL" label="Chef de tremplin" label_inter="Chief jumping" cond="entite == 'FIS'" activite="SAUT,CN" required="1" />
+	
 	<!-- Officiel FFS -->
 	<officiel code="ffs_chr_starter" label="Starter" label_inter="Starter" activite="SAUT,CN" required="1" />
 	<officiel code="ffs_secretariat" label="Secrétaire d'épreuve" label_inter="Event secretary" activite="SAUT,CN" required="1" />
-	<officiel code="ChiefCompetition" label="Chef de piste" label_inter="Chief Competition" activite="FOND,BIATH" required="1" />
+	<officiel code="ChiefCompetition" label="Chef de piste" label_inter="Chief Competition" activite="FOND,ROL,BIATH" required="1" />
 	<officiel code="ffs_chef_pas_tir" label="Chef de pas de tir" label_inter="Chief shooting range" activite="BIATH" required="1" />
-	<officiel code="ffs_jury" label="Membre du jury" label_inter="ffs_jury" activite="FOND,BIATH" required="1" />
+	<officiel code="ffs_jury" label="Membre du jury" label_inter="ffs_jury" activite="FOND,ROL,BIATH" required="1" />
 	<officiel code="ffs_chef_mesureur" label="Chef mesureur" label_inter="Chief Measurer" activite="SAUT,CN" required="1" />
 	<officiel code="ffs_secretariat_mesureur" label="Secrétaire mesureur" label_inter="Event secretary" activite="SAUT,CN" required="1" />
 
@@ -188,31 +189,34 @@
 	<officiel code="ffs_chef_reception" label="Chef reception" label_inter="Chief Reception" activite="SAUT,CN" required="1" />
 
 	<!-- Chronométreur FFS ou FIS-->
-	<officiel code="ChiefTiming" label="Chronométreur" label_inter="Chief Timing" activite="FOND,BIATH" required="1" />
+	<officiel code="ChiefTiming" label="Chronométreur" label_inter="Chief Timing" activite="FOND,ROL,BIATH" required="1" />
 	<!-- staff Chronométreur FFS -->
-	<officiel code="ffs_chr_starter" label="Starter" label_inter="Starter" activite="FOND,BIATH" required="1" /> <!-- discipline="FS,POUR" -->
-	<officiel code="ffs_chr_manuel_start" label="Doublage. manuel départ" label_inter="Dubbing Manual start" activite="FOND,BIATH" required="1" />
-	<officiel code="ffs_chr_manuel_stop" label="Doublage. manuel arrivée" label_inter="Dubbing Manual stop" activite="FOND,BIATH" required="1" />
+	<officiel code="ffs_chr_starter" label="Starter" label_inter="Starter" activite="FOND,ROL,BIATH" required="1" /> <!-- discipline="FS,POUR" -->
+	<officiel code="ffs_chr_manuel_start" label="Doublage. manuel départ" label_inter="Dubbing Manual start" activite="FOND,ROL,BIATH" required="1" />
+	<officiel code="ffs_chr_manuel_stop" label="Doublage. manuel arrivée" label_inter="Dubbing Manual stop" activite="FOND,ROL,BIATH" required="1" />
 	<officiel code="ffs_chr_manuel" label="Doublage manuel" label_inter="Dubbing Manual stop" activite="SAUT,CN" required="1" />
+	
 	<!-- informatique et video FFS -->
 	<officiel code="ffs_informatique" label="Gestionnaire informatique" label_inter="Chief Computer" required="0,1" /> 
-	<officiel code="ffs_operateur_video" label="Opérateur vidéo" label_inter="Opérateur vidéo"  activite="FOND,BIATH" discipline="MASS,POUR" required="1" />
+	<officiel code="ffs_operateur_video" label="Opérateur vidéo" label_inter="Opérateur vidéo"  activite="FOND,ROL,BIATH" discipline="MASS,POUR,KO" required="0,4" />
+	
 	<!-- staff Controleur FFS -->
-	<officiel code="ffs_chef_controleur" label="Chef contrôleurs " label_inter="Chief Timing" activite="FOND,BIATH" required="1" />
-	<officiel code="ffs_juge_start" label="Juge de départ" label_inter="Starting judge" activite="FOND,BIATH" required="1" />
-	<officiel code="ffs_juge_stop" label="Juge d'arrivée" label_inter="Finish judge" activite="FOND,BIATH" required="1" />
-	<officiel code="ffs_controleur" label="Contrôleurs passage" label_inter="Turn controller"  activite="FOND,BIATH" required="2,6" />
-	<officiel code="ffs_control_style" label="Contrôleurs de style" label_inter="Style controller" activite="FOND,BIATH" required="0,6" />
-	<officiel code="ffs_operateur_video" label="Opérateur vidéo" label_inter="Video operator"  activite="FOND,BIATH" required="0,1" />	
+	<officiel code="ffs_chef_controleur" label="Chef contrôleurs " label_inter="Chief Timing" activite="FOND,ROL,BIATH" required="1" />
+	<officiel code="ffs_juge_start" label="Juge de départ" label_inter="Starting judge" activite="FOND,ROL,BIATH" required="1" />
+	<officiel code="ffs_juge_stop" label="Juge d'arrivée" label_inter="Finish judge" activite="FOND,ROL,BIATH" required="1" />
+	<officiel code="ffs_controleur" label="Contrôleurs passage" label_inter="Turn controller"  activite="FOND,ROL,BIATH" required="2,6" />
+	<officiel code="ffs_control_style" label="Contrôleurs de style" label_inter="Style controller" activite="FOND,ROL,BIATH" required="0,6" />
 	<officiel code="ffs_control_tir" label="Contrôleurs  de tir" label_inter="Fire Controller" activite="BIATH" required="2,6" />
+	
 	<!-- sécurité FFS -->
 	<officiel code="ffs_medecin" label="Médecin de course" label_inter="Race doctor" required="0,1" />
 	<officiel code="ffs_secours" label="Secours" label_inter="Rescue" required="1,3" />
+	
 	<!-- staff juge saut FFS -->
-
-	<officiel code="ffs_medecin" label="Médecin de course" label_inter="Race doctor" required="0,1" /> 
+	
 	<!-- autre FFS -->
 	<officiel code="ffs_benevole" label="Bénévole" label_inter="Volunteer" required="0,6" />
+	
 	<!-- autre FFS ou FIS-->
 	<officiel code="TIMEKEEPER" label="Sociétée de chronomérie" label_inter="Timekeeper" required="0,1" />
 </list_officiel>

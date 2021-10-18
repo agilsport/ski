@@ -1,11 +1,12 @@
 -- AGIL IMHP Version 1
-dofile('./interface/include.lua');
+dofile('./interface/interface.lua');
+dofile('./interface/adv.lua');
 dofile('./interface/device.lua');
 
 -- Information : Numéro de Version, Nom, Interface
 function device.GetInformation()
 	return { 
-		version = 1.1, 
+		version = 1.2, 
 		name = 'AGIL IMHP Version 1', 
 		class = 'chrono', 
 		interface = { { type='serial', baudrate = '19200' } } 

@@ -1,11 +1,12 @@
 -- AGIL PDA : Interface Vidage du PDA vers le logiciel de Course 
-dofile('./interface/include.lua');
+dofile('./interface/interface.lua');
+dofile('./interface/adv.lua');
 dofile('./interface/device.lua');
 
 -- Information : Numéro de Version, Nom, Interface
 function device.GetInformation()
 	return { 
-		version = 1.5, 
+		version = 1.6, 
 		code = 'agil_pda', 
 		name = 'Agil PDA-Chrono', 
 		class = 'chrono', 

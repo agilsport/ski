@@ -6,7 +6,7 @@ dofile('./interface/device.lua');
 -- Information : Numéro de Version, Nom, Interface
 function device.GetInformation()
 	return { 
-		version = 2.1, 
+		version = 2.5, 
 		code = 'microgate_rei2', 
 		name = 'MICROGATE Rei2', 
 		class = 'chrono', 
@@ -60,6 +60,9 @@ end
 	--   OO 000119 00000 00000 11 00 0000 2033338539 02102016	trame decouper HD ou HA
 --  1234 56 789012 34567 89012 34 56 7890 1234567890 12345678    compteur
 	--	 SO 000024 00001 00000 11 15 2552 0000056000 +0000000    trame temps net
+	--	 SO 000082 00006 00000 11 01 0011 0000079000 +0000000    trame temps net inter 1 	 
+	-- 	 SO 000092 00007 00000 11 16 0021 0000292000 +0000000    trame temps net inter 2
+	--	 SO 000093 00007 00000 11 16 0022 0000292000 +0000000   envoie de la trame en double pour tout les inters
 	--	 Tt|ID seq| dos |     |OT|Ch|    |hhmmssmmmm|jjmmaaaa
 	--
 	--		origine trame:	11 impuls manu 			channel : 	01  L1
@@ -77,16 +80,32 @@ function IsPacketOk(packet)
 		alert("Invalid Packet Length");
 		return false;
 	end
-	
+	local OriginTrame = adv.PacketString(packet, 23, 24);
+	local Date = adv.PacketString(packet, 41, 48);
 	local typeTrame = adv.PacketString(packet, 5, 6);
 	local channel = adv.PacketString(packet, 25, 26);
 	local id = tonumber(adv.PacketString(packet, 7, 12));
 	local chrono = GetTime(packet);
 	local bib = GetBib(packet);
-	local passage = -1;
-
-	if typeTrame == 'OO' then -- Base de Temps
-
+	
+	--Renvoi l'origine de la trame radio manue ou ligne
+		if OriginTrame == "11" then
+			-- origine trame bouton mauelle du chrono ...
+			OrigineTrame = 'impuls-Man.';
+		elseif OriginTrame == "10" then
+			-- origine trame entrée ligne du chrono ...
+			OrigineTrame = 'impuls-Ligne.';
+		elseif OriginTrame == "15" then
+			-- origine trame de encradio ...
+			OrigineTrame = 'impuls-Rad.';
+		else 
+			-- origine trame Non determiner ...
+			OrigineTrame = '';
+		end
+	
+	
+	
+	-- Renvoi du passage suivant le N° de Channel
 		if channel == "00" then
 			-- Canal de Départ : si C0M => on devrait faire un peu plus ...
 			passage = 0;
@@ -114,19 +133,48 @@ function IsPacketOk(packet)
 		elseif channel == "06" then
 			-- Canal 8 => Inter 6
 			passage = 6;
+		elseif channel == "07" then
+			-- Canal 4 => Inter 2
+			passage = 7;
+		elseif channel == "08" then
+			-- Canal 5 => Inter 3
+			passage = 8;
+		elseif channel == "09" then
+			-- Canal 6 => Inter 4
+			passage = 9;
+		elseif channel == "10" then
+			-- Canal 7 => Inter 5
+			passage = 10;
+		elseif channel == "11" then
+			-- Canal 8 => Inter 6
+			passage = 11;	
+		elseif channel == "12" then
+			-- Canal 5 => Inter 3
+			passage = 12;
+		elseif channel == "13" then
+			-- Canal 6 => Inter 4
+			passage = 13;
+		elseif channel == "14" then
+			-- Canal 7 => Inter 5
+			passage = 14;	
 		else
 			alert("Error channel="..channel);
 		end
+
+	if typeTrame == 'OO' then -- Base de Temps
+		alert("chrono= "..chrono)
 		AddTimePassage(chrono, passage, bib, channel, id);
-		
-	elseif typeTrame == 'SO' then	-- Temps Net
-		AddTimeNet(chrono, bib);
-		return false;
+		return true;	
+	elseif typeTrame == 'SO' and Date == '+0000000' then -- Temps Net
+		AddTimeNet(chrono, passage, bib);
+		return true;
+	elseif typeTrame == 'SO' and Date ~= '+0000000' then -- heure de depart arrivée	
+		return true;
 	else
-		alert("Type Trame non prise en compte = "..typeTrame);
-		return false;
+		alert("Type Trame non prise en compte = "..typeTrame..'//');
+		return true;
 	end 
-	return true;
+	return false
 end
 
 function GetTime(packet)
@@ -139,7 +187,7 @@ function GetTime(packet)
 	minute = string.gsub(minute, ' ', '0');
 	sec = string.gsub(sec, ' ', '0');
 	milli = string.gsub(milli, ' ', '0');
-	
+		
 	return 3600000*tonumber(hour)+60000*tonumber(minute)+1000*tonumber(sec)+tonumber(milli);
 end
 
@@ -151,9 +199,25 @@ end
 
 function AddTimePassage(chrono, passage, bib, channel, id)
 	app.SendNotify("<passage_add>", 
-		{ time = chrono,  passage = passage, bib = bib, device = 'microgate_rei2_'..channel, log = id }
+		{ time = chrono,  passage = passage, bib = bib, device = 'microgate_rei2_'..OrigineTrame, log = id }
 	);
 end
 
-function AddTimeNet(chrono, bib)
+function AddTimeNet(chrono, passage, bib)
+app.SendNotify("<net_time_add>", 
+		{ time = chrono,  passage = passage, bib = bib, device = 'Microgate REi2'..OrigineTrame }
+	);
+
 end
+--[[
+--*********************
+function device.OnClose()
+
+-- fonction permetant le fonctionnement de l'activation ou de la desactivation des devices ds la fenetre chrono
+	local mgr = app.GetAuiManager();
+	mgr:DeletePane(RaceresultWebServeur.panel.container);
+
+-- Appel OnClose Metatable
+	mt_device.OnClose();
+
+end ]]--

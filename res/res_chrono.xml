@@ -100,7 +100,7 @@
 
 	<staticbox row="auto" col_start="1" col_end="0" label="Entrée - Sortie"> 
 		<combobox col="1" row="auto" name="combo_input" style="ALIGN_LEFT"/>
-		<statictext col="auto" syle="ALIGN_CENTER" label="En" />
+		<statictext col="auto" style="ALIGN_CENTER" label="En" />
 		<combobox col="1" name="combo_output" style="ALIGN_LEFT"/>
 	</staticbox>
 	

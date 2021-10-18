@@ -48,20 +48,7 @@
 	
 	<!-- duel_total : utilisation des colonnes Tour_max, Duel_max, Clt_max, Tps_max, et Niveau_max -->
 	<report id="duel_total" title="Résultats Officiels" first_header="0">
-
-		<column name="Clt_qualif_sos" type="ranking" />
-		<lua>
-			for i=0,body:GetNbRows()-1 do 
-				body:SetCell("Clt_qualif_sos", i, body:GetCellInt("Clt_qualif", i));
-				if body:GetCellInt('Tour_max', i) == GetNbTour() then
-					body:SetCell('Clt_qualif', i, 0);
-				else
-					body:SetCell('Duel_max', i, 0);
-				end
-			end
-		</lua>		
-
-		<lua>body:SetRanking('Clt', 'Centre, Tour_max Desc, Duel_max Asc, Clt_max NULL_OK, Clt_qualif NULL_OK')</lua>
+		<lua>body:SetRanking('Clt', 'Centre, Tour_max Desc, Duel_max asc, Clt_max NULL_OK, Clt_qualif NULL_OK, Dossard')</lua>
 		<lua>sqlBase.FixationTableRanking(body)</lua>
 		
 		<!-- Copie Clt dans la colonne Critere -->
@@ -84,13 +71,11 @@
 			</before>
 		</rupture>
 	
-		<rupture key="Tour_max">
+		<rupture key="Niveau_max">
 			<before>
 				<font size="14"/>
 				<row value="0.4cm"/>
-				<!-- <text row="auto" col="1" cond="$(Tour_max) ~= '0'">GetLabelTour($(Tour_max))</text> -->
-				<text row="auto" col="1" cond="$(Tour_max) ~= '0'">'st'..$(Stade)..'/'..GetLabelTour($(Tour_max))</text>
-				<text row="auto" col="1" cond="$(Tour_max) == '0'">'Qualification'</text>
+				<text row="auto" col="1" >$(Niveau_max)</text>
 			</before>
 		</rupture>
 	
@@ -107,11 +92,11 @@
 			<text col="14" align="center" label="Club">$(Club)</text>
 
 			<text col="7" align="right" label="T.Qualif" >$(Tps_qualif)</text>
-			<text col="4" align="right" label="C.Q" >$(Clt_qualif_sos)</text>
+			<text col="4" align="right" label="C.Q" >$(Clt_qualif)</text>
 			
 			<!-- <text col="8" align="center" label="Tab">$(Centre)</text> -->
 			<!-- <text col="8" align="center" label="TourM">$(Tour_max)</text> -->
-			<text col="8" align="center" label="DuelM">$(Duel_max)</text>
+			<!-- <text col="8" align="center" label="DuelM">$(Duel_max)</text> -->
 			<!-- <text col="8" align="center" label="CltM">$(Clt_max)</text> -->
 			<!-- <text col="8" align="center" label="TpsM">$(Tps_max)</text> -->
 		</body>
@@ -212,12 +197,12 @@
 				<col w="1"/>
 			<lua>end</lua>
 			<row c="height_label_tour" />
-			<text col_start="1" col_end="0" row_start="1" row_end="0" font_size_step="2" align="center" border="0">$(Epreuve.Code_categorie)..' - '..$(Epreuve.Sexe)</text>
-
+			<text col_start="1" col_end="0" font_size_step="2" align="center" border="0">$(Epreuve.Code_categorie)..' - '..$(Epreuve.Sexe)</text>
 			<row h="1"/>
+			
 			<lua>for tour=tour_min,tour_max do</lua>
 			
-				<matrix col_start="(tour-tour_min+1)">
+				<matrix col_start="(tour)">
 					<col p="width_duel" />
 					<col c="width_separaror_duel" />
 					<lua>nb_duel = GetNbDuel(tour)</lua>

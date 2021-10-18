@@ -1,6 +1,7 @@
--- ALGE Timy
-dofile('./interface/include.lua');
-dofile('./interface/device.lua');
+-- ALGE Gaz4 Meca
+dofile('./interface/adv.lua');
+dofile('./interface/interface.lua');
+---    a verifier avec pierre si on peut l'enlever
 dofile('./interface/wndDisplayBoard.lua');
 
 -- Information : Numéro de Version, Nom, Interface

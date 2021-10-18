@@ -1,4 +1,6 @@
-dofile('./interface/include.lua');
+dofile('./interface/interface.lua');
+dofile('./interface/adv.lua');
+dofile('./interface/device.lua');
 
 -- Information : Numéro de de Version, Nom, Interface
 function device.GetInformation()
@@ -88,6 +90,7 @@ function device.SetNote(tResultat_Saut, juge)
 	app.SendNotify('<bib_note>', { bib = device.bib, note = device.note[juge], judge = juge });
 --	adv.Error('OnTimer Juge '..juge..' : Note='..device.note[juge]);
 end
+
 
 -- Notification : <bib_next>
 function device.OnNotifyBibNext(key, params)

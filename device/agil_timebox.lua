@@ -1,11 +1,12 @@
 -- AGIL TIMEBOX - CONTACTOR-BOX
-dofile('./interface/include.lua');
+dofile('./interface/interface.lua');
+dofile('./interface/adv.lua');
 dofile('./interface/device.lua');
 
 -- Information : Numéro de Version, Nom, Interface
 function device.GetInformation()
 	return { 
-		version = 1.2, 
+		version = 1.6, 
 		code = 'agil_timebox',
 		name = 'Agil TimeBox', 
 		class = 'chrono', 
