@@ -55,7 +55,7 @@ dofile('./interface/device.lua');
 
 -- Information : Numéro de Version, Nom, Interface
 function device.GetInformation()
-	return { version = 3.9,
+	return { version = 4.0,
 			 code = 'RaceResult_WebRestApi', 
 			 name = 'RaceResult Web RestApi', 
 			class = 'chrono'
