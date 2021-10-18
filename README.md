@@ -45,7 +45,6 @@ Sous dossier /res du répertoire principal
 <br>
 Resources internes C++ 
 
-## totot
 
 
 
