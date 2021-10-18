@@ -1,5 +1,5 @@
 -- TAG HL-650
-dofile('./interface/include.lua');
+dofile('./interface/adv.lua');
 dofile('./interface/device.lua');
 
 -- Information : Numéro de Version, Nom, Interface

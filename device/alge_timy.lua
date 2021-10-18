@@ -1,11 +1,11 @@
 -- ALGE Timy
-dofile('./interface/include.lua');
+dofile('./interface/adv.lua');
 dofile('./interface/device.lua');
 
 -- Information : Numéro de Version, Nom, Interface
 function device.GetInformation()
 	return { 
-		version = 2.2, 
+		version = 2.3, 
 		code = 'alge_timy', 
 		name = 'ALGE Timy', 
 		class = 'chrono', 

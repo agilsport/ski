@@ -1,12 +1,12 @@
 -- ALGE TDC 8000
-dofile('./interface/include.lua');
+dofile('./interface/interface.lua');
+dofile('./interface/adv.lua');
 dofile('./interface/device.lua');
-
 
 -- Information : Numéro de Version, Nom, Interface
 function device.GetInformation()
 	return { 
-		version = 2.0, 
+		version = 2.1, 
 		code = 'ALGE TDC 8000', 
 		name = 'ALGE TDC 8000', 
 		class = 'chrono', 

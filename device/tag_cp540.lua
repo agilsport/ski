@@ -1,6 +1,6 @@
 -- TAG CP-540
-dofile('./interface/include.lua');
-dofile('./interface/device.lua');
+dofile('./interface/adv.lua');
+dofile('./interface/interface.lua');
 
 -- Information : Numéro de Version, Nom, Interface
 function device.GetInformation()

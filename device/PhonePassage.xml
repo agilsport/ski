@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+	<!-- XML race result web serveur a passer a la new morme XML -->
+	<panel name="config_PhonePassage">
+		<pen border="0" />
+		<spacing all="3"/>
+		<padding all="2px"/>
+		<col w="1,1,1,1,1" />	
+		
+		<row h="auto"/>
+			<statictext col_start="1" col_end="2" style="ALIGN_CENTER" label="type de serveur"/>
+			<combobox col_start="3" col_end="4" name="PhonePassageType"/>
+		
+		<row h="auto"/>
+			<statictext col_start="1" col_end="0" style="ALIGN_LEFT" label="A ne remplir que si le choix de la liste est perso" />
+		
+		<row h="auto"/>
+			<statictext col_start="1" col_end="2" style="ALIGN_CENTER" label="Adresse Serveur" />
+			<textctrl col_start="3" col_end="0" name="config_AdrServeurPhonePassage" />
+		
+		<row h="auto"/>
+			<statictext col_start="1" col_end="2" style="ALIGN_CENTER" label="Lect. des Dos. en base de temps"/>
+			<checkbox col_start="3" name="checkbox_config_Lect_Dos"/>
+			
+		<toolbar row="auto" col_start="1" col_end= "0" name="tb" style="TB_FLAT,TB_HORIZONTAL,TB_TEXT" />
+	</panel>
+
+</root>
