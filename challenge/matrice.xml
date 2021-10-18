@@ -844,9 +844,9 @@
 			<text row="auto" col_start="1" col_end="0">''</text>
 			<text row_start="-1" col_start="1">
 				<background mode="transparent"/>$(Identite)</text>
-			<text row_start="-1" col_start="2" style="ALIGN_CENTER" cond="body:GetCellInt('Clt_last_discipline', row) &gt;0">
+			<text row_start="-1" col_start="2" align="center" cond="body:GetCellInt('Clt_last_discipline', row) &gt;0">
 				<background mode="transparent"/>$(Pts_last_discipline)..' ('..$(Clt_last_discipline)..')'</text>
-			<text row_start="-1" col_start="2" style="ALIGN_CENTER" cond="body:GetCellInt('Clt_last_discipline', row) == 0">
+			<text row_start="-1" col_start="2" align="center" cond="body:GetCellInt('Clt_last_discipline', row) == 0">
 				<background mode="transparent"/>''</text>
 			<text row_start="-1" col_start="3" align="(GetAlignCol('An', body:GetCell('An', row)))">
 				<background mode="transparent"/>$(An)</text>
@@ -856,25 +856,25 @@
 				<background mode="transparent"/>$(Comite)</text>
 			<text row_start="-1" col_start="6" align="left">
 				<background mode="transparent"/>$(Club)</text>
-			<text row_start="-1" col_start="7" style="ALIGN_CENTER" cond="analyse1 &gt; 0">
+			<text row_start="-1" col_start="7" align="center" cond="analyse1 &gt; 0">
 				<background mode="transparent"/>analyse1..' x'</text>
-			<text row_start="-1" col_start="7" style="ALIGN_CENTER" cond="analyse1 == -1">
+			<text row_start="-1" col_start="7" align="center" cond="analyse1 == -1">
 				<background mode="transparent"/>''</text>
-			<text row_start="-1" col_start="8" style="ALIGN_CENTER" cond="analyse2 &gt; 0">
+			<text row_start="-1" col_start="8" align="center" cond="analyse2 &gt; 0">
 				<background mode="transparent"/>analyse2..' x'</text>
-			<text row_start="-1" col_start="8" style="ALIGN_CENTER" cond="analyse2 == -1">
+			<text row_start="-1" col_start="8" align="center" cond="analyse2 == -1">
 				<background mode="transparent"/>''</text>
-			<text row_start="-1" col_start="9" style="ALIGN_CENTER" cond="analyse3 &gt; 0">
+			<text row_start="-1" col_start="9" align="center" cond="analyse3 &gt; 0">
 				<background mode="transparent"/>analyse3..' x'</text>
-			<text row_start="-1" col_start="9" style="ALIGN_CENTER" cond="analyse3 == -1">
+			<text row_start="-1" col_start="9" align="center" cond="analyse3 == -1">
 				<background mode="transparent"/>''</text>
-			<text row_start="-1" col_start="10" style="ALIGN_CENTER" cond="analyse4 &gt; 0">
+			<text row_start="-1" col_start="10" align="center" cond="analyse4 &gt; 0">
 				<background mode="transparent"/>analyse4..' x'</text>
-			<text row_start="-1" col_start="10" style="ALIGN_CENTER" cond="analyse4 == -1">
+			<text row_start="-1" col_start="10" align="center" cond="analyse4 == -1">
 				<background mode="transparent"/>''</text>
-			<text row_start="-1" col_start="11" style="ALIGN_CENTER" cond="analyse5 &gt; 0">
+			<text row_start="-1" col_start="11" align="center" cond="analyse5 &gt; 0">
 				<background mode="transparent"/>analyse5..' x'</text>
-			<text row_start="-1" col_start="11" style="ALIGN_CENTER" cond="analyse5 == -1">
+			<text row_start="-1" col_start="11" align="center" cond="analyse5 == -1">
 				<background mode="transparent"/>''</text>
 			<lua>end</lua>
 		</body>
@@ -960,10 +960,10 @@
 			<lua>if liste1:len() &gt; 0 then txt1 = txt1..'Points et Classement sur la liste '..liste1..' en '..liste1Classement..' avec primauté '..comboListePrimaute; end</lua>
 			<lua>if liste2:len() &gt; 0 then txt1 = txt1..' | Points  et Classement sur la liste '..liste2..' en '..liste2Classement..' avec primauté '..comboListePrimaute; end</lua>
 
-			<text row="auto" style="ALIGN_LEFT" cond="tEvenement:GetCell('Commentaire', 0):len() &gt; 0 and txt1:len() == 0">$(tEvenement.Commentaire)</text>
-			<text row="auto" style="ALIGN_LEFT" cond="txt1:len() &gt; 0">
+			<text row="auto" cond="tEvenement:GetCell('Commentaire', 0):len() &gt; 0 and txt1:len() == 0">$(tEvenement.Commentaire)</text>
+			<text row="auto" cond="txt1:len() &gt; 0">
 				<font adjust="both" weight="normal"/>$(Evenement.Commentaire)..' - N.B. '..txt1</text>
-			<text row="auto" style="ALIGN_LEFT" cond="params.CoefMaxiBlocs:len() &gt; 65">params.CoefMaxiBlocs</text>
+			<text row="auto" cond="params.CoefMaxiBlocs:len() &gt; 65">params.CoefMaxiBlocs</text>
 		</footer>
 		<label>
 			<lua>if texteNbColPresCourses == 5 then</lua>
@@ -988,22 +988,22 @@
 							<pen border="all" size="5" color="red"/>
 							<text row="auto" col="1" align="right">'Disciplines'</text>
 							<text row="auto" align="right">texteLigne2Texte</text>
-							<text row="auto" cond="params.Criteres1 ~= nil">'Retenues pour le Clt.'</text>
+							<text row="auto" align="right" cond="params.Criteres1 ~= nil">'Retenues pour le Clt.'</text>
 							<lua>for i = 1, #arDiscipline do
 									discipline = arDiscipline[i].Discipline;
 									rgbx = colorDiscipline[discipline];</lua>
-									<text row_start="(-2 - enlever)" style="ALIGN_CENTER" col="auto">
+									<text row_start="(-2 - enlever)" align="center" col="auto">
 										<background color="(rgbx)" mode="solid"/>arDiscipline[i].Discipline</text>
-									<text row_start="(0 - enlever)" align="center">
+									<text row_start="(0 - enlever)" align="center" >
 										<background color="(rgbx)" mode="solid"/>arDiscipline[i].Sur</text>
-									<text row_start="0" style="ALIGN_CENTER"  cond="params.Criteres1 ~= nil">
+									<text row_start="0" align="center"  cond="params.Criteres1 ~= nil">
 										<background color="(rgbx)" mode="solid"/>arDiscipline[i].Combien</text>
 									<lua>sommeSur = sommeSur + tonumber(arDiscipline[i].Sur);
 										sommeCombien = sommeCombien + tonumber(arDiscipline[i].Combien);
 								end</lua>
-								<text row_start="(-1 - enlever)" col="auto" align="center">'Tot'</text>
-								<text row_start="(0 - enlever)" align="center">sommeSur</text>
-								<text row_start="0" style="ALIGN_CENTER" cond="params.Criteres1 ~= nil">sommeCombien</text>
+								<text row_start="(-1 - enlever)" col="auto" align="center"  >'Tot'</text>
+								<text row_start="(0 - enlever)" align="center"  >sommeSur</text>
+								<text row_start="0" align="center"  cond="params.Criteres1 ~= nil">sommeCombien</text>
 						</matrix>
 				<lua>elseif params.Criteres1 ~= nil and params.Criteres1:len() &gt; 15 then</lua>
 					<pen border="none"/>
@@ -1068,21 +1068,21 @@
 				<lua>gecplus = '2'</lua>
 				<lua>listeplus = '2'</lua>
 				<text row="auto" col="(cltplus)" align="center">'Clt.'</text>
-				<text col="(codeplus)" style="ALIGN_CENTER" cond="prnColonne.Code_coureur.Imprimer == 1">prnColonne.Code_coureur.Label</text>
-				<text col="(identiteplus)" style="ALIGN_CENTER" cond="prnColonne.Identite.Imprimer == 1">prnColonne.Identite.Label</text>
-				<text col="(sexeplus)" style="ALIGN_CENTER" cond="prnColonne.Sexe.Imprimer == 1">prnColonne.Sexe.Label</text>
-				<text col="(anplus)" style="ALIGN_CENTER" cond="prnColonne.An.Imprimer == 1">prnColonne.An.Label</text>
-				<text col="(categplus)" style="ALIGN_CENTER" cond="prnColonne.Categ.Imprimer == 1">prnColonne.Categ.Label</text>
-				<text col="(nationplus)" style="ALIGN_CENTER" cond="prnColonne.Nation.Imprimer == 1">prnColonne.Nation.Label</text>
-				<text col="(comiteplus)" style="ALIGN_CENTER" cond="prnColonne.Comite.Imprimer == 1">prnColonne.Comite.Label</text>
-				<text col="(clubcourtplus)" style="ALIGN_CENTER" cond="prnColonne.Club.Imprimer == 1 and texteImprimerClubLong == 'Non'">prnColonne.Club.Label</text>
-				<text col="(clublongplus)" style="ALIGN_CENTER" cond="prnColonne.Club.Imprimer == 1 and texteImprimerClubLong ~= 'Non'">prnColonne.Club.Label</text>
-				<text col="(gecplus)" style="ALIGN_CENTER" cond="prnColonne.Groupe.Imprimer == 1">prnColonne.Groupe.Label</text>
-				<text col="(gecplus)" style="ALIGN_CENTER" cond="prnColonne.Equipe.Imprimer == 1">prnColonne.Equipe.Label</text>
-				<text col="(gecplus)" style="ALIGN_CENTER" cond="prnColonne.Critere.Imprimer == 1">prnColonne.Critere.Label</text>
-				<text col="(listeplus)" style="ALIGN_CENTER" cond="prnColonne.Liste1.Imprimer == 1">prnColonne.Liste1.Label..' '..liste1</text>
-				<text col="(listeplus)" style="ALIGN_CENTER" cond="prnColonne.Liste2.Imprimer == 1">prnColonne.Liste2.Label..' '..liste2</text>
-				<text col="(listeplus)" style="ALIGN_CENTER" cond="prnColonne.Delta.Imprimer == 1">prnColonne.Delta.Label</text>
+				<text col="(codeplus)" align="center" cond="prnColonne.Code_coureur.Imprimer == 1">prnColonne.Code_coureur.Label</text>
+				<text col="(identiteplus)" align="center" cond="prnColonne.Identite.Imprimer == 1">prnColonne.Identite.Label</text>
+				<text col="(sexeplus)" align="center" cond="prnColonne.Sexe.Imprimer == 1">prnColonne.Sexe.Label</text>
+				<text col="(anplus)" align="center" cond="prnColonne.An.Imprimer == 1">prnColonne.An.Label</text>
+				<text col="(categplus)" align="center" cond="prnColonne.Categ.Imprimer == 1">prnColonne.Categ.Label</text>
+				<text col="(nationplus)" align="center" cond="prnColonne.Nation.Imprimer == 1">prnColonne.Nation.Label</text>
+				<text col="(comiteplus)" align="center" cond="prnColonne.Comite.Imprimer == 1">prnColonne.Comite.Label</text>
+				<text col="(clubcourtplus)" align="center" cond="prnColonne.Club.Imprimer == 1 and texteImprimerClubLong == 'Non'">prnColonne.Club.Label</text>
+				<text col="(clublongplus)" align="center" cond="prnColonne.Club.Imprimer == 1 and texteImprimerClubLong ~= 'Non'">prnColonne.Club.Label</text>
+				<text col="(gecplus)" align="center" cond="prnColonne.Groupe.Imprimer == 1">prnColonne.Groupe.Label</text>
+				<text col="(gecplus)" align="center" cond="prnColonne.Equipe.Imprimer == 1">prnColonne.Equipe.Label</text>
+				<text col="(gecplus)" align="center" cond="prnColonne.Critere.Imprimer == 1">prnColonne.Critere.Label</text>
+				<text col="(listeplus)" align="center" cond="prnColonne.Liste1.Imprimer == 1">prnColonne.Liste1.Label..' '..liste1</text>
+				<text col="(listeplus)" align="center" cond="prnColonne.Liste2.Imprimer == 1">prnColonne.Liste2.Label..' '..liste2</text>
+				<text col="(listeplus)" align="center" cond="prnColonne.Delta.Imprimer == 1">prnColonne.Delta.Label</text>
 				<text col="(largeur_total)" align="center">
 					<background color="LtYellow" mode="solid"/>'Total'</text>
 				<lua>for i = 0, tMatrice_Courses:GetNbRows() -1 do
@@ -1092,35 +1092,35 @@
 						nb_col = tMatrice_Courses:GetCellInt('Nb_col', i);
 						rgbx = colorDiscipline[code_discipline];
 						if code_discipline ~= 'CS' then</lua>
-							<text col="(largeur_etroite)" style="ALIGN_CENTER" cond="prnColonne.Clt[idxcourse].Imprimer == 1">
+							<text col="(largeur_etroite)" align="center" cond="prnColonne.Clt[idxcourse].Imprimer == 1">
 								<background color="(rgbx)" mode="solid" cond="string.find(params.Presentation,'horizontale')"/>idxcourse..' '..prnColonne['Clt'].Label</text>
-							<text col="(largeur_large)" style="ALIGN_CENTER" cond="prnColonne.Tps[idxcourse].Imprimer == 1">
+							<text col="(largeur_large)" align="center" cond="prnColonne.Tps[idxcourse].Imprimer == 1">
 								<background color="(rgbx)" mode="solid" cond="string.find(params.Presentation,'horizontale')"/>idxcourse..' '..prnColonne['Tps'].Label</text>
-							<text col="(largeur_etroite)" style="ALIGN_CENTER" cond="prnColonne.Diff[idxcourse].Imprimer == 1">
+							<text col="(largeur_etroite)" align="center" cond="prnColonne.Diff[idxcourse].Imprimer == 1">
 								<font adjust="both"/>
 								<background color="(rgbx)" mode="solid" cond="string.find(params.Presentation,'horizontale')"/>idxcourse..' '..prnColonne['Diff'].Label</text>
-							<text col="(largeur_etroite)" style="ALIGN_CENTER" cond="prnColonne.Pts[idxcourse].Imprimer == 1 and nb_col == 1">
+							<text col="(largeur_etroite)" align="center" cond="prnColonne.Pts[idxcourse].Imprimer == 1 and nb_col == 1">
 								<background color="(rgbx)" mode="solid" cond="string.find(params.Presentation,'horizontale')"/>idxcourse</text>
-							<text col="(largeur_etroite)" style="ALIGN_CENTER" cond="prnColonne.Pts[idxcourse].Imprimer == 1 and nb_col &gt; 1">
+							<text col="(largeur_etroite)" align="center" cond="prnColonne.Pts[idxcourse].Imprimer == 1 and nb_col &gt; 1">
 								<background color="(rgbx)" mode="solid" cond="string.find(params.Presentation,'horizontale')"/>idxcourse..' '..prnColonne['Pts'].Label</text>
 						<lua>else</lua>
-							<text col="(largeur_etroite)" style="ALIGN_CENTER" cond="prnCombiSaut.Cltcs.Imprimer == 1">
+							<text col="(largeur_etroite)" align="center" cond="prnCombiSaut.Cltcs.Imprimer == 1">
 								<background color="(rgbx)" mode="solid" cond="string.find(params.Presentation,'horizontale')"/>idxcourse..' '..prnCombiSaut.Cltcs.Label</text>
-							<text col="(largeur_etroite)" style="ALIGN_CENTER" cond="prnCombiSaut.Lng_saut.Imprimer == 1">
+							<text col="(largeur_etroite)" align="center" cond="prnCombiSaut.Lng_saut.Imprimer == 1">
 								<background color="(rgbx)" mode="solid" cond="string.find(params.Presentation,'horizontale')"/>idxcourse..' '..prnCombiSaut.Lng_saut.Label</text>
-							<text col="(largeur_etroite)" style="ALIGN_CENTER" cond="prnCombiSaut.Clt_saut.Imprimer == 1">
+							<text col="(largeur_etroite)" align="center" cond="prnCombiSaut.Clt_saut.Imprimer == 1">
 								<background color="(rgbx)" mode="solid" cond="string.find(params.Presentation,'horizontale')"/>idxcourse..' '..prnCombiSaut.Clt_saut.Label</text>
-							<text col="(largeur_etroite)" style="ALIGN_CENTER" cond="prnCombiSaut.Pts_saut.Imprimer == 1">
+							<text col="(largeur_etroite)" align="center" cond="prnCombiSaut.Pts_saut.Imprimer == 1">
 								<background color="(rgbx)" mode="solid" cond="string.find(params.Presentation,'horizontale')"/>idxcourse..' '..prnCombiSaut.Pts_saut.Label</text>
-							<text col="(largeur_etroite)" style="ALIGN_CENTER" cond="prnCombiSaut.Tps_alpin.Imprimer == 1">
+							<text col="(largeur_etroite)" align="center" cond="prnCombiSaut.Tps_alpin.Imprimer == 1">
 								<background color="(rgbx)" mode="solid" cond="string.find(params.Presentation,'horizontale')"/>idxcourse..' '..prnCombiSaut.Tps_alpin.Label</text>
-							<text col="(largeur_etroite)" style="ALIGN_CENTER" cond="prnCombiSaut.Clt_alpin.Imprimer == 1">
+							<text col="(largeur_etroite)" align="center" cond="prnCombiSaut.Clt_alpin.Imprimer == 1">
 								<background color="(rgbx)" mode="solid" cond="string.find(params.Presentation,'horizontale')"/>idxcourse..' '..prnCombiSaut.Clt_alpin.Label</text>
-							<text col="(largeur_etroite)" style="ALIGN_CENTER" cond="prnCombiSaut.Pts_alpin.Imprimer == 1">
+							<text col="(largeur_etroite)" align="center" cond="prnCombiSaut.Pts_alpin.Imprimer == 1">
 								<background color="(rgbx)" mode="solid" cond="string.find(params.Presentation,'horizontale')"/>idxcourse..' '..prnCombiSaut.Pts_alpin.Label</text>
 							<text col="(largeur_etroite)" align="center">
 								<background color="(rgbx)" mode="solid" cond="string.find(params.Presentation,'horizontale')"/>'Points'</text>
-							<text col="(largeur_etroite)" style="ALIGN_CENTER" cond="prnCombiSaut.Ptstotalcs.Imprimer == 1">
+							<text col="(largeur_etroite)" align="center" cond="prnCombiSaut.Ptstotalcs.Imprimer == 1">
 								<background color="(rgbx)" mode="solid" cond="string.find(params.Presentation,'horizontale')"/>idxcourse..' '..prnCombiSaut.Ptstotalcs.Label</text>
 						<lua>end
 						for run = 1, arCourses[idxcourse].Nb_run do
@@ -1129,19 +1129,19 @@
 								suffixe = '';						
 							end		
 							if code_discipline ~= 'CS' then</lua>
-				<text col="(largeur_large)" style="ALIGN_CENTER" cond="prnColonne.Tpsrun[idxcourse].Imprimer == 1">
+				<text col="(largeur_large)" align="center" cond="prnColonne.Tpsrun[idxcourse].Imprimer == 1">
 					<background color="(rgbx)" mode="solid" cond="string.find(params.Presentation,'horizontale')"/>prnColonne['Tpsrun'].Label..suffixe</text>
-				<text col="(largeur_etroite)" style="ALIGN_CENTER" cond="prnColonne.Ptsrun[idxcourse].Imprimer == 1">
+				<text col="(largeur_etroite)" align="center" cond="prnColonne.Ptsrun[idxcourse].Imprimer == 1">
 					<background color="(rgbx)" mode="solid" cond="string.find(params.Presentation,'horizontale')"/>prnColonne['Ptsrun'].Label..suffixe</text>
-				<text col="(largeur_etroite)" style="ALIGN_CENTER" cond="prnColonne.Diffrun[idxcourse].Imprimer == 1">
+				<text col="(largeur_etroite)" align="center" cond="prnColonne.Diffrun[idxcourse].Imprimer == 1">
 					<background color="(rgbx)" mode="solid" cond="string.find(params.Presentation,'horizontale')"/>prnColonne['Diffrun'].Label..suffixe</text>
-				<text col="(largeur_etroite)" style="ALIGN_CENTER" cond="prnColonne.Cltrun[idxcourse].Imprimer == 1">
+				<text col="(largeur_etroite)" align="center" cond="prnColonne.Cltrun[idxcourse].Imprimer == 1">
 					<background color="(rgbx)" mode="solid" cond="string.find(params.Presentation,'horizontale')"/>prnColonne['Cltrun'].Label..suffixe</text>
 				<lua>end
 						end</lua>
-				<text col="(largeur_etroite)" style="ALIGN_CENTER" cond="code_discipline ~= 'CS' and prnColonne.Ptstotal[idxcourse].Imprimer == 1">
+				<text col="(largeur_etroite)" align="center" cond="code_discipline ~= 'CS' and prnColonne.Ptstotal[idxcourse].Imprimer == 1">
 					<background color="(rgbx)" mode="solid" cond="string.find(params.Presentation,'horizontale')"/>prnColonne['Ptstotal'].Label</text>
-				<text col_start="(col_start)" col_end="0" row_start="-3" style="ALIGN_CENTER" cond="string.find(params.Presentation,'horizontale')">
+				<text col_start="(col_start)" col_end="0" row_start="-3" align="center" cond="string.find(params.Presentation,'horizontale')">
 					<background color="(rgbx)" mode="solid"/>'('..GetSetDiscipline(i)..')'</text>
 				<lua>if not string.find(params.Presentation,'horizontale') then</lua>
 				<text col_start="(col_start)" col_end="0" row_start="-3">
@@ -1170,14 +1170,14 @@
 					<background color="(rgbx)" cond="not params.Presentation:find('transparent')" mode="solid"/>
 					<font color="(rgbx)" cond="string.find(params.Presentation,'transparent')"/>GetSetDiscipline(i)</text>
 				<lua>end</lua>
-				<text col="(largeur_etroite)" style="ALIGN_CENTER" font_weight="bold" cond="bloc1_last == i and prnBloc1['EtapeClt'].Imprimer == 1">
+				<text col="(largeur_etroite)" align="center" font_weight="bold" cond="bloc1_last == i and prnBloc1['EtapeClt'].Imprimer == 1">
 					<background color="LtYellow" mode="solid"/>'Clt Bloc1'</text>
-				<text col="(largeur_etroite)" style="ALIGN_CENTER" font_weight="bold" cond="bloc1_last == i and prnBloc1['EtapePts'].Imprimer == 1">
+				<text col="(largeur_etroite)" align="center" font_weight="bold" cond="bloc1_last == i and prnBloc1['EtapePts'].Imprimer == 1">
 					<background color="LtYellow" mode="solid"/>'Pts Bloc1'</text>
-				<text col_start="-1" col_end="0" row_start="-4" row_end="-1" style="ALIGN_CENTER" font_weight="bold" cond="bloc1_last == i and prnBloc1['EtapePts'].Imprimer == 1">
+				<text col_start="-1" col_end="0" row_start="-4" row_end="-1" align="center" font_weight="bold" cond="bloc1_last == i and prnBloc1['EtapePts'].Imprimer == 1">
 					<background color="LtYellow" mode="solid"/>'Pts maxi du bloc 1\n'..params.PtsMaxiBloc1</text>
 				<lua>end</lua>
-				<text col="(largeur_etroite)" style="ALIGN_CENTER" cond="GetValuePG('texteImprimerDeparts','') == 'Oui'">'Dép.'</text>
+				<text col="(largeur_etroite)" align="center" cond="GetValuePG('texteImprimerDeparts','') == 'Oui'">'Dép.'</text>
 			</matrix>
 		</label>
 		<body>
@@ -1189,24 +1189,24 @@
 				<font weight="bold" size_step="1" color="(colorpodium)" cond="body:GetCellInt('Clt', row) &lt; 4"/>
 				<font weight="bold" cond="body:GetCellInt('Clt', row) &gt; 3"/>
 				$(Clt)</text>
-			<text col="(codeplus)" style="ALIGN_CENTER" cond="prnColonne.Code_coureur.Imprimer == 1 and texteCodeComplet == 'Non'"><font weight="bold" color="(colorpodium)" size_step="1" adjust="width" cond="body:GetCellInt('Clt', row) &lt; 4"/>string.sub($(Code_coureur),4)</text>
-			<text col="(codeplus)" style="ALIGN_CENTER" cond="prnColonne.Code_coureur.Imprimer == 1 and texteCodeComplet ~= 'Non'"><font weight="bold" color="(colorpodium)"  size_step="1" adjust="width" cond="body:GetCellInt('Clt', row) &lt; 4"/>$(Code_coureur)</text>
-			<text col="(identiteplus)" style="ALIGN_LEFT" cond="prnColonne.Identite.Imprimer == 1"><font weight="bold" color="(colorpodium)" size_step="1" adjust="width" cond="body:GetCellInt('Clt', row) &lt; 4"/>$(Identite)</text>
+			<text col="(codeplus)" align="center" cond="prnColonne.Code_coureur.Imprimer == 1 and texteCodeComplet == 'Non'"><font weight="bold" color="(colorpodium)" size_step="1" adjust="width" cond="body:GetCellInt('Clt', row) &lt; 4"/>string.sub($(Code_coureur),4)</text>
+			<text col="(codeplus)" align="center" cond="prnColonne.Code_coureur.Imprimer == 1 and texteCodeComplet ~= 'Non'"><font weight="bold" color="(colorpodium)"  size_step="1" adjust="width" cond="body:GetCellInt('Clt', row) &lt; 4"/>$(Code_coureur)</text>
+			<text col="(identiteplus)" align="left" cond="prnColonne.Identite.Imprimer == 1"><font weight="bold" color="(colorpodium)" size_step="1" adjust="width" cond="body:GetCellInt('Clt', row) &lt; 4"/>$(Identite)</text>
 			<text col="(sexeplus)" align="(GetAlignCol('Sexe', body:GetCell('Sexe', row)))" cond="prnColonne.Sexe.Imprimer == 1"><font weight="bold" color="(colorpodium)" size_step="1" adjust="width" cond="body:GetCellInt('Clt', row) &lt; 4"/>$(Sexe)</text>
 			<text col="(anplus)" align="(GetAlignCol('An', body:GetCell('An', row)))" cond="prnColonne.An.Imprimer == 1"><font weight="bold" color="(colorpodium)" size_step="1" adjust="width" cond="body:GetCellInt('Clt', row) &lt; 4"/>$(An)</text>
 			<text col="(categplus)" align="(GetAlignCol('Categ', body:GetCell('Categ', row)))" cond="prnColonne.Categ.Imprimer == 1"><font weight="bold" color="(colorpodium)" size_step="1" adjust="width" cond="body:GetCellInt('Clt', row) &lt; 4"/>$(Categ)</text>
 			<text col="(nationplus)" align="(GetAlignCol('Nation', body:GetCell('Nation', row)))" cond="prnColonne.Nation.Imprimer == 1"><font weight="bold" color="(colorpodium)" size_step="1" adjust="width" cond="body:GetCellInt('Clt', row) &lt; 4"/>$(Nation)</text>
 			<text col="(comiteplus)" align="(GetAlignCol('Comite', body:GetCell('Comite', row)))" cond="prnColonne.Comite.Imprimer == 1"><font weight="bold" color="(colorpodium)" size_step="1" adjust="width" cond="body:GetCellInt('Clt', row) &lt; 4"/>$(Comite)</text>
-			<text col="(clubcourtplus)" style="ALIGN_LEFT" cond="prnColonne.Club.Imprimer == 1 and texteImprimerClubLong == 'Non'"><font weight="bold" color="(colorpodium)" size_step="1" adjust="width" cond="body:GetCellInt('Clt', row) &lt; 4"/>$(Club)</text>
-			<text col="(clublongplus)" style="ALIGN_LEFT" cond="prnColonne.Club.Imprimer == 1 and texteImprimerClubLong == 'Oui'"><font weight="bold" color="(colorpodium)" size_step="1" adjust="width" cond="body:GetCellInt('Clt', row) &lt; 4"/>$(Club_long)</text>
+			<text col="(clubcourtplus)" align="left" cond="prnColonne.Club.Imprimer == 1 and texteImprimerClubLong == 'Non'"><font weight="bold" color="(colorpodium)" size_step="1" adjust="width" cond="body:GetCellInt('Clt', row) &lt; 4"/>$(Club)</text>
+			<text col="(clublongplus)" align="left" cond="prnColonne.Club.Imprimer == 1 and texteImprimerClubLong == 'Oui'"><font weight="bold" color="(colorpodium)" size_step="1" adjust="width" cond="body:GetCellInt('Clt', row) &lt; 4"/>$(Club_long)</text>
 			<text col="(gecplus)" align="(prnColonne.Groupe.Align)" cond="prnColonne.Groupe.Imprimer == 1"><font weight="bold" color="(colorpodium)" size_step="1" adjust="width" cond="body:GetCellInt('Clt', row) &lt; 4"/>$(Groupe)</text>
 			<text col="(gecplus)" align="(prnColonne.Equipe.Align)" cond="prnColonne.Equipe.Imprimer == 1"><font weight="bold" color="(colorpodium)" size_step="1" adjust="width" cond="body:GetCellInt('Clt', row) &lt; 4"/>$(Equipe)</text>
 			<text col="(gecplus)" align="(prnColonne.Critere.Align)" cond="prnColonne.Critere.Imprimer == 1"><font weight="bold" color="(colorpodium)" size_step="1" adjust="width" cond="body:GetCellInt('Clt', row) &lt; 4"/>$(Critere)</text>
-			<text col="(listeplus)" style="ALIGN_CENTER" cond="prnColonne.Liste1.Imprimer == 1 and body:GetCellInt('Clt_liste1', row) &lt; 999999"><font weight="bold" color="(colorpodium)" size_step="1" adjust="width" cond="body:GetCellInt('Clt', row) &lt; 4"/>$(Pts_liste1)..' ('..$(Clt_liste1)..')'</text>
-			<text col="(listeplus)" style="ALIGN_CENTER" cond="prnColonne.Liste1.Imprimer == 1 and body:GetCellInt('Clt_liste1', row) == 999999">''</text>
-			<text col="(listeplus)" style="ALIGN_CENTER" cond="prnColonne.Liste2.Imprimer == 1 and body:GetCellInt('Clt_liste2', row) &lt; 999999"><font weight="bold" color="(colorpodium)" size_step="1" adjust="width" cond="body:GetCellInt('Clt', row) &lt; 4"/>$(Pts_liste2)..' ('..$(Clt_liste2)..')'</text>
-			<text col="(listeplus)" style="ALIGN_CENTER" cond="prnColonne.Liste2.Imprimer == 1 and body:GetCellInt('Clt_liste2', row) == 999999">''</text>
-			<text col="(listeplus)" style="ALIGN_CENTER" cond="prnColonne.Delta.Imprimer == 1"><font weight="bold" color="ltred" size_step="1" adjust="width" cond="body:GetCellInt('Clt', row) &lt; 4"/>$(Delta)</text>
+			<text col="(listeplus)" align="center" cond="prnColonne.Liste1.Imprimer == 1 and body:GetCellInt('Clt_liste1', row) &lt; 999999"><font weight="bold" color="(colorpodium)" size_step="1" adjust="width" cond="body:GetCellInt('Clt', row) &lt; 4"/>$(Pts_liste1)..' ('..$(Clt_liste1)..')'</text>
+			<text col="(listeplus)" align="center" cond="prnColonne.Liste1.Imprimer == 1 and body:GetCellInt('Clt_liste1', row) == 999999">''</text>
+			<text col="(listeplus)" align="center" cond="prnColonne.Liste2.Imprimer == 1 and body:GetCellInt('Clt_liste2', row) &lt; 999999"><font weight="bold" color="(colorpodium)" size_step="1" adjust="width" cond="body:GetCellInt('Clt', row) &lt; 4"/>$(Pts_liste2)..' ('..$(Clt_liste2)..')'</text>
+			<text col="(listeplus)" align="center" cond="prnColonne.Liste2.Imprimer == 1 and body:GetCellInt('Clt_liste2', row) == 999999">''</text>
+			<text col="(listeplus)" align="center" cond="prnColonne.Delta.Imprimer == 1"><font weight="bold" color="ltred" size_step="1" adjust="width" cond="body:GetCellInt('Clt', row) &lt; 4"/>$(Delta)</text>
 			<text col="(largeur_total)" align="center">
 				<font weight="bold" size_step="1" cond="body:GetCellInt('Clt', row) &lt; 4"/>
 				<font weight="bold" cond="body:GetCellInt('Clt', row) &gt; 3"/>
@@ -1225,61 +1225,61 @@
 							sigma = pts_course_saut + pts_course_alpin
 						end</lua>
 					 <!-- Cltcs,1|Lng_saut,1|Clt_saut,1|Pts_saut,1|Tps_alpin,1|Clt_alpin,1|Pts_alpin,1|Ptstotalcs,1 -->
-						<text col="(largeur_etroite)" style="ALIGN_CENTER" cond="prnCombiSaut.Cltcs.Imprimer == 1">EvaluateClt(body:GetCellInt('Clt'..idxcourse, row, -1))</text>
-						<text col="(largeur_etroite)" style="ALIGN_CENTER" cond="prnCombiSaut.Lng_saut.Imprimer == 1">body:GetCell('Lng'..idxcourse..'_saut', row)</text>
-						<text col="(largeur_etroite)" style="ALIGN_CENTER" cond="prnCombiSaut.Clt_saut.Imprimer == 1 and body:GetCellInt('Clt'..idxcourse..'_run1', row) &gt; 0">body:GetCellInt('Clt'..idxcourse..'_run1', row)</text>
-						<text col="(largeur_etroite)" style="ALIGN_CENTER" cond="prnCombiSaut.Clt_saut.Imprimer == 1 and body:GetCellInt('Clt'..idxcourse..'_run1', row) == 0">''</text>
-						<text col="(largeur_etroite)" style="ALIGN_CENTER" cond="prnCombiSaut.Pts_saut.Imprimer == 1 and body:GetCellDouble('Pts'..idxcourse..'_run1', row) &gt;= 0">body:GetCellDouble('Pts'..idxcourse..'_run1', row)</text>
-						<text col="(largeur_etroite)" style="ALIGN_CENTER" cond="prnCombiSaut.Pts_saut.Imprimer == 1 and body:GetCellDouble('Pts'..idxcourse..'_run1', row) &lt; 0">''</text>
+						<text col="(largeur_etroite)" align="center" cond="prnCombiSaut.Cltcs.Imprimer == 1">EvaluateClt(body:GetCellInt('Clt'..idxcourse, row, -1))</text>
+						<text col="(largeur_etroite)" align="center" cond="prnCombiSaut.Lng_saut.Imprimer == 1">body:GetCell('Lng'..idxcourse..'_saut', row)</text>
+						<text col="(largeur_etroite)" align="center" cond="prnCombiSaut.Clt_saut.Imprimer == 1 and body:GetCellInt('Clt'..idxcourse..'_run1', row) &gt; 0">body:GetCellInt('Clt'..idxcourse..'_run1', row)</text>
+						<text col="(largeur_etroite)" align="center" cond="prnCombiSaut.Clt_saut.Imprimer == 1 and body:GetCellInt('Clt'..idxcourse..'_run1', row) == 0">''</text>
+						<text col="(largeur_etroite)" align="center" cond="prnCombiSaut.Pts_saut.Imprimer == 1 and body:GetCellDouble('Pts'..idxcourse..'_run1', row) &gt;= 0">body:GetCellDouble('Pts'..idxcourse..'_run1', row)</text>
+						<text col="(largeur_etroite)" align="center" cond="prnCombiSaut.Pts_saut.Imprimer == 1 and body:GetCellDouble('Pts'..idxcourse..'_run1', row) &lt; 0">''</text>
 						
-						<text col="(largeur_etroite)" style="ALIGN_CENTER" cond="prnCombiSaut.Tps_alpin.Imprimer == 1">body:GetCell('Tps'..idxcourse..'_run2', row)</text>
-						<text col="(largeur_etroite)" style="ALIGN_CENTER" cond="prnCombiSaut.Clt_alpin.Imprimer == 1 and body:GetCellInt('Clt'..idxcourse..'_run2', row) &gt; 0">body:GetCell('Clt'..idxcourse..'_run2', row)</text>
-						<text col="(largeur_etroite)" style="ALIGN_CENTER" cond="prnCombiSaut.Clt_alpin.Imprimer == 1 and body:GetCellInt('Clt'..idxcourse..'_run2', row) &lt;= 0">''</text>
+						<text col="(largeur_etroite)" align="center" cond="prnCombiSaut.Tps_alpin.Imprimer == 1">body:GetCell('Tps'..idxcourse..'_run2', row)</text>
+						<text col="(largeur_etroite)" align="center" cond="prnCombiSaut.Clt_alpin.Imprimer == 1 and body:GetCellInt('Clt'..idxcourse..'_run2', row) &gt; 0">body:GetCell('Clt'..idxcourse..'_run2', row)</text>
+						<text col="(largeur_etroite)" align="center" cond="prnCombiSaut.Clt_alpin.Imprimer == 1 and body:GetCellInt('Clt'..idxcourse..'_run2', row) &lt;= 0">''</text>
 
-						<text col="(largeur_etroite)" style="ALIGN_CENTER" cond="prnCombiSaut.Pts_alpin.Imprimer == 1 and body:GetCellInt('Clt'..idxcourse..'_run2', row) &gt; 0">body:GetCellDouble('Pts'..idxcourse..'_run2', row)</text>
-						<text col="(largeur_etroite)" style="ALIGN_CENTER" cond="prnCombiSaut.Pts_alpin.Imprimer == 1 and body:GetCellInt('Clt'..idxcourse..'_run2', row) &lt;= 0">''</text>
-						<text col="(largeur_etroite)" style="ALIGN_CENTER" cond="sigma &gt;= 0 and sigma &lt; 10000">sigma</text>					
-						<text col="(largeur_etroite)" style="ALIGN_CENTER" cond="sigma &lt; 0 or sigma &gt;= 10000">''</text>					
-						<text col="(largeur_etroite)" style="ALIGN_CENTER" cond="prnCombiSaut.Ptstotalcs.Imprimer == 1 and body:GetCellInt('Clt'..idxcourse, row) &gt;0 ">
+						<text col="(largeur_etroite)" align="center" cond="prnCombiSaut.Pts_alpin.Imprimer == 1 and body:GetCellInt('Clt'..idxcourse..'_run2', row) &gt; 0">body:GetCellDouble('Pts'..idxcourse..'_run2', row)</text>
+						<text col="(largeur_etroite)" align="center" cond="prnCombiSaut.Pts_alpin.Imprimer == 1 and body:GetCellInt('Clt'..idxcourse..'_run2', row) &lt;= 0">''</text>
+						<text col="(largeur_etroite)" align="center" cond="sigma &gt;= 0 and sigma &lt; 10000">sigma</text>					
+						<text col="(largeur_etroite)" align="center" cond="sigma &lt; 0 or sigma &gt;= 10000">''</text>					
+						<text col="(largeur_etroite)" align="center" cond="prnCombiSaut.Ptstotalcs.Imprimer == 1 and body:GetCellInt('Clt'..idxcourse, row) &gt;0 ">
 							<font color="red" size_step="1" cond="string.find(selection, 'G')"/>
 							EvaluatePts(row, idxcourse, 'Pts'..idxcourse..'_total', params.AbdDsq)</text>					
-						<text col="(largeur_etroite)" style="ALIGN_CENTER" cond="prnCombiSaut.Ptstotalcs.Imprimer == 1 and body:GetCellInt('Clt'..idxcourse, row) &lt;=0">''</text>					
+						<text col="(largeur_etroite)" align="center" cond="prnCombiSaut.Ptstotalcs.Imprimer == 1 and body:GetCellInt('Clt'..idxcourse, row) &lt;=0">''</text>					
 				<lua>else</lua>
-						<text col="(largeur_etroite)" style="ALIGN_CENTER" cond="prnColonne.Clt[idxcourse].Imprimer == 1">EvaluateClt(body:GetCellInt('Clt'..idxcourse, row, -1))</text>
-						<text col="(largeur_large)" style="ALIGN_CENTER" cond="prnColonne.Tps[idxcourse].Imprimer == 1">EvaluateTps(row, 'Tps'..idxcourse, params.AbdDsq)</text>
-						<text col="(largeur_etroite)" style="ALIGN_CENTER" cond="prnColonne.Diff[idxcourse].Imprimer == 1"><font adjust="both"/>EvaluateDiff(body:GetCellInt('Tps'..idxcourse..'_diff', row))</text>
-						<text col="(largeur_etroite)" style="ALIGN_CENTER" cond="prnColonne.Pts[idxcourse].Imprimer == 1">
+						<text col="(largeur_etroite)" align="center" cond="prnColonne.Clt[idxcourse].Imprimer == 1">EvaluateClt(body:GetCellInt('Clt'..idxcourse, row, -1))</text>
+						<text col="(largeur_large)" align="center" cond="prnColonne.Tps[idxcourse].Imprimer == 1">EvaluateTps(row, 'Tps'..idxcourse, params.AbdDsq)</text>
+						<text col="(largeur_etroite)" align="center" cond="prnColonne.Diff[idxcourse].Imprimer == 1"><font adjust="both"/>EvaluateDiff(body:GetCellInt('Tps'..idxcourse..'_diff', row))</text>
+						<text col="(largeur_etroite)" align="center" cond="prnColonne.Pts[idxcourse].Imprimer == 1">
 							<font color="(rgbx)" size_step="1" cond="string.find(selection, 'G') and string.find(params.Presentation,'transparent')"/>
 							<font color="red" size_step="1" cond="string.find(selection, 'G') and not string.find(params.Presentation,'transparent')" />
 							<font color="(colorpodium)" cond="string.find(selection,'Pts'..idxcourse..'G') and string.find(selection, 'Z')"/>
 							EvaluatePts(row, idxcourse, 'Pts'..idxcourse, params.AbdDsq)</text>
 					<lua>for run = 1, arCourses[idxcourse].Nb_run do</lua>
-							<text col="(largeur_large)" style="ALIGN_CENTER" cond="prnColonne.Tpsrun[idxcourse].Imprimer == 1">
+							<text col="(largeur_large)" align="center" cond="prnColonne.Tpsrun[idxcourse].Imprimer == 1">
 								<font color="(rgbx)" cond="string.find(params.Presentation,'transparent')"/>
 								<font color="red" cond="not string.find(params.Presentation,'transparent')"/>
 									EvaluateTps(row, 'Tps'..idxcourse..'_run'..run, params.AbdDsq)</text>
-							<text col="(largeur_etroite)" style="ALIGN_CENTER" cond="prnColonne.Ptsrun[idxcourse].Imprimer == 1">
+							<text col="(largeur_etroite)" align="center" cond="prnColonne.Ptsrun[idxcourse].Imprimer == 1">
 								<font color="(rgbx)" size_step="1" cond="string.find(params.Presentation,'transparent') and string.find(selection, 'Pts'..idxcourse..'_run'..run)"/>
 								<font color="red" size_step="1" cond="not string.find(params.Presentation,'transparent') and string.find(selection, 'Pts'..idxcourse..'_run'..run)"/>
 								EvaluatePts(row, idxcourse, 'Pts'..idxcourse..'_run'..run, params.AbdDsq)</text>
-							<text col="(largeur_etroite)" style="ALIGN_CENTER" cond="prnColonne.Diffrun[idxcourse].Imprimer == 1"><font adjust="both"/>'g'..EvaluateDiff(body:GetCellInt('Tps'..idxcourse..'_run'..run..'_diff', row))</text>
-							<text col="(largeur_etroite)" style="ALIGN_CENTER" cond="prnColonne.Cltrun[idxcourse].Imprimer == 1">
+							<text col="(largeur_etroite)" align="center" cond="prnColonne.Diffrun[idxcourse].Imprimer == 1"><font adjust="both"/>'g'..EvaluateDiff(body:GetCellInt('Tps'..idxcourse..'_run'..run..'_diff', row))</text>
+							<text col="(largeur_etroite)" align="center" cond="prnColonne.Cltrun[idxcourse].Imprimer == 1">
 								<font color="(rgbx)" cond="string.find(params.Presentation,'transparent')"/>
 								EvaluateClt(body:GetCellInt('Clt'..idxcourse..'_run'..run, row, -1))</text>
 					<lua>end</lua>
 				<lua>end</lua>
-				<text col="(largeur_etroite)" style="ALIGN_CENTER" cond="code_discipline ~= 'CS' and prnColonne.Ptstotal[idxcourse].Imprimer == 1">
+				<text col="(largeur_etroite)" align="center" cond="code_discipline ~= 'CS' and prnColonne.Ptstotal[idxcourse].Imprimer == 1">
 					<font color="red" size_step="1" cond="string.find(body:GetCell('Selection'..idxcourse, row), 'Pts'..idxcourse..'_total') and not string.find(params.Presentation,'transparent')"/>
 					<font weight="bold" color="(rgbx)" cond="string.find(body:GetCell('Selection'..idxcourse, row), 'Pts'..idxcourse..'_total') and string.find(params.Presentation,'transparent')"/>
 						EvaluatePts(row, idxcourse, 'Pts'..idxcourse..'_total', params.AbdDsq)</text>
-				<text col="(largeur_etroite)" style="ALIGN_CENTER" font_weight="bold" cond="bloc1_last == i and prnBloc1['EtapeClt'].Imprimer == 1 and body:GetCellDouble('Pts_bloc1', row) &gt;= 0">
+				<text col="(largeur_etroite)" align="center" font_weight="bold" cond="bloc1_last == i and prnBloc1['EtapeClt'].Imprimer == 1 and body:GetCellDouble('Pts_bloc1', row) &gt;= 0">
 					<background color="LtYellow" mode="solid"/>EvaluateClt(body:GetCellInt('Clt_bloc1', row, -1))</text>
-				<text col="(largeur_etroite)" style="ALIGN_CENTER" font_weight="bold" cond="bloc1_last == i and prnBloc1['EtapeClt'].Imprimer == 1 and body:GetCellDouble('Pts_bloc1', row) &lt; 0">
+				<text col="(largeur_etroite)" align="center" font_weight="bold" cond="bloc1_last == i and prnBloc1['EtapeClt'].Imprimer == 1 and body:GetCellDouble('Pts_bloc1', row) &lt; 0">
 					<background color="LtYellow" mode="solid"/>''</text>
-				<text col="(largeur_etroite)" style="ALIGN_CENTER" font_weight="bold" cond="bloc1_last == i and prnBloc1['EtapePts'].Imprimer == 1">
+				<text col="(largeur_etroite)" align="center" font_weight="bold" cond="bloc1_last == i and prnBloc1['EtapePts'].Imprimer == 1">
 					<background color="LtYellow" mode="solid"/>EvaluateVal(body:GetCell('Pts_bloc1', row))</text>
 			<lua>end</lua>
-			<text col="(largeur_etroite)" style="ALIGN_CENTER" font_weight="bold" cond="GetValuePG('texteImprimerDeparts','') == 'Oui'">body:GetCell('Nb_depart', row)</text>
+			<text col="(largeur_etroite)" align="center" font_weight="bold" cond="GetValuePG('texteImprimerDeparts','') == 'Oui'">body:GetCell('Nb_depart', row)</text>
 		</body>
 	</panel>
 </root>
