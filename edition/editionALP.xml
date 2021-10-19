@@ -28,6 +28,7 @@
 			<menu title="Résultats Officiels" image="./res/16x16_official.png" id="res_officiel" officiel="1"/>
 			<menu title="Résultats Par Catégories (filtrage des coureurs apres le calcul des points)" filter="after" image="./res/16x16_ranking.png" id="res_categ" choix_clt_max="1"/>
 			<menu title="Résultats Meilleurs Temps" image="./res/16x16_ranking.png" id="res_best" />
+			<menu title="Résultats Multi-Passages" image="./res/16x16_official.png" id="res_passage" choix_manche="1" mode_lap="2" />
 		</menu>
 		<menu title="Outils" image="./res/32x32_tools.png">
 			<menu title="Analyse des Performances" image="./res/16x16_analyse.png" id="res_performance" choix_manche="1" />
@@ -121,7 +122,7 @@
 		<text col_start="5" col_end="0" align="right" >$(Epreuve_Alpine_Manche.Altitude_Depart):Suffix(' m')</text>
 
 		<row value="auto" />
-			<lua>if base:GetOfficiel('AssistantReferee', 'Nom'):len() &gt; 0 then</lua>
+		<lua>if base:GetOfficiel('AssistantReferee', 'Nom'):len() &gt; 0 then</lua>
 			<text col_start="1" align="left">base:GetOfficielAttribute('AssistantReferee', 'label'):upper() </text>
 			<text col_start="2" align="left">base:GetOfficiel('AssistantReferee', 'Nom')..' '..base:GetOfficiel('AssistantReferee', 'Prenom')</text>
 			<text col_start="3" align="right">base:GetOfficiel('AssistantReferee', 'Nation'):Parenthesis()</text>
@@ -353,8 +354,10 @@
 			<text col="3" align="center" label="CS">$(Comite)</text>
 			<text col="12" align="center" label="Club">$(Club)</text>
 			<text col="7" align="center" label="Point">$(Point)</text>
+			<padding all="10px" />
 			<qrcode col="2cm" cond="entite == 'FIS'" >'https://www.fis-ski.com/DB/alpine-skiing/biographies.html?fiscode='..string.sub($(Code_coureur),4)..'&amp;search=true'</qrcode>
 			<qrcode col="2cm" cond="entite == 'FFS'" >'http://www.ffs.fr/ski-alpin/competitions/fiche-individuelle?licence='..string.sub($(Code_coureur),4)..'&amp;send=Afficher'</qrcode>
+			<padding all="0px" />
 			<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
 		</body>
 	</report>
@@ -480,11 +483,11 @@
 	<report id="parti_etiquette_factorise" title="Liste Alphabétique des Participants par Nation" first_header="0">
 		<lua>entite = $(Evenement.Code_entite)</lua>
 		<header />
-		<firstheader />
+		<first_header />
 		<footer />
 		<label />
 		<layers />
-		<layer />
+		<!-- <layer /> -->
 		<order key="(params.orderby)" />
 		<paper orientation="landscape" />
 		<margin top="50" bottom="50" />
@@ -871,6 +874,54 @@
 				<font color="white" cond="body:GetCell('Clt'..manche, row) == '1'"/>
 					body:GetCell('Tps'..manche, row)
 			</text> 
+		</body>
+	</report>
+	
+	<!-- Résultats Multi-Passage -->
+	<report id="res_passage" title="Résultats Multi-Passages" first_header="0">
+
+		<column name="Tps_best" type="chrono" />
+		<column name="Clt_best" type="ranking" />
+		<lua>
+			for i=0,body:GetNbRows()-1 do
+				local tpsBest = chrono.KO;
+				for l=1,nb_lap do
+					local tpsPassage = body:GetCellInt('Tps'..manche..'_lap'..l, i);
+					tpsBest = chrono.Min(tpsBest, tpsPassage);
+				end
+				body:SetCell('Tps_best',i, tpsBest);
+			end
+			body:SetRanking('Clt_best', 'Tps_best');
+		</lua>
+		<order key="Clt_best, Dossard" />
+	
+		<body>
+			<call option="couleur_alternee" file="./edition/options.xml" />
+			<font size="9" adjust="ellipsize"/>
+	
+			<row value="auto"/>
+			<text col="4" align="right" label="Dos.">$(Dossard)</text>
+			<text col="25" align="left" label="Nom - Prénom" font_weight="bold" font_size_step="1">$(Identite)</text> 
+			<text col="4" align="center" label="Cat.">$(Categ)</text>
+			
+			<lua>for l=1,nb_lap do</lua>
+				<text col="8" cond="group=='label'" label="('Passage '..l)"/>
+				<matrix col="8" cond="group=='body'" fit_inside="0" >
+					<row h="1"/>
+					<font size_step="-1" />
+					<text col="7" align="right">body:GetCell('Tps'..manche..'_lap'..l,row)</text>
+					<text col="4" align="right">body:GetCell('Clt'..manche..'_lap'..l,row)</text>
+				</matrix> 
+			<lua>end</lua>
+
+			<text col="10" cond="group=='label'" label="Meilleur"/>
+			<matrix col="10" cond="group=='body'" fit_inside="0" >
+				<row h="1"/>
+				<font size_step="1" weight="bold" />
+				<text col="7" align="right">body:GetCell('Tps_best',row)</text>
+				<text col="4" align="right">body:GetCell('Clt_best',row)</text>
+			</matrix>
+				
 		</body>
 	</report>
 	
