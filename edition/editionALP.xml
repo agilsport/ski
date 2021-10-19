@@ -503,7 +503,7 @@
 			<text row_start="3" col_start="3" label="Prenom" >$(Prenom)</text> 
 			<text row_start="2" col="5" align="center" font_size_step="-6">$(Categ)..'/'..$(An)</text>
 			<text row_start="2" col="4" align="center"  font_size_step="-6">$(Point)</text>
-			<text row_start="3" col_start="4" align="center" cond="base:GetTable('Epreuve'):GetCell('Code_regroupement', 0) == 'CE'">'ECSP :'</text>
+			<text row_start="3" col_start="4" align="center" cond="base:GetTable('Epreuve'):GetCell('Code_regroupement', 0) == 'CE'">'ECSL pts'</text>
 			<line row_start="4" col_start="1" col_end="0" pen_size="1" border="bottom" cond="x &lt; 5 and not _context_border"/>
 			<lua>if x == 5 then x = 0; end</lua>
 		</body>
