@@ -71,11 +71,12 @@
 			</before>
 		</rupture>
 	
-		<rupture key="Niveau_max">
+		<rupture key="Tour_max">
 			<before>
 				<font size="14"/>
 				<row value="0.4cm"/>
-				<text row="auto" col="1" >$(Niveau_max)</text>
+				<text row="auto" col="1" cond="$(Tour_max) ~= '0'">GetLabelTour($(Tour_max))</text>
+				<text row="auto" col="1" cond="$(Tour_max) == '0'">'Qualification'</text>
 			</before>
 		</rupture>
 	
