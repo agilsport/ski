@@ -48,7 +48,7 @@
 	
 	<!-- duel_total : utilisation des colonnes Tour_max, Duel_max, Clt_max, Tps_max, et Niveau_max -->
 	<report id="duel_total" title="Résultats Officiels" first_header="0">
-		<lua>body:SetRanking('Clt', 'Centre, Tour_max Desc, Duel_max asc, Clt_max NULL_OK, Clt_qualif NULL_OK, Dossard')</lua>
+		<!-- <lua>body:SetRanking('Clt', 'Centre, Tour_max Desc, Duel_max asc, Clt_max NULL_OK, Clt_qualif NULL_OK, Dossard')</lua> -->
 		<lua>sqlBase.FixationTableRanking(body)</lua>
 		
 		<!-- Copie Clt dans la colonne Critere -->
