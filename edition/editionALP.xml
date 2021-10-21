@@ -8,10 +8,10 @@
 			<menu title="Par Comité" image="./res/16x16_juges.png" label="Comité" rupture="Comite" id="parti_factorise"/>
 			<menu title="Par Nation" image="./res/16x16_juges.png" rupture="Nation" id="parti_factorise"/>
 			<menu title="Par Points" image="./res/16x16_juges.png" id="parti_point"/>
-			<menu title="Format Etiquettes avec Drapeaux des Pays par ordre de points" orderby="Point, Identite" image="./res/16x16_juges.png" id="parti_etiquette_factorise"/>
-			<menu title="Format Etiquettes avec Drapeaux des Pays par ordre alphabétique" orderby="Identite" image="./res/16x16_juges.png" id="parti_etiquette_factorise"/>
-			<menu title="Format Etiquettes avec Drapeaux des Pays par Nation, Identité" orderby="Nation, Identite" image="./res/16x16_juges.png" id="parti_etiquette_factorise"/>
-			<menu title="Format Etiquettes avec Drapeaux des Pays par Nation, Points" orderby="Nation, Point" image="./res/16x16_juges.png" id="parti_etiquette_factorise"/>
+			<menu title="Format Etiquettes avec Drapeaux des Pays par ordre de points" ecsl="1" orderby="Point, Identite" image="./res/16x16_juges.png" id="parti_etiquette_factorise"/>
+			<menu title="Format Etiquettes avec Drapeaux des Pays par ordre alphabétique" ecsl="1" orderby="Identite" image="./res/16x16_juges.png" id="parti_etiquette_factorise"/>
+			<menu title="Format Etiquettes avec Drapeaux des Pays par Nation, Identité" ecsl="1" orderby="Nation, Identite" image="./res/16x16_juges.png" id="parti_etiquette_factorise"/>
+			<menu title="Format Etiquettes avec Drapeaux des Pays par Nation, Points" ecsl="1" orderby="Nation, Point" image="./res/16x16_juges.png" id="parti_etiquette_factorise"/>
 		</menu>
 
 		<menu title="Listes de Départ" image="./res/32x32_bib.png">
@@ -398,13 +398,14 @@
 			orderby = rupture..", Nom, Prenom";
 			somme_rupture = 0;
 			comite = {};
+			page_break = 1;
 			bolAjouter = false;
 		</lua>
 		<call option="comite_origine" file="./edition/options.xml" />
 		<order key="(orderby)" />
 		<rupture key="(rupture)">
 			<before>
-				<pagebreak cond="row ~= 0" />
+				<pagebreak cond="row ~= 0 and page_break ~= 0" />
 				<need h="2cm" />
 				<font size="16"/>
 				<row value="0.5cm" />
@@ -491,19 +492,31 @@
 		<order key="(params.orderby)" />
 		<paper orientation="landscape" />
 		<margin top="50" bottom="50" />
-		<lua>x = 0</lua>
+		<lua>x = 0;
+			ecsl = tonumber(params.ecsl) or 0;
+			tResultat_Info_Tirage = base:GetTable('Resultat_Info_Tirage');
+			base:TableLoad(tResultat_Info_Tirage, 'Select * From Resultat_Info_Tirage Where Code_evenement = '..$(Evenement.Code));
+		</lua>
 		
 		<body>
+			<lua>r = tResultat_Info_Tirage:GetIndexRow('Code_coureur', body:GetCell('Code_coureur', row));
+				if r >= 0 then
+					ECSL_pts = tResultat_Info_Tirage:GetCellInt('ECSL_points', r);
+					ECSL_rank = tResultat_Info_Tirage:GetCellInt('ECSL_rank', r);
+				end
+			</lua>
 			<font size="28" weight="bold" adjust="ellipsize"/>
 			<lua>x = x + 1;</lua>
+			
 			<row value="0.3cm,1.4cm,1.4cm,0.9cm"/>
-			<image row_start="2" row_end="3"  col="4" adjust="best" align="center" border="0"><background mode="transparent"/>app.ImageNation($(Nation))</image> 
+			<image row_start="2" row_end="3" col="4" adjust="best" align="center" border="0"><background mode="transparent"/>app.ImageNation($(Nation))</image> 
 			<text row_start="2" row_end="3" col="3" align="center" >$(Nation)</text>
 			<text row_start="2" col="11" label="Name" >$(Nom)</text> 
 			<text row_start="3" col_start="3" label="Prenom" >$(Prenom)</text> 
-			<text row_start="2" col="5" align="center" font_size_step="-6">$(Categ)..'/'..$(An)</text>
-			<text row_start="2" col="4" align="center"  font_size_step="-6">$(Point)</text>
-			<text row_start="3" col_start="4" align="center" cond="base:GetTable('Epreuve'):GetCell('Code_regroupement', 0) == 'CE'">'ECSL pts'</text>
+			<text row_start="2" col="6" align="center" font_size_step="-6">$(Categ)..'/'..$(An)</text>
+			<text row_start="2" col="5" align="center" font_size_step="-6">$(Point)</text>
+			<text row_start="3" col_start="4" col_end="0" align="left" cond="ecsl==1 and base:GetTable('Epreuve'):GetCell('Code_regroupement', 0) == 'CE'" font_size_step="-3">'ECSL pts/rank'</text>
+			<text row_start="3" col_start="4" col_end="0" align="right" cond="ecsl==1 and r &gt;= 0 and ECSL_pts &gt; 0" >ECSL_pts..' / '..ECSL_rank</text>
 			<line row_start="4" col_start="1" col_end="0" pen_size="1" border="bottom" cond="x &lt; 5 and not _context_border"/>
 			<lua>if x == 5 then x = 0; end</lua>
 		</body>
@@ -1104,7 +1117,5 @@
 			</matrix>
 		</end>
 	</report>
-	
-
 </edition>
 
