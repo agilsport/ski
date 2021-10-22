@@ -49,6 +49,8 @@
 	-- bug diff GMT => UTC
 -- 21/09/2021 Version   3.8
 	-- mise en place d'un if recordcount ~= nil else return false (Ligne 1130) pour eviter si si records count == le restapi se blocque
+-- 21/10/2021 Version 4.0
+	-- 1ère version officielles skiffs
 dofile('./interface/interface.lua');
 dofile('./interface/adv.lua');
 dofile('./interface/device.lua');
