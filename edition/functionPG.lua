@@ -32,6 +32,7 @@ function CreateTableResultat_Info_Tirage();
 	tResultat_Info_Tirage:AddColumn({ name = 'WCSL_rank', label = 'WCSL_rank', type = sqlType.LONG, style = sqlStyle.NULL });
 	tResultat_Info_Tirage:AddColumn({ name = 'ECSL_points', label = 'ECSL_points', type = sqlType.LONG, style = sqlStyle.NULL });
 	tResultat_Info_Tirage:AddColumn({ name = 'ECSL_rank', label = 'ECSL_rank', type = sqlType.LONG, style = sqlStyle.NULL });
+	tResultat_Info_Tirage:AddColumn({ name = 'ECSL_30', label = 'ECSL_30', type = sqlType.LONG, style = sqlStyle.NULL });
 	tResultat_Info_Tirage:AddColumn({ name = 'ECSL_overall_points', label = 'ECSL_overall_points', type = sqlType.LONG, style = sqlStyle.NULL });
 	tResultat_Info_Tirage:AddColumn({ name = 'ECSL_overall_rank', label = 'ECSL_overall_rank', type = sqlType.LONG, style = sqlStyle.NULL });
 	tResultat_Info_Tirage:AddColumn({ name = 'Winner_CC', label = 'Winner_CC', type = sqlType.CHAR, size = 1, style = sqlStyle.NULL });
