@@ -366,7 +366,30 @@ function OnPrintDoubleTirage(groupe)
 	end
 end
 
-function OnPrint(groupe)
+function OnPrintEtiquettes(orderby)
+	tDraw:OrderBy(orderby);
+	-- Creation du Report
+	local estce = 0;
+	if draw.bolEstCE then
+		estce = 1;
+	end
+	local vitesse = 0;
+	if draw.bolVitesse then
+		vitesse = 1;
+	end
+	report = wnd.LoadTemplateReportXML({
+		xml = './process/live_draw.xml',
+		node_name = 'root/report',
+		node_attr = 'id',
+		node_value = 'parti_etiquette_factorise',
+		base = base,
+		body = tDraw,
+		params = {Orderby = orderby, EstCE = estce, EstVitesse = vitesse}
+	});
+	
+end
+
+function OnPrintBibo(groupe)
 	ChecktDraw();
 	tDraw:OrderBy('Rang_tirage');
 	local last_group = tDraw:GetCellInt('Groupe_tirage', tDraw:GetNbRows() -1);
@@ -1221,7 +1244,7 @@ function OnChangeDossard(row)
 	nodeCommand = xmlNode.Create(nil, xmlType.ELEMENT_NODE, "command");
 	local nodeDrawInProgress = xmlNode.Create(nodeCommand, xmlType.ELEMENT_NODE, "drawinprogress");
 	nodeRoot:AddChild(nodeRaceEvent);
-	nodeRoot:AddChild(nodeCommand);
+	-- nodeRoot:AddChild(nodeCommand);
 	CreateXML(nodeRoot);
 end
 
@@ -1452,7 +1475,7 @@ function RefreshGrid(bolTableSource)	-- bolTableSource = true ou false
 		grid_tableau:SynchronizeRowsView();
 	end
 	base:TableBulkUpdate(tDraw,'Dossard, Critere', 'Resultat');
-	base:TableBulkUpdate(tDraw,'Groupe_tirage, Rang_tirage, WCSL_points, WCSL_rank, ECSL_points, ECSL_rank, ECSL_overall_points, ECSL_overall_rank, Winner_CC, FIS_pts, FIS_clt, FIS_SG_pts, FIS_SG_clt, Statut', 'Resultat_Info_Tirage');
+	base:TableBulkUpdate(tDraw,'Groupe_tirage, Rang_tirage, WCSL_points, WCSL_rank, ECSL_points, ECSL_rank, ECSL_30, ECSL_overall_points, ECSL_overall_rank, Winner_CC, FIS_pts, FIS_clt, FIS_SG_pts, FIS_SG_clt, Statut', 'Resultat_Info_Tirage');
 end
 
 function BuildTablesDraw()	-- on ajoute ou on supprime des enregistrements dans la table Resultat_Info_Tirage
@@ -1467,14 +1490,22 @@ function BuildTablesDraw()	-- on ajoute ou on supprime des enregistrements dans 
 		local r = tResultat_Info_Tirage:GetIndexRow('Code_coureur', code_coureur);
 		if r < 0 then
 			-- on ajoute le coureur dans la table tResultat_Info_Tirage
+			if draw.debug then
+				Info('code '..code_coureur..' non trouvé dans tResultat_Info_Tirage');
+			end
 			draw.build_table = true;
 			row = tResultat_Info_Tirage:AddRow();
 			tResultat_Info_Tirage:SetCell('Code_evenement', row, draw.code_evenement);
 			tResultat_Info_Tirage:SetCell('Code_coureur', row, tResultat:GetCell('Code_coureur', i));
 			tResultat_Info_Tirage:SetCell('Groupe_tirage', row, 5);
 			tResultat_Info_Tirage:SetCell('Statut', row, 'UF');
-			tResultat_Info_Tirage:SetCell('FIS_pts', row, pts);
-			tResultat_Info_Tirage:SetCell('FIS_clt', row, rank);
+			if pts then
+				tResultat_Info_Tirage:SetCell('FIS_pts', row, pts);
+				tResultat_Info_Tirage:SetCell('FIS_clt', row, rank);
+			else
+				tResultat_Info_Tirage:SetCellNull('FIS_pts', row);
+				tResultat_Info_Tirage:SetCellNull('FIS_clt', row);
+			end
 			tResultat_Info_Tirage:SetCell('FIS_SG_pts', row, pts_SG);
 			tResultat_Info_Tirage:SetCell('FIS_SG_clt', row, rank_SG);
 			base:TableInsert(tResultat_Info_Tirage, row);
@@ -1490,6 +1521,7 @@ function SetuptDraw()
 	for i = 0, tDraw:GetNbRows() -1 do
 		tDraw:SetCellNull('Critere', i);
 		tDraw:SetCellNull('Groupe', i);
+		tDraw:SetCellNull('ECSL_30', i);
 		if tDraw:GetCell('Statut', i):len() == 0 then
 			tDraw:SetCell('Statut', i, 'UF');
 		end
@@ -1497,8 +1529,16 @@ function SetuptDraw()
 		if rank and rank > 0 then
 			tDraw:SetCell('FIS_pts', i, pts);
 			tDraw:SetCell('FIS_clt', i, rank);
+		else
+			tDraw:SetCellNull('FIS_pts', i);
+			tDraw:SetCellNull('FIS_clt', i);
+		end
+		if rank_SG and rank_SG > 0 then
 			tDraw:SetCell('FIS_SG_pts', i, pts_SG);
 			tDraw:SetCell('FIS_SG_clt', i, rank_SG);
+		else
+			tDraw:SetCellNull('FIS_SG_pts', i);
+			tDraw:SetCellNull('FIS_SG_clt', i);
 		end
 		if tDraw:GetCell('Code_coureur', i) == draw.ajouter_code then
 			tDraw:SetCell('Statut', i, 'CF');
@@ -1655,6 +1695,8 @@ Groupe 6 On poursuit selon les points FIS.
 		if rang_tirage == 0 then rang_tirage = 1; end
 		tDraw:SetCell('TG', r, 'tDrawG1');
 		tDraw:SetCell('Pris', r, 1);
+		tDraw:SetCell('ECSL_30', r, 1);
+		
 		tDraw:SetCell('Rang_tirage', r, rang_tirage);
 		if draw.debug == true then
 			Info('pour '..tDrawG1:GetCell('Nom', i)..', rang_tirage = '..rang_tirage);
@@ -1715,8 +1757,12 @@ Groupe 6 On poursuit selon les points FIS.
 			tDraw:SetCell('Pris', r, 1);
 			tDraw:SetCell('Groupe_tirage', r, current_group);
 			tDraw:SetCell('Rang_tirage', r, rang_tirage);
+			tDraw:SetCell('ECSL_30', r, 2);
 			tDraw:SetCell('Critere', r, string.format('%03d', rang_tirage));
 			draw.nb_pris_ecsl = draw.nb_pris_ecsl + 1;
+			if draw.nb_pris_ecsl <= 30 then
+				-- tDraw:SetCell('ECSL_30', r, 1);
+			end
 			r = tDrawG3:GetIndexRow('Code_coureur', code_coureur);
 			if r >= 0 then		-- on trouve le coureur
 				tDrawG3:RemoveRowAt(r);
@@ -1803,6 +1849,9 @@ Groupe 6 On poursuit selon les points FIS.
 			tDraw:SetCell('Rang_tirage', r, rang_tirage);
 			tDraw:SetCell('Critere', r, string.format('%03d', rang_tirage));
 			draw.nb_pris_ecsl = draw.nb_pris_ecsl + 1;
+			if draw.nb_pris_ecsl <= 30 then
+				tDraw:SetCell('ECSL_30', r, 1);
+			end
 			local r = tDrawG6:GetIndexRow('Code_coureur', code_coureur);
 			if draw.debug == true then
 				Info('On a traité le coureur tDrawG5 : '..tDrawG5:GetCell('Nom', i)..', son rang_tirage = '..rang_tirage);
@@ -2068,6 +2117,20 @@ function OnAfficheTableau()
 	tbTableau:SetDropdownMenu(btnValider:GetId(), menuValider);
 		
 	tbTableau:AddSeparator();
+	local btnMenuPrint = tbTableau:AddTool("Menu des impressions", "./res/32x32_printer.png",'', itemKind.DROPDOWN);
+	local menuPrint = menu.Create();
+	menuPrint:AppendSeparator();
+	local btnPrintDoubleTirageBibo = menuPrint:Append({label="Impression du double tirage du BIBO", image ="./res/32x32_printer.png"});
+	menuPrint:AppendSeparator();
+	local btnPrintEtiquettesAlpha = menuPrint:Append({label="Impression des étiquettes par ordre alphabétique", image ="./res/32x32_printer.png"});
+	menuPrint:AppendSeparator();
+	local btnPrintEtiquettesNation = menuPrint:Append({label="Impression par Nation", image ="./res/32x32_printer.png"});
+	menuPrint:AppendSeparator();
+	local btnPrintEtiquettesParpoints = menuPrint:Append({label="Impression par Points", image ="./res/32x32_printer.png"});
+	menuPrint:AppendSeparator();
+	tbTableau:SetDropdownMenu(btnMenuPrint:GetId(), menuPrint);
+
+	tbTableau:AddSeparator();
 	local btnOutils = tbTableau:AddTool("Menu des outils", "./res/32x32_tools.png",'', itemKind.DROPDOWN);
 	local menuOutils = menu.Create();
 	menuOutils:AppendSeparator();
@@ -2084,8 +2147,6 @@ function OnAfficheTableau()
 	local btnDecalerHaut = menuOutils:Append({label="Décaler les rangs de tirage vers le haut", image ="./res/32x32_list_remove.png"});
 	menuOutils:AppendSeparator();
 	local btnPrintFeuilleTirage = menuOutils:Append({label="Impression de la feuille de tirage", image ="./res/32x32_printer.png"});
-	menuOutils:AppendSeparator();
-	local btnPrintDoubleTirageBibo = menuOutils:Append({label="Impression du double tirage du BIBO", image ="./res/32x32_printer.png"});
 	menuOutils:AppendSeparator();
 	local btnAideCE = menuOutils:Append({label="Aide / ranking en CE", image ="./res/32x32_ranking.png"});
 	menuOutils:AppendSeparator();
@@ -2133,7 +2194,7 @@ function OnAfficheTableau()
 			draw.skip_question = false;
 			OnRAZData('All')
 		end, btnRAZAll);
-	dlgTableau:Bind(eventType.MENU, OnPrint, btnPrintFeuilleTirage);
+	dlgTableau:Bind(eventType.MENU, OnPrintBibo, btnPrintFeuilleTirage);
 	dlgTableau:Bind(eventType.MENU, 
 		function(evt)
 			ChecktDraw();
@@ -2142,6 +2203,24 @@ function OnAfficheTableau()
 				OnPrintDoubleTirage(2);
 			end
 		end, btnPrintDoubleTirageBibo);
+		
+	dlgTableau:Bind(eventType.MENU, 
+		function(evt)
+			OnPrintEtiquettes('Nom, Prenom');
+		end, btnPrintEtiquettesAlpha);
+	dlgTableau:Bind(eventType.MENU, 
+		function(evt)
+			OnPrintEtiquettes('Nation, Nom, Prenom');
+		end, btnPrintEtiquettesNation);
+	dlgTableau:Bind(eventType.MENU, 
+		function(evt)
+			if draw.bolEstCE then
+				OnPrintEtiquettes(draw.orderbyCE);
+			else
+				OnPrintEtiquettes(draw.orderbyFIS);
+			end
+		end, btnPrintEtiquettesParpoints);
+		
 	dlgTableau:Bind(eventType.MENU, OnAide, btnAideCE);
 	dlgTableau:Bind(eventType.MENU, 
 		function(evt)
