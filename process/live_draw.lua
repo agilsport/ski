@@ -1826,7 +1826,7 @@ Groupe 6 On poursuit selon les points FIS.
 	end
 	-- on continue avec les ECSL pts (tDrawG5) interrompu par les winners en 31 ème place
 	-- rang_tirage = tDrawG1:GetNbRows() + tDrawG2:GetNbRows() + tDrawG3:GetNbRows() +1;
-	tDrawG4:OrderBy('FIS_pts');				-- les winners de CC triés par leurs points FIS
+	tDrawG4:OrderBy('ECSL_points DESC, FIS_pts');				-- les winners de CC triés par leurs points ECSL et les points FIS
 	tDrawG5:OrderBy('ECSL_points DESC, FIS_pts');				-- les 30 ECSL
 	if draw.debug then
 		Info('\navant tDrawG5 - on continue avec la ECSL  - dernier rang attribué = '..rang_tirage)
