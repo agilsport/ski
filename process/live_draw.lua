@@ -185,14 +185,19 @@ function OnAide()
 		msgBoxStyle.OK+msgBoxStyle.ICON_INFORMATION);
 end
 
-function OnDecaler(row, bolVersLeBas)
+function OnDecaler(row, bolVersLeBas, bolGroupe)
 	local plus = 1;
 	if bolVersLeBas == false then
 		plus = -1;
 	end
 	for i = row, tDraw:GetNbRows() -1 do
-		local rang_tirage = tDraw:GetCellInt('Rang_tirage', i) + plus;
-		tDraw:SetCell('Rang_tirage', i, rang_tirage);
+		if not bolGroupe then
+			local rang_tirage = tDraw:GetCellInt('Rang_tirage', i) + plus;
+			tDraw:SetCell('Rang_tirage', i, rang_tirage);
+		else
+			local groupe_tirage = tDraw:GetCellInt('Groupe_tirage', i) + plus;
+			tDraw:SetCell('Groupe_tirage', i, groupe_tirage);
+		end
 	end
 	RefreshGrid();
 end
@@ -1792,6 +1797,9 @@ Groupe 6 On poursuit selon les points FIS.
 	end
 	
 	if tDrawG3:GetNbRows() > 0 then
+		if tDrawG2:GetNbRows() == 0 then
+			current_group = current_group + 1;
+		end
 		-- on garde le même groupe
 		for i = 0, tDrawG3:GetNbRows() -1 do		-- dans les 30 de la WCSL 
 			local code_coureur = tDrawG3:GetCell('Code_coureur', i);
@@ -2145,6 +2153,10 @@ function OnAfficheTableau()
 	local btnDecalerBas = menuOutils:Append({label="Décaler les rangs de tirage vers le bas", image ="./res/32x32_list_add.png"});
 	menuOutils:AppendSeparator();
 	local btnDecalerHaut = menuOutils:Append({label="Décaler les rangs de tirage vers le haut", image ="./res/32x32_list_remove.png"});
+	menuOutils:AppendSeparator();
+	local btnDecalerGroupeBas = menuOutils:Append({label="Décaler les groupes de tirage vers le bas", image ="./res/32x32_down.png"});
+	menuOutils:AppendSeparator();
+	local btnDecalerGroupeHaut = menuOutils:Append({label="Décaler les groupes de tirage vers le haut", image ="./res/32x32_up.png"});
 	menuOutils:AppendSeparator();
 	local btnPrintFeuilleTirage = menuOutils:Append({label="Impression de la feuille de tirage", image ="./res/32x32_printer.png"});
 	menuOutils:AppendSeparator();
@@ -2545,7 +2557,7 @@ function OnAfficheTableau()
 					return;
 				end
 				local row = rowsSelected[1]; 
-				OnDecaler(row, true);
+				OnDecaler(row, true, false);
 			end
 		end, btnDecalerBas);
 	dlgTableau:Bind(eventType.MENU, 
@@ -2560,9 +2572,41 @@ function OnAfficheTableau()
 					return;
 				end
 				local row = rowsSelected[1]; 
-				OnDecaler(row, false);
+				OnDecaler(row, false, false);
 			end
 		end, btnDecalerHaut);
+
+	dlgTableau:Bind(eventType.MENU, 
+		function(evt)
+			local msg = "Voulez-vous décaler les groupes de tirage de UN vers le bas\n"..
+						"à partir de la ligne sélectionnée ?";
+			if dlgTableau:MessageBox(
+				msg, "Décalage des groupes de tirage", 
+				msgBoxStyle.YES_NO+msgBoxStyle.NO_DEFAULT+msgBoxStyle.ICON_INFORMATION) == msgBoxStyle.YES then
+				local rowsSelected = grid_tableau:GetSelectedRows();
+				if #rowsSelected == 0 then 	-- Aucune ligne sélectionnée ...
+					return;
+				end
+				local row = rowsSelected[1]; 
+				OnDecaler(row, true, true);
+			end
+		end, btnDecalerGroupeBas);
+	dlgTableau:Bind(eventType.MENU, 
+		function(evt)
+			local msg = "Voulez-vous décaler les groupes de tirage de UN vers le haut\n"..
+						"à partir de la ligne sélectionnée ?";
+			if dlgTableau:MessageBox(
+				msg, "Décalage des groupes de tirage", 
+				msgBoxStyle.YES_NO+msgBoxStyle.NO_DEFAULT+msgBoxStyle.ICON_INFORMATION) == msgBoxStyle.YES then
+				local rowsSelected = grid_tableau:GetSelectedRows();
+				if #rowsSelected == 0 then 	-- Aucune ligne sélectionnée ...
+					return;
+				end
+				local row = rowsSelected[1]; 
+				OnDecaler(row, false, true);
+			end
+		end, btnDecalerGroupeHaut);
+
 	dlgTableau:Bind(eventType.GRID_FILTER_CHANGED, 
 		function(evt)
 			if grid_tableau:GetTableSrc():GetNbRows() == grid_tableau:GetTableView():GetNbRows() then
