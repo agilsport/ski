@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- Menu Editions Activité "FOND" !-->
-<!-- version="5.4" !-->
+<!-- version="5.5" !-->
 <!-- calcul de la note poursuite 2éme jour !-->
 <!-- si possible de faire fonctionner les cond="discipline:In('POURS')" dans les <menus> ?? dans <marging> et dans les <options> -->
 <!-- <paper orientation="landscape" cond="Nb_tps_inter >= 4 "/> -->
 <!-- appel de la fenetre de filtrage epreuves dans couloir.lua -->
-<!-- mise des heures de départ à la seconde -->
-<!-- rectification bug edition poursuite jour2 -->
+
 <edition>
 	<menu>
 		<menu title="Listes des Participants " image="./res/32x32_juges.png">
@@ -23,11 +22,11 @@
 			<menu title="Liste de départ" image="./res/16x16_official.png" header="1" first_header="0" id="lst_officielle" officiel="0"/>
 			<menu title="Liste de départ Officielle" image="./res/16x16_official.png" id="lst_officielle" Qrcode="0" officiel="1"/>
 			<menu title="Liste de départ avec Qrcode Live" image="./res/16x16_official.png" id="lst_officielle" Qrcode="1" officiel="1"/>
-			<menu title="Officielle poursuite" image="./res/16x16_official.png" id="lst_officielle_pours" choix_manche="1" cond="discipline:In('POURS')"/>
+			<menu title="Officielle poursuite" image="./res/16x16_official.png" id="lst_officielle_pours" choix_manche="1" cond="discipline:In('POURS')" officiel="1"/>
 			<menu title="Liste de départ Par Nation" image="./res/16x16_bib.png" page_break="1" orderby="Nation" id="lst_officielle_Filtrer"/>
 			<menu title="Liste de départ Par Comite" image="./res/16x16_bib.png" page_break="1" orderby="Comite" id="lst_officielle_Filtrer"/>
 			<menu title="Liste de départ Par Club" image="./res/16x16_bib.png" page_break="1" orderby="Club" id="lst_officielle_Filtrer"/>
-			<menu title="Liste de départ Par Epreuve (speaker)" image="./res/16x16_bib.png" id="lst_officielle_epreuve"/>
+			<menu title="Liste de départ Par Epreuve (speaker)" image="./res/16x16_bib.png" id="lst_officielle_epreuve" officiel="0"/>
 			<menu title="Edition des couloirs" image="./res/16x16_text.png" lua="./edition/couloir.lua" cond="discipline:In('POURS')" />
 		</menu>
 		
@@ -44,7 +43,6 @@
 
 	<!-- header standard !-->
 	<header>
-		<lua>type_edition = id:sub(1,4)</lua>
 		<spacing all="0"/>
 		<background mode="transparent"/>
 		<font name="Calibri" size="14" adjust="max" weight="bold"/>
@@ -420,7 +418,7 @@
 			entite = $(Evenement.Code_entite)
 			discipline = $(Epreuve.Code_discipline)
 			type_edition = id:sub(1,4)
-			officiel = params.officiel
+			officiel = tonumber(params.officiel)
 			Regroupement = $(Epreuve.Code_regroupement)
 		</lua>	
 		<!-- <layers> -->
@@ -436,29 +434,33 @@
 			<call option="identite" file="./edition/options.xml"/>
 			<font size="9" adjust="ellipsize"/>
 			<spacing left="5" right="10" top="2" bottom="2" />
-			<lua>LabelCode = $(Code_coureur):sub(1,3)</lua>
+			<lua>
+				LabelCode = $(Code_coureur):sub(1,3)
+			</lua>
 			<row h="auto"/>
 			<text col="0.5cm" font_size="6" align="center" label="Pb">$(Modif_manuel) </text>
 			<text col="4" align="right" label="Dos">$(Dossard) </text>
 			<text col="7" align="center" label="Code"><font size="8" cond="group =='body'"/>$(Code_coureur):sub(4)</text>
 			<lua>
-				if tonumber(params.officiel) == 0 then
-			</lua>	
-			<text col="15" align="left" label="Prénom - Nom" >Prenom_NOM</text> 	
-			<lua>else
-					if LabelCode == 'FFS' then </lua>
-						<text col="18" align="left" label="Nom - Prénom" >NOM_PRENOM</text> 
-					<lua>elseif LabelCode == 'EXT' then </lua>
-						<text col="18" align="left" label="nom - prenom" >nom_prenom</text>
-					<lua>elseif LabelCode == 'LCN' then </lua>
-						<text col="18" align="left" label="nom - prenom" >NOM_PRENOM</text>
-					<lua>elseif LabelCode == 'TIC' then </lua>
-						<text col="18" align="left" label="Prénom - Nom" >NOM_Prenom</text>
-					<lua>else</lua>
-						<text col="18" align="left" label="Prénom - Nom" >Prenom_NOM</text> 
-					<lua> end 
+				if officiel == 0 then
+					AfficheIdentite = Prenom_NOM	
+				else
+					if LabelCode == 'FFS' then 
+						AfficheIdentite = NOM_PRENOM
+					elseif LabelCode == 'IFO' then 
+						AfficheIdentite = NOM_PRENOM
+					elseif LabelCode == 'EXT' then
+						AfficheIdentite = nom_prenom
+					elseif LabelCode == 'LCN' then
+						AfficheIdentite = NOM_PRENOM
+					elseif LabelCode == 'TIC' then
+						AfficheIdentite = NOM_Prenom
+					else
+						AfficheIdentite = nom_prenom
+					end 
 				end	
 			</lua>  
+			<text col="18" align="left" label="Prénom - Nom" >AfficheIdentite</text> 
 			<text col="4" align="center" label="An">$(An)</text>
 			<text col="6" align="center" label="Categ">$(Categ)</text>
 			<text col="4" align="center" label="S.">$(Sexe)</text>
@@ -478,6 +480,7 @@
 		<lua>
 			entite = $(Evenement.Code_entite)
 			discipline = $(Epreuve.Code_discipline)
+			officiel = tonumber(params.officiel) 
 		</lua>
 		<order key="Heure_depart2, Dossard, Identite" />
 
@@ -490,7 +493,26 @@
 			<!-- <text col="4" align="right" label="Rg.">$(Rang2) </text> -->
 			<text col="4" align="right" label="Dos">$(Dossard) </text>
 			<text col="7" align="center" label="Code"><font size="8" cond="group =='body'"/>$(Code_coureur):sub(4)</text>
-			<text col="20" align="left" label="Nom - Prénom">NOM_Prenom</text> 
+			<lua>
+				if officiel == 0 then
+					AfficheIdentite = Prenom_NOM	
+				else
+					if LabelCode == 'FFS' then 
+						AfficheIdentite = NOM_PRENOM
+					elseif LabelCode == 'IFO' then 
+						AfficheIdentite = NOM_PRENOM
+					elseif LabelCode == 'EXT' then
+						AfficheIdentite = nom_prenom
+					elseif LabelCode == 'LCN' then
+						AfficheIdentite = NOM_PRENOM
+					elseif LabelCode == 'TIC' then
+						AfficheIdentite = NOM_Prenom
+					else
+						AfficheIdentite = nom_prenom
+					end 
+				end	
+			</lua>  
+			<text col="18" align="left" label="Prénom - Nom" >AfficheIdentite</text> 
 			<text col="4" align="center" label="An">$(An)</text>
 			<text col="6" align="center" label="Categ">$(Categ)</text>
 			<text col="4" align="center" label="S.">$(Sexe)</text>
@@ -508,7 +530,7 @@
 	<!-- Liste de départ officielle par Nation Comite Club -->
 	<report id="lst_officielle_Filtrer" title="(params.title or '')" header="1" first_header="0">
 		<lua>page_break = tonumber(params.page_break) or 0;
-			 discipline = $(Epreuve.Code_discipline)
+			 discipline = $(Epreuve.Code_discipline);
 			 entite = $(Evenement.Code_entite);
 			 body:SetCounter(params.orderby);
 		</lua>
@@ -521,9 +543,9 @@
 				<font name="Calibri" size="16"/>
 				<row h="0.5cm" />
 				<lua>
-					codeClub = $(Club):EscapeQuote()
-					tClub = base:GetTable('Club')
-					base:TableLoad(tClub, "Select * From Club Where Nom_reduit = '"..codeClub.."'")
+					codeClub = $(Club):EscapeQuote();
+					tClub = base:GetTable('Club');
+					base:TableLoad(tClub, "Select * From Club Where Nom_reduit = '"..codeClub.."'");
 					code = body:GetCell(params.orderby, row);
 					if $(Club.Nom_complet) == '' then 
 						CodeClub = code;
@@ -563,9 +585,12 @@
 		
 	<!-- Liste de départ officielle par epreuve -->
 	<report id="lst_officielle_epreuve" title="Liste de Départ" header="1" first_header="0">
-		<lua>entite = $(Evenement.Code_entite)</lua>
-		<lua>discipline = $(Epreuve.Code_discipline)</lua>
-		<lua>body:SetCounter('Code_epreuve')</lua>
+		<lua>
+			entite = $(Evenement.Code_entite);
+			discipline = $(Epreuve.Code_discipline);
+			body:SetCounter('Code_epreuve');
+			officiel = tonumber(params.officiel);
+		</lua>
 		<order key="Code_epreuve,Dossard" />
 
 		<rupture key="Code_epreuve">	
@@ -589,7 +614,26 @@
 			<row h="auto"/>
 			<text col="4" align="right" label="Dos">$(Dossard) </text>
 			<text col="7" align="center" label="Code"><font size="8" cond="group =='body'"/>$(Code_coureur):sub(4)</text>
-			<text col="20" align="left" label="Nom - Prénom">$(Identite)</text> 
+			<lua>
+				if officiel == 0 then
+					AfficheIdentite = Prenom_NOM	
+				else
+					if LabelCode == 'FFS' then 
+						AfficheIdentite = NOM_PRENOM
+					elseif LabelCode == 'IFO' then 
+						AfficheIdentite = NOM_PRENOM
+					elseif LabelCode == 'EXT' then
+						AfficheIdentite = nom_prenom
+					elseif LabelCode == 'LCN' then
+						AfficheIdentite = NOM_PRENOM
+					elseif LabelCode == 'TIC' then
+						AfficheIdentite = NOM_Prenom
+					else
+						AfficheIdentite = nom_prenom
+					end 
+				end	
+			</lua>  
+			<text col="20" align="left" label="Prénom - Nom" >AfficheIdentite</text>  
 			<text col="4" align="center" label="An">$(An)</text>
 			<text col="6" align="center" label="Categ">$(Categ)</text>
 			<text col="4" align="center" label="S.">$(Sexe)</text>
@@ -607,10 +651,13 @@
 	<!-- Résultats Officiels, Officieux ou Provisoires -->
 	<report id="res_officiel" title="(params.title or '')" header="1" first_header="(params.first_header or '1')" >
 		<column name="Tps_status">chrono.Status(body:GetCellInt('Tps', row))</column>
-		<lua>type_edition = id:sub(1,4)</lua>
-		<lua>body:SetCounter('Tps_status')</lua>
-		<lua>entite = $(Evenement.Code_entite)</lua>
-		<lua>nb_manche = base:GetTable('Epreuve'):GetCellInt('Nombre_de_manche', 0, 1)</lua>	
+		<lua>
+			type_edition = id:sub(1,4);
+			body:SetCounter('Tps_status');
+			entite = $(Evenement.Code_entite);
+			nb_manche = base:GetTable('Epreuve'):GetCellInt('Nombre_de_manche', 0, 1);
+			officiel = tonumber(params.officiel);
+		</lua>	
 		<order key="Tps, Dossard Desc" />
 		
 		<rupture key="Tps_status">
@@ -636,23 +683,25 @@
 			<text col="9" align="right" label="Clt /Cat / S."><font size_step="-1" cond="group=='body'"/>$(Cltc)..' /'..$(Categ)..' /'..$(Sexe)..' '</text>
 			<text col="7" align="center" label="Code"><font size_step="-2" cond="group =='body'"/>$(Code_coureur):sub(4)</text>
 			<lua>
-				if tonumber(params.officiel) == 0 then
-			</lua>	
-			<text col="15" align="left" label="Prénom - Nom" >Prenom_NOM</text> 	
-			<lua>else
-					if LabelCode == 'FFS' then </lua>
-						<text col="18" align="left" label="Nom - Prénom" >NOM_PRENOM</text> 
-					<lua>elseif LabelCode == 'EXT' then </lua>
-						<text col="18" align="left" label="nom - prenom" >nom_prenom</text>
-					<lua>elseif LabelCode == 'LCN' then </lua>
-						<text col="18" align="left" label="nom - prenom" >NOM_PRENOM</text>
-					<lua>elseif LabelCode == 'TIC' then </lua>
-						<text col="18" align="left" label="Prénom - Nom" >NOM_Prenom</text>
-					<lua>else</lua>
-						<text col="18" align="left" label="Prénom - Nom" >Prenom_NOM</text> 
-					<lua> end 
+				if officiel == 0 then
+					AfficheIdentite = Prenom_NOM	
+				else
+					if LabelCode == 'FFS' then 
+						AfficheIdentite = NOM_PRENOM
+					elseif LabelCode == 'IFO' then 
+						AfficheIdentite = NOM_PRENOM
+					elseif LabelCode == 'EXT' then
+						AfficheIdentite = nom_prenom
+					elseif LabelCode == 'LCN' then
+						AfficheIdentite = NOM_PRENOM
+					elseif LabelCode == 'TIC' then
+						AfficheIdentite = NOM_Prenom
+					else
+						AfficheIdentite = nom_prenom
+					end 
 				end	
 			</lua>  
+			<text col="18" align="left" label="Prénom - Nom" >AfficheIdentite</text> 
 			<text col="4" align="center" label="An">$(An)</text>
 			<text col="4" align="center" label="Nat" cond="entite == 'FIS'">$(Nation)</text>
 			<text col="3" align="center" label="CS." cond="entite == 'FFS'">$(Comite)</text>
@@ -675,7 +724,10 @@
 	<!-- Résultats Officiels, poursuite 2eme jour-->
 	<report id="res_off_Pours" title="(params.title or '')" header="1" first_header="(params.first_header or '1')" >
 		<column name="Tps_status">chrono.Status(body:GetCellInt('Tps2', row))</column>
-		<lua>type_edition = id:sub(1,4)</lua>
+		<lua>
+			type_edition = id:sub(1,4)
+			officiel = tonumber(params.officiel)
+		</lua>
 		<lua>body:SetCounter('Tps_status')</lua>
 		<lua>entite = $(Evenement.Code_entite)</lua>
 		<lua>nb_manche = base:GetTable('Epreuve'):GetCellInt('Nombre_de_manche', 0, 1)</lua>
@@ -705,23 +757,25 @@
 			<text col="9" align="right" label="Clt /Cat / S."><font size_step="-1" cond="group=='body'"/>$(Cltc)..' /'..$(Categ)..' /'..$(Sexe)..' '</text>
 			<text col="7" align="center" label="Code"><font size_step="-2" cond="group =='body'"/>$(Code_coureur):sub(4)</text>
 			<lua>
-				if tonumber(params.officiel) == 0 then
-			</lua>	
-			<text col="15" align="left" label="Prénom - Nom" >Prenom_NOM</text> 	
-			<lua>else
-					if LabelCode == 'FFS' then </lua>
-						<text col="18" align="left" label="Nom - Prénom" >NOM_PRENOM</text> 
-					<lua>elseif LabelCode == 'EXT' then </lua>
-						<text col="18" align="left" label="nom - prenom" >nom_prenom</text>
-					<lua>elseif LabelCode == 'LCN' then </lua>
-						<text col="18" align="left" label="nom - prenom" >NOM_PRENOM</text>
-					<lua>elseif LabelCode == 'TIC' then </lua>
-						<text col="18" align="left" label="Prénom - Nom" >NOM_Prenom</text>
-					<lua>else</lua>
-						<text col="18" align="left" label="Prénom - Nom" >Prenom_NOM</text> 
-					<lua> end 
+				if officiel == 0 then
+					AfficheIdentite = Prenom_NOM	
+				else
+					if LabelCode == 'FFS' then 
+						AfficheIdentite = NOM_PRENOM
+					elseif LabelCode == 'IFO' then 
+						AfficheIdentite = NOM_PRENOM
+					elseif LabelCode == 'EXT' then
+						AfficheIdentite = nom_prenom
+					elseif LabelCode == 'LCN' then
+						AfficheIdentite = NOM_PRENOM
+					elseif LabelCode == 'TIC' then
+						AfficheIdentite = NOM_Prenom
+					else
+						AfficheIdentite = nom_prenom
+					end 
 				end	
 			</lua>  
+			<text col="18" align="left" label="Prénom - Nom" >AfficheIdentite</text>  
 			<text col="4" align="center" label="An">$(An)</text>
 			<text col="4" align="center" label="Nat" cond="entite == 'FIS'">$(Nation)</text>
 			<text col="3" align="center" label="CS." cond="entite == 'FFS'">$(Comite)</text>
