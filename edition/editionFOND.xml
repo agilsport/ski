@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- Menu Editions Activité "FOND" !-->
-<!-- version="5.5" !-->
+<!-- version="5.6" !-->
 <!-- calcul de la note poursuite 2éme jour !-->
 <!-- si possible de faire fonctionner les cond="discipline:In('POURS')" dans les <menus> ?? dans <marging> et dans les <options> -->
 <!-- <paper orientation="landscape" cond="Nb_tps_inter >= 4 "/> -->
@@ -15,7 +15,7 @@
 			<menu title="Par Nation / Alphabétique" image="./res/16x16_juges.png" page_break="1" orderby="Nation" id="participants" />
 			<menu title="Par Comité / Alphabétique" image="./res/16x16_juges.png" page_break="1" orderby="Comite" id="participants" />
 			<menu title="Par Club / Alphabétique" image="./res/16x16_juges.png" page_break="1" orderby="Club" id="participants" />
-			<menu title="Par Epreuve" image="./res/16x16_juges.png" id="part_epreuve" />
+			<menu title="Par Epreuve / Alphabétique" image="./res/16x16_juges.png" id="part_epreuve" />
 		</menu>
 		
 		<menu title="Listes de Départ" image="./res/32x32_bib.png">
