@@ -55,6 +55,13 @@
 	<toolbar row="auto" col_start="1" col_end="0" name="tb" style="TB_FLAT|TB_HORIZONTAL" />
 </panel>
 
+<!-- autocomplete -->
+<panel name="autocomplete">
+	<padding all="2px"/>
+	<grid row="1" col_start="1" col_end="0" name="grid" />
+	<toolbar cond="create_tb == true" row="auto" col_start="1" col_end="0" name="tb" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT" />
+</panel>
+
 <!-- Calculatrice -->
 <panel name="calculator">
 	<padding all="2px"/>
