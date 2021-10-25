@@ -1162,6 +1162,13 @@ function OnAjouterCoureur()
 		tDraw:GetRecord():Set('Club', club);
 		tDraw:GetRecord():Set('Groupe_tirage', groupe);
 		tDraw:GetRecord():Set('Statut', 'CF');
+		tDraw:GetRecord():SetNull('ECSL_rank');
+		tDraw:GetRecord():SetNull('ECSL_points');
+		tDraw:GetRecord():SetNull('ECSL_overall_rank');
+		tDraw:GetRecord():SetNull('ECSL_overall_points');
+		tDraw:GetRecord():SetNull('WCSL_rank');
+		tDraw:GetRecord():SetNull('WCSL_points');
+		tDraw:GetRecord():SetNull('Winner_CC');
 		if draw.bolEstCE then
 			if ecsl_rank > 1 and ecsl_points > 0 then
 				tDraw:GetRecord():Set('ECSL_rank', ecsl_rank);
@@ -1819,10 +1826,7 @@ Groupe 6 On poursuit selon les points FIS.
 	end
 	
 	if tDrawG3:GetNbRows() > 0 then
-		if tDrawG2:GetNbRows() == 0 then
-			current_group = current_group + 1;
-		end
-		-- on garde le même groupe
+		current_group = current_group + 1;
 		for i = 0, tDrawG3:GetNbRows() -1 do		-- dans les 30 de la WCSL 
 			local code_coureur = tDrawG3:GetCell('Code_coureur', i);
 			local r = tDraw:GetIndexRow('Code_coureur', code_coureur);
@@ -1932,7 +1936,6 @@ Groupe 6 On poursuit selon les points FIS.
 		Info(tDrawG5:GetNbRows()..' coureurs dans tDrawG5');
 	end
 	-- on continue avec les points FIS
-	current_group = current_group + 1;
 	nb_exaequo = 0;
 	-- rang_tirage = rang_tirage + tDrawG4:GetNbRows();
 	if draw.debug then
@@ -1948,6 +1951,7 @@ Groupe 6 On poursuit selon les points FIS.
 	nb_exaequo = 0;
 	tDrawG6:OrderBy('FIS_pts');			-- on continue avec les points FIS
 	if tDrawG6:GetNbRows() > 0 then
+		current_group = current_group + 1;
 		rang_tirage = rang_tirage + 1;
 		for i = 0, tDrawG6:GetNbRows() -1 do
 			local pts = tDrawG6:GetCellDouble('FIS_pts', i);
@@ -1960,7 +1964,7 @@ Groupe 6 On poursuit selon les points FIS.
 					else
 						current_group = 3;
 					end
-				else
+				elseif not draw.bolEstCE then
 					if pts <= draw.ptsFIS15 then
 						current_group = 1;
 					else
@@ -2728,7 +2732,7 @@ function main(params_c)
 	draw.height = display:GetSize().height - 30;
 	draw.x = 0;
 	draw.y = 0;
-	draw.version = "1.3";
+	draw.version = "1.31";
 	draw.orderbyCE = 'Rang_tirage, Groupe_tirage, ECSL_points DESC, WCSL_points DESC, ECSL_overall_points DESC, Winner_CC DESC, FIS_pts, Nom, Prenom';
 	draw.orderbyFIS = 'Rang_tirage, Groupe_tirage, FIS_pts, Nom, Prenom';
 	draw.hostname = 'live.fisski.com';
