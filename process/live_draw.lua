@@ -155,6 +155,9 @@ function OnSocketLive(evt)
 		Warning("CONNEXION FIS PERDUE ...");
 		draw.socket_state = false;
 	end
+	tbTableau:EnableTool(btnSendMessage:GetId(), draw.socket_state);
+	tbTableau:EnableTool(btnClear:GetId(), draw.socket_state);
+	tbTableau:EnableTool(btnMenuSend:GetId(), draw.socket_state);
 end
 
 function OnAide()
@@ -404,18 +407,36 @@ function OnPrintBibo(groupe)
 		tDraw_Copy = tDraw:Copy();
 		tDraw_Copy:OrderBy('Rang_tirage');
 		for i = tDraw_Copy:GetNbRows() -1, 0, -1 do
-			if tDraw_Copy:GetCellInt('Groupe_tirage', i) > 2 then
-				tDraw_Copy:RemoveRowAt(i);
+			if not draw.bolVitesse then
+				if tDraw_Copy:GetCellInt('Groupe_tirage', i) > 2 then
+					tDraw_Copy:RemoveRowAt(i);
+				end
 			else
-				break;
+				if tDraw_Copy:GetCellInt('Groupe_tirage', i) > 1 then
+					if tDraw_Copy:GetCellInt('ECSL_overall_points', i) == 0 then
+						tDraw_Copy:RemoveRowAt(i);
+					end
+				end
 			end
 		end
 	else
 		tDraw_Copy = tDraw:Copy();
 		tDraw_Copy:OrderBy('FIS_pts');
 		for i = tDraw_Copy:GetNbRows() -1, 0, -1 do
-			if tDraw_Copy:GetCellInt('Groupe_tirage', i) > 1 then
-				tDraw_Copy:RemoveRowAt(i);
+			if not draw.bolVitesse then
+				if draw.code_niveau ~= 'NC' then
+					if tDraw_Copy:GetCellInt('Groupe_tirage', i) > 1 then
+						tDraw_Copy:RemoveRowAt(i);
+					end
+				else
+					if tDraw_Copy:GetCellInt('Groupe_tirage', i) > 2 then
+						tDraw_Copy:RemoveRowAt(i);
+					end
+				end
+			else
+				if tDraw_Copy:GetCellInt('Groupe_tirage', i) > 1 then
+					tDraw_Copy:RemoveRowAt(i);
+				end
 			end
 		end
 	end
@@ -465,6 +486,10 @@ function OnReOrder(old_rank,new_rank, code_coureur)
 end
 
 function OnOrder()
+	if draw.bolInit then
+		draw.build_table = true;
+		draw.skip_question = true;
+	end
 	if not draw.skip_question then
 		draw.build_table = false;
 		local msg = "Voulez-vous reconstruire les groupes et les rangs de départ ?\n\n"..
@@ -481,12 +506,19 @@ function OnOrder()
 		draw.skip_question = true;
 		OnRAZData('Tout');
 		draw.build_table = true;
-		SetuptDraw();
+		if draw.bolInit then
+			if not draw.bolEstCE then 
+				SetuptDraw();
+			end
+		else
+			SetuptDraw();
+		end
 	else
 		tDraw:OrderBy('Rang_tirage');
 	end
 	-- draw.build_table = false;
 	-- grid_tableau:SetSortingColumn('Rang_tirage');
+	draw.bolInit = false;
 	RefreshGrid();
 end
 
@@ -723,9 +755,9 @@ function CommandSendOrder()
 	CreateXML(nodeRoot);
 	dlgTableau:GetWindowName('info'):SetValue("Ordre des coureurs dans le tableau envoyé");
 	if draw.statut == 'UF' then
-		SendMessage('Board of racers refreshed');
+		SendMessage('Board of racers refreshed (you might have to refresh the page)');
 	else
-		SendMessage('Board confirmed, bib drawing in progress');
+		SendMessage('Board confirmed, bib drawing in progress (you might have to refresh the page)');
 	end
 end
 
@@ -810,25 +842,6 @@ function CommandSendMessage();
 		CreateXML(nodeRoot);
 	end
 
-end
-
-function CommandBibDeleted(code_coureur, nom, prenom, nation)
-	CommandSendList();
-	CommandSendOrder();
-	CommandSendMessage();
-	local code_coureur = code_coureur;
-	local nom = nom;
-	local prenom = prenom;
-	local nation = nation;
-	local nodeMessage = xmlNode.Create(nil, xmlType.ELEMENT_NODE, "message");
-	local tMessage = {Updates = {racer = {{lastname = nom, firstname = prenom, nat = nation, fiscode = code_coureur, status = 'RM', message = '', logid = 0}}}};
-	local jsontxt = table.ToStringJSON(tMessage, false);
-
-	local nodeJSON = xmlNode.Create(nodeMessage, xmlType.ELEMENT_NODE, "drawupdatesJSON");
-	xmlNode.Create(nodeJSON, xmlType.CDATA_SECTION_NODE,'', jsontxt);
-	local nodeRoot = xmlNode.Create(nil, xmlType.ELEMENT_NODE, "livetiming");
-	nodeRoot:AddChild(nodeMessage);
-	CreateXML(nodeRoot);
 end
 
 function CommandClear()
@@ -953,6 +966,11 @@ function CommandRaceInfo()
 end
 
 function CreateXML(nodeRoot)
+	if not draw.socket_state then
+		dlgTableau:GetWindowName('info'):SetValue('Pas de connexion à la FIS !!!');
+		Error('Pas de connexion à la FIS !!!');
+		return;
+	end
 	assert(app.GetNameSpace(nodeRoot) == 'xmlNode');
 	
 	local doc = xmlDocument.Create();
@@ -1488,6 +1506,9 @@ function BuildTablesDraw()	-- on ajoute ou on supprime des enregistrements dans 
 	local cmd = 'Delete From Resultat_Info_Tirage Where Code_evenement = '..draw.code_evenement..' And Code_coureur Not In (Select Code_coureur From Resultat Where Code_evenement = '..draw.code_evenement..')';
 	base:Query(cmd);
 	base:TableLoad(tResultat_Info_Tirage, 'Select * From Resultat_Info_Tirage Where Code_evenement = '..draw.code_evenement);
+	if tResultat_Info_Tirage:GetNbRows() == 0 then
+		draw.bolInit = true;
+	end
 	for i = 0, tResultat:GetNbRows() -1 do
 		local code_coureur = tResultat:GetCell('Code_coureur', i);
 		local pts, rank, pts_SG, rank_SG = GetRank(code_coureur);
@@ -1550,6 +1571,7 @@ function SetuptDraw()
 		end
 	end
 	tDraw:OrderBy('FIS_pts');
+	draw.ptsFIS7 = tDraw:GetCellDouble('FIS_pts', 6);
 	draw.ptsFIS15 = tDraw:GetCellDouble('FIS_pts', 14);
 	tDraw:OrderBy('ECSL_points DESC, FIS_pts');
 	tDrawG1 = tDraw:Copy();	-- dans les 15 de la ECSL
@@ -1929,6 +1951,23 @@ Groupe 6 On poursuit selon les points FIS.
 		rang_tirage = rang_tirage + 1;
 		for i = 0, tDrawG6:GetNbRows() -1 do
 			local pts = tDrawG6:GetCellDouble('FIS_pts', i);
+			if not draw.bolVitesse then
+				if draw.code_niveau == 'NC' then		-- Championnats de France
+					if pts <= draw.ptsFIS7 then
+						current_group = 1;
+					elseif pts <= draw.ptsFIS15 then
+						current_group = 2;
+					else
+						current_group = 3;
+					end
+				else
+					if pts <= draw.ptsFIS15 then
+						current_group = 1;
+					else
+						current_group = 2;
+					end
+				end
+			end
 			if current_group == 1 then
 				if pts > draw.ptsFIS15 then
 					current_group = 2;
@@ -2081,96 +2120,98 @@ function OnAfficheTableau()
 
 -- Initialisation des Controles
 	
-	local tbTableau = dlgTableau:GetWindowName('tbtableau');
+	tbTableau = dlgTableau:GetWindowName('tbtableau');
 	tbTableau:AddStretchableSpace();
-	local btnSendMessage = tbTableau:AddTool("Envoyer un message", "./res/32x32_journal.png");
+	btnSendMessage = tbTableau:AddTool("Envoyer un message", "./res/32x32_journal.png");
 	tbTableau:AddSeparator();
-	local btnMenuRAZ = tbTableau:AddTool("RAZ des données", "./res/32x32_journal.png",'', itemKind.DROPDOWN);
+	btnMenuRAZ = tbTableau:AddTool("RAZ des données", "./res/32x32_journal.png",'', itemKind.DROPDOWN);
 	tbTableau:AddSeparator();
-	local btnOrder = tbTableau:AddTool("Trier le tableau", "./res/32x32_bib.png");
+	btnOrder = tbTableau:AddTool("Trier le tableau", "./res/32x32_bib.png");
 	tbTableau:AddSeparator();
-	local btnClear = tbTableau:AddTool("RAZ à la FIS", "./res/32x32_clear.png");
+	btnClear = tbTableau:AddTool("RAZ à la FIS", "./res/32x32_clear.png");
 	
-	local menuRAZ = menu.Create();
-	local btnRAZRang = menuRAZ:Append({label="RAZ des rangs", image ="./res/32x32_clear.png"});
+	menuRAZ = menu.Create();
+	btnRAZRang = menuRAZ:Append({label="RAZ des rangs", image ="./res/32x32_clear.png"});
 	menuRAZ:AppendSeparator();
-	local btnRAZGroupe = menuRAZ:Append({label="RAZ des groupes", image ="./res/32x32_clear.png"});
+	btnRAZGroupe = menuRAZ:Append({label="RAZ des groupes", image ="./res/32x32_clear.png"});
 	menuRAZ:AppendSeparator();
-	local btnRAZAll = menuRAZ:Append({label="RAZ des deux", image ="./res/32x32_clear.png"});
+	btnRAZAll = menuRAZ:Append({label="RAZ des deux", image ="./res/32x32_clear.png"});
 	menuRAZ:AppendSeparator();
-	local btnRAZDossard = menuRAZ:Append({label="RAZ des dossards", image ="./res/32x32_clear.png"});
+	btnRAZDossard = menuRAZ:Append({label="RAZ des dossards", image ="./res/32x32_clear.png"});
 	tbTableau:SetDropdownMenu(btnMenuRAZ:GetId(), menuRAZ);
 	
 	tbTableau:AddSeparator();
-	local btnMenuSend = tbTableau:AddTool("Menu des envois", "./res/32x32_send.png",'', itemKind.DROPDOWN);
+	btnMenuSend = tbTableau:AddTool("Menu des envois", "./res/32x32_send.png",'', itemKind.DROPDOWN);
 
-	local menuSend = menu.Create();
-	local btnSendTableau = menuSend:Append({label="Envoi du tableau à la FIS", image ="./res/32x32_send.png"});
+	menuSend = menu.Create();
+	btnSendTableau = menuSend:Append({label="Envoi du tableau à la FIS", image ="./res/32x32_send.png"});
 	menuSend:AppendSeparator();
-	local btnSendDossards = menuSend:Append({label="Renvoi de tous les dossards", image ="./res/32x32_send.png"});
+	btnSendDossards = menuSend:Append({label="Renvoi de tous les dossards", image ="./res/32x32_send.png"});
 	menuSend:AppendSeparator();
 	tbTableau:SetDropdownMenu(btnMenuSend:GetId(), menuSend);
 
 	tbTableau:AddSeparator();
-	local btnValider = tbTableau:AddTool("Menu des validations", "./res/32x32_send.png",'', itemKind.DROPDOWN);
-	local menuValider = menu.Create();
-	local btnValiderSelection = menuValider:Append({label="Validation des coureurs filtrés", image ="./res/32x32_down.png"});
+	btnValider = tbTableau:AddTool("Menu des validations", "./res/32x32_send.png",'', itemKind.DROPDOWN);
+	menuValider = menu.Create();
+	btnValiderSelection = menuValider:Append({label="Validation des coureurs filtrés", image ="./res/32x32_down.png"});
 	menuValider:AppendSeparator();
-	local btnValiderCoureurs = menuValider:Append({label="Validation globale des coureurs", image ="./res/32x32_dialog_ok.png"});
+	btnValiderCoureurs = menuValider:Append({label="Validation globale des coureurs", image ="./res/32x32_dialog_ok.png"});
 	menuValider:AppendSeparator();
-	local btnInValiderSelection = menuValider:Append({label="Invalider les coureurs filtrés", image ="./res/32x32_close.png"});
+	btnInValiderSelection = menuValider:Append({label="Invalider les coureurs filtrés", image ="./res/32x32_close.png"});
 	menuValider:AppendSeparator();
-	local btnInvaliderCoureurs = menuValider:Append({label="Revenir au statut Non Validé", image ="./res/32x32_dialog_ko.png"});
+	btnInvaliderCoureurs = menuValider:Append({label="Revenir au statut Non Validé", image ="./res/32x32_dialog_ko.png"});
 	menuValider:AppendSeparator();
 	tbTableau:SetDropdownMenu(btnValider:GetId(), menuValider);
 		
 	tbTableau:AddSeparator();
-	local btnMenuPrint = tbTableau:AddTool("Menu des impressions", "./res/32x32_printer.png",'', itemKind.DROPDOWN);
-	local menuPrint = menu.Create();
+	btnMenuPrint = tbTableau:AddTool("Menu des impressions", "./res/32x32_printer.png",'', itemKind.DROPDOWN);
+	menuPrint = menu.Create();
 	menuPrint:AppendSeparator();
-	local btnPrintDoubleTirageBibo = menuPrint:Append({label="Impression du double tirage du BIBO", image ="./res/32x32_printer.png"});
+	btnPrintDoubleTirageBibo = menuPrint:Append({label="Impression du double tirage du BIBO", image ="./res/32x32_printer.png"});
 	menuPrint:AppendSeparator();
-	local btnPrintEtiquettesAlpha = menuPrint:Append({label="Impression des étiquettes par ordre alphabétique", image ="./res/32x32_printer.png"});
+	btnPrintEtiquettesAlpha = menuPrint:Append({label="Impression des étiquettes par ordre alphabétique", image ="./res/32x32_printer.png"});
 	menuPrint:AppendSeparator();
-	local btnPrintEtiquettesNation = menuPrint:Append({label="Impression par Nation", image ="./res/32x32_printer.png"});
+	btnPrintEtiquettesNation = menuPrint:Append({label="Impression des étiquettes par Nation", image ="./res/32x32_printer.png"});
 	menuPrint:AppendSeparator();
-	local btnPrintEtiquettesParpoints = menuPrint:Append({label="Impression par Points", image ="./res/32x32_printer.png"});
+	btnPrintEtiquettesParpoints = menuPrint:Append({label="Impression des étiquettes par Points", image ="./res/32x32_printer.png"});
+	menuPrint:AppendSeparator();
+	btnPrintFeuilleTirage = menuPrint:Append({label="Impression de la feuille de tirage", image ="./res/32x32_printer.png"});
 	menuPrint:AppendSeparator();
 	tbTableau:SetDropdownMenu(btnMenuPrint:GetId(), menuPrint);
 
 	tbTableau:AddSeparator();
-	local btnOutils = tbTableau:AddTool("Menu des outils", "./res/32x32_tools.png",'', itemKind.DROPDOWN);
-	local menuOutils = menu.Create();
+	btnOutils = tbTableau:AddTool("Menu des outils", "./res/32x32_tools.png",'', itemKind.DROPDOWN);
+	menuOutils = menu.Create();
 	menuOutils:AppendSeparator();
-	local btnTirageDossardsBIBO = menuOutils:Append({label="Double tirage à la mêlée du BIBO", image ="./res/32x32_bib.png"});
+	btnTirageDossardsBIBO = menuOutils:Append({label="Double tirage à la mêlée du BIBO", image ="./res/32x32_bib.png"});
 	menuOutils:AppendSeparator();
-	local btnTirageDossardsRestants = menuOutils:Append({label="Tirage des dossards restants (avec points)", image ="./res/32x32_bib.png"});
+	btnTirageDossardsRestants = menuOutils:Append({label="Tirage des dossards restants (avec points)", image ="./res/32x32_bib.png"});
 	menuOutils:AppendSeparator();
-	local btnTirageDossardsSansPoints = menuOutils:Append({label="Double tirage à la mêlée (sans points)", image ="./res/32x32_bib.png"});
+	btnTirageDossardsSansPoints = menuOutils:Append({label="Double tirage à la mêlée (sans points)", image ="./res/32x32_bib.png"});
 	menuOutils:AppendSeparator();
-	local btnWeb = menuOutils:Append({label="Vers la page FIS de la course", image ="./res/32x32_fis.png"});
+	btnWeb = menuOutils:Append({label="Vers la page FIS de la course", image ="./res/32x32_fis.png"});
 	menuOutils:AppendSeparator();
-	local btnDecalerBas = menuOutils:Append({label="Décaler les rangs de tirage vers le bas", image ="./res/32x32_list_add.png"});
+	btnDecalerBas = menuOutils:Append({label="Décaler les rangs de tirage vers le bas", image ="./res/32x32_list_add.png"});
 	menuOutils:AppendSeparator();
-	local btnDecalerHaut = menuOutils:Append({label="Décaler les rangs de tirage vers le haut", image ="./res/32x32_list_remove.png"});
+	btnDecalerHaut = menuOutils:Append({label="Décaler les rangs de tirage vers le haut", image ="./res/32x32_list_remove.png"});
 	menuOutils:AppendSeparator();
-	local btnDecalerGroupeBas = menuOutils:Append({label="Décaler les groupes de tirage vers le bas", image ="./res/32x32_down.png"});
+	btnDecalerGroupeBas = menuOutils:Append({label="Décaler les groupes de tirage vers le bas", image ="./res/32x32_down.png"});
 	menuOutils:AppendSeparator();
-	local btnDecalerGroupeHaut = menuOutils:Append({label="Décaler les groupes de tirage vers le haut", image ="./res/32x32_up.png"});
+	btnDecalerGroupeHaut = menuOutils:Append({label="Décaler les groupes de tirage vers le haut", image ="./res/32x32_up.png"});
 	menuOutils:AppendSeparator();
-	local btnPrintFeuilleTirage = menuOutils:Append({label="Impression de la feuille de tirage", image ="./res/32x32_printer.png"});
-	menuOutils:AppendSeparator();
-	local btnAideCE = menuOutils:Append({label="Aide / ranking en CE", image ="./res/32x32_ranking.png"});
+	btnAideCE = menuOutils:Append({label="Aide / ranking en CE", image ="./res/32x32_ranking.png"});
 	menuOutils:AppendSeparator();
 	tbTableau:SetDropdownMenu(btnOutils:GetId(), menuOutils);
 
 	tbTableau:AddSeparator();
-	local btnClose = tbTableau:AddTool("Quitter", "./res/32x32_exit.png");
+	btnClose = tbTableau:AddTool("Quitter", "./res/32x32_exit.png");
 	tbTableau:AddStretchableSpace();
 	
  	tbTableau:Realize();
-	local menuId = tbTableau:GetId();
-	
+	-- tbTableau:EnableTool(btnSendMessage:GetId(), draw.socket_state);
+	-- tbTableau:EnableTool(btnClear:GetId(), draw.socket_state);
+	-- tbTableau:EnableTool(btnMenuSend:GetId(), draw.socket_state);
+
 	-- tbTableau:EnableTool(btnPrintDoubleTirageBibo:GetId(), false);
 	-- pour le moment, EnableTool ne marche que bour des boutons de premier niveau et pas dans un menu
 	
@@ -2342,19 +2383,21 @@ function OnAfficheTableau()
 			BuildTableTirage(1, tDrawG6:GetNbRows() - 1);
 			CommandRenvoyerDossards(false);
 			OnPrintDoubleTirage(1);
-			if draw.bolEstCE and not draw.bolVitesse then
-				tDrawG6 = tDraw:Copy();
-				ReplaceTableEnvironnement(tDrawG6, 'DrawG6');
-				tDrawG6:OrderBy('Rang_tirage');
-				for i = tDrawG6:GetNbRows() -1, 0, -1 do
-					local groupe_tirage = tDrawG6:GetCellInt('Groupe_tirage', i, -1);
-					if groupe_tirage ~= 2 then
-						tDrawG6:RemoveRowAt(i);
+			if not draw.bolVitesse then
+				if draw.bolEstCE or draw.code_niveau == 'NC' then
+					tDrawG6 = tDraw:Copy();
+					ReplaceTableEnvironnement(tDrawG6, 'DrawG6');
+					tDrawG6:OrderBy('Rang_tirage');
+					for i = tDrawG6:GetNbRows() -1, 0, -1 do
+						local groupe_tirage = tDrawG6:GetCellInt('Groupe_tirage', i, -1);
+						if groupe_tirage ~= 2 then
+							tDrawG6:RemoveRowAt(i);
+						end
 					end
+					BuildTableTirage(params.nb_groupe1 + 1, tDrawG6:GetNbRows() -1);
+					CommandRenvoyerDossards(false);
+					OnPrintDoubleTirage(2);
 				end
-				BuildTableTirage(params.nb_groupe1 + 1, tDrawG6:GetNbRows() -1);
-				CommandRenvoyerDossards(false);
-				OnPrintDoubleTirage(2);
 			end
 		end
 		, btnTirageDossardsBIBO);
@@ -2397,10 +2440,26 @@ function OnAfficheTableau()
 				-- on commence par tirer les exaequos
 				draw.start_Bib = nil;
 				for i = 0, tDraw:GetNbRows() -1 do
-					if tDraw:GetCellInt('Groupe_tirage', i) == 1 then
-						draw.start_Bib = i + 1;
+					if draw.code_niveau ~= 'NC' then
+						if tDraw:GetCellInt('Groupe_tirage', i) == 1 then
+							draw.start_Bib = i + 1;
+						else
+							break;
+						end
 					else
-						break;
+						if not draw.bolVitesse then
+							if tDraw:GetCellInt('Groupe_tirage', i) < 3 then
+								draw.start_Bib = i + 1;
+							else
+								break;
+							end
+						else
+							if tDraw:GetCellInt('Groupe_tirage', i) == 1 then
+								draw.start_Bib = i + 1;
+							else
+								break;
+							end
+						end
 					end
 				end
 				draw.bib_done = true;
@@ -2669,7 +2728,7 @@ function main(params_c)
 	draw.height = display:GetSize().height - 30;
 	draw.x = 0;
 	draw.y = 0;
-	draw.version = "1.2";
+	draw.version = "1.3";
 	draw.orderbyCE = 'Rang_tirage, Groupe_tirage, ECSL_points DESC, WCSL_points DESC, ECSL_overall_points DESC, Winner_CC DESC, FIS_pts, Nom, Prenom';
 	draw.orderbyFIS = 'Rang_tirage, Groupe_tirage, FIS_pts, Nom, Prenom';
 	draw.hostname = 'live.fisski.com';
@@ -2769,9 +2828,6 @@ function main(params_c)
 	draw.tModifs_tableau = {};
 	draw.raz_sequence = false;
 	draw.print_alone = true;
-
-	-- draw.EnableToolSendTableau = false;
-	-- tbTableau:EnableTool(btnSendTableau:GetId(), draw.EnableToolSendTableau);
 
 	dlgConfig = wnd.CreateDialog(
 		{
