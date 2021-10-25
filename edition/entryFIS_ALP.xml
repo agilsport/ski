@@ -1,0 +1,663 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Edition du Formulaire d'Inscription FIS -->
+<edition>
+	<gestion>
+		<panel name="listeevenement">
+			<lua>nbrows = tonumber(params.nbrows);</lua>
+			<lua>nbofficiels = tonumber(params.nbofficiels);</lua>
+			<col value="100px,1,100px"/>
+			<padding all="3px"/>
+			<row value="30px"/>
+			<matrix col_start="2" row="auto">
+				<col value="50px,1,30px"/>
+				<wndtext row="80px" col_start="2" align="center" font_weight="bold" ><background mode="solid" color="ltgray" />'Liste des courses "POOL" contenant\n les Officiels enregistrés.'</wndtext>
+				<statictext row="auto" col_start="2" align="center" label="Titre"/>
+				<lua>for i = 1, nbrows do</lua>
+					<textctrl row="auto" col_start="2" name="('nom'..i)" style="TE_READONLY"/>
+					<checkbox col_start="1" name="('chk'..i)" style="CHK_2STATE|ALIGN_LEFT"/>
+				<lua>end</lua>
+				<wndtext row="50px" col_start="2" align="center" font_weight="bold"><background mode="solid" color="ltgray" />'Indiquez ci-dessous le code d\'une course supplémentaire.'</wndtext>
+				<textctrl row="50px" col_start="1" name="plus" />
+				<textctrl col_start="2" align="center" name="pluscourse" font_weight="bold" style="TE_READONLY"/>
+				<row value="10px"/>
+				<toolbar row="auto" col_start="1" col_end="2" name="tbevenement" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
+				<row value="1"/>
+			</matrix>
+		</panel>
+		<panel name="listeofficiel">
+			<lua>nbrows = tonumber(params.nbrows);</lua>
+			<lua>nbofficiels = tonumber(params.nbofficiels);</lua>
+			<col value="1,2,100px"/>
+			<padding all="3px"/>
+			<row value="30px"/>
+			<matrix col_start="1" col_end="0" row="auto">
+				<pen border="none" />
+				<col value="100px,1,2,100px"/>
+				<wndtext row="80px" col_start="1" col_end="0" align="center" font_weight="bold" ><background mode="solid" color="ltgray" />params.station..' le '..params.datex..' - '..params.titre..'\nListe des Officiels proposés'</wndtext>
+				<statictext row="auto" col_start="2" align="center" label="Titre"/>
+				<statictext col_start="3" align="center" label="Identité"/>
+				<lua>for i = 1, nbrows do</lua>
+						<checkbox row="auto" col_start="1" name="('chkofficiel'..i)" style="CHK_2STATE|ALIGN_RIGHT"/>
+						<textctrl col_start="2" name="('fonction'..i)" style="TE_READONLY"/>
+						<textctrl col_start="3" name="('nom'..i)" style="TE_READONLY"/>
+				<lua>end</lua>
+				<row value="10px"/>
+				<toolbar row="auto" col_start="1" col_end="0" name="tbofficiel" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
+				<row value="1"/>
+			</matrix>
+		</panel>
+		<panel name="gestiondates">
+			<col value="1,2,100px"/>
+			<padding all="3px"/>
+			<row value="30px"/>
+			<matrix col_start="1" col_end="0" row="auto">
+				<pen border="none" />
+				<col value="1,1,1,1"/>
+				<wndtext row="80px" col_start="1" col_end="0" align="center" font_weight="bold" ><background mode="solid" color="ltgray" />params.station..' le '..params.datex..' - '..params.titre..'\nListe des Officiels proposés'</wndtext>
+				<statictext row="auto" col_start="2" align="center" label="Date de début"/>
+				<statictext col_start="3" align="center" label="date de fin"/>
+				<datepickerctrl row="auto" col_start="2" align="center" name="debut" />
+				<datepickerctrl col_start="3" align="center" name="fin" />
+				<row value="10px"/>
+				<toolbar row="auto" col_start="1" col_end="0" name="tbdate" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
+				<row value="1"/>
+			</matrix>
+		</panel>
+	</gestion>
+	<report id="Entry_form">
+		<lua>tEvenement_Officiel = base:GetTable('Evenement_Officiel');
+			tEpreuve = base:GetTable('Epreuve');
+			tEvenement = base:GetTable('Evenement');
+			dofile('./interface/adv.lua');
+			dofile('./interface/interface.lua');
+			dofile('./edition/functionPG.lua');
+		</lua>
+		<layers>
+			<layer id="entryformfis">
+			</layer>
+		</layers>
+		<margin top="150" bottom="100" left="100" right="100" />
+		<header>
+			<spacing all="4" />
+			<padding all="0"/>
+			<col value="1" />
+			<matrix row="auto">
+				<font name="Calibri" size="13" adjust="height" weight="bold"/>
+				<pen border="0" />
+				<col value="2cm, 1" />
+				<row value="1cm" />
+				<text row="auto" >'ENTRY FORM'</text>
+				<text row="auto" font_style="italic" font_weight="normal">'FORMULAIRE D\'INSCRIPTION'</text>
+				<text row="auto" font_weight="normal">'ANMELDUNGSFORMULAR'</text>
+			</matrix>
+			<row value="0.5cm" />
+			<!-- Définition des blocs -->
+			<matrix row="auto">
+				<font size="10" adjust="both" weight="normal"/>
+				<col value="5,4,0.07cm" />
+				<row value="2.5cm" />
+				<!-- Bloc Compétition -->
+				<matrix col_start="1">
+					<padding left="0.2cm"/>
+					<row value="auto" />
+					<text col="auto" font_weight="bold">'Competition'</text>
+					<padding left="0"/>
+					<text col="auto" font_style="italic">' (Name/Place) '</text>
+					<text col="auto" font_style="italic" font_size_step="-2">' /Manifestation(Nom/Lieu) / '</text>
+					<row value="auto" />
+					<text col_start="1" col_end="0" font_style="italic" font_size_step="-2">'Veranstaltung (Name/Ort)'</text>
+					<row value="1" />
+					<lua>station = tEvenement:GetCell('Station', 0)</lua>
+					<text cond="string.sub(station, 1, 1) == ' '" col_start="1" col_end="0" font_weight="bold" align="center">$(Evenement.Nom)</text>
+					<text cond="string.sub(station, 1, 1) ~= ' '" col_start="1" col_end="0" font_size_step="2" font_weight="bold" align="center">$(Evenement.Nom)..'\n'..$(Evenement.Station)</text>
+					<!-- <text cond="$(Evenement.Nom):match('^%a')" col_start="1" col_end="0" font_weight="bold" align="center">$(Evenement.Nom)..'\n'..$(Evenement.Station)</text> -->
+					<!-- <text cond="not $(Evenement.Nom):match('^%a')" col_start="1" col_end="0" font_size_step="2" font_weight="bold" align="center">$(Evenement.Station)</text> -->
+				</matrix>
+				<padding all="0" />
+				<text col_start="1" border="all" pen_size="2" />
+
+				<!-- Bloc Date -->
+				<matrix col_start="2" >
+					<padding left="0.2cm"/>
+					<row value="auto" />
+					<text col="auto" font_weight="bold">'Date of race'</text>
+					<padding left="0"/>
+					<text col="auto" font_style="italic" font_size_step="-2">' / Date de la course / Datum des wettkampfs'</text>
+					<row value="auto" />
+					<row value="1" />
+					<text col_start="1" col_end="0" font_weight="bold" align="center" cond="tEpreuve:GetNbRows() &gt; 1">tEpreuve:GetCell('Date_epreuve', 0)..' - '..tEpreuve:GetCell('Date_epreuve', tEpreuve:GetNbRows() -1)</text>
+					<text col_start="1" col_end="0" font_weight="bold" align="center" cond="tEpreuve:GetNbRows() == 1">tEpreuve:GetCell('Date_epreuve', 0)</text>
+				</matrix>
+				<text col_start="2" col_end="-1" border="all" pen_size="2" />
+				
+				<!-- Bloc Responsable -->
+				<row value="2.5cm" />
+				<matrix col_start="1">
+					<padding left="0.2cm"/>
+					<row value="auto" />
+					<text col="auto" font_weight="bold">'Responsible for Entry '</text>
+					<padding left="0"/>
+					<text col="auto" font_style="italic" font_size_step="-2">' / Responsable de l\'inscription / Verantwortlich '</text>
+					<padding left="0.2cm"/>
+					<row value="1" />
+					<text col_start="1" col_end="0" font_weight="bold" align="center">GetOfficiel(params.code_evenement, 'ResponsibleEntry', true)</text>
+				</matrix>
+				<padding left="0"/>
+				<text col_start="1" border="all" pen_size="2" />
+				
+				<!-- Bloc Fédération -->
+				<row value="2.5cm" />
+				<matrix col_start="1">
+					<padding left="0.2cm"/>
+					<row value="auto" />
+					<text col="auto" font_weight="bold">'National Association'</text>
+					<padding left="0"/>
+					<text col="auto" font_style="italic" font_size_step="-2">' / Fédération nationale / Nationaler Verband  '</text>
+					<row value="1" />
+					<text col_start="2" col_end="0" font_weight="bold" align="center" font_size_step="-1">GetOfficiel(params.code_evenement, 'NationalAssociation', true)</text>
+				</matrix>
+				<matrix col_start="1">
+					<col value="0.2cm,2cm,1"/>
+					<row value="0.5cm,1" />
+					<!-- <text col_start="1">'toto'</text> -->
+					<image col_start="2" align="center" adjust="best" ><background mode="solid"/>GetOfficielSignature(params.code_evenement, 'NationalAssociation', true)</image>
+				</matrix>
+				<padding left="0"/>
+				<text col_start="1" border="all" pen_size="2" />
+
+				<!-- Bloc Catégorie -->
+				<matrix col_start="2" row_start="-1" row_end="0">
+					<padding left="0.2cm"/>
+					<col value="1,1,1" />
+					<text row="auto" col_start="1" col_end="0" font_weight="bold">'Category'</text>
+					<text row="auto" col_start="1" col_end="0" font_size_step="-2">'Catégorie'</text>
+					<text row="auto" col_start="1" col_end="0" font_size_step="-2">'Kategorie'</text>
+					<row value="1" count="3" />
+					<font size_step="1"/>
+					<matrix row_start="-2" col_start="1">
+						<row value="1,0.6cm, 1"/>
+						<col value="1,0.6cm, 1"/>
+						<padding left="0.2cm"/>
+						<text row_start="1" row_end="0" col_start="1" col_end="0" >'COC'</text>
+						<padding all="0"/>
+						<line row_start="2" col_start="2" border="left|top|bottom|right" />
+						<lua>if params.code_regroupement:In('COC', 'EC', 'CE') then</lua>
+							<pen color="red" size="5" />
+							<line row_start="2" col_start="2" border="diag_up|diag_down" />
+							<pen color="black" size="1" />
+						<lua>end</lua>
+					</matrix>
+					
+					<matrix row_start="-1" col_start="1">
+						<row value="1,0.6cm, 1"/>
+						<col value="1,0.6cm, 1"/>
+						<padding left="0.2cm"/>
+						<text row_start="1" row_end="0" col_start="1" col_end="0" >'CIT'</text>
+						<padding all="0"/>
+						<line row_start="2" col_start="2" border="left|top|bottom|right" />
+						<lua>if params.code_regroupement:In('CIT','CITWC') then</lua>
+							<pen color="red" size="5" />
+							<line row_start="2" col_start="2" border="diag_up|diag_down" />
+							<pen color="black" size="1" />
+						<lua>end</lua>
+					</matrix>
+
+					<matrix row_start="0" col_start="1">
+						<row value="1,0.6cm, 1"/>
+						<col value="1,0.6cm, 1"/>
+						<padding left="0.2cm"/>
+						<text row_start="1" row_end="0" col_start="1" col_end="0" >'NJR'</text>
+						<padding all="0"/>
+						<line row_start="2" col_start="2" border="left|top|bottom|right" />
+						<lua>if params.code_regroupement:In('JUN', 'EL-PJ', 'NJR', 'FJ') then</lua>
+							<pen color="red" size="5" />
+							<line row_start="2" col_start="2" border="diag_up|diag_down" />
+							<pen color="black" size="1" />
+						<lua>end</lua>
+					</matrix>
+
+					<matrix row_start="-2" col_start="2">
+						<row value="1,0.6cm, 1"/>
+						<col value="1,0.6cm, 1"/>
+						<padding left="0.2cm"/>
+						<text row_start="1" row_end="0" col_start="1" col_end="0" >'FIS'</text>
+						<padding all="0"/>
+						<line row_start="2" col_start="2" border="left|top|bottom|right" />
+						<lua>if params.code_regroupement:In('FIS','ELIT','FIS-B','ENL') then</lua>
+							<pen color="red" size="5" />
+							<line row_start="2" col_start="2" border="diag_up|diag_down" />
+							<pen color="black" size="1" />
+						<lua>end</lua>
+					</matrix>
+					
+					<matrix row_start="-1" col_start="2">
+						<row value="1,0.6cm, 1"/>
+						<col value="1,0.6cm, 1"/>
+						<padding left="0.2cm"/>
+						<text row_start="1" row_end="0" col_start="1" col_end="0" >'UNI'</text>
+						<padding all="0"/>
+						<line row_start="2" col_start="2" border="left|top|bottom|right" />
+						<lua>if params.code_regroupement:In('UNI') then</lua>
+							<pen color="red" size="5" />
+							<line row_start="2" col_start="2" border="diag_up|diag_down" />
+							<pen color="black" size="1" />
+						<lua>end</lua>
+					</matrix>
+
+					<matrix row_start="0" col_start="2">
+						<row value="1,0.6cm, 1"/>
+						<col value="1,0.6cm, 1"/>
+						<padding left="0.2cm"/>
+						<text row_start="1" row_end="0" col_start="1" col_end="0" >'CHI'</text>
+						<padding all="0"/>
+						<line row_start="2" col_start="2" border="left|top|bottom|right" />
+						<lua>if params.code_regroupement:In('CHI') then</lua>
+							<pen color="red" size="5" />
+							<line row_start="2" col_start="2" border="diag_up|diag_down" />
+							<pen color="black" size="1" />
+						<lua>end</lua>
+					</matrix>
+
+					<matrix row_start="-2" col_start="3">
+						<row value="1,0.6cm, 1"/>
+						<col value="1,0.6cm, 1"/>
+						<padding left="0.2cm"/>
+						<text row_start="1" row_end="0" col_start="1" col_end="0" >'NC'</text>
+						<padding all="0"/>
+						<line row_start="2" col_start="2" border="left|top|bottom|right" />
+						<lua>if params.code_regroupement:In('F','FC','FCJ','NC') then</lua>
+							<pen color="red" size="5" />
+							<line row_start="2" col_start="2" border="diag_up|diag_down" />
+							<pen color="black" size="1" />
+						<lua>end</lua>
+					</matrix>
+
+					<matrix row_start="-1" col_start="3">
+						<row value="1,0.6cm, 1"/>
+						<col value="1,0.6cm, 1"/>
+						<padding left="0.2cm"/>
+						<text row_start="1" row_end="0" col_start="1" col_end="0" >'ENL'</text>
+						<padding all="0"/>
+						<line row_start="2" col_start="2" border="left|top|bottom|right" />
+						<lua>if params.code_regroupement:In('ENL') then</lua>
+							<pen color="red" size="5" />
+							<line row_start="2" col_start="2" border="diag_up|diag_down" />
+							<pen color="black" size="1" />
+						<lua>end</lua>
+					</matrix>
+
+					<matrix row_start="0" col_start="3">
+						<row value="1,0.6cm, 1"/>
+						<col value="1,0.6cm, 1"/>
+						<padding left="0.2cm"/>
+						<text row_start="1" row_end="0" col_start="1" col_end="0" align="left">'Other'</text>
+						<padding all="0"/>
+					</matrix>
+					<font size_step="0"/>
+
+				</matrix>
+				<padding left="0"/>
+				<text col_start="2" row_start="-1" row_end="0" border="all" pen_size="2" />
+				
+				<!-- Bloc 1 ligne COUREUR -->
+				<matrix row="auto" col_start="1" col_end="2">
+					<padding left="0.2cm"/>
+					<row value="0.2cm, 0.6cm, 0.2cm" />
+					<col value="10cm, 0.6cm, 1.5cm, 0.6cm"/>
+					<font size_step="1"/>
+					<text col_start="1" col_end="1" row_start="2" row_end="2" font_weight="bold">'COMPETITORS / COUREURS / WETTKÄMPFER     L'</text>
+					<text col_start="3" col_end="3" row_start="2" row_end="2" font_weight="bold" align="right">'/ M  '</text>
+					<padding all="0"/>
+					<font size_step="0"/>
+					<line row_start="2" row_end="2" col_start="2" col_end="2" border="left|top|bottom|right" />
+					<line row_start="2" row_end="2" col_start="4" col_end="4" border="left|top|bottom|right" />
+					<lua>if params.sexe == 'F' or params.sexe == 'T' then</lua>
+						<pen color="red" size="5" />
+						<line row_start="2" col_start="2" border="diag_up|diag_down" />
+					<lua>end</lua>
+					<lua>if params.sexe == 'M' or params.sexe == 'T' then</lua>
+						<pen color="red" size="5" />
+						<line row_start="2" col_start="4" border="diag_up|diag_down" />
+					<lua>end</lua>
+
+					<pen color="black" size="1" />
+				</matrix>
+				<padding all="0"/>
+				<text col_start="1" col_end="2" border="all" pen_size="2" />
+			</matrix>
+			<padding all="0"/>
+			<row value="0.05cm" />
+		</header>
+		<first_header />
+		<label>
+			<padding all="0"/>
+			<col value="4, 12, 4, 4, 4, 4, 4, 4, 4, 5, 5"/>
+			<row value="0.5cm, 0.5cm, 0.5cm, 0.5cm"/>
+			
+			<font size="10" adjust="both" weight="bold"/>
+
+			<lua>for c = 1, 11 do</lua>
+				<text col_start="(c)" row_start="1" row_end="0" ><pen border="all"/></text>
+			<lua>end</lua>
+
+			<lua>c=1</lua>
+			<text col_start="(c)" row_start="1" align="center">'FIS'</text>
+			<text col_start="(c)" row_start="2" align="center">'Code'</text>
+
+			<lua>c=c+1</lua>
+			<text col_start="(c)" row_start="1" align="center">'Surname, First Name'</text>
+			<text col_start="(c)" row_start="2" font_weight="normal" font_style="italic" align="center">'Nom de famille, Prénom'</text>
+			<text col_start="(c)" row_start="3" font_weight="normal" font_style="italic" align="center">'Familienname, Vorname'</text>
+
+			<lua>c=c+1</lua>
+			<text col_start="(c)" row_start="1" align="center">'YB'</text>
+			<text col_start="(c)" row_start="2" align="center">'AN'</text>
+			<text col_start="(c)" row_start="3" align="center">'JG'</text>
+			
+			<lua>c=c+1</lua>
+			<text col_start="(c)" row_start="1" align="center">'DH'</text>
+			<lua>c=c+1</lua>
+			<text col_start="(c)" row_start="1" align="center">'SG'</text>
+			<lua>c=c+1</lua>
+			<text col_start="(c)" row_start="1" align="center">'GS'</text>
+			<lua>c=c+1</lua>
+			<text col_start="(c)" row_start="1" align="center">'SL'</text>
+			<lua>c=c+1</lua>
+			<text col_start="(c)" row_start="1" align="center">'AC'</text>
+			<lua>c=c+1</lua>
+			<text col_start="(c)" row_start="1" align="center">'NTE'</text>
+			<lua>c=c+1</lua>
+			<text col_start="(c)" row_start="1" >'Arrival'</text>
+			<text col_start="(c)" row_start="2" font_weight="normal" font_style="italic" >'Arrivée'</text>
+			<text col_start="(c)" row_start="3" font_weight="normal" font_style="italic"  font_size_step="-1">'Anreise'</text>
+			<text col_start="(c)" row_start="4" font_weight="normal" font_style="italic"  font_size_step="-1">'(dd.mm.yy)'</text>
+			<lua>c=c+1</lua>
+			<text col_start="(c)" row_start="1" font_weight="bold" font_size_step="-1">'Departure'</text>
+			<text col_start="(c)" row_start="2" font_weight="normal" font_style="italic" font_size_step="-1">'Départ'</text>
+			<text col_start="(c)" row_start="3" font_weight="normal" font_style="italic" font_size_step="-1">'Abreise'</text>
+			<text col_start="(c)" row_start="4" font_weight="normal" font_style="italic" font_size_step="-1">'(dd.mm.yy)'</text>
+
+		</label>
+		<footer>
+			<lua>if editor:GetPageCurrent() &lt; math.floor(body:GetNbRows() / 15) then</lua>
+				<text row="3cm" col="1">''</text>
+			<lua>end</lua>
+		</footer>
+		
+		<lua>bodyModulo(15)</lua>
+		<order key="Sexe,Nom,Prenom" />
+		<body>
+			<lua>nb_with_pts = nb_with_pts or 0; nb_without_pts = nb_without_pts or 0;</lua>
+			<lua>if $(IADH) == "X" then nb_without_pts = nb_without_pts +1 else if $(IADH):len() &gt;0 then nb_with_pts = nb_with_pts + 1 end end;</lua>
+			<lua>if $(IASG) == "X" then nb_without_pts = nb_without_pts +1 else if $(IASG):len() &gt;0 then nb_with_pts = nb_with_pts + 1 end end;</lua>
+			<lua>if $(IAGS) == "X" then nb_without_pts = nb_without_pts +1 else if $(IAGS):len() &gt;0 then nb_with_pts = nb_with_pts + 1 end end;</lua>
+			<lua>if $(IASL) == "X" then nb_without_pts = nb_without_pts +1 else if $(IASL):len() &gt;0 then nb_with_pts = nb_with_pts + 1 end end;</lua>
+			<lua>if $(IASC) == "X" then nb_without_pts = nb_without_pts +1 else if $(IASCDH):len() &gt;0 then nb_with_pts = nb_with_pts + 1 end end;</lua>
+			<font adjust="width" />
+			<row value="0.7cm" />
+			<col value="4, 12, 4, 4, 4, 4, 4, 4, 4, 5, 5"/>
+			<pen border="all" size="2" />
+			<font name="Calibri" size="10" adjust="both" weight="normal" />
+			<text col_start="1" align="center" >$(Code_coureur):sub(4)</text>
+			<text col_start="2" align="left">$(Identite)</text>
+			<text col_start="3" align="center">$(An)</text>
+			<text col_start="4" align="center">$(IADH)</text>
+			<text col_start="5" align="center">$(IASG)</text>
+			<text col_start="6" align="center">$(IAGS)</text>
+			<text col_start="7" align="center">$(IASL)</text>
+			<text col_start="8" align="center">$(IASC)</text>
+			<text col_start="9" align="center">$(NTE)</text>
+			<text col_start="10" align="center">$(Info)</text>
+			<text col_start="11" align="center">$(Niveau)</text>
+		</body>
+		<end>
+			<lua>if editor:GetPageCurrent() &gt;= math.floor(body:GetNbRows() / 15) then</lua>
+				<padding all="0"/>
+				<col value="4, 12, 4, 4, 4, 4, 4, 4, 4, 5, 5"/>
+				<font name="Calibri" size="10" adjust="both" weight="normal" />
+				<row value="0.6cm" />
+				<matrix col_start="1" col_end ="10">
+					<text col="auto" ><font weight="bold" size="10"/>'Entry with FIS points'</text>
+					<text col="auto" font_style="italic" >'/ Inscription avec points FIS / Anmeldung mit FIS Punkten'</text>
+				</matrix>
+				<text col_start="11" align="center"><pen border="all"/>nb_with_pts</text>
+				<row value="0.6cm" />
+				<matrix col_start="1" col_end ="10">
+					<text col="auto" ><font weight="bold" size="10"/>'Entry Without FIS points (X)'</text>
+					<text col="auto" font_style="italic" >'/ Inscription sans points FIS / Anmeldung ohne FIS punkte'</text>
+				</matrix>
+				<text col_start="11" align="center"><pen border="all"/>nb_without_pts</text>
+				<row value="0.6cm" />
+				<matrix col_start="1" col_end ="10">
+					<text col="auto" font_weight="bold">'No entry'</text>
+					<text col="auto" font_style="italic" >'/ Pas de participation / Keine Teilnahme'</text>
+				</matrix>
+				<text col_start="11" align="center"><pen border="all"/>''</text>
+				<matrix row_start="-2" row_end="0" col_start="8" col_end ="10" >
+					<col value="1,3" />
+					<row value="2" />
+					<image col_start="2" align="center" adjust="best" ><background mode="transparent"/>GetOfficielSignature(params.code_evenement, 'ResponsibleEntry', false)</image>
+					<text row="auto" align="center" >GetOfficiel(params.code_evenement, 'ResponsibleEntry')</text>
+				</matrix>
+				<matrix row_start="-2" col_start="5" col_end ="7" >
+					<col value="1" />
+					<row value="1cm" />
+					<row value="2cm" />
+					<image adjust="best" align="center"><background mode="transparent"/>GetOfficielSignature(params.code_evenement, 'NationalAssociation', false)</image>
+				</matrix>
+			<lua>end</lua>
+		</end>
+	</report>
+
+	<report id="Entry_form2" >
+		<lua>tEvenement_Officiel = base:GetTable('Evenement_Officiel');
+			tEpreuve = base:GetTable('Epreuve');
+			dofile('./interface/adv.lua');
+			dofile('./edition/functionPG.lua');
+		</lua>
+		<layers>
+			<layer id="entryformfis">
+			</layer>
+		</layers>
+		<header>
+			<spacing all="4" />
+			<padding all="0"/>
+			<col value="1" />
+			<matrix row="auto">
+				<font name="Calibri" size="13" adjust="height" weight="bold"/>
+				<pen border="0" />
+				<col value="2cm, 1" />
+				<row value="1cm" />
+				<text row="auto" >'ENTRY FORM'</text>
+				<text row="auto" font_style="italic" font_weight="normal">'FORMULAIRE D\'INSCRIPTION'</text>
+				<text row="auto" font_weight="normal">'ANMELDUNGSFORMULAR'</text>
+			</matrix>
+		</header>
+		<first_header />
+		<footer />
+		<body />
+		<end>
+			<padding all="0"/>
+			<col value="4, 3, 3, 5"/>
+			<font size="10" adjust="both" weight="normal"/>
+
+			<!-- Dessins des Cadres : 23 lignes definies en tout -->
+			<row value="0.9cm" />
+			<text col_start="1" col_end="4" row_start="0"><pen border="all"/></text>
+			<row value="2cm" />
+			<lua>for c = 1, 4 do</lua>
+				<text col_start="(c)" row_start="0"><pen border="all"/></text>
+			<lua>end</lua>
+			<text col_start="1" col_end="4" row_start="0"><pen border="all"/></text>
+			<lua>for lng = 1, 20 do</lua>
+				<row value="0.9cm" />
+				<text col_start="4" row_start="0"><pen border="all"/></text>
+				<!-- <lua>for c = 1, 4 do</lua> -->
+					<!-- <text col_start="(c)" row_start="0"><pen border="all"/>'Z'</text> -->
+				<!-- <lua>end</lua> -->
+			<lua>end</lua>
+			<row value="1.6cm" />
+			<text col_start="1" col_end="2" row_start="0"><pen border="all"/></text>
+			<text col_start="3" col_end="4" row_start="0"><pen border="all"/></text>
+
+			<!-- valeurs fixes -->
+			<lua>r=1</lua>
+			<matrix row_start="(r)" col_start="1" col_end="4">
+				<padding left="0.2cm"/>
+				<text col="auto" align="left" font_weight="bold">'Official'</text>
+				<text col="auto" font_style="italic" >'/ Officiels / Offizielle'</text>
+			</matrix>
+			
+			<lua>r=r+1</lua>
+			<matrix row_start="(r)" col_start="1">
+				<col value="1" />
+				<row value="1,1,1,1" />
+				<padding left="0.2cm"/>
+				<text row_start="-3" font_weight="bold">'Surname , First Name'</text>
+				<text row_start="-2" font_style="italic" font_size_step="-1">'Nom, Prénom'</text>
+				<text row_start="-1" font_style="italic" font_size_step="-1">'Familienname, Vorname'</text>
+			</matrix>
+			<matrix row_start="(r)" col_start="2">
+				<col value="1" />
+				<row value="1,1,1,1" />
+				<padding left="0.2cm"/>
+				<text row_start="-3" font_weight="bold">'Arrival'</text>
+				<text row_start="-2" font_style="italic" font_size_step="-1">'Arrivée'</text>
+				<text row_start="-1" font_style="italic" font_size_step="-1">'Anreise'</text>
+				<text row_start="0" font_style="italic" font_size_step="-1">'(dd.mm.yyyy)'</text>
+			</matrix>
+			<matrix row_start="(r)" col_start="3">
+				<col value="1" />
+				<row value="1,1,1,1" />
+				<padding left="0.2cm"/>
+				<text row_start="-3" font_weight="bold">'Departure'</text>
+				<text row_start="-2" font_style="italic" font_size_step="-1">'Départ'</text>
+				<text row_start="-1" font_style="italic" font_size_step="-1">'Abreise'</text>
+				<text row_start="0" font_style="italic" font_size_step="-1">'(dd.mm.yyyy)'</text>
+			</matrix>
+			<matrix row_start="(r)" col_start="4">
+				<col value="1" />
+				<row value="1,1,1,1" />
+				<padding left="0.2cm"/>
+				<text row_start="-3" font_weight="bold">'Position on the team'</text>
+				<text row_start="-2" font_style="italic" font_size_step="-1">'Position dans l\'équipe'</text>
+				<text row_start="-1" font_style="italic" font_size_step="-1">'Position im Team'</text>
+			</matrix>
+			<matrix row_start="-20" col_start="4">
+				<row value="1,1" />
+				<padding left="0.1cm"/>
+				<text col="auto" row_start="1" font_weight="bold">'Team Captain'</text>
+				<text col="auto" row_start="1" font_style="italic" >'/ Chef d\'équipe'</text>
+				<text col_start="1" col_end="2" row_start="2" font_style="italic" >'Mannschaftsführer'</text>
+			</matrix>
+			<matrix row_start="-19" col_start="4">
+				<row value="auto" />
+				<padding left="0.1cm"/>
+				<text col="auto" row_start="0" font_weight="bold">'Trainer'</text>
+				<text col="auto" row_start="0" font_style="italic" >'/ Entraîneur'</text>
+				<text col="auto" row_start="0" font_style="italic" >'/ Trainer'</text>
+			</matrix>
+			<matrix row_start="-13" col_start="4">
+				<row value="auto" />
+				<padding left="0.1cm"/>
+				<text col="auto" row_start="0" font_weight="bold">'Doctor'</text>
+				<text col="auto" row_start="0" font_style="italic" >'/ Médecin'</text>
+				<text col="auto" row_start="0" font_style="italic" >'/ Arzt'</text>
+			</matrix>
+			<matrix row_start="-11" col_start="4">
+				<row value="auto" />
+				<padding left="0.1cm"/>
+				<text col="3" row_start="0" font_weight="bold">'Physiotherapist'</text>
+				<text col="2" row_start="0" font_style="italic" >'/ Masseur'</text>
+				<text col="2" row_start="0" font_style="italic" >'/ Masseur'</text>
+			</matrix>
+			<matrix row_start="-9" col_start="4">
+				<row value="auto" />
+				<padding left="0.1cm"/>
+				<text col="12" row_start="0" font_weight="bold">'Technicians'</text>
+				<text col="13" row_start="0" font_style="italic" >'/ Techniciens'</text>
+				<text col="11" row_start="0" font_style="italic" >'/ Techniker'</text>
+			</matrix>
+			<matrix row_start="-8" col_start="4">
+				<row value="1,1" />
+				<padding left="0.1cm"/>
+				<text col="auto" row_start="1" font_weight="bold">'Service personnel'</text>
+				<text col="auto" row_start="1" font_style="italic" >'/ Personnel de'</text>
+				<text col_start="1" col_end="2" row_start="2" font_style="italic" >'service / Servicepersonal'</text>
+			</matrix>
+			<matrix row_start="0" col_start="1">
+				<row value="1,1" />
+				<padding left="0.1cm"/>
+				<text col="auto" row_start="1" font_weight="bold">'Place, Date'</text>
+				<text col="auto" row_start="1" font_style="italic" >'/ Lieu, date / Ort, Datum'</text>
+			</matrix>
+			<matrix row_start="0" col_start="3" col_end="0">
+				<col value="1" />
+				<row value="1,3" />
+				<matrix col_start="1" row_start="1">
+					<padding all="0"/>
+					<text col="auto" font_weight="bold">'Signature'</text>
+					<text col="auto" font_style="italic" >'/ Signature / Unterschrift'</text>
+					<text col="auto" font_style="italic" font_size_step="-2">'(please print and sign)'</text>
+				</matrix>
+				<matrix col_start="1" row_start="2">
+					<col value="3,2,2" />
+					<text col_start="1" align="center" adjust="width" >GetOfficiel(params.code_evenement,'ResponsibleEntry')</text>
+					<image col_start="2" align="center" adjust="best"><background mode="transparent"/>GetOfficielSignature(params.code_evenement,'ResponsibleEntry', false)</image>
+					<!-- <image col_start="3" align="center" adjust="best"><background mode="transparent"/>GetOfficielSignature(params.code_evenement,'NationalAssociation')</image> -->
+				</matrix>
+			</matrix>
+			<!-- data -->
+			<spacing all="0" />
+			<padding all="0"/>
+			<lua>tEvenement_Officiel = GetOfficiel(params.code_evenement, 'TeamCaptain', false, true);</lua>
+			<text col_start="1" row_start="3"><pen border="all" />'  '..tEvenement_Officiel:GetCell('Nom', 0)..' '..tEvenement_Officiel:GetCell('Prenom', 0)</text>
+			<text col_start="2" row_start="3" cond="tEvenement_Officiel:GetCell('Nom', 0):len() &gt;0"><pen border="all" />'  '..tEvenement_Officiel:GetCell('Date_arrivee', 0,'%2D.%2M.%4Y')</text>
+			<text col_start="3" row_start="3" cond="tEvenement_Officiel:GetCell('Nom', 0):len() &gt;0"><pen border="all" />'  '..tEvenement_Officiel:GetCell('Date_depart', 0,'%2D.%2M.%4Y')</text>
+			<text col_start="2" row_start="3" cond="tEvenement_Officiel:GetCell('Nom', 0):len() == 0"><pen border="all" /></text>
+			<text col_start="3" row_start="3" cond="tEvenement_Officiel:GetCell('Nom', 0):len() == 0"><pen border="all" /></text>
+			<lua>tEvenement_Officiel = GetOfficiel(params.code_evenement, 'Trainer', false, true);</lua>
+			<lua>for i = 1, 6 do</lua>
+				<text col_start="1" row_start="(i+3)"><pen border="all" />'  '..tEvenement_Officiel:GetCell('Nom', i-1)..' '..tEvenement_Officiel:GetCell('Prenom', i-1)</text>
+				<text col_start="2" row_start="(i+3)" cond="tEvenement_Officiel:GetCell('Nom', i-1):len() &gt;0"><pen border="all" />'  '..tEvenement_Officiel:GetCell('Date_arrivee', i-1,'%2D.%2M.%4Y')</text>
+				<text col_start="3" row_start="(i+3)" cond="tEvenement_Officiel:GetCell('Nom', i-1):len() &gt;0"><pen border="all" />'  '..tEvenement_Officiel:GetCell('Date_depart', i-1,'%2D.%2M.%4Y')</text>
+				<text col_start="2" row_start="(i+3)" cond="tEvenement_Officiel:GetCell('Nom', i-1):len() == 0"><pen border="all" /></text>
+				<text col_start="3" row_start="(i+3)" cond="tEvenement_Officiel:GetCell('Nom', i-1):len() == 0"><pen border="all" /></text>
+			<lua>end</lua>
+			<lua>tEvenement_Officiel = GetOfficiel(params.code_evenement, 'Doctor', false, true);</lua>
+			<lua>for i = 1, 2 do</lua>
+				<text col_start="1" row_start="(i+9)"><pen border="all" />'  '..tEvenement_Officiel:GetCell('Nom', i-1)..' '..tEvenement_Officiel:GetCell('Prenom', i-1)</text>
+				<text col_start="2" row_start="(i+9)" cond="tEvenement_Officiel:GetCell('Nom', i-1):len() &gt;0"><pen border="all" />'  '..tEvenement_Officiel:GetCell('Date_arrivee', i-1,'%2D.%2M.%4Y')</text>
+				<text col_start="3" row_start="(i+9)" cond="tEvenement_Officiel:GetCell('Nom', i-1):len() &gt;0"><pen border="all" />'  '..tEvenement_Officiel:GetCell('Date_depart', i-1,'%2D.%2M.%4Y')</text>
+				<text col_start="2" row_start="(i+9)" cond="tEvenement_Officiel:GetCell('Nom', i-1):len() == 0"><pen border="all" /></text>
+				<text col_start="3" row_start="(i+9)" cond="tEvenement_Officiel:GetCell('Nom', i-1):len() == 0"><pen border="all" /></text>
+			<lua>end</lua>
+			<lua>tEvenement_Officiel = GetOfficiel(params.code_evenement, 'Physiotherapist', false, true);</lua>
+			<lua>for i = 1, 2 do</lua>
+				<text col_start="1" row_start="(i+11)"><pen border="all" />'  '..tEvenement_Officiel:GetCell('Nom', i-1)..' '..tEvenement_Officiel:GetCell('Prenom', i-1)</text>
+				<text col_start="2" row_start="(i+11)" cond="tEvenement_Officiel:GetCell('Nom', i-1):len() &gt;0"><pen border="all" />'  '..tEvenement_Officiel:GetCell('Date_arrivee', i-1,'%2D.%2M.%4Y')</text>
+				<text col_start="3" row_start="(i+11)" cond="tEvenement_Officiel:GetCell('Nom', i-1):len() &gt;0"><pen border="all" />'  '..tEvenement_Officiel:GetCell('Date_depart', i-1,'%2D.%2M.%4Y')</text>
+				<text col_start="2" row_start="(i+11)" cond="tEvenement_Officiel:GetCell('Nom', i-1):len() == 0"><pen border="all" /></text>
+				<text col_start="3" row_start="(i+11)" cond="tEvenement_Officiel:GetCell('Nom', i-1):len() == 0"><pen border="all" /></text>
+			<lua>end</lua>
+			<lua>tEvenement_Officiel = GetOfficiel(params.code_evenement, 'Technician', false, true);</lua>
+			<text col_start="1" row_start="14"><pen border="all" />'  '..tEvenement_Officiel:GetCell('Nom', 0)..' '..tEvenement_Officiel:GetCell('Prenom', 0)</text>
+			<text col_start="2" row_start="14" cond="tEvenement_Officiel:GetCell('Nom', 0):len() &gt;0"><pen border="all" />'  '..tEvenement_Officiel:GetCell('Date_arrivee', 0,'%2D.%2M.%4Y')</text>
+			<text col_start="3" row_start="14" cond="tEvenement_Officiel:GetCell('Nom', 0):len() &gt;0"><pen border="all" />'  '..tEvenement_Officiel:GetCell('Date_depart', 0,'%2D.%2M.%4Y')</text>
+			<text col_start="2" row_start="14" cond="tEvenement_Officiel:GetCell('Nom', 0):len() == 0"><pen border="all" /></text>
+			<text col_start="3" row_start="14" cond="tEvenement_Officiel:GetCell('Nom', 0):len() == 0"><pen border="all" /></text>
+			<lua>tEvenement_Officiel = GetOfficiel(params.code_evenement, 'ServicePersonnal', false, true);</lua>
+			<lua>for i = 1, 8 do</lua>
+				<text col_start="1" row_start="(i+14)"><pen border="all" />'  '..tEvenement_Officiel:GetCell('Nom', i-1)..' '..tEvenement_Officiel:GetCell('Prenom', i-1)</text>
+				<text col_start="2" row_start="(i+14)" cond="tEvenement_Officiel:GetCell('Nom', i-1):len() &gt;0"><pen border="all" />'  '..tEvenement_Officiel:GetCell('Date_arrivee', i-1,'%2D.%2M.%4Y')</text>
+				<text col_start="3" row_start="(i+14)" cond="tEvenement_Officiel:GetCell('Nom', i-1):len() &gt;0"><pen border="all" />'  '..tEvenement_Officiel:GetCell('Date_depart', i-1,'%2D.%2M.%4Y')</text>
+				<text col_start="2" row_start="(i+14)" cond="tEvenement_Officiel:GetCell('Nom', i-1):len() == 0"><pen border="all" /></text>
+				<text col_start="3" row_start="(i+14)" cond="tEvenement_Officiel:GetCell('Nom', i-1):len() == 0"><pen border="all" /></text>
+			<lua>end</lua>
+			<padding top="0.4cm"/>
+			<lua>tEvenement_Officiel = GetOfficiel(params.code_evenement, 'NationalAssociation', false, true);</lua>
+			<text row="2cm" col_start="1" row_start="23">'  '..tEvenement_Officiel:GetCell('Ville', 0):upper()..' LE '..os.date("%d/%m/%Y")</text>
+		</end>
+	</report>
+</edition>
+
