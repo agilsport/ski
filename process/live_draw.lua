@@ -1047,25 +1047,22 @@ function OnRAZData(colonne)
 	end
 	draw.bib_done = false;
 	for i = 0, tDraw:GetNbRows() -1 do
+		tDraw:SetCell('Pris', i, 0);
 		if colonne == 'Rang_tirage' then
 			tDraw:SetCellNull('Rang_tirage', i);
-			tDraw:SetCell('Pris', i, 0);
+			tDraw:SetCellNull('Critere', i);
 		elseif colonne == 'Groupe_tirage' then 
-			tDraw:SetCellNull('Rang_tirage', i);
 			tDraw:SetCell('Groupe_tirage', i, 5);
-			tDraw:SetCell('Pris', i, 0);
 		elseif colonne == 'All' then 
 			tDraw:SetCellNull('Rang_tirage', i);
 			tDraw:SetCell('Groupe_tirage', i, 5);
-			tDraw:SetCell('Pris', i, 0);
 		elseif colonne == 'Dossard' then
 			tDraw:SetCellNull('Dossard', i);
-			tDraw:SetCell('Pris', i, 0);
 		elseif colonne == 'Tout' then
-			tDraw:SetCellNull('Dossard', i);
 			tDraw:SetCellNull('Rang_tirage', i);
-			tDraw:SetCell('Pris', i, 0);
 			tDraw:SetCell('Groupe_tirage', i, 5);
+			tDraw:SetCellNull('Critere', i);
+			tDraw:SetCellNull('Dossard', i);
 		end
 	end
 	if colonne == 'Dossard' then
@@ -1264,18 +1261,18 @@ function OnChangeDossard(row)
 		draw.tDossards_pris = draw.tDossards_pris or {};
 		draw.tDossards_pris[dossard] = dossard;
 	end
-	dlgTableau:GetWindowName('info'):SetValue('Dossard '..dossard..' attribué pour '..tDraw:GetCell('Nom', row)..' '..tDraw:GetCell('Prenom', row));
 	local nodeRaceEvent = xmlNode.Create(nil, xmlType.ELEMENT_NODE, "raceevent");
 	local code_coureur = tDraw:GetCell('Code_coureur', row):sub(4);;
 	local nodeDrawBib = xmlNode.Create(nodeRaceEvent, xmlType.ELEMENT_NODE, "drawbib");
 	local nodeBib = xmlNode.Create(nodeDrawBib, xmlType.ELEMENT_NODE, "bib", dossard);
 	nodeDrawBib:AddAttribute('fiscode', code_coureur);
 	nodeRoot = xmlNode.Create(nil, xmlType.ELEMENT_NODE, "livetiming");
-	nodeCommand = xmlNode.Create(nil, xmlType.ELEMENT_NODE, "command");
-	local nodeDrawInProgress = xmlNode.Create(nodeCommand, xmlType.ELEMENT_NODE, "drawinprogress");
+	-- nodeCommand = xmlNode.Create(nil, xmlType.ELEMENT_NODE, "command");
+	-- local nodeDrawInProgress = xmlNode.Create(nodeCommand, xmlType.ELEMENT_NODE, "drawinprogress");
 	nodeRoot:AddChild(nodeRaceEvent);
 	-- nodeRoot:AddChild(nodeCommand);
 	CreateXML(nodeRoot);
+	dlgTableau:GetWindowName('info'):SetValue('Dossard '..dossard..' attribué pour '..tDraw:GetCell('Nom', row)..' '..tDraw:GetCell('Prenom', row));
 end
 
 function OnChangeStatut(row)
@@ -1341,6 +1338,7 @@ function OnCellChanged(evt)
 			grid_tableau:RefreshCell(row, col);
 		end
 		OnChangeStatut(row);
+		base:TableBulkUpdate(tDraw, 'Statut', 'Resultat_Info_Tirage');
 	elseif colName == 'Dossard' then
 		draw.double_tirage_bibo = false;
 		local dossard = t:GetCellInt('Dossard', row);
@@ -1354,12 +1352,10 @@ function OnCellChanged(evt)
 		OnChangeDossard(row);
 		grid_tableau:SynchronizeRows();
 		base:TableBulkUpdate(tDraw, 'Dossard', 'Resultat');
-		-- local tb = dlgTableau:GetWindowName('tbtableau');
-		-- if tb then
-			-- tb:EnableTool(btnPrintDoubleTirageBibo:GetId(), false);
-		-- end
 	elseif colName == 'Rang_tirage' then
 		OnReOrder(tonumber(evt:GetString(row)), tDraw:GetCellInt('Rang_tirage',row), tDraw:GetCell('Code_coureur', row));
+		grid_tableau:SynchronizeRows();
+		base:TableBulkUpdate(tDraw, 'Rang_tirage', 'Resultat_Info_Tirage');
 	end
 end
 
@@ -2256,8 +2252,10 @@ function OnAfficheTableau()
 		function(evt)
 			ChecktDraw();
 			OnPrintDoubleTirage(1);
-			if draw.bolEstCE then
-				OnPrintDoubleTirage(2);
+			if not draw.bolVitesse then
+				if draw.bolEstCE or draw.code_niveau == 'NC' then
+					OnPrintDoubleTirage(2);
+				end
 			end
 		end, btnPrintDoubleTirageBibo);
 		
@@ -2732,7 +2730,7 @@ function main(params_c)
 	draw.height = display:GetSize().height - 30;
 	draw.x = 0;
 	draw.y = 0;
-	draw.version = "1.31";
+	draw.version = "1.32";
 	draw.orderbyCE = 'Rang_tirage, Groupe_tirage, ECSL_points DESC, WCSL_points DESC, ECSL_overall_points DESC, Winner_CC DESC, FIS_pts, Nom, Prenom';
 	draw.orderbyFIS = 'Rang_tirage, Groupe_tirage, FIS_pts, Nom, Prenom';
 	draw.hostname = 'live.fisski.com';
