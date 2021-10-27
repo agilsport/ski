@@ -859,8 +859,10 @@
 	
 	<row h="auto"/>
 	<statictext col_start="1" label="Code" font_color="red" font_weight="bold" />
-	<combotable col_start="2"  name="origine_coureur" />
-	<searchctrl col_start="3" col_end="0" name="code" />
+	<combotable col_start="2" name="origine_coureur" />
+	<searchctrl col_start="3" col_end="4" name="code" />
+	<statictext col_start="5" label="Dossard" font_color="red" font_weight="bold" />
+	<textctrl col_start="6" name="Dossard" validator="Resultat.Dossard"/>
 
 	<row h="auto"/>
 	<statictext col_start="1" label="Nom" font_color="red" font_weight="bold" />
