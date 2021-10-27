@@ -5,9 +5,9 @@
 	<panel id="print">
 		<lua>dofile('./interface/adv.lua');
 			dofile('./edition/functionPG.lua');
-			tTableTirage1 = base:GetTable('_TableTirage1');
 			tableDossards1 = params.tableDossards1 or {};
 			tableDossards2 = params.tableDossards2 or {};
+			
 			params.Draw = params.Draw or 0;
 			params.NbGroupe1 = params.NbGroupe1 or 0;
 			params.NC = params.NC or 0;
@@ -25,8 +25,8 @@
 			<row value="0.6cm" />
 			<font name="Calibri" size="10" adjust="ellipsize" weight="normal"/>
 			<col value="1"/>
-			<text row="0.6cm" font_weight="bold" cond="params.Draw &gt; 0" font_size_step="1">'Impression des tables de tirage pour le groupe '..params.Draw</text>
-			<text row="0.6cm" font_weight="bold" cond="params.Draw == 0" font_size_step="1">'Impression des tables de tirage'</text>
+			<text row="0.6cm" font_weight="bold" cond="params.Draw &gt; 0" font_size_step="1">'Impression toto des tables de tirage pour le groupe '..params.Draw</text>
+			<text row="0.6cm" font_weight="bold" cond="params.Draw == 0" font_size_step="1">'Impression tata des tables de tirage'</text>
 			<text row="0.6cm" font_weight="bold" font_size_step="1">'1. Table des dossards (par mélange de Fisher-Yates)'</text>
 			<text row="0.6cm" font_weight="bold" font_size_step="1">'Tirage 1 : il y a '..#tableDossards1..' dossards à affecter'</text>
 			<row value="0.3cm" />
@@ -52,18 +52,14 @@
 				<text col_start="2" align="center" font_weight="bold" font_size_step="1">'Points'</text>
 				<text col_start="3" align="center" font_weight="bold" font_size_step="1">'Rang fictif'</text>
 				<text col_start="4" align="center" font_weight="bold" font_size_step="1">'dossard correspondant'</text>
-				<lua>for i = 1, #tableDossards2 do
-						identite = tableDossards2[i].Identite;
-						point = tableDossards2[i].Pts;
-						rang_fictif = tableDossards2[i].RangFictif;
-						dossard = tableDossards2[i].Dossard;</lua>
+				<lua>for i = 1, #tableDossards2 do </lua>
 						<background color="white" mode="solid" cond="i%2 == 0"/>
 						<background color="ltgray" mode="solid" cond="i%2 == 1"/>
-						<text row="0.6cm" col_start="1" align="left" cond="i &lt; 9">(i+params.NbGroupe1)..'.  '..identite</text>
-						<text row="0.6cm" col_start="1" align="left" cond="i &gt;= 9">(i+params.NbGroupe1)..'.'..identite</text>
-						<text col_start="2" align="center">point</text>
-						<text col_start="3" align="center">rang_fictif</text>
-						<text col_start="4" align="center">dossard</text>
+						<text row="0.6cm" col_start="1" align="left" cond="i &lt; 10">(i+params.NbGroupe1)..'.  '..tableDossards2[i].Identite</text>
+						<text row="0.6cm" col_start="1" align="left" cond="i &gt;= 10">(i+params.NbGroupe1)..'.'..tableDossards2[i].Identite</text>
+						<text col_start="2" align="center">tableDossards2[i].Pts</text>
+						<text col_start="3" align="center">tableDossards2[i].RangFictif</text>
+						<text col_start="4" align="center">tableDossards2[i].Dossard</text>
 				<lua>end</lua>
 			</matrix>
 		</first_header>
@@ -85,100 +81,4 @@
 			</matrix>
 		</footer>
 	</panel>
-	<!-- <panel id="printold"> -->
-		<!-- <lua>dofile('./interface/adv.lua'); -->
-			<!-- dofile('./edition/functionPG.lua'); -->
-			<!-- tTableTirage1 = base:GetTable('_TableTirage1'); -->
-			<!-- tableDossards1 = params.tableDossards1; -->
-			<!-- params.Draw = params.Draw or 0; -->
-			<!-- params.NbGroupe1 = params.NbGroupe1 or 0; -->
-			<!-- params.NC = params.NC or 0; -->
-			<!-- if params.Draw == 0 then -->
-				<!-- tResultat = base:GetTable('Resultat'); -->
-			<!-- else -->
-				<!-- tDrawG6 = base:GetTable('DrawG6'); -->
-			<!-- end -->
-		<!-- </lua> -->
-		<!-- <header> -->
-			<!-- <col value="1" /> -->
-			<!-- <spacing all="0"/> -->
-			<!-- <padding all="0"/> -->
-			<!-- <pen border="none"/> -->
-			<!-- <font name="Calibri" size="13" adjust="width" weight="bold"/> -->
-			<!-- <text row="auto" col_start="1" align="center">params.Nom</text> -->
-			<!-- <text row="auto" col_start="1" align="center">'Double tirage au sort des dossards du BIBO.\nLes deux tirages sont faits par deux méthodes différentes.'</text> -->
-		<!-- </header> -->
-		<!-- <first_header> -->
-			<!-- <row value="0.6cm" /> -->
-			<!-- <font name="Calibri" size="10" adjust="ellipsize" weight="normal"/> -->
-			<!-- <col value="1"/> -->
-			<!-- <text row="0.6cm" font_weight="bold" cond="params.Draw &gt; 0" font_size_step="1">'Impression des tables de tirage pour le groupe '..params.Draw</text> -->
-			<!-- <text row="0.6cm" font_weight="bold" cond="params.Draw == 0" font_size_step="1">'Impression des tables de tirage'</text> -->
-			<!-- <text row="0.6cm" font_weight="bold" font_size_step="1">'1. Table des dossards (par mélange de Fisher-Yates)'</text> -->
-			<!-- <text row="0.6cm" font_weight="bold" font_size_step="1">'Tirage 1 : il y a '..#tableDossards1..' dossards à affecter'</text> -->
-			<!-- <row value="0.3cm" /> -->
-			<!-- <pen border="all"/> -->
-			<!-- <matrix row="auto" col_start="1"> -->
-				<!-- <col value="7cm,1cm"/> -->
-				<!-- <lua>for i = 1, #tableDossards1 do</lua> -->
-					<!-- <background color="white" mode="solid" cond="i%2 == 0"/> -->
-					<!-- <background color="ltgray" mode="solid" cond="i%2 == 1"/> -->
-					<!-- <text row="0.6cm" col_start="1" align="left">'dossard du rang fictif '..i</text> -->
-					<!-- <text col_start="2" align="center">tableDossards1[i]</text> -->
-				<!-- <lua>end</lua> -->
-			<!-- </matrix> -->
-			<!-- <pen border="none"/> -->
-			<!-- <row value="0.5cm" /> -->
-			<!-- <text row="0.6cm" col_start="1" font_weight="bold" font_size_step="1">'Tirage 2 : tirage au sort du rang fictif des coureurs (tirage aléatoire "sans remise")'</text> -->
-			<!-- <row value="0.3cm" /> -->
-			<!-- <pen border="all"/> -->
-			<!-- <matrix row="auto" col_start="1"> -->
-				<!-- <col value="7cm,2.5cm,3.5cm,4cm"/> -->
-				<!-- <background color="ltgray" mode="solid"/> -->
-				<!-- <text row="0.6cm" col_start="1" align="center" font_weight="bold" font_size_step="1">'Rang dans le tableau. Identité'</text> -->
-				<!-- <text col_start="2" align="center" font_weight="bold" font_size_step="1">'Points'</text> -->
-				<!-- <text col_start="3" align="center" font_weight="bold" font_size_step="1">'Rang fictif'</text> -->
-				<!-- <text col_start="4" align="center" font_weight="bold" font_size_step="1">'dossard correspondant'</text> -->
-				<!-- <lua>for i = 0, tTableTirage1:GetNbRows() -1 do -->
-						<!-- if params.Draw == 0 then -->
-							<!-- identite = tResultat:GetCell('Nom', i)..' '..tResultat:GetCell('Prenom', i); -->
-							<!-- point = tResultat:GetCellDouble('Point', i); -->
-						<!-- else -->
-							<!-- identite = tDrawG6:GetCell('Nom', i)..' '..tDrawG6:GetCell('Prenom', i); -->
-							<!-- if params.NC == 0 then -->
-								<!-- point = tDrawG6:GetCellDouble('FIS_pts', i); -->
-							<!-- else -->
-								<!-- point = tDrawG6:GetCellDouble('Point', i); -->
-							<!-- end -->
-						<!-- end -->
-						<!-- local ligne = tTableTirage1:GetCellInt('Row', i); -->
-						<!-- dossard = tableDossards1[ligne];</lua> -->
-						<!-- <background color="white" mode="solid" cond="i%2 == 0"/> -->
-						<!-- <background color="ltgray" mode="solid" cond="i%2 == 1"/> -->
-						<!-- <text row="0.6cm" col_start="1" align="left" cond="i &lt; 9">(i+1+params.NbGroupe1)..'.  '..identite</text> -->
-						<!-- <text row="0.6cm" col_start="1" align="left" cond="i &gt;= 9">(i+1+params.NbGroupe1)..'.'..identite</text> -->
-						<!-- <text col_start="2" align="center">point</text> -->
-						<!-- <text col_start="3" align="center">ligne</text> -->
-						<!-- <text col_start="4" align="center">dossard</text> -->
-				<!-- <lua>end</lua> -->
-			<!-- </matrix> -->
-		<!-- </first_header> -->
-		
-		<!-- <footer> -->
-			<!-- <background mode="transparent"/> -->
-			<!-- <font name="Calibri" size="8" adjust="width" weight="normal"/> -->
-			<!-- <pen border="none"/> -->
-			<!-- <text row="auto" col="1" align="left"/> -->
-			<!-- <line col_start="1" col_end="0" pen_size="2" pen_color="dkgray" border="bottom"/> -->
-			<!-- <row value="auto"/> -->
-			<!-- <matrix col_start="1"> -->
-				<!-- <row value="auto"/> -->
-				<!-- <text col="auto" align="left">app.GetName()..' Version '..app.GetVersion()..' / FFS'</text> -->
-				<!-- <image col="0.4cm" adjust="width" align="left">'./res/32x32_ffs.png'</image> -->
-				<!-- <text col="auto" align="left">' / Agil Informatique'</text> -->
-				<!-- <image col="0.4cm" adjust="width" align="left">'./res/32x32_agil.png'</image> -->
-				<!-- <text col="auto" align="left">'/ Ph.Guérindon (v '..params.Version..')'..os.date(' / Edition du %d-%m-%Y à %H:%M:%S')</text> -->
-			<!-- </matrix> -->
-		<!-- </footer> -->
-	<!-- </panel> -->
 </root>

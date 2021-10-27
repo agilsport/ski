@@ -1013,6 +1013,8 @@ function OnRAZData(colonne)
 			return;
 		end
 	end
+	local cmd = 'Delete From Resultat_Info_Bibo Where Code_evenement = '..draw.code_evenement;
+	base:Query(cmd);
 	draw.bib_done = false;
 	for i = 0, tDraw:GetNbRows() -1 do
 		tDraw:SetCell('Pris', i, 0);
@@ -2698,7 +2700,7 @@ function main(params_c)
 	draw.height = display:GetSize().height - 30;
 	draw.x = 0;
 	draw.y = 0;
-	draw.version = "1.4";
+	draw.version = "1.5";
 	draw.orderbyCE = 'Rang_tirage, Groupe_tirage, ECSL_points DESC, WCSL_points DESC, ECSL_overall_points DESC, Winner_CC DESC, FIS_pts, Nom, Prenom';
 	draw.orderbyFIS = 'Rang_tirage, Groupe_tirage, FIS_pts, Nom, Prenom';
 	draw.hostname = 'live.fisski.com';

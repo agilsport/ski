@@ -8,6 +8,17 @@ function OnPrintDoubleTirage(groupe)
 		OnEncodeJsonBibo(params.code_evenement, groupe);
 		params.tableDossards1, params.tableDossards2 = OnDecodeJsonBibo(params.code_evenement, groupe);
 	end
+	if tResultat_Info_Bibo:GetNbRows() == 0 then
+		if groupe == 1 then
+			app.GetAuiFrame():MessageBox("Il n'y a rien à imprimer dans ce contexte",
+							"Impression", 
+							msgBoxStyle.OK+msgBoxStyle.ICON_WARNING
+							);
+			return;
+		else
+			return;
+		end
+	end
 	if groupe == 1 then
 		report = wnd.LoadTemplateReportXML({
 			xml = './process/dossardDoubleTirage.xml',
@@ -56,25 +67,36 @@ function OnPrintDoubleTirage(groupe)
 end
 
 function GetBibo()
-	resultat = {};
-	params.pts15 = tResultat:GetCellDouble('Point', 14);
-	resultat.pts15 = tResultat:GetCellDouble('Point', 14);
+	params.pts_7 = tResultat:GetCellDouble('Point', 6);
+	params.pts_15 = tResultat:GetCellDouble('Point', 14);
+	params.last_row_bibo = nil; params.row_pts7 = nil;
+
 	params.nb_bibo = 0;
 	params.nb_classes = 0;
 	params.nb_non_classes = 0;
 	params.first_row_non_classe = nil;
-	params.last_row_bibo = 0;
 	for row = 0, tResultat:GetNbRows() -1 do
 		local point = tResultat:GetCellDouble('Point', row, -1);
-		if point >= 0 then
-			if point <= params.pts15 then
-				params.nb_bibo = params.nb_bibo + 1;
+		if point == params.pts_15 then
+			if not params.last_row_bibo then
 				params.last_row_bibo = row;
+			end
+		end
+		if point == params.pts_7 then
+			if not params.row_pts7 then
+				params.row_pts7 = row;
+			end
+		end
+		if point >= 0 then
+			if point <= params.pts_15 then
+				params.nb_bibo = params.nb_bibo + 1;
 			else
 				params.nb_classes = params.nb_classes + 1;
 			end
 		else
-			params.first_row_non_classe = params.first_row_non_classe or row;
+			if not params.first_row_non_classe then
+				params.first_row_non_classe = row;
+			end
 			params.nb_non_classes = params.nb_non_classes + 1;
 		end
 	end	
@@ -254,43 +276,44 @@ function main(params_c)
 	base:TableLoad(tResultat_Info_Bibo, cmd);
 	tResultat_Info_Bibo:OrderBy('Groupe, Ligne');
 	params.print_alone = nil;
+	params.skip_question = false;
+	if tEpreuve:GetCell('Code_entite', 0) == 'FIS' and tEpreuve:GetCell('Code_niveau', 0):In('EC', 'NC') and tEpreuve:GetCell('Code_discipline', 0):In('SG','DH') then
+		params.print_alone = true;
+		params.skip_question = true;
+	end
+	if tEpreuve:GetCell('Code_entite', 0) == 'FIS' and tEpreuve:GetCell('Code_niveau', 0):In('EC') then
+		params.print_alone = true;
+		params.skip_question = true;
+	end
 	if tResultat_Info_Bibo:GetNbRows() > 0 then
-		local msg = "Le double tirage au sort des dossards a déjà été réalisé.\n"..
-					"Voulez vous rééditer la feuille du tirage fait précédemment?\n"..
-					"ATTENTION, si vous cliquez sur Non, tous les dossards seront alors effacés et remplacé par ceux du nouveau tirage.";
-		local reponse =  app.GetAuiFrame():MessageBox(msg,
-						"Lancer le tirage", 
-						msgBoxStyle.YES+msgBoxStyle.NO+msgBoxStyle.CANCEL+msgBoxStyle.CANCEL_DEFAULT+msgBoxStyle.ICON_WARNING
-						);
-		if reponse == msgBoxStyle.CANCEL then
-			return ;
-		elseif reponse == msgBoxStyle.YES then
-			params.print_alone = true;
+		if not params.skip_question then
+			local msg = "Le double tirage au sort des dossards a déjà été réalisé.\n"..
+						"Voulez vous rééditer la feuille du tirage fait précédemment?\n"..
+						"ATTENTION, si vous cliquez sur Non, tous les dossards seront alors effacés et remplacé par ceux du nouveau tirage.";
+			local reponse =  app.GetAuiFrame():MessageBox(msg,
+							"Lancer le tirage", 
+							msgBoxStyle.YES+msgBoxStyle.NO+msgBoxStyle.CANCEL+msgBoxStyle.CANCEL_DEFAULT+msgBoxStyle.ICON_WARNING
+							);
+			if reponse == msgBoxStyle.CANCEL then
+				return ;
+			elseif reponse == msgBoxStyle.YES then
+				params.print_alone = true;
+			end
 		end
 	end
 	bolSplitBibo = false;
 	tResultat:OrderBy('Point');
 	params.pts_7 = tResultat:GetCellDouble('Point', 6);
 	params.pts_15 = tResultat:GetCellDouble('Point', 14);
-	params.row_pts15 = nil; params.row_pts7 = nil;
-	for i = tResultat:GetNbRows() -1, 0, -1 do
-		if tResultat:GetCellDouble('Point', i) == params.pts_15 then
-			if not params.row_pts15 then
-				params.row_pts15 = i;
-			end
-		end
-		if tResultat:GetCellDouble('Point', i) == params.pts_7 then
-			if not params.row_pts7 then
-				params.row_pts7 = i;
-			end
-		end
-	end
+	params.last_row_bibo = nil; params.row_pts7 = nil;
+	GetBibo();
 	if not params.print_alone then
-		GetBibo();
 		local cmd = 'Update Resultat Set Dossard = Null, Rang = NULL, Critere = Null Where Code_evenement = '..params.code_evenement;
 		base:Query(cmd);
-		local cmd = 'Update Resultat Set Rang = '..(params.first_row_non_classe + 1)..' Where Code_evenement = '..params.code_evenement..' And Point Is Null';
-		base:Query(cmd);
+		if params.first_row_non_classe then
+			local cmd = 'Update Resultat Set Rang = '..(params.first_row_non_classe + 1)..' Where Code_evenement = '..params.code_evenement..' And Point Is Null';
+			base:Query(cmd);
+		end
 		base:TableLoad(tResultat, 'Select * From Resultat Where Code_evenement = '..params.code_evenement);
 		tResultat:OrderBy('Point');
 
@@ -316,26 +339,30 @@ function main(params_c)
 		-- base:TableBulkUpdate(tResultat, 'Dossard, Rang', 'Resultat');
 		-- base:TableLoad(tResultat, 'Select * From Resultat Where Code_evenement = '..params.code_evenement);
 		
-		for row = params.nb_bibo, params.first_row_non_classe -1 do
-			if tResultat:GetCellInt('Dossard', row) == 0 then
-				local code_coureur = tResultat:GetCell('Code_coureur', row);
-				local dossard = row + 1;
-				tResultat:SetCell('Dossard', row, dossard) ;
+		if params.first_row_non_classe then
+			for row = params.nb_bibo, params.first_row_non_classe -1 do
+				if tResultat:GetCellInt('Dossard', row) == 0 then
+					local code_coureur = tResultat:GetCell('Code_coureur', row);
+					local dossard = row + 1;
+					tResultat:SetCell('Dossard', row, dossard) ;
+				end
 			end
+			base:TableBulkUpdate(tResultat, 'Dossard, Rang', 'Resultat');
 		end
-		base:TableBulkUpdate(tResultat, 'Dossard, Rang', 'Resultat');
 		base:TableLoad(tResultat, 'Select * From Resultat Where Code_evenement = '..params.code_evenement);
 		tResultat:OrderBy('Point');
 		if params.debug then
 			adv.Alert('\n!! tirage des non classes, first_row_non_classe = '..params.first_row_non_classe);
 		end
-		if params.first_row_non_classe < tResultat:GetNbRows() -1 then
-	--      BuildTableTirage(row_first, row_last, rang_tirage, bib_first, shuffle);
-			BuildTableTirage(params.first_row_non_classe, nil, params.first_row_non_classe + 1, params.first_row_non_classe + 1, true) -- tirage des sans points
-		else
-			tResultat:SetCell('Dossard', tResultat:GetNbRows()-1, tResultat:GetNbRows())
+		if params.first_row_non_classe then
+			if params.first_row_non_classe < tResultat:GetNbRows() -1 then
+		--      BuildTableTirage(row_first, row_last, rang_tirage, bib_first, shuffle);
+				BuildTableTirage(params.first_row_non_classe, nil, params.first_row_non_classe + 1, params.first_row_non_classe + 1, true) -- tirage des sans points
+			else
+				tResultat:SetCell('Dossard', tResultat:GetNbRows()-1, tResultat:GetNbRows())
+			end
+			base:TableBulkUpdate(tResultat, 'Dossard, Rang', 'Resultat');
 		end
-		base:TableBulkUpdate(tResultat, 'Dossard, Rang', 'Resultat');
 		if params.debug then
 			adv.Alert('\n!! tirage du bibo, params.nb_bibo = '..params.nb_bibo);
 		end
@@ -366,7 +393,7 @@ function main(params_c)
 	else
 		if not params.print_alone then
 			if params.debug then
-				adv.Alert('\n!! tirage du bibo : slpil, params.row_pts7 = '..params.row_pts7..', params.row_pts15 = '..params.row_pts15);
+				adv.Alert('\n!! tirage du bibo : slpil, params.row_pts7 = '..params.row_pts7..', params.last_row_bibo = '..params.last_row_bibo);
 			end
 			tResultat:OrderBy('Point');
 			tDrawG6 = tResultat:Copy();

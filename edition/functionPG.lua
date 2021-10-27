@@ -129,11 +129,7 @@ function OnDecodeJsonBibo(code_evenement, groupe)
 		
 		local jsontxt2 = tResultat_Info_Bibo:GetCell('Table2', i);
 		local xTable2 = table.FromStringJSON(jsontxt2);
-		local identite = xTable2.Table2[1].Col1 ;
-		local pts = xTable2.Table2[1].Col2 ;
-		local rang_fictif = xTable2.Table2[1].Col3 ;
-		local dossard = xTable2.Table2[1].Col4;
-		table.insert(tableDossards2, {Identite = identite, Pts = pts, RangFictif = rang_fictif, Dossard = dossard})
+		table.insert(tableDossards2, {Identite = xTable2.Table2[1].Identite, Pts = xTable2.Table2[1].Pts, RangFictif = xTable2.Table2[1].RangFictif, Dossard = xTable2.Table2[1].Dossard})
 	end
 	return tableDossards1, tableDossards2;
 end
@@ -168,7 +164,7 @@ function OnEncodeJsonBibo(code_evenement, groupe)
 		local col2 = pts;
 		local col3 = rang_fictif;
 		local col4 = dossard;
-		table.insert(tTable2, {Col1 = col1, Col2 = col2, Col3 = col3, Col4 = col4});
+		table.insert(tTable2, {Identite = col1, Pts = col2, RangFictif = col3, Dossard = col4});
 		local xTable2 = {Table2 = tTable2};
 		local jsontxt2 = table.ToStringJSON(xTable2, false);
 		local rowsql = tResultat_Info_Bibo:AddRow();
@@ -177,9 +173,6 @@ function OnEncodeJsonBibo(code_evenement, groupe)
 			tResultat_Info_Bibo:SetCell('Groupe', rowsql, 1);
 		else
 			tResultat_Info_Bibo:SetCell('Groupe', rowsql, groupe);
-		end
-		if params.debug then
-			adv.Alert('OnEncodeJson groupe '..tostring(groupe)..' - row : '..row..', jsontxt1 '..jsontxt1..'\t'..', jsontxt2 = '..jsontxt2);
 		end
 		tResultat_Info_Bibo:SetCell('Ligne', rowsql, idx);
 		tResultat_Info_Bibo:SetCell('Table1', rowsql, jsontxt1);
