@@ -116,6 +116,79 @@ function VerifNodePodium()
 	doc_config:Delete();
 end
 
+function OnDecodeJsonBibo(code_evenement, groupe)
+	cmd = 'Select * From Resultat_Info_Bibo Where Code_evenement = '..code_evenement..' And Groupe = '..groupe;
+	base:TableLoad(tResultat_Info_Bibo, cmd);
+	tResultat_Info_Bibo:OrderBy('Groupe, Ligne');
+	local tableDossards1 = {};
+	local tableDossards2 = {};
+	for i = 0, tResultat_Info_Bibo:GetNbRows() -1 do
+		local jsontxt1 = tResultat_Info_Bibo:GetCell('Table1', i);
+		local xTable1 = table.FromStringJSON(jsontxt1);
+		table.insert(tableDossards1, xTable1.Table1[1].Col2);
+		
+		local jsontxt2 = tResultat_Info_Bibo:GetCell('Table2', i);
+		local xTable2 = table.FromStringJSON(jsontxt2);
+		local identite = xTable2.Table2[1].Col1 ;
+		local pts = xTable2.Table2[1].Col2 ;
+		local rang_fictif = xTable2.Table2[1].Col3 ;
+		local dossard = xTable2.Table2[1].Col4;
+		table.insert(tableDossards2, {Identite = identite, Pts = pts, RangFictif = rang_fictif, Dossard = dossard})
+	end
+	return tableDossards1, tableDossards2;
+end
+
+function OnEncodeJsonBibo(code_evenement, groupe)
+	-- tResultat_Copy contient tous les coureurs du BIBO
+	if not groupe or groupe == 1 then
+		local cmd = 'Delete From Resultat_Info_Bibo Where Code_evenement = '..code_evenement;
+		base:Query(cmd);
+	end
+	local cmd = 'Select * From Resultat_Info_Bibo Where Code_evenement = '..code_evenement;
+	base:TableLoad(tResultat_Info_Bibo, cmd);
+	local row_groupe = nil;
+	assert(tTableTirage1:GetNbRows() > 0);
+	for row = 0, tTableTirage1:GetNbRows() -1 do
+		local idx = row + 1;
+		local tTable1 = {};
+		local tTable2 = {};
+		table.insert(tTable1, {Col1 = 'Dossard du rang fictif '..idx, Col2 = params.tableDossards1[idx]});
+		local xTable1 = {Table1 = tTable1};
+		local jsontxt1 = table.ToStringJSON(xTable1, false);
+		
+		local rang_fictif = tTableTirage1:GetCellInt('Row', row);
+		local code_coureur = '';
+		local identite = '';
+		local pts = '';
+		local dossard = params.tableDossards1[rang_fictif] or '';
+		code_coureur = tDrawG6:GetCell('Code_coureur', row);
+		identite = tDrawG6:GetCell('Nom', row)..' '..tDrawG6:GetCell('Prenom', row);
+		pts = tDrawG6:GetCellDouble('Point', row);
+		local col1 = identite;
+		local col2 = pts;
+		local col3 = rang_fictif;
+		local col4 = dossard;
+		table.insert(tTable2, {Col1 = col1, Col2 = col2, Col3 = col3, Col4 = col4});
+		local xTable2 = {Table2 = tTable2};
+		local jsontxt2 = table.ToStringJSON(xTable2, false);
+		local rowsql = tResultat_Info_Bibo:AddRow();
+		tResultat_Info_Bibo:SetCell('Code_evenement', rowsql, params.code_evenement);
+		if not groupe then
+			tResultat_Info_Bibo:SetCell('Groupe', rowsql, 1);
+		else
+			tResultat_Info_Bibo:SetCell('Groupe', rowsql, groupe);
+		end
+		if params.debug then
+			adv.Alert('OnEncodeJson groupe '..tostring(groupe)..' - row : '..row..', jsontxt1 '..jsontxt1..'\t'..', jsontxt2 = '..jsontxt2);
+		end
+		tResultat_Info_Bibo:SetCell('Ligne', rowsql, idx);
+		tResultat_Info_Bibo:SetCell('Table1', rowsql, jsontxt1);
+		tResultat_Info_Bibo:SetCell('Table2', rowsql, jsontxt2);
+		base:TableInsert(tResultat_Info_Bibo, rowsql);
+	end
+end
+
+
 function Eval(e1, e2)
 	if e1 == e2 then
 		return true;

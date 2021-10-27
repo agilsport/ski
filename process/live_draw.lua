@@ -267,38 +267,12 @@ end
 
 function OnPrintDoubleTirage(groupe)
 	if draw.print_alone then
-		OnDecodeJson(groupe)
+		params.tableDossards1, params.tableDossards2 = OnDecodeJsonBibo(draw.code_evenement, groupe);
+	else
+		OnEncodeJsonBibo(draw.code_evenement, groupe);
+		params.tableDossards1, params.tableDossards2 = OnDecodeJsonBibo(draw.code_evenement, groupe);
 	end
 	if groupe == 1 then
-		if not draw.print_alone then
-			local cmd = 'Delete From Resultat_Info_Bibo Where Code_evenement = '..draw.code_evenement..' And Groupe = '..groupe;
-			base:Query(cmd);
-			for i = 0, tTableTirage1:GetNbRows() -1 do
-				local ligne = tTableTirage1:GetCellInt('Row', i);
-				local dossard = params.tableDossards1[ligne];
-				local identite = tDrawG6:GetCell('Nom', i)..' '..tDrawG6:GetCell('Prenom', i);
-				local pts = tDrawG6:GetCellDouble('FIS_pts', i)
-				local col1 = identite;
-				local col2 = pts;
-				local col3 = ligne;
-				local col4 = dossard;
-				local tTable1 = {};
-				local tTable2 = {};
-				table.insert(tTable1, {Col1 = 'Dossard du rang fictif '..(i+1), Col2 = params.tableDossards1[i+1]});
-				local xTable1 = {Table1 = tTable1};
-				local jsontxt1 = table.ToStringJSON(xTable1, false);
-				table.insert(tTable2, {Col1 = col1, Col2 = col2, Col3 = col3, Col4 = col4});
-				local xTable2 = {Table2 = tTable2};
-				local jsontxt2 = table.ToStringJSON(xTable2, false);
-				local row = tResultat_Info_Bibo:AddRow();
-				tResultat_Info_Bibo:SetCell('Code_evenement', row, draw.code_evenement);
-				tResultat_Info_Bibo:SetCell('Groupe', row, groupe);
-				tResultat_Info_Bibo:SetCell('Ligne', row, i+1);
-				tResultat_Info_Bibo:SetCell('Table1', row, jsontxt1);
-				tResultat_Info_Bibo:SetCell('Table2', row, jsontxt2);
-				base:TableInsert(tResultat_Info_Bibo, row)
-			end
-		end
 		report = wnd.LoadTemplateReportXML({
 			xml = './process/dossardDoubleTirage.xml',
 			node_name = 'root/panel',
@@ -316,38 +290,9 @@ function OnPrintDoubleTirage(groupe)
 			margin_bottom = 100,
 			layers = {file = './edition/layer.xml', id = 'ffs-fis', page = '*'}, 
 			paper_orientation = 'portrait',
-			params = {Nom = params.evenementNom, tableDossards1 = params.tableDossards1, Draw = 1, Version = draw.version, NbGroupe1 = 0}
+			params = {Nom = params.evenementNom, tableDossards1 = params.tableDossards1, tableDossards2 = params.tableDossards2, Draw = 1, Version = draw.version, NbGroupe1 = 0}
 		});
 	elseif groupe == 2 then
-		if not draw.print_alone then
-			local cmd = 'Delete From Resultat_Info_Bibo Where Code_evenement = '..draw.code_evenement..' And Groupe = '..groupe;
-			base:Query(cmd);
-			for i = 0, tTableTirage1:GetNbRows() -1 do
-				local ligne = tTableTirage1:GetCellInt('Row', i);
-				local dossard = params.tableDossards1[ligne];
-				local identite = tDrawG6:GetCell('Nom', i)..' '..tDrawG6:GetCell('Prenom', i);
-				local pts = tDrawG6:GetCellDouble('FIS_pts', i)
-				local col1 = identite;
-				local col2 = pts;
-				local col3 = ligne;
-				local col4 = dossard;
-				local tTable1 = {};
-				local tTable2 = {};
-				table.insert(tTable1, {Col1 = 'Dossard du rang fictif '..(i+1), Col2 = params.tableDossards1[i+1]});
-				local xTable1 = {Table1 = tTable1};
-				local jsontxt1 = table.ToStringJSON(xTable1, false);
-				table.insert(tTable2, {Col1 = col1, Col2 = col2, Col3 = col3, Col4 = col4});
-				local xTable2 = {Table2 = tTable2};
-				local jsontxt2 = table.ToStringJSON(xTable2, false);
-				local row = tResultat_Info_Bibo:AddRow();
-				tResultat_Info_Bibo:SetCell('Code_evenement', row, draw.code_evenement);
-				tResultat_Info_Bibo:SetCell('Groupe', row, groupe);
-				tResultat_Info_Bibo:SetCell('Ligne', row, i+1);
-				tResultat_Info_Bibo:SetCell('Table1', row, jsontxt1);
-				tResultat_Info_Bibo:SetCell('Table2', row, jsontxt2);
-				base:TableInsert(tResultat_Info_Bibo, row)
-			end
-		end
 		local editor = report:GetEditor();
 		editor:PageBreak(); -- Saut de Page entre les 2 éditions ...
 
@@ -369,17 +314,40 @@ function OnPrintDoubleTirage(groupe)
 			margin_bottom = 100,
 			layers = {file = './edition/layer.xml', id = 'ffs-fis', page = '*'}, 
 			paper_orientation = 'portrait',
-			params = {Nom = params.evenementNom, tableDossards1 = params.tableDossards1, Draw = 2, Version = draw.version, NbGroupe1 = draw.nb_groupe_1}
+			params = {Nom = params.evenementNom, tableDossards1 = params.tableDossards1, tableDossards2 = params.tableDossards2, Draw = 2, Version = draw.version, NbGroupe1 = draw.nb_groupe_1}
 		});
 	end
 end
 
 function OnPrintEtiquettes(orderby)
 	tDraw:OrderBy(orderby);
+	tEtiquette = tDraw:Copy();
+	ReplaceTableEnvironnement(tEtiquette, '_Etiquette');
 	-- Creation du Report
 	local estce = 0;
+	local row_separation = nil;
 	if draw.bolEstCE then
+		for i = tEtiquette:GetNbRows() -1, 0, -1 do
+			if tEtiquette:GetCellInt('ECSL_30', i) > 0 and not row_separation then
+				row_separation = i;
+			end
+			local bolDelete = true;
+			if i > 30 then
+				if tEtiquette:GetCellInt('ECSL_points', i) > 0 then
+					bolDelete = false;
+				end
+				if tEtiquette:GetCell('Winner_CC', i):len() > 0 then
+					bolDelete = false;
+				end
+			else
+				bolDelete = false;
+			end
+			if bolDelete == true then
+				tEtiquette:RemoveRowAt(i);
+			end
+		end
 		estce = 1;
+		Info('row_separation = '..row_separation);
 	end
 	local vitesse = 0;
 	if draw.bolVitesse then
@@ -391,8 +359,8 @@ function OnPrintEtiquettes(orderby)
 		node_attr = 'id',
 		node_value = 'parti_etiquette_factorise',
 		base = base,
-		body = tDraw,
-		params = {Orderby = orderby, EstCE = estce, EstVitesse = vitesse}
+		body = tEtiquette,
+		params = {Orderby = orderby, EstCE = estce, EstVitesse = vitesse, RowSeparation = row_separation}
 	});
 	
 end
@@ -2730,7 +2698,7 @@ function main(params_c)
 	draw.height = display:GetSize().height - 30;
 	draw.x = 0;
 	draw.y = 0;
-	draw.version = "1.32";
+	draw.version = "1.4";
 	draw.orderbyCE = 'Rang_tirage, Groupe_tirage, ECSL_points DESC, WCSL_points DESC, ECSL_overall_points DESC, Winner_CC DESC, FIS_pts, Nom, Prenom';
 	draw.orderbyFIS = 'Rang_tirage, Groupe_tirage, FIS_pts, Nom, Prenom';
 	draw.hostname = 'live.fisski.com';
