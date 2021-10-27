@@ -20,6 +20,7 @@ function OnPrintDoubleTirage(groupe)
 		end
 	end
 	if groupe == 1 then
+		params.nb_groupe_1 = #params.tableDossards1;
 		report = wnd.LoadTemplateReportXML({
 			xml = './process/dossardDoubleTirage.xml',
 			node_name = 'root/panel',
@@ -308,7 +309,9 @@ function main(params_c)
 	params.last_row_bibo = nil; params.row_pts7 = nil;
 	GetBibo();
 	if not params.print_alone then
-		local cmd = 'Update Resultat Set Dossard = Null, Rang = NULL, Critere = Null Where Code_evenement = '..params.code_evenement;
+		local cmd = 'Delete From Resultat_Info_Bibo Where Code_evenement = '..params.code_evenement;
+		base:Query(cmd);
+		cmd = 'Update Resultat Set Dossard = Null, Rang = NULL, Critere = Null Where Code_evenement = '..params.code_evenement;
 		base:Query(cmd);
 		if params.first_row_non_classe then
 			local cmd = 'Update Resultat Set Rang = '..(params.first_row_non_classe + 1)..' Where Code_evenement = '..params.code_evenement..' And Point Is Null';

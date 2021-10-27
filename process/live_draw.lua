@@ -273,6 +273,7 @@ function OnPrintDoubleTirage(groupe)
 		params.tableDossards1, params.tableDossards2 = OnDecodeJsonBibo(draw.code_evenement, groupe);
 	end
 	if groupe == 1 then
+		params.nb_groupe1 = #params.tableDossards1;
 		report = wnd.LoadTemplateReportXML({
 			xml = './process/dossardDoubleTirage.xml',
 			node_name = 'root/panel',
@@ -295,7 +296,6 @@ function OnPrintDoubleTirage(groupe)
 	elseif groupe == 2 then
 		local editor = report:GetEditor();
 		editor:PageBreak(); -- Saut de Page entre les 2 éditions ...
-
 		wnd.LoadTemplateReportXML({
 			xml = './process/dossardDoubleTirage.xml',
 			node_name = 'root/panel',
@@ -314,7 +314,7 @@ function OnPrintDoubleTirage(groupe)
 			margin_bottom = 100,
 			layers = {file = './edition/layer.xml', id = 'ffs-fis', page = '*'}, 
 			paper_orientation = 'portrait',
-			params = {Nom = params.evenementNom, tableDossards1 = params.tableDossards1, tableDossards2 = params.tableDossards2, Draw = 2, Version = draw.version, NbGroupe1 = draw.nb_groupe_1}
+			params = {Nom = params.evenementNom, tableDossards1 = params.tableDossards1, tableDossards2 = params.tableDossards2, Draw = 2, Version = draw.version, NbGroupe1 = params.nb_groupe1}
 		});
 	end
 end
