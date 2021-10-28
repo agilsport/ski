@@ -324,15 +324,15 @@
 
 	<font size="11" weight="normal" />
 
-	<row h="18px" />
+	<row h="24px" />
 	<image col_start="1" adjust="best" spacing="0">'./res/32x32_bullet_green.png'</image> 
 	<text col_start="2">"Evénement de la saison en cours"</text>
 
-	<row h="18px" />
+	<row h="24px" />
 	<image col_start="1" adjust="best" spacing="0">'./res/32x32_bullet_red.png'</image> 
 	<text col_start="2">"Evénement lié à une saison ancienne"</text>
 
-	<row h="18px" />
+	<row h="24px" />
 	<image col_start="1" adjust="best" spacing="0">'./res/16x16_lock_yellow.png'</image> 
 	<text col_start="2">"Evénement verrouillé, Protection en lecture seule"</text>
 
@@ -989,8 +989,8 @@
 			<button col_start="1" col_end="0" row="auto" label="Mise à Jour des Points" name = "btn_point" />
 			<button col_start="1" col_end="0" row="auto" label="Mise à Jour des Années de Naissance" name = "btn_an" />
 			<button col_start="1" col_end="0" row="auto" label="Mise à Jour des Distances" name = "btn_distance"/>
-			<button col_start="1" col_end="0" row="auto" label="Fixation des Tickets Courses" />
-			<button col_start="1" col_end="0" row="auto" label="Dé-Fixation des Tickets Courses" />
+			<button col_start="1" col_end="0" row="auto" label="Fixation des Tickets Courses" name = "btn_fixation_ticket" />
+			<button col_start="1" col_end="0" row="auto" label="Dé-Fixation des Tickets Courses" name = "btn_defixation_ticket" />
 		</staticbox>
 		<staticbox row="auto" label="ESF">
 			<col w="1"/>
@@ -1009,7 +1009,42 @@
 	<staticbox col_start="1" col_end="0" row="1" label="Message">
 		<gridmessage row="1" col="1" name="message" />
 	</staticbox>
+</panel>
+
+<!-- concurrent_dossard_plage -->
+<panel name="concurrent_dossard_plage">
+	<padding all="2px"/>
+	<wnd name="statictext" style="ALIGN_RIGHT" />
+	<col w="2,1"/>
 	
+	<row h="auto"/>
+	<statictext col_start="1" label="Dossard Début" />
+	<textctrl col_start="2" name="dossard_debut" />
+
+	<row h="auto"/>
+	<statictext col_start="1" label="Dossard Fin" />
+	<textctrl col_start="2" name="dossard_fin" />
+
+	<row value="auto" />
+	<toolbar col_start="1" col_end="0" name="tb" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT" />
+</panel>
+
+<!-- concurrent_dossard_tirage -->
+<panel name="concurrent_dossard_tirage">
+	<padding all="2px"/>
+	<wnd name="statictext" style="ALIGN_RIGHT" />
+	<col w="1, 64px"/>
+	
+	<row h="auto"/>
+	<statictext col_start="1" label="Numéro premier Dossard" />
+	<textctrl col_start="2" name="dossard_debut" />
+
+	<radiobutton row="auto" col_start="1" col_end="0" name="radio_random" label="Globale à la mêlée" style="RB_GROUP|ALIGN_LEFT" />
+	<radiobutton row="auto" col_start="1" col_end="0" name="radio_point" label="Par Ordre de Point" style="ALIGN_LEFT" />
+	<radiobutton row="auto" col_start="1" col_end="0" name="radio_ordre" label="En respectant l\'ordre actuel de la liste" style="ALIGN_LEFT" />
+	
+	<row value="auto" />
+	<toolbar col_start="1" col_end="0" name="tb" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT" />
 </panel>
 
 <!-- Tooltip Information Pb Licence -->
