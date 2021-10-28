@@ -743,38 +743,36 @@ function CommandSendList()
 			draw.statut_CF = false;
 		end
 		local code = tDraw:GetCell('Code_coureur', i):sub(4);
-		local wcsl_points = tDraw:GetCellInt('WCSL_points', i, -1);
-		local wcsl_rank = tDraw:GetCellInt('WCSL_rank', i);
-		local ecsl_points = tDraw:GetCellInt('ECSL_points', i, -1);
-		local ecsl_rank = tDraw:GetCellInt('ECSL_rank', i);
-		local cupsl_points = tDraw:GetCellInt('CupSL_points', i, -1);
-		local cupsl_rank = tDraw:GetCellInt('CupSL_rank', i);
+		local wcsl_points = tDraw:GetCell('WCSL_points', i);
+		local wcsl_rank = tDraw:GetCell('WCSL_rank', i);
+		local ecsl_points = tDraw:GetCell('ECSL_points', i);
+		local ecsl_rank = tDraw:GetCell('ECSL_rank', i);
+		local ecsl_overall_points = tDraw:GetCell('ECSL_overall_points', i);
+		local ecsl_overall_rank = tDraw:GetCell('ECSL_overall_rank', i);
+		local winner_points = tDraw:GetCell('Winner_CC', i);
+		local winner_rank = '';
 		local fis_pts = tDraw:GetCellDouble('FIS_pts', i, -1);
-		local fis_clt = tDraw:GetCellInt('FIS_clt', i);
+		local fis_clt = tDraw:GetCellInt('FIS_clt', i, -1);
+		if fis_pts < 0 then fis_pts = ''; end
+		if fis_clt < 0 then fis_clt = ''; end
 		local tStandings = {};
-		if wcsl_points >= 0 then
-			   table.insert(tStandings, {category = 'WCSL', event = 'ALL', points = wcsl_points, rank = wcsl_rank});
-		end
-		if ecsl_points >= 0 then
-			table.insert(tStandings, {category = 'ECSL', event = 'ALL', points = ecsl_points, rank = ecsl_rank});
-		end
-		if cupsl_points >= 0 then
-			table.insert(tStandings, {category = 'CUPS', event = 'ALL', points = cupsl_points, rank = cupsl_rank});
-		end
-		if fis_pts >= 0 then
-			table.insert(tStandings, {category = 'FIS', event = draw.discipline, points = fis_pts, rank = fis_clt});
+		local tData = {};
+		if draw.bolEstCE then
+			table.insert(tData, {rank = ecsl_rank, points = ecsl_points, event = draw.discipline, category = 'ECSL'});
+			table.insert(tData, {rank = ecsl_overall_rank, points = ecsl_overall_points, event = 'ALL', category = 'ECSL'});
+			table.insert(tData, {rank = wcsl_rank, points = wcsl_points, event = draw.discipline, category = 'WCSL'});
+			table.insert(tData, {rank = winner_rank, points = winner_points, event = 'ALL', category = 'CC WINNER'});
+			table.insert(tData, {rank = fis_clt, points = fis_pts, event = draw.discipline, category = 'FIS'});
 		else
-			table.insert(tStandings, {category = 'FIS', event = draw.discipline, points = '', rank = ''});
+			table.insert(tData, {rank = fis_clt, points = fis_pts, event = draw.discipline, category = 'FIS'});
 		end
-		local tCoureur = {standings = tStandings};
+		local tCoureur = {standings = tData};
 		local jsontxt = table.ToStringJSON(tCoureur, false);
-		
 		local nodeRacer = xmlNode.Create(nodeStartlist, xmlNodeType.ELEMENT_NODE, "racer");
 		local nodeLastname = xmlNode.Create(nodeRacer, xmlType.ELEMENT_NODE, "lastname", nom);
 		local nodeFirstname = xmlNode.Create(nodeRacer, xmlType.ELEMENT_NODE, "firstname", prenom);
 		local nodeNation = xmlNode.Create(nodeRacer, xmlType.ELEMENT_NODE, "nat", nation);
 		local nodeFiscode = xmlNode.Create(nodeRacer, xmlType.ELEMENT_NODE, "fiscode", code);
-		-- local noderacerinfoJSON = xmlNode.Create(nodeRacer, xmlType.ELEMENT_NODE, "racerinfoJSON", jsontxt);	
 		local noderacerinfoJSON = xmlNode.Create(nodeRacer, xmlType.ELEMENT_NODE, "racerinfoJSON");	
 		xmlNode.Create(noderacerinfoJSON, xmlType.CDATA_SECTION_NODE,'', jsontxt);
 	end
@@ -980,7 +978,7 @@ function OnSendTableau(statut)
 	) ~= msgBoxStyle.YES then
 		return;
 	end
-	CommandClear();
+	-- CommandClear();
 	CommandRaceInfo();
 	CommandPhaseD();
 	CommandSendList();
@@ -2700,7 +2698,7 @@ function main(params_c)
 	draw.height = display:GetSize().height - 30;
 	draw.x = 0;
 	draw.y = 0;
-	draw.version = "1.5";
+	draw.version = "1.6";
 	draw.orderbyCE = 'Rang_tirage, Groupe_tirage, ECSL_points DESC, WCSL_points DESC, ECSL_overall_points DESC, Winner_CC DESC, FIS_pts, Nom, Prenom';
 	draw.orderbyFIS = 'Rang_tirage, Groupe_tirage, FIS_pts, Nom, Prenom';
 	draw.hostname = 'live.fisski.com';
