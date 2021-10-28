@@ -1090,6 +1090,11 @@
 	<row h="auto" />
 	<text col_start="1" font_color="red" font_weight="bold" font_size_step="2" align="center">'X'</text>
 	<text col_start="2">"Modification manuelle du concurrent"</text>
+	
+	<row h="auto" />
+	<text col_start="1" font_color="red" font_weight="bold" font_size_step="2" align="center">'?'</text>
+	<text col_start="2">"Licence inexistante base locale"</text>
+
 
 	<row h="16px" />
 </tooltip>
