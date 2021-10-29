@@ -17,6 +17,10 @@ table:FindColumnIndex(indice) -> indice numérique retourne l'indice de la colonn
 
 ]]
 
+function GetMenuName()
+	return "Tirage en ligne des dossards sur le site de la FIS";
+end
+
 function Error(txt)
 	adv.Error(txt);
 end
@@ -275,7 +279,7 @@ function OnPrintDoubleTirage(groupe)
 	if groupe == 1 then
 		params.nb_groupe1 = #params.tableDossards1;
 		report = wnd.LoadTemplateReportXML({
-			xml = './process/dossardDoubleTirage.xml',
+			xml = './process/dossard_DoubleTirage.xml',
 			node_name = 'root/panel',
 			node_attr = 'id',
 			node_value = 'print',
@@ -297,7 +301,7 @@ function OnPrintDoubleTirage(groupe)
 		local editor = report:GetEditor();
 		editor:PageBreak(); -- Saut de Page entre les 2 éditions ...
 		wnd.LoadTemplateReportXML({
-			xml = './process/dossardDoubleTirage.xml',
+			xml = './process/dossard_DoubleTirage.xml',
 			node_name = 'root/panel',
 			node_attr = 'id',
 			node_value = 'print',
@@ -354,7 +358,7 @@ function OnPrintEtiquettes(orderby)
 		vitesse = 1;
 	end
 	report = wnd.LoadTemplateReportXML({
-		xml = './process/live_draw.xml',
+		xml = './process/dossard_LiveDraw.xml',
 		node_name = 'root/report',
 		node_attr = 'id',
 		node_value = 'parti_etiquette_factorise',
@@ -411,7 +415,7 @@ function OnPrintBibo(groupe)
 	local estCE = draw.bolEstCE and 1 or 0;
 	-- Creation du Report
 	report = wnd.LoadTemplateReportXML({
-		xml = './process/live_draw.xml',
+		xml = './process/dossard_LiveDraw.xml',
 		node_name = 'root/panel',
 		node_attr = 'id',
 		node_value = 'print',
@@ -523,12 +527,12 @@ function OnSendMessage()
 		parent = app.GetAuiFrame(),
 		icon = "./res/32x32_message.png",
 		label = "Envoi Message",
-		width = 500,
-		height = 150
+		width = 700,
+		height = 200
 	});
 	
 	dlg:LoadTemplateXML({ 
-		xml = './process/live_draw.xml',
+		xml = './process/dossard_LiveDraw.xml',
 		node_name = 'root/panel',
 		node_attr = 'name',
 		node_value = 'message'
@@ -536,6 +540,7 @@ function OnSendMessage()
 	function OnSend()
 		SendMessage(dlg:GetWindowName('message'):GetValue());
 		dlg:EndModal(idButton.OK);
+		nodelivedraw:ChangeAttribute('last_message', dlg:GetWindowName('message'):GetValue());
 	end
 	
 	-- Initialisation des variables 
@@ -545,9 +550,15 @@ function OnSendMessage()
 	dlg:GetWindowName('message'):Append('Validation of racers in progress');
 	dlg:GetWindowName('message'):Append('Board of racers refreshed');
 	dlg:GetWindowName('message'):Append('Board confirmed, bib drawing in progress');
+	dlg:GetWindowName('message'):Append('Bib drawing completed, the race will start at ');
 	dlg:GetWindowName('message'):SetSelection(0);
 	
+	if nodelivedraw:GetAttribute('last_message'):len() > 0 then
+		dlg:GetWindowName('message'):SetValue(nodelivedraw:GetAttribute('last_message'));
+	end
 	
+	nodelivedraw:GetAttribute('send', 0)
+	nodelivedraw:GetAttribute('send', 0)
 	-- Toolbar Principale ...
 	local tb = dlg:GetWindowName('tb');
 	local btnSend = tb:AddTool("Envoyer", "./res/32x32_send_green.png");
@@ -626,22 +637,6 @@ end
 
 function ChecktDraw()
 	tDraw:OrderBy('Rang_tirage');
-	-- params.last_row_groupe_bibo = nil;
-	-- if draw.bolEstCE then
-		-- draw.pts7 = tDraw:GetCellInt('ECSL_points', 6);
-		-- draw.pts15 = tDraw:GetCellInt('ECSL_points', 14);
-		-- if not draw.bolVitesse then
-			-- for i = tDraw:GetNbRows() -1, 0, -1 do
-				-- if 
-			-- end
-		-- else
-			-- for i = tDraw:GetNbRows() -1, 0, -1 do
-				-- if tDraw:GetCellInt('Groupe_tirage', i) == 1 then
-					-- params.last_row_groupe_bibo = i;
-				-- end
-			-- end
-		-- end
-	-- end
 
 	draw.tRang_tirageauto = {};
 	draw.statut = 'CF';
@@ -1257,6 +1252,7 @@ function OnChangeStatut(row)
 	nodeRoot:AddChild(nodeRaceEvent);
 	CreateXML(nodeRoot);
 	dlgTableau:GetWindowName('info'):SetValue('Statut de '..tDraw:GetCell('Nom', row)..' '..tDraw:GetCell('Prenom', row)..' modifié');
+	SendMessage(tDraw:GetCell('Nom', row)..' '..tDraw:GetCell('Prenom', row)..' updated. You might have to refresh the page.');
 end
 
 function OnChercheCoureurCode(code);
@@ -1992,7 +1988,7 @@ function OnAfficheTableau()
 		parentFrame:Bind(eventType.SOCKET, OnSocketLive, draw.socket);
 	end
 -- Création Dialog 
-	draw.label_dialog = 'Tableau des coureurs - discipline de la course : '..draw.discipline..'  - version '..draw.version..' du script';
+	draw.label_dialog = 'Tableau des coureurs - discipline de la course : '..draw.discipline..' - version '..draw.version..' du script  -  course n° '..draw.code_evenement..' - CODEX : '..tEvenement:GetCell('Codex', 0);
 	dlgTableau = wnd.CreateDialog(
 		{
 		width = draw.width,
@@ -2005,14 +2001,14 @@ function OnAfficheTableau()
 	
 	if draw.bolEstCE then
 		dlgTableau:LoadTemplateXML({ 
-			xml = './process/live_draw.xml',
+			xml = './process/dossard_LiveDraw.xml',
 			node_name = 'root/panel', 
 			node_attr = 'name', 	
 			node_value = 'gridCE' 
 		});
 	else
 		dlgTableau:LoadTemplateXML({ 
-			xml = './process/live_draw.xml',
+			xml = './process/dossard_LiveDraw.xml',
 			node_name = 'root/panel', 
 			node_attr = 'name', 	
 			node_value = 'gridFIS' 
@@ -2278,7 +2274,6 @@ function OnAfficheTableau()
 			grid_tableau:SynchronizeRowsView();
 			CommandSendList();
 			CommandSendOrder();
-			CommandRenvoyerDossards();
 			base:TableBulkUpdate(tDraw, 'Statut', 'Resultat_Info_Tirage');
 		end
 		, btnValiderSelection);
@@ -2296,7 +2291,6 @@ function OnAfficheTableau()
 			grid_tableau:SynchronizeRowsView(); -- on est sur la vue
 			CommandSendList();
 			CommandSendOrder();
-			CommandRenvoyerDossards();
 			base:TableBulkUpdate(tDraw, 'Statut', 'Resultat_Info_Tirage');
 		end
 		, btnInValiderSelection);
@@ -2810,7 +2804,7 @@ function main(params_c)
 		});
 	
 	dlgConfig:LoadTemplateXML({ 
-		xml = './process/live_draw.xml',
+		xml = './process/dossard_LiveDraw.xml',
 		node_name = 'root/panel', 
 		node_attr = 'name', 
 		discipline = draw.discipline;

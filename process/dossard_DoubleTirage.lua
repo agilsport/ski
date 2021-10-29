@@ -1,6 +1,10 @@
 -- Calcul d'un temps manuel (avec 10 avant ou avec décalage)
 dofile('./edition/functionPG.lua');
 
+function GetMenuName()
+	return "Double Tirage au sort des dossards (RIS)";
+end
+
 function OnPrintDoubleTirage(groupe)
 	if params.print_alone then
 		params.tableDossards1, params.tableDossards2 = OnDecodeJsonBibo(params.code_evenement, groupe);

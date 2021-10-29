@@ -117,8 +117,8 @@
 	</panel>
 	<panel name="message">
 		<padding all="2px"/>
-		<col value="1,2"/>
-		<statictext row="auto" col_start="1" align="right" label="Message"/>
+		<col value="1,3"/>
+		<statictext row="auto" col_start="1" style="ALIGN_RIGHT" label="Message :"/>
 		<combobox col_start="2" name="message"/>
 		<toolbar row="auto" col_start="1" col_end="0" name="tb" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
 	</panel>
