@@ -13,10 +13,10 @@
 			<menu title="Rapport d'accident" image="./res/16x16_pdf.png" action="open ./edition/Rapport_Accident.pdf" />
 		</menu>
 		<menu title="Outils - Scripts LUA spécifiques" image="./res/32x32_options.png">
-			<menu title="Double Tirage au sort des dossards (RIS)" image="./res/32x32_ranking.png" lua="./process/dossardDoubleTirage.lua" />
+			<menu title="Double Tirage au sort des dossards (RIS)" image="./res/32x32_ranking.png" lua="./process/dossard_DoubleTirage.lua" />
 		</menu>
 		<menu title="Coupes d'Europe et FIS" image="./res/32x32_juges.png">
-			<menu title="Construction et Envoi du tableau des coureurs à la FIS" image="./res/16x16_ranking.png" lua="./process/live_draw.lua"/>
+			<menu title="Tirage en ligne des dossards sur le site de la FIS" image="./res/16x16_ranking.png" lua="./process/dossard_LiveDraw.lua"/>
 		</menu>
 		
 	</menu>

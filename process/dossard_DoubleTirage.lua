@@ -1,6 +1,10 @@
 -- Calcul d'un temps manuel (avec 10 avant ou avec décalage)
 dofile('./edition/functionPG.lua');
 
+function GetMenuName()
+	return "Double Tirage au sort des dossards (RIS)";
+end
+
 function OnPrintDoubleTirage(groupe)
 	if params.print_alone then
 		params.tableDossards1, params.tableDossards2 = OnDecodeJsonBibo(params.code_evenement, groupe);
@@ -22,7 +26,7 @@ function OnPrintDoubleTirage(groupe)
 	if groupe == 1 then
 		params.nb_groupe_1 = #params.tableDossards1;
 		report = wnd.LoadTemplateReportXML({
-			xml = './process/dossardDoubleTirage.xml',
+			xml = './process/dossard_DoubleTirage.xml',
 			node_name = 'root/panel',
 			node_attr = 'id',
 			node_value = 'print',
@@ -45,7 +49,7 @@ function OnPrintDoubleTirage(groupe)
 		editor:PageBreak(); -- Saut de Page entre les 2 éditions ...
 
 		wnd.LoadTemplateReportXML({
-			xml = './process/dossardDoubleTirage.xml',
+			xml = './process/dossard_DoubleTirage.xml',
 			node_name = 'root/panel',
 			node_attr = 'id',
 			node_value = 'print',
@@ -254,7 +258,7 @@ function main(params_c)
 	end
 	params = params_c;
 	params.debug = false;
-	params.version = '2.3';
+	params.version = '2.4';
 	params.code_evenement = params.code_evenement or -1;
 	if params.code_evenement < 0 then
 		return;
@@ -288,9 +292,9 @@ function main(params_c)
 	end
 	if tResultat_Info_Bibo:GetNbRows() > 0 then
 		if not params.skip_question then
-			local msg = "Le double tirage au sort des dossards a déjà été réalisé.\n"..
-						"Voulez vous rééditer la feuille du tirage fait précédemment?\n"..
-						"ATTENTION, si vous cliquez sur Non, tous les dossards seront alors effacés et remplacé par ceux du nouveau tirage.";
+			local msg = "Le double tirage au sort des dossards a déjà été réalisé. \n"..
+						"Voulez-vous rééditer la feuille du tirage fait précédemment? \n"..
+						"ATTENTION, si vous cliquez sur Non, tous les dossards seront alors effacés et remplacés par ceux du nouveau tirage.";
 			local reponse =  app.GetAuiFrame():MessageBox(msg,
 							"Lancer le tirage", 
 							msgBoxStyle.YES+msgBoxStyle.NO+msgBoxStyle.CANCEL+msgBoxStyle.CANCEL_DEFAULT+msgBoxStyle.ICON_WARNING
@@ -299,6 +303,20 @@ function main(params_c)
 				return ;
 			elseif reponse == msgBoxStyle.YES then
 				params.print_alone = true;
+			end
+		end
+	else
+		tResultat:OrderBy('Dossard DESC');
+		if tResultat:GetCell('Dossard', 0):len() > 0 then
+			local msg = "ATTENION : Les dossards ont déjà été tirés pour cette course !!!\n"..
+						"Confirmez-vous le double tirage au sort des dossards?\n"..
+						"Les dossards présents seront alors effacés et remplacés par ceux du nouveau tirage.";
+			local reponse =  app.GetAuiFrame():MessageBox(msg,
+						"Lancer le tirage", 
+						msgBoxStyle.YES+msgBoxStyle.NO+msgBoxStyle.NO_DEFAULT+msgBoxStyle.ICON_WARNING
+						);
+			if reponse == msgBoxStyle.NO then
+				return ;
 			end
 		end
 	end
