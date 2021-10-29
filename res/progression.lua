@@ -1,5 +1,5 @@
 -- Synthaxe Progression :
--- Version 2.0
+-- Version 3.2
 -- clt/duel/tour/ordre/tri : clt (obligatoire ...), duel, tour, ordre (non obligatoires ...)
 -- exemple 1 : 12 => 12ième du tour précédent (et de tous les duels)
 -- exemple 2 : 2/3 => 2ème du duel 3 du tour précédent
@@ -8,7 +8,7 @@
 -- exemple 5 : 3/1-5/2/2 => Deuxième Troisième des duels 1 à 5 du tour 2 (2ème Lucky Looser)
 -- exemple 6 : 3/1-5/2/2/qualif => Deuxième Troisième des duels 1 à 5 du tour 2 (2ème Lucky Looser) avec tri sur les temps de Qualification
 -- exemple 7 : 3/1-5/2/2/duel => Deuxième Troisième des duels 1 à 5 du tour 2 (2ème Lucky Looser) avec tri sur le temps du duel
--- ??? quel est la valeur par default  duel ou qualif ?????????
+-- la valeur par default pour le tri est qualif
 
 function GetLabel3Tours(progression, tour)
 	if tour == 1 then return 'Quart de Finale';
@@ -209,9 +209,8 @@ duel_progression = {
 	KO_20_D4 =
 	{
 		dimension = 20,
-		
 		niveau = 'KO_20_D4',
-
+		--label = { 'Quart de Finale', 'Demi Finale', 'Finale' },
 		GetLabelTour = GetLabel3Tours,
 
 		progression = {
@@ -239,11 +238,8 @@ duel_progression = {
 	KO_20_D5 =
 	{
 		dimension = 20,
-		
 		niveau = 'KO_20_D5',
-		
 		GetLabelTour = GetLabel3Tours,
-		
 		progression = {
 			{ 
 				-- tour 1 :  Quart de final => 4 duels de 5 couloirs
@@ -267,8 +263,8 @@ duel_progression = {
 	
 	Tab20FIS =
 	{
-		dimension = 20,
 		entite = 'FIS',
+		dimension = 20,
 
 		GetLabelTour = GetLabel3Tours,
 		progression = {
@@ -295,9 +291,7 @@ duel_progression = {
 	std24 =
 	{
 		dimension = 24,
-		
 		GetLabelTour = GetLabel3Tours,
-		
 		progression = {
 			{ 
 				-- tour 1 : 4 duels de 6 couloirs
@@ -322,9 +316,6 @@ duel_progression = {
 	ko30 =
 	{
 		dimension = 30,
-
-		GetLabelTour = GetLabel3Tours,
-
 		progression = {
 			{ 
 				-- tour 1 : 5 duels de 6 couloirs
@@ -351,9 +342,8 @@ duel_progression = {
 	{
 		dimension = 30,
 		niveau = 'KO_30_LO',
-		
 		GetLabelTour = GetLabel3Tours,
-		
+		--label = { 'Quart de Finale', 'Demi Finale', 'Finale' },
 		progression = {
 			{ 
 				-- tour 1 :  Quart de final => 5 duels de 4 couloirs
@@ -375,12 +365,39 @@ duel_progression = {
 			}
 		}
 	},
+	
+	std30Chr =
+	{
+		dimension = 30,
+		niveau = 'KO_30_CH',
+		GetLabelTour = GetLabel3Tours,
+
+		progression = {
+			{ 
+				-- tour 1 :  Quart de final => 5 duels de 4 couloirs
+				{ '1', '10', '11', '20', '21', '30' }, 
+				{ '4', '7', '14', '17', '24', '27' },
+				{ '5', '6', '15', '16', '25', '26' },
+				{ '2', '9', '12', '19', '22', '29' },
+				{ '3', '8', '13', '18', '23', '28' }
+			},
+			{ 
+				-- tour 2 : demie finale => 2 duels de 6 couloirs
+				{ '1/1-3/1/1', '1/1-3/1/2', '1/1-3/1/3', '2/1-2/1/1', '2/1-2/1/2', '3-4/1-5/1/2/duel' }, 
+				{ '1/4-5/1/1', '1/4-5/1/2', '2/3-5/1/1', '2/3-5/1/2', '2/3-5/1/3', '3/1-5/1/1/duel' }
+			},
+			{ 
+				-- tour  : Finale A et Finale B => 2 duel de 6 couloirs
+				{ '1/1', '1/2', '2/1', '2/2', '3/1', '3/2' }, 
+				{ '4/1', '4/2', '5/1', '5/2', '6/1', '6/2' }
+			}
+		}
+	},
 
 	std32 =
 	{
 		dimension = 32,
 		label = { '8ième de finale', 'Quart de Finale', 'Demi Finale', 'Finale' },
-		
 		progression = {
 			{ 
 				-- tour 1 : 8 duels de 4 couloirs
@@ -452,9 +469,8 @@ duel_progression = {
 	{
 		dimension = 50,
 		niveau = 'Tb_A_B50',
-		
-		GetLabelTour = GetLabel3Tours,
 		GetLabelDuel = GetLabelDuelTabA_B,
+		GetLabelTour = GetLabel3Tours,
 		GetLabelDuelWidth = function() return 9; end,
 		
 		progression = {
@@ -494,9 +510,9 @@ duel_progression = {
 	{
 		dimension = 60,
 		niveau = 'Tb_A_B60',
-
-		GetLabelTour = GetLabel3Tours,
+		label = { 'Quart de Finale', 'Demi Finale', 'Finale' },
 		GetLabelDuel = GetLabelDuelTabA_B,
+		GetLabelTour = GetLabel3Tours,
 		GetLabelDuelWidth = function() return 9; end,
 		
 		progression = {
@@ -538,11 +554,12 @@ duel_progression = {
 	{
 		dimension = 100,
 		dimension_min = 15,
-		niveau = 'KO_MT_D5',
-		
+	
 		GetLabelTour = GetLabelTour_Mont_Desc,
 		GetLabelDuel = GetLabelDuel_Mont_Desc,
 		GetLabelDuelWidth = function() return 8; end,
+		
+		niveau = 'KO_MT_D5',
 		
 		progression = {
 			{ 
@@ -621,8 +638,8 @@ duel_progression = {
 	{
 		dimension = 102,
 		dimension_min = 18,
-		niveau = 'KO_MT_D6',
 		
+		niveau = 'KO_MT_D6',
 		GetLabelTour = GetLabelTour_Mont_Desc,
 		GetLabelDuel = GetLabelDuel_Mont_Desc,
 		GetLabelDuelWidth = function() return 8; end,
