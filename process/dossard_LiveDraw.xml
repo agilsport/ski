@@ -5,17 +5,21 @@
 		<col value="1"/>
 		<row value="50px"/>
 		<matrix row="auto">
-			<col value="5,1,1,5"/>
+			<col value="1,1,1,1"/>
 			<row value="40px" />
-			<statictext row="auto" col_start="2" align="right" label="Hostname"/>
-			<textctrl col_start="3" align="left" name="fis_hostname" style="TE_READONLY"/>
-			<statictext row="auto" col_start="2" align="right" label="Port"/>
-			<textctrl col_start="3" align="left" name="fis_port"/>
-			<statictext row="auto" col_start="2" align="right" label="Mot de Passe"/>
-			<textctrl col_start="3" align="left" name="fis_pwd"/>
+			<padding all="5px"/>
+			<textctrl row="150px" col_start="2" col_end="3" style="TE_CENTER|TE_READONLY|TE_MULTILINE" name="race_name" ><background mode="solid" color="ltgray" /></textctrl>
+			<statictext row="auto" col_start="2" style="ALIGN_RIGHT" label="Codex : "/>
+			<textctrl col_start="3" style="TE_READONLY" name="codex"/>
+			<statictext row="auto" col_start="2" style="ALIGN_RIGHT" label="Hostname : "/>
+			<textctrl col_start="3" style="TE_READONLY" name="fis_hostname"/>
+			<statictext row="auto" col_start="2" style="ALIGN_RIGHT" label="Port : "/>
+			<textctrl col_start="3" name="fis_port"/>
+			<statictext row="auto" col_start="2" style="ALIGN_RIGHT" label="Mot de Passe : "/>
+			<textctrl col_start="3" name="fis_pwd"/>
 			<row value="20px"/>
-			<statictext col_start="2" align="right" cond="discipline=='AC'" label="Discipline en vitesse : " />
-			<textctrl col_start="3" align="left" cond="discipline=='AC'" name="discipline_vitesse"/>
+			<textctrl row="auto" col_start="3" cond="discipline=='AC'" name="discipline_vitesse"/>
+			<statictext col_start="2" style="ALIGN_RIGHT" cond="discipline=='AC'" label="Discipline en vitesse : " />
 			<row value="20px"/>
 			<toolbar row="auto" col_start="1" name="tbconfig" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
 		</matrix>

@@ -167,8 +167,8 @@ end
 function OnAide()
 -- groupe 1 ECSL de la discipline : de 1 à 15 (ou plus)
 -- groupe 2 Si plus de 450 pts en EC la saison dernière de 16 à x
--- groupe 2 on met en plus dans ce groupe les coureurs de la WC dans les 30 de la WCSL de la discipline. On départage selon les pts ECSL sinon les pts WCSL
--- groupe 3 On continue avec les Pts de la ECSL jusqu'à en avoir 30 pris au titre de la ECSL
+-- groupe 3 on met ici les coureurs de la WC dans les 30 de la WCSL de la discipline. On départage selon les pts ECSL sinon les pts WCSL
+-- groupe 4 On continue avec les Pts de la ECSL jusqu'à en avoir 30 pris au titre de la ECSL
 -- groupe 4 Cette série est interrompue si on a un vainqueur d'une autre Coupe continentale qui par systématiquement en 31 ème position.
 -- groupe 5 La série interrompue reprend jusqu'à en avoir 30.
 -- Groupe 6 On poursuit selon les points FIS.
@@ -176,15 +176,15 @@ function OnAide()
 				"Groupe 1-2 : les 15 premiers de la dernière European Cup Starting List produite par la FIS dans la discipline courue. "..
 				"Ce groupe 1 sera divisé en deux sous groupe (1 à 7 et 8 à 15). Ces sous groupes sont augmentés en cas d'exaequo.\n"..
 				"Groupe 3 : Ceux qui auront marqué au moins 450 points dans la ECSL toutes disciplines confondues dans la saison précédente ou celle en cours.\n"..
-				"          + les coureurs de Coupe du Monde dans les 30 premiers de la spécialité (au jour de la course).\n"..
+				" Groupe 4 : les coureurs de Coupe du Monde dans les 30 premiers de la spécialité (au jour de la course).\n"..
 				"           en cas d'exaequos, ils seront départagés par les Pts ECSL ou les points FIS.\n"..
-				"Groupe 4 : On continue dans l'ordre de la Starting List jusqu'à avoir 30 coureurs listés.\n"..
+				"Groupe 5 : On continue dans l'ordre de la Starting List jusqu'à avoir 30 coureurs listés.\n"..
 				"           Cette série peut être interrompue au rang 31 par un ou plusieurs vainqueurs des autres Coupes Continentales. Vous mettrez un caractère quelquonque dans 'Winner CC'.\n"..
 				"           La série interrompue reprend ensuite pour en avoir 30 sur la ECSL\n"..
 				"           Les coureurs pris au titre des points 'Overall' comptent parmi ces 30.\n"..
 				"           là encore, en cas d'exaequos, ils seront départagés par les Pts ECSL ou les points FIS.\n"..
 				"S'il y en a moins de 30, on prendra dans ce groupe les viennent ensuite par ordre de leurs points FIS.\n"..
-				"Groupe 5 : Le ranking se poursuit selon les points FIS.\n"..
+				"Groupe 6 : Le ranking se poursuit selon les points FIS.\n"..
 				"Les exaequos dans les coureurs 'points FIS' sont départagés par double tirage.\n"..
 				"Vous pouvez télécharger les fichiers Excel des classements sur le site de la FIS dans votre 'Member section'\n"..
 				"ATTENTION à bien vérifier que la dernière course a été prise en compte soit dès qu'elle est validée par le DT.";
@@ -637,7 +637,7 @@ end
 
 function ChecktDraw()
 	tDraw:OrderBy('Rang_tirage');
-
+	draw.bolExisteDossard = false;
 	draw.tRang_tirageauto = {};
 	draw.statut = 'CF';
 	draw.tDossardsAvailable = {};
@@ -647,9 +647,12 @@ function ChecktDraw()
 		end
 	end
 	for i = 0, tDraw:GetNbRows() -1 do
+		local dossard = tDraw:GetCellInt('Dossard', i);
+		if dossard > 0 then
+			draw.bolExisteDossard = true;
+		end
 		if draw.bolVitesse then
 			if i < 30 then
-				local dossard = tDraw:GetCellInt('Dossard', i);
 				if dossard > 0 then
 					draw.tDossardsAvailable[dossard] = draw.tDossardsAvailable[dossard] + 100;
 				end
@@ -2315,6 +2318,16 @@ function OnAfficheTableau()
 		, btnSendDossards);
 	dlgTableau:Bind(eventType.MENU, 
 		function(evt)
+			ChecktDraw();
+			if draw.bolExisteDossard then
+				local msg = "Les dossards ont déjà été tirés.\n"..
+						"Vous devez les supprimer avant de lancer ce tirage.";
+				dlgTableau:MessageBox(
+					msg, "Attribution des dossards",
+					msgBoxStyle.OK+msgBoxStyle.ICON_WARNING
+				)
+				return;
+			end
 			local msg = "Cliquer sur Oui pour lancer le double tirage du BIBO.\n"..
 					"Les coureurs doivent être validés sur le tableau au préalable.\n\n"..
 					"Vous pourrez retrouver cette impression plus tard\n"..
@@ -2327,7 +2340,6 @@ function OnAfficheTableau()
 				return;
 			end
 			draw.print_alone = false;
-			ChecktDraw();
 			if draw.statut == 'UF' then
 				local msg = "Tous les coureurs n'on pas été Validés !!!";
 				dlgTableau:MessageBox(msg, "Erreur", msgBoxStyle.OK+msgBoxStyle.ICON_WARNING)
@@ -2368,6 +2380,15 @@ function OnAfficheTableau()
 	dlgTableau:Bind(eventType.MENU, 
 		function(evt)
 			ChecktDraw();
+			if draw.bolExisteDossard then
+				local msg = "Les dossards ont déjà été tirés.\n"..
+						"Vous devez les supprimer avant de lancer ce tirage.";
+				dlgTableau:MessageBox(
+					msg, "Attribution des dossards",
+					msgBoxStyle.OK+msgBoxStyle.ICON_WARNING
+				)
+				return;
+			end
 			if draw.statut == 'UF' then
 				local msg = "Tous les coureurs n'on pas été Validés !!!";
 				dlgTableau:MessageBox(msg, "Erreur", msgBoxStyle.OK+msgBoxStyle.ICON_WARNING)
@@ -2518,6 +2539,16 @@ function OnAfficheTableau()
 
 	dlgTableau:Bind(eventType.MENU, 
 		function(evt)
+			ChecktDraw();
+			if draw.bolExisteDossard then
+				local msg = "Les dossards ont déjà été tirés.\n"..
+						"Vous devez les supprimer avant de lancer ce tirage.";
+				dlgTableau:MessageBox(
+					msg, "Attribution des dossards",
+					msgBoxStyle.OK+msgBoxStyle.ICON_WARNING
+				)
+				return;
+			end
 			draw.start_Bib = nil;
 			local msg = "Cliquer sur Oui pour lancer l'attribution\n"..
 					"des dossards pour les coureurs sans points FIS\n"..
@@ -2528,7 +2559,6 @@ function OnAfficheTableau()
 			) ~= msgBoxStyle.YES then
 				return;
 			end
-			ChecktDraw();
 			if draw.statut == 'UF' then
 				local msg = "Tous les coureurs n'on pas été Validés !!!";
 				dlgTableau:MessageBox(msg, "Erreur", msgBoxStyle.OK+msgBoxStyle.ICON_WARNING)
@@ -2570,6 +2600,16 @@ function OnAfficheTableau()
 		end, btnWeb);
 	dlgTableau:Bind(eventType.MENU, 
 		function(evt)
+			ChecktDraw();
+			if draw.bolExisteDossard then
+				local msg = "Les dossards ont déjà été tirés.\n"..
+						"Vous devez les supprimer avant de faire ce décalage.";
+				dlgTableau:MessageBox(
+					msg, "Attribution des dossards",
+					msgBoxStyle.OK+msgBoxStyle.ICON_WARNING
+				)
+				return;
+			end
 			local msg = "Voulez-vous décaler les rangs de tirage de UN vers le bas\n"..
 						"à partir de la ligne sélectionnée ?";
 			if dlgTableau:MessageBox(
@@ -2585,6 +2625,16 @@ function OnAfficheTableau()
 		end, btnDecalerBas);
 	dlgTableau:Bind(eventType.MENU, 
 		function(evt)
+			ChecktDraw();
+			if draw.bolExisteDossard then
+				local msg = "Les dossards ont déjà été tirés.\n"..
+						"Vous devez les supprimer avant de faire ce décalage.";
+				dlgTableau:MessageBox(
+					msg, "Attribution des dossards",
+					msgBoxStyle.OK+msgBoxStyle.ICON_WARNING
+				)
+				return;
+			end
 			local msg = "Voulez-vous décaler les rangs de tirage de UN vers le haut\n"..
 						"à partir de la ligne sélectionnée ?";
 			if dlgTableau:MessageBox(
@@ -2601,6 +2651,16 @@ function OnAfficheTableau()
 
 	dlgTableau:Bind(eventType.MENU, 
 		function(evt)
+			ChecktDraw();
+			if draw.bolExisteDossard then
+				local msg = "Les dossards ont déjà été tirés.\n"..
+						"Vous devez les supprimer avant de faire ce décalage.";
+				dlgTableau:MessageBox(
+					msg, "Attribution des dossards",
+					msgBoxStyle.OK+msgBoxStyle.ICON_WARNING
+				)
+				return;
+			end
 			local msg = "Voulez-vous décaler les groupes de tirage de UN vers le bas\n"..
 						"à partir de la ligne sélectionnée ?";
 			if dlgTableau:MessageBox(
@@ -2616,6 +2676,16 @@ function OnAfficheTableau()
 		end, btnDecalerGroupeBas);
 	dlgTableau:Bind(eventType.MENU, 
 		function(evt)
+			ChecktDraw();
+			if draw.bolExisteDossard then
+				local msg = "Les dossards ont déjà été tirés.\n"..
+						"Vous devez les supprimer avant de faire ce décalage.";
+				dlgTableau:MessageBox(
+					msg, "Attribution des dossards",
+					msgBoxStyle.OK+msgBoxStyle.ICON_WARNING
+				)
+				return;
+			end
 			local msg = "Voulez-vous décaler les groupes de tirage de UN vers le haut\n"..
 						"à partir de la ligne sélectionnée ?";
 			if dlgTableau:MessageBox(
@@ -2664,6 +2734,16 @@ function OnAfficheTableau()
 
 	dlgTableau:Bind(eventType.BUTTON, 
 		function(evt)
+			ChecktDraw();
+			if draw.bolExisteDossard then
+				local msg = "Les dossards ont déjà été tirés.\n"..
+						"Vous devez les supprimer avant de faire ce décalage.";
+				dlgTableau:MessageBox(
+					msg, "Attribution des dossards",
+					msgBoxStyle.OK+msgBoxStyle.ICON_WARNING
+				)
+				return;
+			end
 			if dlgTableau:GetWindowName('nom'):GetValue():len() > 0 then
 				OnAjouterCoureur();
 			end
@@ -2692,7 +2772,7 @@ function main(params_c)
 	draw.height = display:GetSize().height - 30;
 	draw.x = 0;
 	draw.y = 0;
-	draw.version = "1.6";
+	draw.version = "1.7";
 	draw.orderbyCE = 'Rang_tirage, Groupe_tirage, ECSL_points DESC, WCSL_points DESC, ECSL_overall_points DESC, Winner_CC DESC, FIS_pts, Nom, Prenom';
 	draw.orderbyFIS = 'Rang_tirage, Groupe_tirage, FIS_pts, Nom, Prenom';
 	draw.hostname = 'live.fisski.com';
@@ -2820,7 +2900,9 @@ function main(params_c)
 	tbconfig:AddStretchableSpace();
 	tbconfig:Realize();
 	local message = app.GetAuiMessage();
-
+	local titre = 'TIRAGE DES DOSSARDS EN LIGNE SUR LE SITE DE LA FIS\n\nCourse : '..tEvenement:GetCell('Nom', 0)
+	dlgConfig:GetWindowName('race_name'):SetValue(titre);
+	dlgConfig:GetWindowName('codex'):SetValue(tEvenement:GetCell('Codex', 0));
 	dlgConfig:GetWindowName('fis_hostname'):SetValue('live.fisski.com');
 	dlgConfig:GetWindowName('fis_port'):SetValue(draw.port);
 	dlgConfig:GetWindowName('fis_pwd'):SetValue(draw.pwd);
