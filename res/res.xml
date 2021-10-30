@@ -980,21 +980,23 @@
 	<matrix col_start="1">
 		<col w="1" />
 		<staticbox row="auto" label="FFS">
-			<col w="1"/>
-			<button col_start="1" col_end="0" row="auto" label="Mise à Jour Globale FFS" name="btn_ffs" />
-			<button col_start="1" col_end="0" row="auto" label="Mise à Jour des Catégories" name = "btn_categ" />
-			<button col_start="1" col_end="0" row="auto" label="Mise à Jour des Clubs" name = "btn_club" />
-			<button col_start="1" col_end="0" row="auto" label="Mise à Jour des Comités" name = "btn_comite" />
-			<button col_start="1" col_end="0" row="auto" label="Mise à Jour des Nation" name = "btn_nation" />
-			<button col_start="1" col_end="0" row="auto" label="Mise à Jour des Points" name = "btn_point" />
-			<button col_start="1" col_end="0" row="auto" label="Mise à Jour des Années de Naissance" name = "btn_an" />
+			<col w="1, 32px"/>
+			
+			<row h="auto" />
+			<button col_start="1" label="Mise à Jour Globale FFS" name="btn_ffs" />
+			<button col_start="2" label="..." name="btn_ffs_option" />
+			
 			<button col_start="1" col_end="0" row="auto" label="Mise à Jour des Distances" name = "btn_distance"/>
 			<button col_start="1" col_end="0" row="auto" label="Fixation des Tickets Courses" name = "btn_fixation_ticket" />
 			<button col_start="1" col_end="0" row="auto" label="Dé-Fixation des Tickets Courses" name = "btn_defixation_ticket" />
 		</staticbox>
 		<staticbox row="auto" label="ESF">
-			<col w="1"/>
-			<button col_start="1" col_end="0" row="auto" label="Mise à Jour Globale ESF" name="btn_esf" />
+			<col w="1, 32px"/>
+
+			<row h="auto" />
+			<button col_start="1" label="Mise à Jour Globale ESF" name="btn_esf" />
+			<button col_start="2" label="..." name="btn_esf_option" />
+		
 			<button col_start="1" col_end="0" row="auto" label="Transformation des codes EXT en ESF" name="btn_ext_to_esf"/>
 		</staticbox>
 	</matrix>
@@ -1003,12 +1005,13 @@
 		<button col_start="1" col_end="0" row="auto" label="Suppression des Concurrents" name="btn_remove" />
 		<button col_start="1" col_end="0" row="auto" label="Importation des Concurrents" name="btn_import" />
 		<button col_start="1" col_end="0" row="auto" label="Exportation des Concurrents" name="btn_export" />
-		<button col_start="1" col_end="0" row="auto" label="Transformation des Codes" />
-		<button col_start="1" col_end="0" row="auto" label="Tronquer les Temps" />
+		<button col_start="1" col_end="0" row="auto" label="Conversion des Codes" name="btn_convert_code" />
+		<button col_start="1" col_end="0" row="auto" label="Tronquer les Temps" name="btn_tronque_tps"/>
 	</staticbox>
 	<staticbox col_start="1" col_end="0" row="1" label="Message">
 		<gridmessage row="1" col="1" name="message" />
 	</staticbox>
+	<toolbar col_start="1" col_end="0" row="auto" name="tb" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT" />
 </panel>
 
 <!-- concurrent_dossard_plage -->
@@ -1072,6 +1075,10 @@
 	<text col_start="2">"Licence Dirigeant"</text>
 
 	<row h="auto" />
+	<text col_start="1" font_color="red" font_weight="bold" font_size_step="1" align="center">'f'</text>
+	<text col_start="2">"Licence familiale valide avec identité différente"</text>
+
+	<row h="auto" />
 	<text col_start="1" font_color="red" font_weight="bold" font_size_step="1" align="center">'F'</text>
 	<text col_start="2">"Licence FIS expirée ou inexistante"</text>
 
@@ -1093,9 +1100,12 @@
 	
 	<row h="auto" />
 	<text col_start="1" font_color="red" font_weight="bold" font_size_step="2" align="center">'?'</text>
-	<text col_start="2">"Licence inexistante base locale"</text>
+	<text col_start="2">"Licence inexistante en base locale"</text>
 
-
+	<row h="auto" />
+	<text col_start="1" font_color="red" font_weight="bold" font_size_step="2" align="center">'-'</text>
+	<text col_start="2">"Licence inexistante sur le www.ffs.fr"</text>
+	
 	<row h="16px" />
 </tooltip>
 
