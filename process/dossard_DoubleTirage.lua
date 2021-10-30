@@ -258,13 +258,14 @@ function main(params_c)
 	end
 	params = params_c;
 	params.debug = false;
-	params.version = '2.4';
+	params.version = '2.5';
 	params.code_evenement = params.code_evenement or -1;
 	if params.code_evenement < 0 then
 		return;
 	end
 	base = sqlBase.Clone();
 	tResultat = base:GetTable('Resultat');
+	base:TableLoad(tResultat, 'Select * From Resultat Where Code_evenement = '..params.code_evenement);
 	tEvenement = base:GetTable('Evenement');
 	base:TableLoad(tEvenement, 'Select * From Evenement Where Code = '..params.code_evenement);
 	params.evenementNom = tEvenement:GetCell('Nom', 0);

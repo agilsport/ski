@@ -2772,7 +2772,7 @@ function main(params_c)
 	draw.height = display:GetSize().height - 30;
 	draw.x = 0;
 	draw.y = 0;
-	draw.version = "1.7";
+	draw.version = "1.8";
 	draw.orderbyCE = 'Rang_tirage, Groupe_tirage, ECSL_points DESC, WCSL_points DESC, ECSL_overall_points DESC, Winner_CC DESC, FIS_pts, Nom, Prenom';
 	draw.orderbyFIS = 'Rang_tirage, Groupe_tirage, FIS_pts, Nom, Prenom';
 	draw.hostname = 'live.fisski.com';
@@ -2781,8 +2781,11 @@ function main(params_c)
 	draw.directory = app.GetPath()..'/live_draw/';
 	base = base or sqlBase.Clone();
 	tEvenement = base:GetTable('Evenement');
+	base:TableLoad(tEvenement, 'Select * From Evenement Where Code = '..draw.code_evenement);
 	tResultat = base:GetTable('Resultat');
+	base:TableLoad(tResultat, 'Select * From Resultat Where Code_evenement = '..draw.code_evenement);
 	tEpreuve = base:GetTable('Epreuve');
+	base:TableLoad(tEpreuve, 'Select * From Epreuve Where Code_evenement = '..draw.code_evenement);
 	tPistes = base:GetTable('Pistes');
 	tNation = base:GetTable('Nation');
 	tResultat_Info_Tirage = base:GetTable('Resultat_Info_Tirage');
@@ -2797,6 +2800,7 @@ function main(params_c)
 	tCategorie = base:GetTable('Categorie');
 	tClassement_Coureur = base:GetTable('Classement_Coureur');
 	tEpreuve_Alpine_Manche = base:GetTable('Epreuve_Alpine_Manche');
+	base:TableLoad(tEpreuve_Alpine_Manche, 'Select * From Epreuve_Alpine_Manche Where Code_evenement = '..draw.code_evenement);
 	
 	tTableTirage1 = sqlTable.Create('_TableTirage1');
 	tTableTirage1:AddColumn({ name = 'Row', type = sqlType.LONG, style = sqlStyle.NULL });
@@ -2811,6 +2815,7 @@ function main(params_c)
 	draw.code_entite = tEvenement:GetCell("Code_entite",0);
 	draw.code_activite = tEvenement:GetCell("Code_activite",0);
 	draw.code_niveau = tEpreuve:GetCell('Code_niveau', 0);
+	adv.Alert('draw.code_entite = '..draw.code_entite..', draw.code_activite = '..draw.code_activite..', draw.code_niveau = '..draw.code_niveau)
 	draw.sexe = tEpreuve:GetCell('Sexe', 0);
 	if draw.code_niveau ~= 'EC' then
 		draw.bolEstCE = false;
