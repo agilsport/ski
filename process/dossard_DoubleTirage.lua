@@ -105,9 +105,6 @@ function GetBibo()
 			params.nb_non_classes = params.nb_non_classes + 1;
 		end
 	end	
-	if params.debug == true then
-		adv.Alert('GetBibo - params.last_row_bibo = '..params.last_row_bibo..', params.first_row_non_classe = '..params.first_row_non_classe);
-	end
 end
 
 function CheckExaequo();
@@ -144,11 +141,6 @@ function CheckExaequo();
 		end
 	end
 	base:TableBulkUpdate(tResultat, 'Rang', 'Resultat');
-	if params.debug == true then
-		for i = 1, #params.tExaequo do
-			adv.Alert('params.tExaequo['..i..'] = '..params.tExaequo[i]);
-		end
-	end
 end
 
 function BuildTableTirageSplit(bib_first, last_row_groupe_bibo)
@@ -192,9 +184,6 @@ function BuildTableTirage(row_first, row_last, rang_tirage, bib_first, shuffle);
 		end
 		row_last = row_first + tResultat_Copy:GetNbRows() -1;
 	end
-	if params.debug then
-		adv.Alert('BuildTableTirage !! - row_first = '..row_first..', row_last = '..row_last..', rang_tirage = '..tostring(rang_tirage)..', bib_first = '..bib_first..', shuffle = '..tostring(shuffle));
-	end
 	-- row_first = 49, row_last = 78, rang_tirage = false, bib_first = 50	
 	params.tableDossards1 = {};
 	local bib = bib_first;
@@ -205,11 +194,6 @@ function BuildTableTirage(row_first, row_last, rang_tirage, bib_first, shuffle);
 	if shuffle then
 		params.tableDossards1 = Shuffle(params.tableDossards1, false);
 	end
-	for i = 1, #params.tableDossards1 do
-		if params.debug then
-			adv.Alert('BuildTableTirage !! - lecture de params.tableDossards1 après shuffle : '..params.tableDossards1[i]);
-		end
-	end
 	tTableTirage1:RemoveAllRows();
 	local rang_fictif = 0;
 	for row = 1, #params.tableDossards1 do
@@ -219,11 +203,6 @@ function BuildTableTirage(row_first, row_last, rang_tirage, bib_first, shuffle);
 	if shuffle then
 		tTableTirage1:OrderRandom('Prenom');
 	end
-	if params.debug then
-		for row = 0, tTableTirage1:GetNbRows() -1 do
-			adv.Alert('BuildTableTirage !! - Lecture de tTableTirage1 après Random : '..', Row = '..tTableTirage1:GetCellInt('Row', row));
-		end
-	end
 	
 	for row = 0, tTableTirage1:GetNbRows() -1 do
 		local row_coureur = row + row_first;
@@ -231,9 +210,6 @@ function BuildTableTirage(row_first, row_last, rang_tirage, bib_first, shuffle);
 		local code_coureur = tResultat:GetCell('Code_coureur', row_coureur);
 		local identite = tResultat:GetCell('Nom', row_coureur)..' '..tResultat:GetCell('Prenom', row_coureur);
 		local dossard = params.tableDossards1[rang_fictif];
-		if params.debug then
-			adv.Alert('BuildTableTirage !! - row_coureur : '..row_coureur..' pour '..identite..'\t'..' : rang fictif =  '..rang_fictif..', dossard correspondant = '..tostring(dossard)..' code : '..code_coureur..', dossard lu = '..tResultat_Copy:GetCellInt('Dossard', row));
-		end
 		if tResultat_Copy:GetCellInt('Dossard', row) == 0 then
 			tResultat_Copy:SetCell('Dossard', row, dossard);
 			tResultat:SetCell('Dossard', row_coureur, dossard);
@@ -243,11 +219,6 @@ function BuildTableTirage(row_first, row_last, rang_tirage, bib_first, shuffle);
 				tResultat:SetCell('Rang', row_coureur, rang_tirage);
 				-- cmd = cmd..', Rang = '..rang_tirage;
 			end
-			-- cmd = cmd..' Where Code_evenement = '..params.code_evenement.." and Code_coureur = '"..code_coureur.."'";
-			-- base:Query(cmd);
-			-- if params.debug then
-				-- adv.Alert('on fait : '..cmd);
-			-- end
 		end
 	end
 end
@@ -257,12 +228,12 @@ function main(params_c)
 		return false;
 	end
 	params = params_c;
-	params.debug = false;
-	params.version = '2.5';
+	params.version = '2.6';
 	params.code_evenement = params.code_evenement or -1;
 	if params.code_evenement < 0 then
 		return;
 	end
+	params.origine = params.origine or 'scenario';	
 	base = sqlBase.Clone();
 	tResultat = base:GetTable('Resultat');
 	base:TableLoad(tResultat, 'Select * From Resultat Where Code_evenement = '..params.code_evenement);
@@ -307,6 +278,15 @@ function main(params_c)
 			end
 		end
 	else
+		local msg = "Voulez-vous lancer le scénario de tirage au sort ?\n"..
+					"ATTENTION, tous les dossards seront effacés et remplacés par ceux du nouveau tirage.";
+		local reponse =  app.GetAuiFrame():MessageBox(msg,
+						"Lancer le tirage", 
+						msgBoxStyle.YES+msgBoxStyle.NO+msgBoxStyle.NO_DEFAULT+msgBoxStyle.ICON_WARNING
+						);
+		if reponse == msgBoxStyle.NO then
+			return ;
+		end
 		tResultat:OrderBy('Dossard DESC');
 		if tResultat:GetCell('Dossard', 0):len() > 0 then
 			local msg = "ATTENION : Les dossards ont déjà été tirés pour cette course !!!\n"..
@@ -351,9 +331,6 @@ function main(params_c)
 		-- params.first_row_non_classe;
 		-- function BuildTableTirage(row_first, row_last, rang_tirage, bib_first, shuffle);
 		for i = 1, #params.tExaequo do
-			if i == 1 and params.debug then
-				adv.Alert('\n!! tirage des exaequos !!');
-			end
 			if params.tExaequo[i] < tResultat:GetNbRows() then
 				BuildTableTirage(params.tExaequo[i]+1, nil, params.tExaequo[i] ,nil, false) -- tirage des exaequo ayants des points
 			end
@@ -373,9 +350,6 @@ function main(params_c)
 		end
 		base:TableLoad(tResultat, 'Select * From Resultat Where Code_evenement = '..params.code_evenement);
 		tResultat:OrderBy('Point');
-		if params.debug then
-			adv.Alert('\n!! tirage des non classes, first_row_non_classe = '..params.first_row_non_classe);
-		end
 		if params.first_row_non_classe then
 			if params.first_row_non_classe < tResultat:GetNbRows() -1 then
 		--      BuildTableTirage(row_first, row_last, rang_tirage, bib_first, shuffle);
@@ -384,9 +358,6 @@ function main(params_c)
 				tResultat:SetCell('Dossard', tResultat:GetNbRows()-1, tResultat:GetNbRows())
 			end
 			base:TableBulkUpdate(tResultat, 'Dossard, Rang', 'Resultat');
-		end
-		if params.debug then
-			adv.Alert('\n!! tirage du bibo, params.nb_bibo = '..params.nb_bibo);
 		end
 --      BuildTableTirage(row_first, row_last, rang_tirage, bib_first, shuffle);
 		if not bolSplitBibo then
@@ -414,9 +385,6 @@ function main(params_c)
 		OnPrintDoubleTirage(1);
 	else
 		if not params.print_alone then
-			if params.debug then
-				adv.Alert('\n!! tirage du bibo : slpil, params.row_pts7 = '..params.row_pts7..', params.last_row_bibo = '..params.last_row_bibo);
-			end
 			tResultat:OrderBy('Point');
 			tDrawG6 = tResultat:Copy();
 			ReplaceTableEnvironnement(tDrawG6, 'DrawG6');
