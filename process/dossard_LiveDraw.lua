@@ -539,8 +539,8 @@ function OnSendMessage()
 	});
 	function OnSend()
 		SendMessage(dlg:GetWindowName('message'):GetValue());
-		dlg:EndModal(idButton.OK);
 		nodelivedraw:ChangeAttribute('last_message', dlg:GetWindowName('message'):GetValue());
+		dlg:EndModal(idButton.OK);
 	end
 	
 	-- Initialisation des variables 
@@ -549,6 +549,7 @@ function OnSendMessage()
 	dlg:GetWindowName('message'):Append('Draw available');
 	dlg:GetWindowName('message'):Append('Validation of racers in progress');
 	dlg:GetWindowName('message'):Append('Board of racers refreshed');
+	dlg:GetWindowName('message'):Append('Board confirmed');
 	dlg:GetWindowName('message'):Append('Board confirmed, bib drawing in progress');
 	dlg:GetWindowName('message'):Append('Bib drawing completed, the race will start at ');
 	dlg:GetWindowName('message'):SetSelection(0);
@@ -2219,15 +2220,6 @@ function OnAfficheTableau()
 	dlgTableau:Bind(eventType.MENU, 
 		function(evt)
 			ChecktDraw();
-			if draw.bolExisteDossard then
-				local msg = "Les dossards ont déjà été tirés.\n"..
-						"Vous devez les supprimer avant de lancer ce tirage.";
-				dlgTableau:MessageBox(
-					msg, "Attribution des dossards",
-					msgBoxStyle.OK+msgBoxStyle.ICON_WARNING
-				)
-				return;
-			end
 			local msg = "Cliquer sur Oui pour lancer le double tirage du BIBO.\n"..
 					"Les coureurs doivent être validés sur le tableau au préalable.\n\n"..
 					"Vous pourrez retrouver cette impression plus tard\n"..
@@ -2280,15 +2272,6 @@ function OnAfficheTableau()
 	dlgTableau:Bind(eventType.MENU, 
 		function(evt)
 			ChecktDraw();
-			if draw.bolExisteDossard then
-				local msg = "Les dossards ont déjà été tirés.\n"..
-						"Vous devez les supprimer avant de lancer ce tirage.";
-				dlgTableau:MessageBox(
-					msg, "Attribution des dossards",
-					msgBoxStyle.OK+msgBoxStyle.ICON_WARNING
-				)
-				return;
-			end
 			if draw.statut == 'UF' then
 				local msg = "Tous les coureurs n'on pas été Validés !!!";
 				dlgTableau:MessageBox(msg, "Erreur", msgBoxStyle.OK+msgBoxStyle.ICON_WARNING)
@@ -2440,15 +2423,6 @@ function OnAfficheTableau()
 	dlgTableau:Bind(eventType.MENU, 
 		function(evt)
 			ChecktDraw();
-			if draw.bolExisteDossard then
-				local msg = "Les dossards ont déjà été tirés.\n"..
-						"Vous devez les supprimer avant de lancer ce tirage.";
-				dlgTableau:MessageBox(
-					msg, "Attribution des dossards",
-					msgBoxStyle.OK+msgBoxStyle.ICON_WARNING
-				)
-				return;
-			end
 			draw.start_Bib = nil;
 			local msg = "Cliquer sur Oui pour lancer l'attribution\n"..
 					"des dossards pour les coureurs sans points FIS\n"..
@@ -2672,7 +2646,7 @@ function main(params_c)
 	draw.height = display:GetSize().height - 30;
 	draw.x = 0;
 	draw.y = 0;
-	draw.version = "1.9";
+	draw.version = "2.0";
 	draw.orderbyCE = 'Rang_tirage, Groupe_tirage, ECSL_points DESC, WCSL_points DESC, ECSL_overall_points DESC, Winner_CC DESC, FIS_pts, Nom, Prenom';
 	draw.orderbyFIS = 'Rang_tirage, Groupe_tirage, FIS_pts, Nom, Prenom';
 	draw.hostname = 'live.fisski.com';

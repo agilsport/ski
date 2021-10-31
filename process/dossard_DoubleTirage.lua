@@ -166,6 +166,7 @@ end
 
 function BuildTableTirage(row_first, row_last, rang_tirage, bib_first, shuffle);
 	tResultat_Copy = tResultat:Copy();
+	ReplaceTableEnvironnement(tResultat_Copy, '_Resultat_Copy');
 	shuffle = shuffle or false;
 	if rang_tirage then
 		bib_first = rang_tirage;
@@ -240,6 +241,7 @@ function main(params_c)
 	tEvenement = base:GetTable('Evenement');
 	base:TableLoad(tEvenement, 'Select * From Evenement Where Code = '..params.code_evenement);
 	params.evenementNom = tEvenement:GetCell('Nom', 0);
+	params.evenementNom = tEvenement:GetCell('Nom', 0);
 	tEpreuve = base:GetTable('Epreuve');
 	base.TableLoad(tEpreuve, 'Select * From Epreuve Where Code_evenement = '..params.code_evenement);
 	tResultat_Info_Bibo = base:GetTable('Resultat_Info_Bibo');
@@ -312,15 +314,13 @@ function main(params_c)
 		base:Query(cmd);
 		cmd = 'Update Resultat Set Dossard = Null, Rang = NULL, Critere = Null Where Code_evenement = '..params.code_evenement;
 		base:Query(cmd);
-		if params.first_row_non_classe then
+		if params.first_row_non_classe then		-- tirage des non classés
 			local cmd = 'Update Resultat Set Rang = '..(params.first_row_non_classe + 1)..' Where Code_evenement = '..params.code_evenement..' And Point Is Null';
 			base:Query(cmd);
 		end
 		base:TableLoad(tResultat, 'Select * From Resultat Where Code_evenement = '..params.code_evenement);
 		tResultat:OrderBy('Point');
 
-		tResultat_Copy = tResultat:Copy();
-		ReplaceTableEnvironnement(tResultat_Copy, '_Resultat_Copy');
 		CheckExaequo();
 		-- valeurs définies apres GetBibo
 		-- params.pts15 
@@ -337,17 +337,19 @@ function main(params_c)
 		end
 		-- base:TableBulkUpdate(tResultat, 'Dossard, Rang', 'Resultat');
 		-- base:TableLoad(tResultat, 'Select * From Resultat Where Code_evenement = '..params.code_evenement);
-		
+		local limite = nil;
 		if params.first_row_non_classe then
-			for row = params.nb_bibo, params.first_row_non_classe -1 do
-				if tResultat:GetCellInt('Dossard', row) == 0 then
-					local code_coureur = tResultat:GetCell('Code_coureur', row);
-					local dossard = row + 1;
-					tResultat:SetCell('Dossard', row, dossard) ;
-				end
-			end
-			base:TableBulkUpdate(tResultat, 'Dossard, Rang', 'Resultat');
+			limite = params.first_row_non_classe;
+		else
+			limite = tResultat:GetNbRows();
 		end
+		for row = params.nb_bibo, limite -1 do
+			if tResultat:GetCellInt('Dossard', row) == 0 then
+				local dossard = row + 1;
+				tResultat:SetCell('Dossard', row, dossard) ;
+			end
+		end
+		base:TableBulkUpdate(tResultat, 'Dossard, Rang', 'Resultat');
 		base:TableLoad(tResultat, 'Select * From Resultat Where Code_evenement = '..params.code_evenement);
 		tResultat:OrderBy('Point');
 		if params.first_row_non_classe then
