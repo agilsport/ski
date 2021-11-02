@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Edition des duels (KO - SX - ...) !-->
+<!-- version="2.0" -->
 <edition>
 	<!-- footer standard !-->
 	<footer>
@@ -51,7 +52,7 @@
 		<!-- <lua>body:SetRanking('Clt', 'Centre, Tour_max Desc, Duel_max asc, Clt_max NULL_OK, Clt_qualif NULL_OK, Dossard')</lua> -->
 		<lua>sqlBase.FixationTableRanking(body)</lua>
 		
-		<!-- Copie Clt dans la colonne Critere -->
+		<!-- Copie Clt dans la colonne Critere pour gestion KO en challenge -->
 		<!-- <lua> -->
 			<!-- for i=0,body:GetNbRows()-1 do  -->
 				<!-- local cmd = "Update Resultat Set Critere = '"..body:GetCell('Clt',i).."' "; -->
