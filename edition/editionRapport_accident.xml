@@ -1,0 +1,298 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!-- version_script = '1.5'; -->
+<root>
+	<!-- Fenètre de pour la selection du rapport a lire ou a créer -->
+<panel name="NumFichier">
+	<padding all="2px"/>
+	<col value="5,5,5,5,5" />
+
+	<row value="auto" />
+		<statictext col_start="1" col_end="0"  align="center" label="Sélectionner le rapport d\'accident à éditer"/>
+	
+	<row value="auto" />
+		<statictext col_start="1" col_end="3"  align="right" label='Rapport à éditer'/>
+		<combobox col_start="4" name="NumFichier" align="right" style="CB_READONLY"/>
+		
+	<row value="auto" />
+	<toolbar name="tb" col_start="1" col_end="0" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
+</panel>
+
+
+	<!-- Rapport accident -->
+	<report id="rap_accident" title="(params.title or '')" >
+	<layers>
+		<layer id="FFS">
+		</layer>
+	</layers>
+	<margin left="30" top="45" right="30" bottom="10" />
+	<padding all="2px"/>
+	<font name="Calibri" size="11" adjust="best" weight="normal"/>
+		<header >
+		<spacing left="25" right="5" top="6" bottom="6" />
+		<!-- <padding vert="0.5cm" /> -->
+		<background mode="transparent"/>
+		
+		<text row="auto" align="center" ><font name="Calibri" size="18" adjust="max" weight="bold"/>'Fédération Française de Ski \n DT – Rapport d\'accident'</text>
+		<row h="0.5cm" />
+		<text row="auto" align="center">'Toute blessure survenue lors d\'une compétition inscrite au calendrier de la FFS \n doit faire l\'objet d’un rapport du Délégué Technique. \n Il doit être envoyé au BTR pour une compétition régionale et à la FFS pour une compétition nationale. '</text>
+		<text row="1cm" align="center" >' '</text>
+			<matrix row="auto" >
+				<col w="1,2cm,1,1,1,1,1,1,1,1,1,2cm"/>
+			<!-- parametres -->
+				<!-- ligne 1 -->
+				<row h="auto" />
+					<text col_start="1" col_end="0" align="center" border="all" ><background mode="solid" color="ltgray" />'Paramètres'</text>
+				<!-- espace de separation -->
+				<row h="0.5cm" />
+				
+				<!-- ligne 2 -->
+				<row h="auto" />
+					<text col_start="1" col_end="4" align="left" border="all" ><background mode="solid" color="yellow" />' évènement'</text>
+					<text col_start="5" col_end="8" align="left" border="all" ><background mode="solid" color="yellow" />'Epreuve'</text>
+					<text col_start="9" col_end="12" align="left" border="all" ><background mode="solid" color="yellow" />'Coureur'</text>
+				<row h="0.5cm" />
+				<!-- ligne 3-->
+				<row h="auto" />	
+					<text col_start="1" col_end="1" align="right" >'Nom:'</text>
+					<text col_start="2" col_end="4" align="left" border="right" >$(Rap_accident.Evt_Name)</text>
+					<text col_start="5" col_end="5" align="right" >'Lieu:'</text>
+					<text col_start="6" col_end="8" align="left" border="right" >$(Rap_accident.Epreuve_lieu)</text>
+					<text col_start="9" col_end="9" align="right" >'Identité:'</text>
+					<text col_start="10" col_end="12" align="left" >$(Rap_accident.Coureur_identite)</text>
+				<row h="0.1cm" />	
+				<!-- ligne 4-->
+				<row h="auto" />	
+					<text col_start="1" col_end="1" align="right" >'Date:'</text>
+					<text col_start="2" col_end="2" align="left" >$(Rap_accident.Evt_date)</text>
+					<text col_start="3" col_end="3" align="right" >'Saison:'</text>
+					<text col_start="4" col_end="4" align="left" border="right" >$(Rap_accident.Code_saison)</text>
+					<text col_start="5" col_end="5" align="right" >'Piste:'</text>
+					<text col_start="6" col_end="8" align="left" border="right" >$(Rap_accident.Epreuve_piste)</text>
+					<text col_start="9" col_end="9" align="right" >'N° LIC:'</text>
+					<text col_start="10" col_end="10" align="left" >$(Rap_accident.Code_coureur)</text>
+					<text col_start="11" col_end="11" align="right" >'Sexe:'</text>
+					<text col_start="12" col_end="12" align="left" >$(Rap_accident.Coureur_sexe)</text>
+				<row h="0.1cm" />	
+				<!-- ligne 5 -->
+				<row h="auto" />	
+					<text col_start="1" col_end="1" align="right" >'Activité:'</text>
+					<text col_start="2" col_end="2" align="left" >$(Rap_accident.Evt_activite)</text>
+					<text col_start="3" col_end="4" align="left" border="right"  ></text>
+					<text col_start="5" col_end="5" align="right" >'Disc.:'</text>
+					<text col_start="6" col_end="6" align="left" >$(Rap_accident.Code_discipline)</text>
+					<text col_start="7" col_end="7" align="right" >'Manche:'</text>
+					<text col_start="8" col_end="8" align="left" border="right" >$(Rap_accident.Epr_manche)</text>
+					<text col_start="9" col_end="9" align="right" >'An.:'</text>
+					<text col_start="10" col_end="10" align="left" >$(Rap_accident.Coureur_annee)</text>
+					<text col_start="11" col_end="11" align="right" >'Tel:'</text>
+					<text col_start="12" col_end="12" align="left" >$(Rap_accident.Coureur_tel)</text>
+				<row h="0.1cm" />	
+				<!-- ligne 6 -->
+				<row h="auto" />	
+					<text col_start="1" col_end="1" align="right" >'Codex:'</text>
+					<text col_start="2" col_end="2" align="left" >$(Rap_accident.Evt_codex)</text>
+					<text col_start="3" col_end="4" align="left" border="right"  >'Num. Rapport:'..$(Rap_accident.Num_rapport)</text>
+					<text col_start="5" col_end="7" align="left" ><spacing left="80"/>'Heure de l\'accident:'..$(Rap_accident.Acc_heure)</text>
+					<text col_start="8" col_end="8" align="left" border="right"  ></text>
+				<!-- espace de separation -->
+				<row h="0.5cm" />
+				<!-- ligne 7 -->
+				<row h="auto" />
+					<text col_start="1" col_end="0" align="center" border="all" ><background mode="solid" color="ltgray" />'Infos Météo'</text>
+				<!-- espace de separation -->
+				<row h="0.5cm" />
+				<!-- ligne 8 -->
+				<row h="auto" />
+					<text col_start="1" col_end="3" align="left" >'Condition de course:'</text>
+					<text col_start="4" col_end="8" align="left" >$(Rap_accident.Evt_cond)</text>					
+					<text col_start="9" col_end="9" align="left" >'Temps:'</text>
+					<text col_start="10" col_end="12" align="left" >$(Rap_accident.Epr_temps)</text>
+				<!-- espace de separation -->
+				<row h="0.5cm" />
+			<!-- blessure -->
+				<!-- ligne 7 -->
+				<row h="auto" />
+					<text col_start="1" col_end="0" align="center" border="all" ><background mode="solid" color="ltgray" />'Infos Bléssure(s)'</text>
+				<!-- espace de separation -->
+				<row h="0.5cm" />
+				<!-- ligne 8 -->
+				<row h="auto" />
+					<row h="auto" />	
+					<text col_start="1" col_end="2" align="left" >'Téte-Face:'</text>
+					<text col_start="3" col_end="4" align="left" border="right" >$(Rap_accident.Bles_tete)</text>
+					<text col_start="5" col_end="6" align="left" >'Fracture:'</text>
+					<text col_start="7" col_end="8" align="left" border="right" >$(Rap_accident.Bles_fracture)</text>
+					<text col_start="9" col_end="12" align="center" border="left" ><background mode="solid" color="yellow" />'Information:'</text>
+				<!-- ligne 9 -->
+				<row h="auto" />
+					<row h="auto" />	
+					<text col_start="1" col_end="2" align="left" >'Nuque-Rachis:'</text>
+					<text col_start="3" col_end="4" align="left" border="right" >$(Rap_accident.Bles_nuque)</text>
+					<text col_start="5" col_end="6" align="left" >'Entorse - élongation:'</text>
+					<text col_start="7" col_end="8" align="left" border="right" >$(Rap_accident.Bles_entorse)</text>
+					
+				<!-- ligne 10 -->
+				<row h="auto" />
+					<row h="auto" />	
+					<text col_start="1" col_end="2" align="left" >'Epaule-Clavicule:'</text>
+					<text col_start="3" col_end="4" align="left" border="right" >$(Rap_accident.Bles_epaule)</text>
+					<text col_start="5" col_end="6" align="left" >'Contusion:'</text>
+					<text col_start="7" col_end="8" align="left" border="right" >$(Rap_accident.Bles_contusion)</text>
+					<text col_start="9" col_end="12" align="left" >'Situation:'..$(Rap_accident.Situation)</text>
+				<!-- ligne 11 -->
+				<row h="auto" />
+					<row h="auto" />	
+					<text col_start="1" col_end="2" align="left" >'Membre supérieur:'</text>
+					<text col_start="3" col_end="4" align="left" border="right" >$(Rap_accident.Bles_membre_sup)</text>
+					<text col_start="5" col_end="6" align="left" >'Plaie:'</text>
+					<text col_start="7" col_end="8" align="left" border="right" >$(Rap_accident.Bles_plaie)</text>
+				<!-- ligne 12 -->
+				<row h="auto" />
+					<row h="auto" />	
+					<text col_start="1" col_end="2" align="left" >'Bassin:'</text>
+					<text col_start="3" col_end="4" align="left" border="right" >$(Rap_accident.Bles_bassin)</text>
+					<text col_start="5" col_end="6" align="left" >'Ventre:'</text>
+					<text col_start="7" col_end="8" align="left" border="right" >$(Rap_accident.Bles_ventre)</text>
+					<text col_start="9" col_end="12" align="left" ></text>
+				<!-- ligne 13 -->
+				<row h="auto" />
+					<row h="auto" />	
+					<text col_start="1" col_end="2" align="left" >'Membre infèrieur:'</text>
+					<text col_start="3" col_end="4" align="left" border="right" >$(Rap_accident.Bles_membre_inf)</text>
+					<text col_start="5" col_end="6" align="left" >'Atteintes musculaires:'</text>
+					<text col_start="7" col_end="8" align="left" border="right" >$(Rap_accident.Bles_musculaire)</text>
+					<text col_start="9" col_end="12" align="left" >'Evacuation:'..$(Rap_accident.Evacuation)</text>
+				<!-- ligne 14 -->
+				<row h="auto" />
+					<row h="auto" />	
+					<text col_start="1" col_end="2" align="left" >'Genou:'</text>
+					<text col_start="3" col_end="4" align="left" border="right" >$(Rap_accident.Bles_genou)</text>
+					<text col_start="5" col_end="6" align="left" >'Autre:'</text>
+					<text col_start="7" col_end="8" align="left" border="right" >$(Rap_accident.Bles_type_autre)</text>
+				<!-- ligne 15 -->
+				<row h="auto" />
+					<row h="auto" />	
+					<text col_start="1" col_end="2" align="left" >'Chevilles:'</text>
+					<text col_start="3" col_end="4" align="left" border="right" >$(Rap_accident.Bles_membre_inf)</text>
+					<text col_start="5" col_end="6" align="left" ></text>
+					<text col_start="7" col_end="8" align="left" border="right" ></text>
+					<text col_start="9" col_end="12" align="left" >'Neige:'..$(Rap_accident.Epr_neige)</text>
+				<!-- ligne 16 -->
+				<row h="auto" />
+					<row h="auto" />	
+					<text col_start="1" col_end="2" align="left" >'Autres:'</text>
+					<text col_start="3" col_end="4" align="left" border="right" >$(Rap_accident.Bles_autres)</text>
+					<text col_start="7" col_end="8" align="left" border="right" ></text>
+			</matrix>
+				<row h="0.5cm"/>
+		</header>
+
+		<!-- params evenement	 -->
+		<first_header >
+			<matrix row="auto" >
+				<col w="2cm,1,1,1,1,2cm"/>
+			<!-- parametres -->
+				<!-- ligne 1 -->
+				<row h="auto" />
+					<text col_start="1" col_end="0" align="center" border="all" ><background mode="solid" color="ltgray" />'Désignation et coordonnées des Intervenants'</text>
+				<!-- espace de separation -->
+				<row h="0.5cm" />
+				<!-- ligne 2 -->
+				<row h="auto" />
+					<text col_start="2" col_end="2" align="left" border="all" ><background mode="solid" color="yellow" />'Description'</text>
+					<text col_start="3" col_end="3" align="left" border="all" ><background mode="solid" color="yellow" />'Identité'</text>
+					<text col_start="4" col_end="4" align="left" border="all" ><background mode="solid" color="yellow" />'Téléphone'</text>
+					<text col_start="5" col_end="5" align="left" >''</text>
+				<row h="0.3cm" />
+				<!-- ligne 4 -->
+				<row h="auto" />
+					<text col_start="2" col_end="2" align="left" >'Délégué technique:'</text>
+					<text col_start="3" col_end="3" align="left" >$(Rap_accident.Evt_dt_name)</text>
+					<text col_start="4" col_end="4" align="left" >$(Rap_accident.Evt_dt_tel)</text>
+					<text col_start="5" col_end="5" align="left" >''</text>
+				<row h="0.3cm" />
+				<!-- ligne 5 -->
+				<row h="auto" />
+					<text col_start="2" col_end="2" align="left" >'Medecin de course:'</text>
+					<text col_start="3" col_end="3" align="left" >$(Rap_accident.Evt_Med_Name)</text>
+					<text col_start="4" col_end="4" align="left" >$(Rap_accident.Evt_Med_Tel)</text>
+					<text col_start="5" col_end="5" align="left" >''</text>
+				<row h="0.3cm" />
+				<!-- ligne 6 -->
+				<row h="auto" />
+					<text col_start="2" col_end="2" align="left" >$(Rap_accident.Evt_Sec_descip)</text>
+					<text col_start="3" col_end="3" align="left" >$(Rap_accident.Evt_Sec_Name)</text>
+					<text col_start="4" col_end="4" align="left" >$(Rap_accident.Evt_Sec_Tel)</text>
+					<text col_start="5" col_end="5" align="left" >''</text>
+				<row h="0.3cm" />
+				<!-- ligne 7 -->
+				<row h="auto" />
+					<text col_start="2" col_end="2" align="left" >'Témoin 1:'</text>
+					<text col_start="3" col_end="3" align="left" >$(Rap_accident.Evt_Tem1_Name)</text>
+					<text col_start="4" col_end="4" align="left" >$(Rap_accident.Evt_Tem1_Tel)</text>
+					<text col_start="5" col_end="5" align="left" >''</text>
+				<row h="0.3cm" />
+				<!-- ligne 7 -->
+				<row h="auto" />
+					<text col_start="2" col_end="2" align="left" >'Témoin 2:'</text>
+					<text col_start="3" col_end="3" align="left" >$(Rap_accident.Evt_Tem2_Name)</text>
+					<text col_start="4" col_end="4" align="left" >$(Rap_accident.Evt_Tem2_Tel)</text>
+					<text col_start="5" col_end="5" align="left" >''</text>
+				<row h="0.3cm" />
+				<!-- ligne 7 -->
+				<row h="auto" />
+					<text col_start="2" col_end="2" align="left" >'Témoin 3:'</text>
+					<text col_start="3" col_end="3" align="left" >$(Rap_accident.Evt_Tem3_Name)</text>
+					<text col_start="4" col_end="4" align="left" >$(Rap_accident.Evt_Tem3_Tel)</text>
+					<text col_start="5" col_end="5" align="left" >''</text>
+				<row h="0.6cm" />
+				<!-- ligne 1 -->
+				<row h="auto" />
+					<text col_start="1" col_end="0" align="center" border="all" ><background mode="solid" color="ltgray" />'Commentaires'</text>
+				<!-- espace de separation -->
+				<row h="0.5cm" />
+				<!-- ligne 2 -->
+				<row h="3cm" />
+					<text col_start="2" col_end="5" align="left" border="all" >$(Rap_accident.Rap_commentaire)</text>
+			</matrix>
+		
+		
+		</first_header>
+
+		<!-- footer standard !-->
+	<footer>
+		<background mode="transparent"/>
+		<font name="Calibri" size="8" adjust="best" weight="normal"/>
+		<pen border="none" />
+
+		<lua>entite = entite or $(Evenement.Code_entite)</lua>
+		<lua>info = $(Epreuve.Date_epreuve,'%2D/%2M/%4Y')..' / '..$(Evenement.Station)..' ('</lua>
+		<lua cond="entite=='FIS'">info = info..$(Evenement.Code_nation)..'-'</lua>
+		<lua>info = info..$(Evenement.Code_comite).. ') / '..$(Evenement.Organisateur)</lua>
+		<text row="auto" col="1" align="left">info</text>
+		<text align="right" font_weight="bold" cond="entite=='FIS'">$(Epreuve.Fichier_transfert_int)..' (Liste n°'..$(Evenement.Code_liste)..')'</text>
+		<text align="right" font_weight="bold" cond="entite=='FFS'">$(Epreuve.Fichier_transfert)..' (Liste n°'..$(Evenement.Code_liste)..')'</text>
+		<line col_start="1" col_end="0" pen_size="2" pen_color="dkgray" border="bottom"/>
+		<!-- <text row="auto" align="left"><pen border="top" />app.GetName()..' Version '..app.GetVersion()..' (FFS - ESF - Agil Informatique) - '..os.date('Edité le %d-%m-%Y à %H:%M:%S')</text> -->
+		
+		<row h="auto" />
+		<matrix col_start="1">
+			<row h="auto"/>
+			<text col="auto" align="left">app.GetName()..' Version '..app.GetVersion()..' / FFS'</text>
+			<image col="0.4cm" adjust="width" align="left">'./res/32x32_ffs.png'</image>
+			<text col="auto" align="left" adjust="width">' / ESF'</text>
+			<image col="0.4cm" adjust="width" align="left">'./res/32x32_esf.png'</image>
+			<text col="auto" align="left">' / Agil Informatique'</text>
+			<image col="0.4cm" adjust="width" align="left">'./res/32x32_agil.png'</image>
+			<text col="auto" align="left">os.date(' / Edité le %d-%m-%Y à %H:%M:%S')</text>
+		</matrix>	
+		<text align="right">string.format('Page %d/%s',editor:GetPageCurrent(), editor:GetPageCountLabel())</text>
+		<line col_start="1" col_end="0" border="top" />
+		<text row="auto" align="left" cond="editor:GetPageCurrent() == 1">$(Evenement.Commentaire)</text>
+	</footer>	
+		
+	</report>
+
+
+
+</root>

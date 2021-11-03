@@ -1,14 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- Menu Editions Activité "Biathlon" !-->
+<!-- Menu Editions Activité "ROL" !-->
 <!-- version="5.6" !-->
 <!-- calcul de la note poursuite 2éme jour !-->
-<!-- si possible de faire fonctionner les cond="discipline:In('POURS')" dans les menus ??  !-->
-<!-- verifier l'ordre en cas d'axeco !-->
-<!-- dans le first header comment on peu eviter c-d-c-d- - -   !-->
-
+<!-- si possible de faire fonctionner les cond="discipline:In('POURS')" dans les menus ??  -->
+<!-- appel de la fenetre de filtrage epreuves dans couloir.lua -->
 <edition>
-	
 	<menu>
 		<menu title="Listes des Participants " image="./res/32x32_juges.png">
 			<menu title="Par Ordre Alphabétique" image="./res/16x16_juges.png" id="part_officiel" />
@@ -44,10 +41,7 @@
 
 	<!-- header standard !-->
 	<header>
-		<lua>type_edition = id:sub(1,4)
-			 entite = $(Evenement.Code_entite)
-			 discipline = $(Epreuve.Code_discipline)
-		</lua>
+		<lua>type_edition = id:sub(1,4)</lua>
 		<spacing all="0"/>
 		<background mode="transparent"/>
 		<font name="Calibri" size="14" adjust="max" weight="bold"/>
@@ -55,7 +49,7 @@
 		<text row="auto" align="center">$(Discipline.Libelle)</text>
 		<text row="auto" align="center" cond="params.code_epreuve ~= -1">$(Categorie{$(Epreuve.Code_categorie)}.Libelle)..' - '..$(Sexe{$(Epreuve.Sexe)}.Libelle)</text>
 		<text row="auto" align="center" cond="title" >title</text>
-		<row h="1.5cm"/>
+		<row h="0.5cm"/>
 		<matrix row_start="-3" row_end="0" col_start="10" col_end="0">
 			<row h="1.5cm" />
 			<col w="1, 1.5cm" />
@@ -63,7 +57,7 @@
 			<qrcode adjust="best" col_start="2" cond="tonumber(params.Qrcode)==1 and entite=='FIS' and $(Evenement.Commentaire_live):len() &gt; 0">'live.fis-ski.com/lv-al'..string.sub($(Epreuve.Fichier_transfert),4)..'.htm#/short'</qrcode>
 		</matrix>
 		<!-- affichage de la ligne d'heure de départ en massstart ou fond pop si pas de first header -->
-		<lua>if type_edition == 'lst_' and first_header == '0' and discipline:In('MASS', 'FP', 'RELAIS', 'RELAIS-M', 'RELAIS-S') then</lua>
+		<lua>if type_edition == 'lst_' and first_header == '0' and discipline:In('MASS','POURS-D', 'FP') then</lua>
 		<call option="Ligne_H_depart" cond="editor:GetPageCurrent() == 1" file="./edition/options.xml"/>
 		<lua>end</lua>
 		<!-- affichage du Compteur des classés si c'est un resultat (id commence par 'res_' et si le first header n'est pas actif) -->
@@ -73,7 +67,7 @@
 		<row value="0.4cm" />
 		<lua>end </lua>
 	</header>
-	
+		
 	<!-- first_header standard !-->
 	<first_header >
 		<background mode="transparent"/>
@@ -83,7 +77,7 @@
 		<lua>type_edition = id:sub(1,4)</lua>
 		<lua>entite = $(Evenement.Code_entite)</lua>
 		<lua>discipline = $(Epreuve.Code_discipline)</lua>
-		<col w="5,5,1, 0.2cm,4,4,1, 0.2cm,4,4,1" />
+		<col w="6,5,1, 0.2cm,4,4,1, 0.2cm,4,4,1" />
 
 		<row h="auto" />
 		<text col_start="1" col_end="3" align="center" underlined="1" font_size_step="1" font_weight="bold">'JURY DE COMPETITION'</text>
@@ -129,23 +123,17 @@
 		<text col_start="5" align="left" >'Montée Totale. :'</text>
 		<text col_start="6" align="left" >$(Epreuve.Montee_tot)</text>
 		<text col_start="9" align="left">'Style :'</text>
-		<lua>if $(Epreuve.Style) == 'L' then Style = 'Libre' </lua>
-		<lua>elseif $(Epreuve.Style) == 'C' then Style = 'Classique' </lua>
-		<lua>elseif $(Epreuve.Style) == 'X' then Style = 'Classique + Libre' </lua>
-		<lua>elseif $(Epreuve.Style) == 'Y' then Style = 'Libre + Classique' end </lua>
+		<lua>
+			if $(Epreuve.Style) == 'L' then Style = 'Libre' 
+			elseif $(Epreuve.Style) == 'C' then Style = 'Classique' 
+			elseif $(Epreuve.Style) == 'C+L' then Style = 'Classique + Libre' 
+			elseif $(Epreuve.Style) == 'L+C' then Style = 'Libre + Classique' end 
+		</lua>
 		<text col_start="10" col_end="0" align="right" >Style</text>
 		
-		<row h="auto" />
-		<text col_start="1" align="left">'Resp. pas de tir:'</text>
-		<text col_start="2" col_end="3" align="left">GetIdentiteOfficiels('ffs_chef_pas_tir')</text>
-		<text col_start="5" align="left" >'Type de tir:'</text>
-		<text col_start="6" align="left" >$(Epreuve.Tir)</text>
-		<text col_start="9" align="left">'Pénalités Tir :'</text>
-		<text col_start="10" col_end="0" align="right" >$(Epreuve.Penalite_tir)..' Sec.'</text>
-		
 		<!-- mise en place de ligne verticale -->
-		<line col_start="4" row_start="-6" row_end="0" pen_color="dkgray" border="mid_vert" />
-		<line col_start="8" row_start="-6" row_end="0" pen_color="dkgray" border="mid_vert" />
+		<line col_start="4" row_start="-5" row_end="0" pen_color="dkgray" border="mid_vert" />
+		<line col_start="8" row_start="-5" row_end="0" pen_color="dkgray" border="mid_vert" />
 		
 		<row h="auto" />
 		<lua>
@@ -156,13 +144,15 @@
 		<text col_start="6" col_end="10" align="left" >'Organisateur : '..$(Evenement.Organisateur) </text>
 		<!-- retour a la ligne de 0.1cm		 -->
 		<row h="0.2cm" />
-		
+		<row value="auto" />
+		<line col_start="1" col_end="0" pen_color="dkgray" border="top" />
 		<row h="auto" />
 		<text col_start="1" align="left">'Météo : '..$(Epreuve_Nordique.Meteo)</text>
 		<text col_start="2" align="left">'Liste : '..$(Evenement.Code_liste)</text>
 		<text col_start="5" col_end="6" align="left" >'Codex Epreuve : '..$(Epreuve.Fichier_transfert) </text>
 		<text col_start="8" col_end="9" align="left" >'Coéficient F : '..$(Discipline.Facteur_f)</text>
 		<text col_start="10" align="left" cond="params.title=='Résultats Officiels'" >'Penalitée : '..$(Epreuve.Penalite_appliquee)</text>
+
 		<!-- affichage de la ligne d'heure de départ en massstart ou fond pop -->
 		<lua>if type_edition == 'lst_' and discipline:In('MASS','POURS-D', 'FP') then</lua>
 		<call option="Ligne_H_depart" cond="editor:GetPageCurrent() == 1" file="./edition/options.xml"/>
@@ -205,7 +195,76 @@
 		<text align="right">string.format('Page %d/%s',editor:GetPageCurrent(), editor:GetPageCountLabel())</text>
 		<line col_start="1" col_end="0" border="top" />
 		<text row="auto" align="left" cond="editor:GetPageCurrent() == 1">$(Evenement.Commentaire)</text>
-	</footer>		
+	</footer>
+	
+	<!-- Pénalité Nordique -->
+	<report id="penalite" title="Calcul de la Pénalité" first_header="0">
+		<lua>dofile('./interface/adv.lua');</lua>
+		<layers>
+			<layer id="ffs">
+			</layer>
+		</layers>
+		
+		<end>
+			<lua>entite = base:GetTable("Evenement"):GetCell("Code_entite", 0)</lua>
+			<lua>best5 = base:GetTable("best5")</lua>
+			
+			<!-- Label -->
+			<row h="auto"/>
+			<font size="10" name ="calibri" weight="bold" adjust="best" />
+			<text col="4" align="center">'Clt.'</text>
+			<text col="4" align="center">'Dos.'</text>
+			<text col="7" align="center">'Code'</text>
+			<text col="24" align="center">'Nom - Prénom'</text>
+			<text col="4" align="center">'An'</text>
+			<text col="4" cond="entite == 'FIS'" align="center">'Nat.'</text>
+			<text col="3" cond="entite == 'FFS'" align="center">'CR'</text>
+			<text col="12" cond="entite == 'FFS'" align="center">'Club'</text>
+			<text col="8" align="center">'Pt.Insc.'</text>
+			<text col="8" align="center">'3 Notes.'</text>
+			<lua>if entite == 'FIS' then col3Notes = 8 else col3Notes = 9 end </lua>
+			<text col="8" align="center">'Pt.Compet.'</text>
+			<row h="0.2cm"/>
+			<!-- 5 Meilleurs à l'arrivée -->
+			<text row="auto" col_start="1" col_end="0" align="center" border="1"><font size="12" />'5 MEILLEURS A L\'ARRIVEE'</text>
+			<row h="0.2cm"/>
+			<lua>for i=0, best5:GetNbRows()-1 do</lua>
+				<row h="70px" />
+				<text lua="c=1" col_start="(c)" align="right">best5:GetCell('Clt',i)</text>
+				<text lua="c=c+1" col_start="(c)" align="right">best5:GetCell('Dossard',i)</text>
+				<text lua="c=c+1" col_start="(c)" align="center">best5:GetCell('Code_coureur',i):sub(4)</text>
+				<text lua="c=c+1" col_start="(c)" align="left">best5:GetCell('Identite',i)</text>
+				<text lua="c=c+1" col_start="(c)" align="center">best5:GetCell('An',i)</text>
+				<text lua="c=c+1" col_start="(c)" cond="entite == 'FIS'" align="center">best5:GetCell('Nation',i)</text>
+				<text lua="c=c+1" col_start="(c)" cond="entite == 'FFS'" align="center">best5:GetCell('Comite',i)</text>
+				<text lua="c=c+1" col_start="(c)" cond="entite == 'FFS'" align="center">best5:GetCell('Club',i)</text>
+				<text lua="c=c+1" col_start="(c)" align="right">best5:GetCell('Point',i)</text>
+				<text lua="c=c+1" col_start="(c)" align="right">best5:GetCell('3Best',i)</text>
+				<text lua="c=c+1" col_start="(c)" align="right">best5:GetCell('Pts',i)</text>
+			<lua>end</lua>
+
+			<!-- Total -->
+			<font size="11" />
+			<padding vert="0.1cm" />
+			<text row="auto" col_start="1" col_end="(col3Notes-1)" align="right">''</text>
+			<text row="auto" col_start="1" col_end="(col3Notes-1)" align="right">'TOTAL'</text>
+			<text col_start="(col3Notes)" border="1" align="right">string.format('%-.2f', params.total)</text>
+			<row h="0.3cm"/>
+			<text row="auto" col_start="1" col_end="(col3Notes-1)" align="right">'/'</text>
+			<text col_start="(col3Notes)" border="1" align="right">'3.75'</text>
+			<row h="0.3cm"/>
+			<text row="auto" col_start="1" col_end="(col3Notes-1)" align="right">'PENALITE CALCULEE'</text>
+			<text col_start="(col3Notes)" border="1" align="right">string.format('%-.2f', params.penalite_calculee)</text>
+			<row h="0.3cm"/>
+			<text row="auto" col_start="1" col_end="(col3Notes-1)" align="right">'PENALITE APPLIQUEE'</text>
+			<text col_start="(col3Notes)" border="1" align="right"><background mode="solid" color="yellow" />string.format('%-.2f', params.penalite_appliquee)</text>
+			
+			<!-- DT Signature -->
+			<call option="signature_dt" file="./edition/options.xml" />
+		</end>
+	</report>
+	
+
 	
 <!-- Edition partipants  -->	
 
@@ -258,13 +317,13 @@
 	</report>
 	
 	<!-- Liste Par Nation Comite Club -->
-	<report id="participants" title="('Liste des participants \n'..params.title)" header="1" first_header="0">
+	<report id="participants" title="('Liste des participants par'..params.orderby)" header="1" first_header="0">
 		<lua>page_break = tonumber(params.page_break) or 0;
 			 entite = $(Evenement.Code_entite);
 			 body:SetCounter(params.orderby);
 		</lua>
 		
-		<order key="(params.orderby..',Nom,Prenom')" />
+		<order key="(params.orderby..', Nom,Prenom')" />
 	
 		<rupture key="(params.orderby)">
 			<before>
@@ -345,7 +404,7 @@
 	</report>
 	
 	<!-- Listes de départ officiels -->
-	<report id="lst_officielle" title="Liste de Départ Officielle" header="1" first_header="(params.first_header or '1')" >
+	<report id="lst_officielle" title="(params.title or '')" header="1" first_header="(params.first_header or '1')" >
 		<lua>
 			entite = $(Evenement.Code_entite)
 			discipline = $(Epreuve.Code_discipline)
@@ -391,19 +450,19 @@
 			<text col="4" align="center" label="CS." cond="entite == 'FFS'">$(Comite)</text>
 			<text col="12" align="left" label="Club" cond="entite == 'FFS'">$(Club)</text>
 			<text col="6" align="right" label="Points" cond="entite == 'FFS'">$(Point)</text>
-			<text col="9" align="right" label="H. Départ" cond="discipline:In('IND','IND-COUR','SPR-QLF','TIR','SPR','SPR-COUR')">$(Heure_depart1, "%-1h%-1m%2s")</text>
+			<text col="9" align="right" label="H. Départ" cond="discipline:In('FS','KO-QLF', 'IND')">$(Heure_depart1, "%-1h%-1m%2s")</text>
 			<text col="11" align="right" label="H. Départ Pours" cond="discipline:In('POURS')">$(Heure_depart2, "%-1h%-1m%2s")</text>
 			<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
 		</body>
 	</report>
 
 	<!-- Listes de départ officiels poursuite-->
-	<report id="lst_officielle_pours" title="Liste de Départ Officielle" header="1" first_header="1" >
+	<report id="lst_officielle_pours" title="(params.title or '')" header="1" first_header="1" >
 		<lua>entite = $(Evenement.Code_entite)</lua>
 		<lua>discipline = $(Epreuve.Code_discipline)</lua>
 		<lua>rang = 'Rang'..manche</lua>
 		<lua>Hdpt = 'Heure_depart'..manche</lua>
-		<order key="(Hdpt), Dossard, Identite" />
+		<order key="Heure_depart2, Dossard, Identite" />
 
 		<body>
 			<call option="color_alternate" file="./edition/options.xml" />
@@ -423,7 +482,7 @@
 			<text col="4" align="center" label="CS." cond="entite == 'FFS'">$(Comite)</text>
 			<text col="12" align="left" label="Club" cond="entite == 'FFS'">$(Club)</text>
 			<text col="6" align="right" label="Points" cond="entite == 'FFS'">$(Point)</text>
-			<text col="9" align="right" label="H. Départ" cond="discipline:In('FS','KO_QLF')">$(Heure_depart1, "%-1h%-1m%2s")</text>
+			<text col="9" align="right" label="H. Départ" cond="discipline:In('FS','KO-QLF')">$(Heure_depart1, "%-1h%-1m%2s")</text>
 			<text col="11" align="right" label="H. Dépt. Pours" cond="discipline:In('POURS') and manche>=2">$(Heure_depart2, "%-1h%-1m%2s")</text>
 			<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
 		</body>
@@ -480,13 +539,13 @@
 			<text col="4" align="center" label="CS" cond="entite == 'FFS'">$(Comite)</text>
 			<text col="12" align="left" label="Club" cond="entite == 'FFS'">$(Club)</text>
 			<text col="6" align="right" label="Points" cond="entite == 'FFS'">$(Point)</text>
-			<text col="9" align="right" label="H. Départ" cond="discipline:In('FS','POURS', 'KO_QLF')">$(Heure_depart1, "%-1h%-1m%2s")</text>
+			<text col="9" align="right" label="H. Départ" cond="discipline:In('FS','POURS', 'KO-QLF')">$(Heure_depart1, "%-1h%-1m%2s")</text>
 			<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
 		</body>
 	</report>
 		
 	<!-- Liste de départ officielle par epreuve -->
-	<report id="lst_officielle_epreuve" title="(params.title or '')" header="1" first_header="1">
+	<report id="lst_officielle_epreuve" title="Liste de Départ" header="1" first_header="0">
 		<lua>entite = $(Evenement.Code_entite)</lua>
 		<lua>discipline = $(Epreuve.Code_discipline)</lua>
 		<lua>body:SetCounter('Code_epreuve')</lua>
@@ -522,10 +581,11 @@
 			<text col="4" align="center" label="CS." cond="entite == 'FFS'">$(Comite)</text>
 			<text col="12" align="left" label="Club" cond="entite == 'FFS'">$(Club)</text>
 			<text col="6" align="right" label="Points" cond="entite == 'FFS'">$(Point)</text>
-			<text col="9" align="right" label="H. Départ" cond="discipline:In('FS','POURS', 'KO_QLF')">$(Heure_depart1, "%-1h%-1m%2s")</text>
+			<text col="9" align="right" label="H. Départ" cond="discipline:In('FS','POURS', 'KO-QLF')">$(Heure_depart1, "%-1h%-1m%2s")</text>
 			<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
 		</body>
 	</report>
+
 
 <!-- Résultats  -->
 	<!-- Résultats Officiels, Officieux ou Provisoires -->
@@ -586,11 +646,12 @@
 			<text col="4" align="center" label="Nat" cond="entite == 'FIS'">$(Nation)</text>
 			<text col="3" align="center" label="CS." cond="entite == 'FFS'">$(Comite)</text>
 			<text col="12" align="center" label="Club" cond="entite == 'FFS'">$(Club)</text>
-			<text col="6" align="left" label="Chrono" ><font size_step="-1" />$(Tps_chrono1)</text> 
-			<text col="7" align="right" label="Pénalité" font_size_step="-1">$(Penalite1)..' '</text>
-			<text col="7" align="right" label="Tps." font_weight="bold" font_size_step="1">$(Tps1)</text> 
-			<text col="5" align="right" label="Ecart" font_style="italic">$(Diff1)</text>  
-			<text col="5" align="right" label="Note" cond="params.title=='Résultats Officiels'">$(Note)</text> 
+			<lua>for m=1,nb_manche do</lua>
+				<text col="6" align="right" label="('Tps.M'..m)" cond="nb_manche ~= 1"><font size_step="-1" cond="group == 'body'" />body:GetCell('Tps'..m,row)</text> 
+			<lua>end</lua>
+			<text col="8" align="right" label="Tps.Tot" font_weight="bold" font_size_step="1">$(Tps)</text>
+			<text col="8" align="right" label="Ecart." font_weight="bold" font_size_step="1">$(Diff)</text> 
+			<text col="6" align="right" label="Note" cond="params.title=='Résultats Officiels'">$(Note)</text> 
 			<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
 		</body>
 		
@@ -599,6 +660,7 @@
 			<call option="signature_dt" file="./edition/options.xml" />
 		</end>
 	</report>
+	
 	
 		<!-- Résultats Officiels, poursuite 2eme jour-->
 	<report id="res_off_Pours" title="(params.title or '')" header="1" first_header="(params.first_header or '1')" >
@@ -630,10 +692,10 @@
 			<spacing all="2" />
 			<spacing left="7" right="10" top="2" bottom="2" />
 			<lua>LabelCode = $(Code_coureur):sub(1,3)</lua>
-			<row h="auto"/>  <!-- <font color="Red" cond="$(Sexe) == 'F'and $(Epreuve.sexe) == 'T'"/> -->
-			<text col="4" align="center" label="Clt" font_weight="bold" font_size_step="1"> $(Clt2)</text>
+			<row h="auto"/>   <!-- <font color="Red" cond="$(Sexe) == 'F'and $(Epreuve.sexe) == 'T'"/> -->
+			<text col="4" align="center" label="Clt" font_weight="bold" font_size_step="1"> $(Clt)</text>
 			<text col="3" align="right" label="Dos">$(Dossard)</text>
-			<text col="9" align="right" label="Clt /Cat / S."><font size_step="-1" cond="group=='body'"/>$(Cltc2)..' /'..$(Categ)..' /'..$(Sexe)..' '</text>
+			<text col="9" align="right" label="Clt /Cat / S."><font size_step="-1" cond="group=='body'"/>$(Cltc)..' /'..$(Categ)..' /'..$(Sexe)..' '</text>
 			<text col="7" align="center" label="Code"><font size_step="-2" cond="group =='body'"/>$(Code_coureur):sub(4)</text>
 			<lua>
 				if officiel == 0 then
@@ -662,10 +724,8 @@
 			<lua>for m=1,nb_inter do</lua>
 				<text col="7" align="right" label="('Tps2_i'..m)" cond="nb_inter ~= 1"><font size_step="-1" cond="group == 'body'" />body:GetCell('Tps2_inter'..m,row)</text> 
 			<lua>end</lua>
-			<text col="6" align="left" label="Chrono" ><font size_step="-1" />$(Tps_chrono2)</text> 
-			<text col="7" align="right" label="Pénalité" font_size_step="-1">$(Penalite2)..' '</text>
-			<text col="7" align="right" label="Tps." font_weight="bold" font_size_step="1">$(Tps2)</text> 
-			<text col="5" align="right" label="Ecart" font_style="italic">$(Diff2)</text>  
+			<text col="8" align="right" label="Tps2" font_weight="bold" font_size_step="1">$(Tps2)</text>
+			<text col="8" align="right" label="Ecart." font_weight="bold" font_size_step="1">$(Diff2)</text> 
 			<text col="6" align="right" label="Note">$(Note)</text> 
 			<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
 		</body>
@@ -676,7 +736,7 @@
 		<!-- </end> -->
 	</report>
 	
-	<!-- Résultats Par Catégories -->
+	<!-- Résultats Par Sexe Catégories -->
 	<report id="res_categ" title="Résultats par Catégories" first_header="0">
 		<column name="Tps_status">chrono.Status(body:GetCellInt('Tps', row))</column>
 		<column name="Oder_Categ">$(Categorie{$(Categ)}.Ordre)</column>
@@ -731,7 +791,7 @@
 				<spacing left="5" right="10" top="2" bottom="2" />
 				<row h="auto" />
 				<text col="5" align="right" label="C.Cat" font_weight="bold" font_size_step="1">$(Cltc)</text>
-				<text col="5" align="right" label="C.Tot" font_weight="bold" font_size_step="1">$(Clte)</text>
+				<text col="5" align="right" label="C.Tot" font_weight="bold" font_size_step="1">$(Clt)</text>
 				<text col="4" align="right" label="Dos">$(Dossard)</text>
 				<text col="7" align="center" label="Code"><font size="8" cond="group =='body'"/>$(Code_coureur):sub(4)</text>
 				<text col="20" align="left" label="Prénom - Nom" font_weight="bold">Prenom_NOM</text> 
@@ -740,9 +800,11 @@
 				<image col_start="0" adjust="height" align="right" border="0" cond="entite == 'FIS'"><background mode="transparent"/>app.ImageNation($(Nation))</image> 
 				<text col="3" align="center" label="CS." cond="entite == 'FFS'">$(Comite)</text>
 				<text col="12" align="center" label="Club" cond="entite == 'FFS'">$(Club)</text>
-				<text col="6" align="right" label="Tps1" ><font size_step="-1" />$(Tps_chrono1)</text> 
-				<text col="6" align="right" label="Pénalité" font_size_step="-1">$(Penalite1)</text>
-				<text col="8" align="right" label="Tps.Tot" font_weight="bold" font_size_step="1">$(Tps1)</text> 
+				<lua>for m=1,nb_manche do</lua>
+					<lua>if body:GetCellInt('Tps'..m,row) > 0 then cltManche = ' ('..body:GetCell('Cltc'..m,row)..')' else cltManche = '' end</lua>
+					<text col="6" align="right" label="('Manche.'..m)" cond="nb_manche ~= 1"><font size_step="-1" cond="group == 'body'" />body:GetCell('Tps'..m,row)..cltManche</text> 
+				<lua>end</lua>
+				<text col="8" align="right" label="Tps.Tot" font_weight="bold" font_size_step="1">$(Tps)</text>
 				<lua>
 					if  body:GetCellInt('Tps',row) == -1 then
 						TpscoureurbestCat = 0;
@@ -760,7 +822,7 @@
 							DiffcoureurbestCat = '';
 						end
 				</lua>
-				<text col="8" align="right" label="Ecart." font_weight="bold" font_size_step="1">DiffcoureurbestCat</text>
+				<text col="8" align="right" label="Ecart." font_weight="bold" font_size_step="1">DiffcoureurbestCat</text>				
 				<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
 			<lua>end</lua>
 		</body>
@@ -789,10 +851,10 @@
 			<row h="auto" />
 			<font weight="bold" />
 			<pen border="all" size="1" />
-			<text row_start="2"  row_end="0" col="3" align="center">'Clt'</text>
+			<text row_start="2"  row_end="0" col="2" align="center">'Clt'</text>
 			<text col="12" />
 			<background mode="transparent" />
-			<text row_start="2" align="left" >'Identité'</text> 
+			<text row_start="2" align="left" >'Dossard - Identité'</text> 
 			<text row_start="2" align="right" >'Code_coureur'</text>
 			<background mode="solid" />
 			<text row_start="3" align="left" >'Club - (Comite)'</text> 
@@ -802,9 +864,9 @@
 			<text row_start="2" align="right" >'(Cltc.)'</text>
 			<background mode="solid" />
 			<text row_start="3" align="center" >'Sexe - An.'</text>
-			<text row_start="2"  row_end="0" col="7" align="center">'Epreuve(s)'</text>
-			<text row_start="2"  row_end="0" col="4" align="center">'Penalitée'</text>
-			<text row_start="2"  row_end="0" col="6" align="center">'Tps Epreuve'</text>
+			
+			<text row_start="2"  row_end="0" col="6" align="center">'Epreuve(s)'</text>
+			<text row_start="2"  row_end="0" col="5" align="center">'Tps Epreuve'</text>
 			<text row_start="2"  row_end="0" col="6" align="center">'Total'</text>
 			<text row_start="2"  row_end="0" col="6" align="center">'Ecart'</text>
 			<row h="0.3cm" />
@@ -817,12 +879,12 @@
 			<row h="auto"/>
 			<row h="auto"/>
 			
-			<text col="3" row_start="1" row_end="0" align="right" font_weight="bold" font_size_step="1"><background mode="solid" color="green" cond="$(Clt) == '1'" /><font color="white" cond="$(Clt) == '1'"/>$(Clt)</text>
+			<text col="2" row_start="1" row_end="0" align="right" font_weight="bold" font_size_step="1"><background mode="solid" color="green" cond="$(Clt) == '1'" /><font color="white" cond="$(Clt) == '1'"/>$(Clt)</text>
 	
 			<col w="12"/>
 			<text row_start="1">''</text> 
 			<background mode="transparent" />
-			<text row_start="1" align="left" >$(Identite)</text> 
+			<text row_start="1" align="left" >$(Dossard)..'-'..$(Identite)</text> 
 			<text row_start="1" align="right" >$(Code_coureur):sub(4)</text> 
 			<background mode="solid" />
 			<text row_start="2" align="left" >$(Club)..' - '..$(Comite{$(Comite)}.Nom):Parenthesis()</text> 
@@ -839,19 +901,14 @@
 			end
 		</lua>
 
-			<col w="7" />
+			<col w="6" />
 			<text row_start="1" align="left" >'Epr. 1 :'..styleprolog:Parenthesis()</text> 
 			<text row_start="2" align="left" >'Pours. :'..stylepours:Parenthesis()</text> 
 	
-			<col w="4" />
-			<text row_start="1" align="center" font_size_step="-2"><background mode="solid" color="yellow" cond="$(Clt1) == '1'" />$(Penalite1)</text> 
-			<text row_start="2" align="center" font_size_step="-2"><background mode="solid" color="yellow" cond="$(Clt2) == '1'" />$(Penalite2)</text> 
 		
-			<col w="6" />
+			<col w="5" />
 			<text row_start="1" align="center" font_size_step="-2"><background mode="solid" color="yellow" cond="$(Clt1) == '1'" />$(Tps1)..' '..$(Clt1):Parenthesis()</text> 
 			<text row_start="2" align="center" font_size_step="-2"><background mode="solid" color="yellow" cond="$(Clt2) == '1'" />$(Tps2)..' '..$(Clt2):Parenthesis()</text> 
-	
-			
 	
 			<text col="6" row_start="1" row_end="0" align="right" font_weight="bold" font_size_step="1"><background mode="solid" color="green" cond="$(Clt) == '1'" /><font color="white" cond="$(Clt) == '1'"/>$(Tps)</text> 
 			
@@ -861,6 +918,239 @@
 	</report>
 	
 <!-- Utilitaires  -->
+	<!-- Edition des couloirs de poursuite -->
+	<report id="Edi_Couloirs" title="(params.title or '')" header="1" Affich_HeureDepart="(params.Affich_HeureDepart or '')" Affich_Ecart="(params.Affich_Ecart or '')">	
+		<order key="Dossard Asc" />
+		<first_header />
+
+		<body>
+			<call option="color_alternate" file="./edition/options.xml" />
+			<call option="identite" file="./edition/options.xml"/>
+			<!-- <font name="calibri" size="9" adjust="ellipsize" /> -->
+			<font name="Calibri" size="19" adjust="max" weight="bold"/>
+			<spacing left="7" right="10" top="2" bottom="2" />
+			<col w="6cm,3cm,5cm" />
+			<row h="1cm"/>
+			<!-- <text col_start="1" col_end="1" col="6cm" align="center" label=""><pen border="0" size="1" /></text> -->
+			<text col_start="2" col_end="2" align="center" label="Dos">$(Dossard)</text>
+			<text col_start="3" col_end="3" align="center" label="Ecart" cond="Affich_HeureDepart=='1'" ><font size_step="-1" />$(Diff2)</text>
+			<text col_start="4" col_end="4" align="center" label="Heure Départ" cond="Affich_Ecart=='2'" ><font size_step="-1" />$(Heure_depart2, "%-1h%-1m%2s")</text>		
+		</body>
+		
+	</report>
+
+	<!-- Outil de facturation  -->
+	<report id="uti_facture" title="(params.title or '')" first_header="0" header="1">
+			<!-- header simplifier !-->
+			<header>
+				<spacing all="0"/>
+				<background mode="transparent"/>
+				<lua>ChoixRequette = params.ChoixRequette or ''</lua>
+				<lua>codeClub = $(Club)</lua>
+				<lua>tClub = base:GetTable('Club')</lua>
+				<lua>base:TableLoad(tClub, "Select * From Club Where Nom_reduit = '"..codeClub.."'")</lua>
+				
+				<font name="Calibri" size="14" adjust="max" weight="bold"/>
+				<text row="auto" col="1" col_end="0" align="center">$(Evenement.Nom)</text>
+				<text row="1.5cm" align="center" ></text>
+				<text row="auto" align="center" >title</text>
+				<text row="auto" align="center" >'Récapitulatifs inscrits'</text>
+				<text row="2cm" align="center" ></text>
+				<text row="auto" align="left" >'Eméteur :'</text>
+				<text row="auto" align="left" cond="ChoixRequette == 'Club'">'     '$(Evenement.Club)</text>
+				<text row="auto" align="left" cond="ChoixRequette == 'Comite'">'     CS. '..$(Comite{$(Evenement.Code_comite)}.Nom)</text>
+				<text row="auto" align="left" cond="ChoixRequette == 'Nation'">'     '$(Nation{$(Evenement.Code_nation)}.Libelle)</text>
+				<text row="2cm" align="center" ></text>
+				<text row="auto" align="right" cond="ChoixRequette == 'Club'">'Facturé au Club: '</text>
+				<text row="auto" align="right" cond="ChoixRequette == 'Comite'">'Facturé au Comité: '</text>
+				<text row="auto" align="right" cond="ChoixRequette == 'Nation'">'Facturé à la Nation: '</text>
+				<!-- <text row="auto" align="right" cond="ChoixRequette == 'Club'">$(Evenement.Club)</text> -->
+				<text row="auto" align="right" cond="ChoixRequette == 'Club'">$(Club.Nom_complet)</text>
+				<text row="auto" align="right" cond="ChoixRequette == 'Comite'">'CS. '..$(Comite{$(Evenement.Code_comite)}.Nom)</text>
+				<text row="auto" align="right" cond="ChoixRequette == 'Nation'">$(Nation{$(Evenement.Code_nation)}.Libelle)</text>
+				<text row="1cm" align="center" ></text>
+				<text row="auto" align="right" >'Le : '..$(Epreuve.Date_epreuve)</text>
+				<text row="1cm" align="center" ></text>
+				
+				<row h="0.5cm"/>
+			</header>
+			<first_header />
+			<lua>entite = $(Evenement.Code_entite)</lua>
+			<lua>body:SetCounter('Code_epreuve', 'recap')</lua>
+			<lua>TotalIns = 0</lua>
+			<order key="Code_epreuve" />
+			<lua>counter = body:GetCounter('recap')</lua>
+			
+				<end>
+					<!-- ligne permettant de faire afficher un message ds la fenetre information principale -->				
+					<!-- <lua>app.GetAuiMessage():AddLine('tarif1='..params.tarif_1)</lua> -->
+					<!-- Sexe, Categ, Distance -->
+					<text row="auto" col_start="1" col_end="0" border="1" align="center">'Récapitulatif par épreuve'</text>
+					<row h="0.3cm"/>
+					<lua>for i=0, counter:GetNbRows()-1 do </lua>
+						<lua>Epreuve = counter:GetCell(0,i)</lua>
+						<lua>NomEpreuve = $(Categorie{$(Epreuve.Code_categorie)}.Libelle)</lua>
+						<lua>Sexe = $(Epreuve{Epreuve}.Sexe)</lua>
+						<!-- <lua>categ = $(Categorie{counter:GetCell('Categ',i)}.Libelle)</lua> -->
+						<lua>categ = $(Epreuve.Code_categorie)</lua>
+						<lua>dist = $(Epreuve{Epreuve}.Distance)</lua>
+						<lua>nb = counter:GetCell('_count_',i)</lua>
+						<lua>tarif = tonumber(params['tarif_'..tostring(i+1)]) or 0</lua>
+						<lua>MontantIns = tarif*nb</lua>
+						<lua>TotalIns = TotalIns+MontantIns</lua>
+
+							<matrix row="auto" col_start="1" col_end="0" align="center" >
+								<row h="auto" />
+								<text col_start="1" col="20" align="left">'Epreuve: '..NomEpreuve</text>
+								<text col_start="2" col="10" align="left" >dist..'Km'</text>
+								<text col_start="3" col="13" align="left">'Sexe: '..Sexe</text>
+								<text col_start="4" col="10" align="right">'Nombre: '..nb</text>
+								<text col_start="5" col="10" align="right">MontantIns..'€'</text>
+								<row h="0.2cm"/>
+							</matrix>
+						<row h="0.1cm"/>
+				<lua>end</lua>
+
+					<row h="0.3cm"/>
+							<matrix row="auto" col_start="1" col_end="0" align="center" >
+								<row h="auto" />							
+								<text col_start="1" col="10" align="left" >''</text>
+								<text col_start="2" col="10" align="left">''</text>
+								<text col_start="3" col="10" align="left">''</text>
+								<text col_start="4" col="10" align="left">'Total'</text>
+								<text col_start="5" col="10" align="right">TotalIns..'€'</text>
+								<row h="0.3cm"/>
+							</matrix>
+					
+				<text row="auto" col_start="1" col_end="0" border="0" align="right">'En votre Aimable réglement'</text>	
+				</end>
+		</report>	
+
+		<!-- Utilitaire de facturation par club / comité / nation  présents -->
+	<report id="uti_facture_tri" title="(params.title or '')" header="1" first_header="0" >
+		<lua>ChoixRequette = params.ChoixRequette or ''</lua>
+		<lua>entite = $(Evenement.Code_entite)</lua>
+		<lua>discipline = $(Epreuve.Code_discipline)</lua>
+		
+		
+		
+		<first_header />
+	
+			<header>
+			
+				<spacing all="0"/>
+				<background mode="transparent"/>		
+				<lua>Club = base:GetTable('Club')</lua>
+				<lua>base:TableLoad(Club, 'Select * from Club')</lua>
+				<lua>nb_club = Club:GetNbRows()</lua>
+				<lua>Matric = $(Evenement.Code_club):sub(2,5)</lua>
+				
+				<!-- <lua>Matric = $(Evenement.Club)</lua> -->
+				<font name="Calibri" size="14" adjust="max" weight="bold"/>
+				<text row="auto" col="1" col_end="0" align="center">$(Evenement.Nom)</text>
+				<text row="1.5cm" align="center" ></text>
+				<text row="auto" align="center" >title</text>
+				<text row="2cm" align="center" ></text>
+				<text row="auto" align="left" >'Eméteur :'</text>
+				<!-- <text row="auto" align="left" cond="ChoixRequette == 'Club'">'CS. '..$(Club{Matric}.Nom_complet)</text> -->
+				<text row="auto" align="left" cond="ChoixRequette == 'Club'">$(Evenement.Club)</text>
+				<text row="auto" align="left" cond="ChoixRequette == 'Comite'">'CS. '..$(Comite{$(Evenement.Code_comite)}.Nom)</text>
+				<text row="auto" align="left" cond="ChoixRequette == 'Nation'">$(Nation{$(Evenement.Code_nation)}.Libelle)</text>
+				<text row="2cm" align="center" ></text>
+				<text row="auto" align="right" >'Le : '..$(Epreuve.Date_epreuve)</text>
+				<text row="1cm" align="center" ></text>
+				<text row="auto" align="right" cond="ChoixRequette == 'Club'">'Club : '</text>
+				<text row="auto" align="right" cond="ChoixRequette == 'Comite'">'Comité : '</text>
+				<text row="auto" align="right" cond="ChoixRequette == 'Nation'">'Nation : '</text>
+				
+				<!-- <text row="1cm" align="center" ></text> -->
+				<row h="0.5cm"/>
+			</header>
+		<end>
+			<!-- <lua>if ChoixRequette == 'Club' then</lua> -->
+				<lua>Countclub = base:TableLoad("Select Club, Count(*) as nbPresents from Resultat Where Code_evenement = "..params.code_evenement.." Group By Club")</lua>
+				<lua>body:SetCounter('Club')</lua>
+				<lua>body:SetCounter('Code_epreuve,Club', 'fact')</lua>
+				<order key="Code_epreuve,Club" />
+			<!-- <lua>elseif ChoixRequette == 'Comite' then</lua>		 -->
+				<!-- <lua>Countclub = base:TableLoad("Select Comite, Count(*) as nbPresents from Resultat Where Code_evenement = "..params.code_evenement.." Group By Comite")</lua> -->
+				<!-- <lua>body:SetCounter('Comite')</lua> -->
+				<!-- <lua>body:SetCounter('Code_epreuve,Comite', 'fact')</lua> -->
+				<!-- <order key="Code_epreuve,Comite" /> -->
+			<!-- <lua>elseif ChoixRequette == 'Nation' then</lua> -->
+				<!-- <lua>Countclub = base:TableLoad("Select Nation, Count(*) as nbPresents from Resultat Where Code_evenement = "..params.code_evenement.." Group By Nation")</lua> -->
+				<!-- <lua>body:SetCounter('Nation')</lua> -->
+				<!-- <lua>body:SetCounter('Code_epreuve,Nation', 'fact')</lua> -->
+				<!-- <order key="Code_epreuve,Nation" /> -->
+			<!-- <lua>end</lua> -->
+		
+			
+			
+			<lua>counter_fact = body:GetCounter('fact')</lua>
+				<lua>for m=0, Countclub:GetNbRows()-1 do </lua>
+					<row h="auto" />
+					<text col_start="1" col_end="0" align="right" cond="ChoixRequette == 'Club'" >Countclub:GetCell('Club',m)..' ('..body:GetCounterValue('Club', Countclub:GetCell('Club',m))..')'</text>
+					<!-- <text col_start="1" col_end="0" align="right" cond="ChoixRequette == 'Comite'" >Countclub:GetCell('Comite',m)..' ('..body:GetCounterValue('Comite', Countclub:GetCell('Comite',m))..')'</text> -->
+					<!-- <text col_start="1" col_end="0" align="right" cond="ChoixRequette == 'Nation'" >Countclub:GetCell('Nation',m)..' ('..body:GetCounterValue('Nation', Countclub:GetCell('Nation',m))..')'</text> -->
+					
+					
+					<row h="1.3cm"/>
+					<lua>Nomclub = Countclub:GetCell('Club',m)</lua>
+					<lua>TotalIns = 0</lua>
+					<lua>Liste_Epreuve = base:GetTable("Epreuve")</lua>
+						<lua>for i=0, Liste_Epreuve:GetNbRows()-1 do</lua>
+							<lua>Epreuve = Liste_Epreuve:GetCell('Code_epreuve',i)</lua>
+							<lua>Sexe = Liste_Epreuve:GetCell('Sexe',i)</lua>
+							<lua>categ = Liste_Epreuve:GetCell('Code_categorie',i)</lua>
+							<lua>NomEpreuve = $(Categorie{categ}.Libelle)</lua>
+							<lua>dist = $(Epreuve{Epreuve}.Distance)</lua>
+							
+							<!-- calcul de n pour l'index de ligne du counter_fact -->
+								<lua>val=0</lua>
+								<lua>for n=0, counter_fact:GetNbRows()-1 do</lua>
+									<lua>Club_count = counter_fact:GetCell('Club',n)</lua>
+									<lua>Epreuve_count = counter_fact:GetCell('Code_epreuve',n)</lua>
+									<lua>if Epreuve_count == Epreuve and Club_count == Nomclub then val = counter_fact:GetCell('_count_',n) end</lua>
+									<!-- <row value="auto" /> -->
+								<lua>end</lua>
+							
+							<lua>tarif = tonumber(params['tarif_'..tostring(i+1)]) or 0</lua>
+							<lua>MontantIns = tarif*val</lua>
+							<lua>TotalIns = TotalIns+MontantIns</lua>
+
+								<matrix row="auto" col_start="1" col_end="0" align="center" >
+									<row h="auto" />
+									<text col_start="1" col="20" align="left">'Epreuve: '..NomEpreuve</text>
+									<text col_start="2" col="10" align="left" >dist..'Km  N° epr:'..Epreuve..counter_fact:GetNbRows()</text>
+									<text col_start="3" col="13" align="left">'Sexe: '..Sexe</text>
+									<text col_start="4" col="10" align="right">'Nombre: '..val</text>
+									<text col_start="5" col="10" align="right">MontantIns..'€'</text>
+									<row h="0.2cm"/>
+								</matrix>
+							<row h="0.3cm"/>		
+						<lua>end</lua>
+							<row h="0.3cm"/>
+						<matrix row="auto" col_start="1" col_end="0" align="center" >
+							<row h="auto" />							
+							<text col_start="1" col="10" align="left" >''</text>
+							<text col_start="2" col="10" align="left">''</text>
+							<text col_start="3" col="10" align="left">''</text>
+							<text col_start="4" col="10" align="left">'Total'</text>
+							<text col_start="5" col="10" align="right">TotalIns..'€'</text>
+							<row h="0.3cm"/>
+						</matrix>
+				
+				<text row="auto" col_start="1" col_end="0" border="0" align="right">'En votre Aimable réglement'</text>	
+								
+				<row h="1.3cm"/>
+					<!-- fonction permettant de passer a la page suivante  -->
+					<!-- <lua>editor:PageBreak()</lua> -->
+				<lua>end</lua>
+				
+				<lua>Countclub:Delete()</lua>
+			</end>
+		</report>	
+
 <!-- utilitaire permetant de faire un recap du nombre d'inscrit dans l'evenements -->
 		<report id="uti_recapilatif" title="Nombre de participants" >
 			<!-- header simplifier !-->
@@ -892,7 +1182,7 @@
 					<text row="auto" col_start="1" col_end="0" border="1" align="center">'Récapitulatif par Distance'</text>
 					<row h="0.3cm"/>
 					<lua>for i=0, counter1:GetNbRows()-1 do </lua>
-					<text row="auto" col_start="1" col_end="0">
+					<text h="auto" col_start="1" col_end="0">
 							'distance '..counter1:GetCell(0,i)..' Km => '..counter1:GetCell('_count_',i)..'Inscrits'
 						</text>
 					<lua>sex = counter:GetCell(1,i)</lua> 
@@ -933,7 +1223,7 @@
 						<lua>nb = counter:GetCell('_count_',i)</lua>
 							<matrix row="auto" col_start="1" col_end="0" align="center" >
 							<call option="color_alternate" file="./edition/options.xml" />
-							<!-- <col w="10, 0.2cm,5, 0.2cm,5, 0.2cm,5" /> -->
+							<!-- <col value="10, 0.2cm,5, 0.2cm,5, 0.2cm,5" /> -->
 								<row h="auto" />
 								<lua> if dist == counter:GetCell('Distance',i-1) then </lua>
 									<text col_start="1" col="10" align="left" border ="0">''</text>
@@ -1033,5 +1323,6 @@
 					</end>
 			
 		</report>
+	
 </edition>
 
