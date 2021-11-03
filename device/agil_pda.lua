@@ -1,5 +1,4 @@
 -- AGIL PDA : Interface Vidage du PDA vers le logiciel de Course 
-dofile('./interface/interface.lua');
 dofile('./interface/adv.lua');
 dofile('./interface/device.lua');
 

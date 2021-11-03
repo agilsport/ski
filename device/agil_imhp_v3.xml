@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+	<panel name="dashboard">
+		<padding all="2px" />
+		<col value="1"/>
+
+		<toolbar row="auto" col_start="1" col_end="0" name="tb" style="TB_FLAT|TB_HORIZONTAL" />
+		<grid row="75px" col_start="1" col_end="0" name="grid" />
+		<staticbox row="1" col_start="1" col_end="0" label="Message" name="sb_message">
+			<gridmessage row="1" col_start="1" col_end="0" name="message" />
+		</staticbox>
+	</panel>
+	
+	<panel name="synchro">
+		<padding all="2px" />
+		<col value="90px,1,1"/>
+
+		<row value="auto" />
+		<timepickerctrl col_start="1" name="time"/>
+		<button col_start="2" name="top" label="Synchro. TOP" />
+		<button col_start="3" name="out" label="Synchro. OUT" />
+
+		<button row="auto" col_start="1" col_end="0" name="rf" label="Synchro. RF" />
+		<row h="16px" />
+		<button row="auto" col_start="1" col_end="0" name="exit" label="Quitter" />
+	</panel>
+	
+	<panel name="reload">
+		<padding all="2px" />
+		<wnd name="statictext" style="ALIGN_RIGHT" />
+
+		<staticbox row="auto" col="1" label="Chrono Modem">
+			<combobox row="auto" col="1" name="combo_chrono" />
+		</staticbox>
+
+		<staticbox row="auto" col_start="1" label="ID Impulsion(s)">
+			<row h="auto"/>
+			<statictext col="2" label="Début" />
+			<spinctrl col="3" name="pulse_start" style="ALIGN_RIGHT|SP_ARROW_KEYS" />
+			<statictext col="2" label="Fin" />
+			<spinctrl col="3" name="pulse_stop" style="ALIGN_RIGHT|SP_ARROW_KEYS" />
+		</staticbox>
+
+		<toolbar row="auto" col_start="1" col_end="0" name="tb" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT" />
+	</panel>
+
+	<panel name="global">
+		<padding all="2px"/>
+		<wnd name="statictext" style="ALIGN_RIGHT" />
+
+		<col value="5,1,3,1,3" />
+		
+		<row value="auto" />
+		<checkbox  col_start="1" name="check_chrono1" label="Chrono Modem Radio n°1" />
+		<statictext col_start="2" label="IN 1" />
+		<combobox col_start="3" name="combo_chrono1_input1"/>
+		<statictext col_start="4" label="IN 2" />
+		<combobox col_start="5" name="combo_chrono1_input2" />
+
+		<row value="auto" />
+		<checkbox  col_start="1" name="check_chrono2" label="Chrono Modem Radio n°2" />
+		<statictext col_start="2" label="IN 1" />
+		<combobox col_start="3" name="combo_chrono2_input1"/>
+		<statictext col_start="4" label="IN 2" />
+		<combobox col_start="5" name="combo_chrono2_input2"/>
+
+		<row value="auto" />
+		<checkbox  col_start="1" name="check_chrono3" label="Chrono Modem Radio n°3" />
+		<statictext col_start="2" label="IN 1" />
+		<combobox col_start="3" name="combo_chrono3_input1"/>
+		<statictext col_start="4" label="IN 2" />
+		<combobox col_start="5" name="combo_chrono3_input2"/>
+
+		<row value="auto" />
+		<checkbox  col_start="1" name="check_chrono4" label="Chrono Modem Radio n°4" />
+		<statictext col_start="2" label="IN 1" />
+		<combobox col_start="3" name="combo_chrono4_input1"/>
+		<statictext col_start="4" label="IN 2" />
+		<combobox col_start="5" name="combo_chrono4_input2"/>
+
+		<row value="auto" />
+		<statictext col_start="1" style="ALIGN_LEFT" label="Chrono Modem Master" />
+		<statictext col_start="2" label="IN 1" />
+		<combobox col_start="3" name="combo_master_input1"/>
+		<statictext col_start="4" label="IN 2" />
+		<combobox col_start="5" name="combo_master_input2"/>
+
+		<toolbar row="auto" col_start="1" col_end="0" name="tb" style="TB_FLAT,TB_HORIZONTAL,TB_TEXT" />
+	</panel>
+	
+	<panel name="chrono_modem">
+		<padding all="2px" />
+		<wnd name="statictext" style="ALIGN_RIGHT" />
+
+		<col value="3,4,72px"/>
+
+		<row value="auto"/>
+		<statictext col_start="1" label="ID" />
+		<combobox col_start="2" name="combo_id"/>
+		<button col_start="3" name="btn_id" label="Valider" />
+
+		<row value="auto"/>
+		<statictext col_start="1" label="Canal" />
+		<combobox col_start="2" name="combo_channel"/>
+		<button col_start="3" name="btn_channel" label="Valider" />
+
+		<row value="auto"/>
+		<statictext col_start="1" label="Puissance" />
+		<combobox col_start="2" name="combo_power"/>
+		<button col_start="3" name="btn_power" label="Valider" />
+
+		<row value="auto"/>
+		<statictext col_start="1" label="Délai Rebond (1/10 sec)" />
+		<spinctrl col_start="2" name="spin_delay_input">'1'</spinctrl>
+		<button col_start="3" name="btn_delay_input" label="Valider" />
+		
+		<row value="auto"/>
+		<statictext col_start="1" label="Délai Buzzer (1/10 sec)" />
+		<spinctrl col_start="2" name="spin_delay_buzzer">'4'</spinctrl>
+		<button col_start="3" name="btn_delay_buzzer" label="Valider" />
+
+		<row value="auto"/>
+		<statictext col_start="1" label="Vitesse Imprimante" />
+		<combobox col_start="2" name="combo_printer_speed"/>
+		<button col_start="3" name="btn_printer_speed" label="Valider" />
+
+		<row value="auto"/>
+		<statictext col_start="1" label="Date" />
+		<datepickerctrl col_start="2" name="date_chrono"/>
+		<button col_start="3" name="btn_date_chrono" label="Valider" />
+
+		<row value="auto"/>
+		<statictext col_start="1" label="Heure" />
+		<timepickerctrl col_start="2" name="hour_chrono"/>
+		<button col_start="3" name="btn_hour_chrono" label="Valider" />
+
+		<row value="auto"/>
+		<statictext col_start="1" label="RSSI" />
+		<combobox col_start="2" name="combo_rssi"/>
+		<button col_start="3" name="btn_rssi" label="Valider" />
+
+		<row value="auto"/>
+		<statictext col_start="1" label="Mode Debug." />
+		<combobox col_start="2" name="combo_debug"/>
+		<button col_start="3" name="btn_debug" label="Valider" />
+		
+		<row value="auto"/>
+		<statictext col_start="1" label="Calibration N" />
+		<textctrl col_start="2" name="calib_n">'32768000'</textctrl>
+		<button col_start="3" name="btn_calib_n" label="Valider" />
+		
+		<row value="auto"/>
+		<statictext col_start="1" label="Calibration D" />
+		<textctrl col_start="2" name="calib_d">'32768010'</textctrl>
+		<button col_start="3" name="btn_calib_d" label="Valider" />
+
+		<row value="auto"/>
+		<statictext col_start="1" label="Offset RF" />
+		<textctrl col_start="2" name="offset_rf">'142'</textctrl>
+		<button col_start="3" name="btn_offset_rf" label="Valider" />
+
+		<toolbar row="auto" col_start="1" col_end="0" name="tb" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT" />
+	</panel>
+</root>

@@ -1,5 +1,7 @@
 -- LIVE Timing 
-dofile('./interface/include.lua');
+dofile('./interface/interface.lua');
+dofile('./interface/adv.lua');
+dofile('./interface/device.lua');
 
 site_distant = false;
 if app.FileExists('./process/site_distant.lua') then

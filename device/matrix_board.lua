@@ -6,7 +6,7 @@ dofile('./interface/adv.lua');
 -- Information : Numéro de Version, Nom, Interface
 function device.GetInformation()
 	return { 
-		version = 5.5, 
+		version = 5.9, 
 		code = 'matrix_board', 
 		name = 'Tableau Matrice', 
 		class = 'display', 
@@ -93,7 +93,7 @@ function device.OnInit(params, node)
 	assert(rc);
 	device.raceInfo = raceInfo;
 
-	-- Prise Manche (Ski) ou Course et Phase(Canoe) 
+	-- Prise Manche (Ski) ou Course et Phase (Canoe) 
 	device.Code_course = tonumber(raceInfo.Code_course) or -1;
 	device.Code_phase = tonumber(raceInfo.Code_phase) or -1;
 	device.Code_manche = tonumber(raceInfo.Code_manche) or 1;
@@ -223,7 +223,7 @@ function InitTemplateFields()
 	templateFields = {};
 	
 	local columnCount = displayBoard:MatrixGetColumnCount();
-	if columnCount <= 12 then
+	if columnCount < 12 then
 		InitTemplateFieldsMini();
 	elseif device.entite == 'ESF' then
 		InitTemplateFieldsESF_Fleche();
@@ -265,10 +265,11 @@ function InitTemplateFieldsMini()
 		
 		agil_pi_display_fmt = function(field) 
 			field.txt = field.txt:TrimAll(); 
+			local unitAgil = displayBoard:MatrixGetBlocUnitCount() or 64;
 			if field.txt:len() <= 5 then
-				field.agil_pi_display_col = 96 - GetLenAgilPiFontStd(field.txt)-6; 
+				field.agil_pi_display_col = unitAgil - GetLenAgilPiFontStd(field.txt)-6; 
 			else
-				field.agil_pi_display_col = 96 - GetLenAgilPiFontStd(field.txt)-14; 
+				field.agil_pi_display_col = unitAgil - GetLenAgilPiFontStd(field.txt)-14; 
 			end
 		end
 	};
@@ -300,7 +301,8 @@ function InitTemplateFieldsMini()
 		
 		agil_pi_display_fmt = function(field) 
 			field.txt = field.txt:TrimAll(); 
-			field.agil_pi_display_col = 96 - GetLenAgilPiFontStd(field.txt); 
+			local unitAgil = displayBoard:MatrixGetBlocUnitCount() or 64;
+			field.agil_pi_display_col = unitAgil - GetLenAgilPiFontStd(field.txt); 
 		end
 	};
 	
@@ -335,7 +337,8 @@ function InitTemplateFieldsMini()
 		
 		agil_pi_display_fmt = function(field) 
 			field.txt = field.txt:TrimAll(); 
-			field.agil_pi_display_col = 96 - GetLenAgilPiFontStd(field.txt); 
+			local unitAgil = displayBoard:MatrixGetBlocUnitCount() or 64;
+			field.agil_pi_display_col = unitAgil - GetLenAgilPiFontStd(field.txt); 
 		end
 	};
 end	
@@ -378,10 +381,11 @@ function InitTemplateFieldsESF_Fleche()
 		
 		agil_pi_display_fmt = function(field) 
 			field.txt = field.txt:TrimAll(); 
+			local unitAgil = displayBoard:MatrixGetBlocUnitCount() or 64;
 			if field.txt:len() <= 5 then
-				field.agil_pi_display_col = 96 - GetLenAgilPiFontStd(field.txt)-6; 
+				field.agil_pi_display_col = unitAgil - GetLenAgilPiFontStd(field.txt)-6; 
 			else
-				field.agil_pi_display_col = 96 - GetLenAgilPiFontStd(field.txt)-14; 
+				field.agil_pi_display_col = unitAgil - GetLenAgilPiFontStd(field.txt)-14; 
 			end
 		end
 	};
@@ -452,7 +456,8 @@ function InitTemplateFieldsESF_Fleche()
 		
 		agil_pi_display_fmt = function(field) 
 			field.txt = field.txt:TrimAll(); 
-			field.agil_pi_display_col = 96 - GetLenAgilPiFontStd(field.txt); 
+			local unitAgil = displayBoard:MatrixGetBlocUnitCount() or 64;
+			field.agil_pi_display_col = unitAgil - GetLenAgilPiFontStd(field.txt); 
 		end
 	};
 end
@@ -496,10 +501,11 @@ function InitTemplateFieldsStd()
 		
 		agil_pi_display_fmt = function(field) 
 			field.txt = field.txt:TrimAll(); 
+			local unitAgil = displayBoard:MatrixGetBlocUnitCount() or 64;
 			if field.txt:len() <= 5 then
-				field.agil_pi_display_col = 96 - GetLenAgilPiFontStd(field.txt)-6; 
+				field.agil_pi_display_col = unitAgil - GetLenAgilPiFontStd(field.txt)-6; 
 			else
-				field.agil_pi_display_col = 96 - GetLenAgilPiFontStd(field.txt)-14; 
+				field.agil_pi_display_col = unitAgil - GetLenAgilPiFontStd(field.txt)-14; 
 			end
 		end
 	};
@@ -567,14 +573,14 @@ function InitTemplateFieldsStd()
 		lg = function(txt) return txt:len() end,
 		align = 'left',
 		
-		agil_pi_display_fmt = function(field) 
-			finish_time = finish_time or 0;
-			if finish_time <= 0 or finish_time > 59999 then
+		agil_pi_display_fmt = function(field, client_data) 
+			local rk = client_data or 0;
+			if rk <= 0 or rk >= 99 then
 				field.txt = '';
 			end
 		end,
-		
-		agil_pi_display_col = 42,
+			
+		agil_pi_display_col = 44,
 	};
 
 	-- Clt 
@@ -590,8 +596,9 @@ function InitTemplateFieldsStd()
 		align = 'right',
 		
 		agil_pi_display_fmt = function(field) 
+			local unitAgil = displayBoard:MatrixGetBlocUnitCount() or 64;
 			field.txt = field.txt:TrimAll(); 
-			field.agil_pi_display_col = 96 - GetLenAgilPiFontStd(field.txt); 
+			field.agil_pi_display_col = unitAgil - GetLenAgilPiFontStd(field.txt); 
 		end
 	};
 	
@@ -997,7 +1004,7 @@ function SynchroFieldsAgilPi(fields)
 			if condition == true then
 				field.txt = GetFieldText(field, item.txt);
 				if type(field.agil_pi_display_fmt) == 'function' then
-					field.agil_pi_display_fmt(field);
+					field.agil_pi_display_fmt(field, item.client_data);
 				end
 				if field.txt ~= '' then
 					txt = field.txt:Replace(' ','|');
@@ -1234,15 +1241,15 @@ function Board_FinishTime(bib, finish_time, rk, diff)
 		AddFieldClientData(templateFields, 'time_finish', app.TimeToString(finish_time, "%-1h%-1m%2s.%2f"), finish_time);
 	end
 	if device.entite == 'ESF' then
-		AddField(templateFields, 'medal_finish', bibRanking:GetCell('Medaille'..device.key_current), 0);
+		AddField(templateFields, 'medal_finish', bibRanking:GetCell('Medaille'..device.key_current, 0));
 	end
 	
 	if type(diff) == 'number' then
-		AddField(templateFields, 'diff_finish', app.TimeToString(tonumber(diff), '[DIFF]%xs.%2f'));
+		AddFieldClientData(templateFields, 'diff_finish', app.TimeToString(tonumber(diff), '[DIFF]%xs.%2f'), rk);
 	end
 
 	if rk >= 1 then
-		AddField(templateFields, 'rank_finish',rk);
+		AddField(templateFields, 'rank_finish', rk);
 	end
 
 	RefreshFields(templateFields);

@@ -1,0 +1,329 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<root>
+	<panel name="config">
+		<padding all="2px"/>
+		<wnd name="statictext" style="ALIGN_RIGHT" />
+
+		<col w="2"/>
+		<col w="3"/>
+
+		<row h="auto" />
+		<statictext col_start="1" label="Ecran Cible" />
+		<combobox col_start="2" name="display" style="CB_READONLY"/>
+
+		<row h="auto" />
+		<statictext col_start="1" label="Couleur RGB de Remplissage" />
+		<textctrl col_start="2" name="fill_color" />
+
+		<staticbox row="auto" col_start="1" col_end="0" label="Positionnement">
+			<col w="2,3" />
+			
+			<row h="auto" />
+			<statictext col_start="1" label="Largeur" />
+			<spinctrl col_start="2" name="width"/>
+
+			<row h="auto" />
+			<statictext col_start="1" label="Hauteur" />
+			<spinctrl col_start="2" name="height" />
+
+			<row h="auto" />
+			<statictext col_start="1" label="X" />
+			<spinctrl col_start="2" name="x"/>
+			
+			<row h="auto" />
+			<statictext col_start="1" label="Y" />
+			<spinctrl col_start="2" name="y"/>
+		</staticbox>
+		
+		<staticbox row="auto" col_start="1" col_end="0" label="Scrolling">
+			<col w="2,1" />
+	
+			<row h="auto" />
+			<statictext col_start="1" label="Nombre de Lignes" />
+			<spinctrl col_start="2" name="scroll_count"/>
+
+			<row h="auto" />
+			<statictext col_start="1" label="Délai de rafraichissement en secondes" />
+			<spinctrl col_start="2" name="scroll_delay"/>
+		</staticbox>
+
+		<staticbox row="auto" col_start="1" col_end="0" label="Coureur en Course">
+			<col w="2,1" />
+
+			<row h="auto" />
+			<statictext col_start="1" label="Délai temps tournant en 1/10sec" />
+			<spinctrl col_start="2" name="running_delay"/>
+
+			<row h="auto" />
+			<statictext col_start="1" label="Délai passage Arrivée en secondes" />
+			<spinctrl col_start="2" name="finished_delay"/>
+
+			<row h="auto" />
+			<statictext col_start="1" label="Délai passage Inter en secondes" />
+			<spinctrl col_start="2" name="inter_delay"/>
+		</staticbox>
+
+		<!-- <row h="auto" /> -->
+		<!-- <statictext col_start="1" label="Gestion des Régions" /> -->
+		<!-- <checkbox col_start="2" style="CHK_2STATE,ALIGN_LEFT" name="check_region" /> -->
+
+		<!-- <row h="auto" /> -->
+		<!-- <statictext col_start="1" label="Mise à l\'Echelle" /> -->
+		<!-- <checkbox col_start="2" style="CHK_2STATE,ALIGN_LEFT" name="check_scale" /> -->
+
+		<toolbar row="auto" col_start="1" col_end="0" name="tb" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT" />
+	</panel>
+
+	<report first_header="0" label="0">
+		<lua>
+			mode = mode or ''
+			manche = manche or '1';
+			entite = entite or '';
+		</lua>
+		<layers />
+		
+		<header>
+			<!-- Mode Attente -->
+			<lua>if mode == 'clear' then</lua>
+				<col c="1920"/>
+				<row c="1080"/>
+				<image adjust="scale" cell="a1" cond="entite == 'ESF'">'./res/skiESF.jpg'</image>
+				<image adjust="scale" cell="a1" cond="entite ~= 'ESF'">'./res/skiFFS.png'</image>
+
+			<lua>elseif mode == 'startlist' then</lua>
+				<lua>
+					header_row1 = header_row1 or '';
+					header_row2 = header_row2 or '';
+					header_row3 = header_row3 or '';
+				</lua>
+				
+				<col c="1310"/>
+			
+				<row c="40"/>
+				<row c="40"/>
+				<row c="40"/>
+				<row c="40"/>
+
+				<pen border="0" />
+				<spacing all="0"/>
+				
+				<font name="Calibri" color="white" size="42" weight="bold" adjust='ellipsize'/>
+				<image adjust="scale" cell="a1..a4">'./incrustation/Glava-a-blank_vierge.png'</image>
+				<text cell="a1..a2" align="center">header_row1</text>
+
+				<font color="black" size="28" />
+				<text cell="a3" align="center">header_row2</text>
+				<text cell="a4" align="center">header_row3</text>
+			<lua>end</lua>
+		</header>
+
+		<body>
+			<pen border="0" />
+			<spacing all="0"/>
+			<font name="Calibri" color="white" weight="bold" adjust='ellipsize'/>
+		
+			<!-- Liste de Départ Manche 1 -->
+			<lua>if manche == 1 and mode == 'startlist' then</lua>
+				<col c="170"/>
+				<col c="1140"/>
+
+				<row c="60"/>
+
+				<image adjust="scale" cell="a1">'./incrustation/60_170_Y.jpg'</image>
+				<text cell="a1" align="center"><font color="black" size="48"/>$(Dossard)</text>
+				
+				<image adjust="scale" cell="b1">'./incrustation/60_1030_B_Bar_right_left.jpg'</image>
+				<font color="white" size="42" />
+				<text cell="b1" align="left"><spacing left="12"/>$(Identite)</text>
+				
+				<font size="32" />
+				<text cell="b1" align="right" cond="entite=='FIS'"><spacing right="16" />$(Nation)</text>
+				<text cell="b1" align="right" cond="entite=='FFS'"><spacing right="16" />$(Club)</text>
+				<text cell="b1" align="right" cond="entite=='ESF'"><spacing right="16" />$(Categ)</text>
+				
+			<!-- Liste de Départ Manche 2 -->
+			<lua>elseif manche == 2 and mode == 'startlist' then</lua>
+				<col c="170"/>
+				<col c="50"/>
+				<col c="920"/>
+				<col c="170"/>
+
+				<row c="60"/>
+
+				<image adjust="scale" cell="a1">'./incrustation/60_170_Y.jpg'</image>
+				<text cell="a1" align="center"><font color="black" size="48" />$(Rang2)</text>
+
+				<image adjust="scale" cell="b1">'./incrustation/60_50_Gray.jpg'</image>
+				<text cell="b1" align="center"><font color="black" size="30"/>$(Dossard)</text>
+
+				<image adjust="scale" cell="c1">'./incrustation/60_1030_B_Bar_right_left.jpg'</image>
+				<text cell="c1" align="left"><spacing left="12"/><font color="white" size="40"/>$(Identite)</text>
+				<text cell="c1" align="right"><spacing right="12"/><font color="white" size="28" />$(Nation)</text>
+				
+				<image adjust="scale" cell="d1">'./incrustation/60_170_Y.jpg'</image>
+				<text cell="d1" align="center"><font color="black" size="40" weight="bold" />$(Diff1)</text>
+		
+			<!-- Résultat Manche 1 FIS - FFS -->
+			<lua>elseif manche == 1 and mode == 'ranking' and entite ~= 'ESF' then</lua>
+				<col c="170"/>
+				<col c="50"/>
+				<col c="920"/>
+				<col c="170"/>
+
+				<row c="60"/>
+				
+				<image adjust="scale" cell="a1">'./incrustation/60_170_Y.jpg'</image>
+				<text cell="a1" align="center"><font color="black" size="42" />$(Clt1)</text>
+
+				<image adjust="scale" cell="b1">'./incrustation/60_50_Gray.jpg'</image>
+				<text cell="b1" align="center"><font color="black" size="28"/>$(Dossard)</text>
+
+				<image adjust="scale" cell="c1">'./incrustation/60_1030_B_Bar_right_left.jpg'</image>
+				<text cell="c1" align="left"><spacing left="10"/><font color="white" size="40" />$(Identite)</text>
+				<text cell="c1" align="right" cond="entite=='FIS'"><spacing right="16"/><font color="white" size="32" />$(Nation)</text>
+				<text cell="d1" align="right" cond="entite=='FFS'"><spacing right="16"/><font color="white" size="28" />$(Club)</text>
+				
+				<image adjust="scale" cell="d1">'./incrustation/60_170_Y.jpg'</image>
+				<text cell="d1" align="center"><font color="black" size="32"/>$(Tps1)</text>
+
+			<!-- Résultat Manche 1 ESF -->
+			<lua>elseif manche == 1 and mode == 'ranking' and entite == 'ESF' then</lua>
+				<col c="100"/>
+				<col c="70"/>
+				<col c="810"/>
+				<col c="150"/>
+				<col c="180"/>
+
+				<row c="60"/>
+				
+				<image adjust="scale" cell="a1">'./incrustation/60_170_Y.jpg'</image>
+				<text cell="a1" align="center"><font color="black" size="32" />$(Clt1)</text>
+
+				<image adjust="scale" cell="b1">'./incrustation/60_50_Gray.jpg'</image>
+				<text cell="b1" align="center"><font color="black" size="28" />$(Dossard)</text>
+
+				<image adjust="scale" cell="c1">'./incrustation/60_1030_B_Bar_right_left.jpg'</image>
+				<text cell="c1" align="left"><spacing left="10"/><font color="white" size="32"/>$(Identite)</text>
+				
+				<image adjust="scale" cell="d1">'./incrustation/60_170_Y.jpg'</image>
+				<text cell="d1" align="center"><font color="black" size="30" />$(Tps1)</text>
+
+				<image adjust="scale" cell="e1">'./incrustation/60_170_Y.jpg'</image>
+				<text cell="e1" align="center"><font color="black" size="26" />$(Medaille1)</text>
+
+			<!-- Résultat Manche 2 -->
+			<lua>elseif manche == 2 and mode == 'ranking' then</lua>
+				<col c="170"/>
+				<col c="50"/>
+				<col c="920"/>
+				<col c="170"/>
+
+				<row c="60"/>
+				
+				<image adjust="scale" cell="a1">'./incrustation/60_170_Y.jpg'</image>
+				<text cell="a1" align="center"><font color="black" size="42" />$(Clt)</text>
+
+				<image adjust="scale" cell="b1">'./incrustation/60_50_Gray.jpg'</image>
+				<text cell="b1" align="center"><font color="black" size="28"/>$(Dossard)</text>
+
+				<image adjust="scale" cell="c1">'./incrustation/60_1030_B_Bar_right_left.jpg'</image>
+				<text cell="c1" align="left"><spacing left="12"/><font color="white" size="40"/>$(Identite)</text>
+				<text cell="c1" align="right"><spacing right="12"/><font color="white" size="28" />$(Nation)</text>
+				
+				<image adjust="scale" cell="d1">'./incrustation/60_170_Y.jpg'</image>
+				<text cell="d1" align="center"><font color="black" size="32"/>$(Tps)</text>
+			<lua>end</lua>
+		</body>
+		
+		<footer>
+			<lua>if mode == 'ranking' then</lua>
+				<pen border="0" />
+				<spacing all="0"/>
+				<font name="Calibri" color="black" weight="bold" adjust='ellipsize' />
+
+				<lua>
+				bib = bib or '';
+				identity = identity or '';
+				
+				diff_inter = diff_inter or '';
+				time_inter = time_inter or '';
+				
+				rank = rank or '';
+				time = time or '';
+				diff = diff or '';
+					
+				best_total_time = best_total_time or 0;
+				best_time_identity = best_time_identity or '';
+				best_time_passage = best_time_passage or '';
+				</lua>
+
+				<col c="100"/>	<!-- bib -->
+				<col c="390"/>	<!-- identity  -->
+				<col c="400"/>
+				<col c="100"/>	<!-- rank -->
+				<col c="170"/>	<!-- time -->
+				<col c="150"/>	<!-- diff -->
+
+				<row c="45"/>	<!-- best -->
+				<row c="60"/>	<!-- current -->
+
+				<!-- state = running -->
+				<lua>if state == 'running' then</lua>
+					<image adjust="scale" cell="c1..d1" cond="best_total_time > 0">'./incrustation/45_170_Y.jpg'</image>
+					<text cell="c1..d1" align="center" cond="best_total_time > 0"><font color="black" size="28" />best_time_identity</text>
+
+					<image adjust="scale" cell="e1" cond="best_total_time > 0">'./incrustation/60_170_Gray.jpg'</image>
+					<text cell="e1" align="center" cond="best_total_time > 0"><font color="black" size="28" />best_time_passage</text>
+
+					<image adjust="scale" cell="a2">'./incrustation/60_50_Gray.jpg'</image>
+					<text cell="a2" align="center"><font color="black" size="30" weight="bold"/>bib</text>
+					
+					<image adjust="scale" cell="b2..c2">'./incrustation/60_1030_B_Bar_right_left.jpg'</image>
+					<text cell="b2..c2" align="left"><spacing left="15"/><font color="white" size="30" weight="bold"/>identity</text>
+
+					<image adjust="scale" cell="e2" name="running_time_img">'./incrustation/60_170_B.jpg'</image>
+					<text cell="e2" align="right" name="running_time_txt"><spacing right="16"/><font color="white" size="30"/></text>
+
+				<!-- state = inter -->
+				<lua>elseif state == 'inter' then</lua>
+					<image adjust="scale" cell="c1..d1" cond="best_total_time > 0">'./incrustation/45_170_Y.jpg'</image>
+					<text cell="c1..d1" align="center" cond="best_total_time > 0"><font color="black" size="28" />best_time_identity</text>
+					
+					<image adjust="scale" cell="e1" cond="best_total_time > 0">'./incrustation/60_170_Gray.jpg'</image>
+					<text cell="e1" align="center" cond="best_total_time > 0"><font color="black" size="28" />best_time_passage</text>
+
+					<image adjust="scale" cell="a2">'./incrustation/60_50_Gray.jpg'</image>
+					<text cell="a2" align="center"><font color="black" size="30" weight="bold"/>bib</text>
+
+					<image adjust="scale" cell="b2..c2">'./incrustation/60_1030_B_Bar_right_left.jpg'</image>
+					<text cell="b2..c2" align="left"><spacing left="15"/><font color="white" size="30" weight="bold"/>identity</text>
+
+					<image adjust="scale" cell="e2">'./incrustation/60_170_B.jpg'</image>
+					<text cell="e2" align="right"><spacing right="16"/><font color="white" size="30"/>time_inter</text>
+
+					<image adjust="scale" cell="f2" cond="diff_inter:sub(1,1) =='+'">'./incrustation/60_170_R.jpg'</image>
+					<image adjust="scale" cell="f2" cond="diff_inter:sub(1,1) ~='+' and diff_inter:len() > 0">'./incrustation/60_170_G.jpg'</image>
+					<text cell="f2" align="right" cond="diff_inter:len() > 0"><spacing right="20"/><font color="white" size="24" weight="bold"/>diff_inter</text>
+
+				<!-- state = finished -->
+				<lua>elseif state == 'finished' then</lua>
+					<image adjust="scale" cell="a2">'./incrustation/60_50_Gray.jpg'</image>
+					<text cell="a2" align="center"><font color="black" size="30" weight="bold"/>bib</text>
+					
+					<image adjust="scale" cell="b2..c2">'./incrustation/60_1030_B_Bar_right_left.jpg'</image>
+					<text cell="b2..c2" align="left"><spacing left="15"/><font color="white" size="30" weight="bold"/>identity</text>
+
+					<image adjust="scale" cell="d2">'./incrustation/45_170_Y.jpg'</image>
+					<text cell="d2" align="right"><spacing right="8"/><font color="black" size="30" weight="bold"/>rank</text>
+
+					<image adjust="scale" cell="e2">'./incrustation/60_170_B.jpg'</image>
+					<text cell="e2" align="right"><spacing right="20"/><font color="white" size="30" weight="bold"/>time</text>
+					
+					<image adjust="scale" cell="f2" cond="diff:sub(1,1) =='+'">'./incrustation/60_170_R.jpg'</image>
+					<image adjust="scale" cell="f2" cond="diff:sub(1,1) ~='+' and diff:len() > 0">'./incrustation/60_170_G.jpg'</image>
+					<text cell="f2" align="right" cond="diff:len() > 0"><spacing right="20"/><font color="white" size="30" weight="bold"/>diff</text>
+				<lua>end</lua>
+			<lua>end</lua>
+		</footer>
+	</report>
+</root>

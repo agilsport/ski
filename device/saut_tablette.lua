@@ -91,7 +91,6 @@ function device.SetNote(tResultat_Saut, juge)
 --	adv.Error('OnTimer Juge '..juge..' : Note='..device.note[juge]);
 end
 
-
 -- Notification : <bib_next>
 function device.OnNotifyBibNext(key, params)
 	assert(key == '<bib_next>');
