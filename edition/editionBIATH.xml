@@ -750,8 +750,8 @@
 						TpscoureurbestCat = body:GetCellInt('Tps',row);
 					end
 					
-					local Tpscoureur = body:GetCellInt('Tps1',row);
-					local DiffcoureurbestCat = Tpscoureur - TpscoureurbestCat
+					Tpscoureur = body:GetCellInt('Tps1',row);
+					DiffcoureurbestCat = Tpscoureur - TpscoureurbestCat
 						if tonumber(DiffcoureurbestCat) == 0 then 
 							DiffcoureurbestCat = '';
 						elseif tonumber(DiffcoureurbestCat) > 0 then
