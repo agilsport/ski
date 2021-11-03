@@ -1,11 +1,12 @@
 -- ALGE Gaz4
-dofile('./interface/include.lua');
+dofile('./interface/interface.lua');
+dofile('./interface/adv.lua');
 dofile('./interface/device.lua');
 
 -- Information : Numéro de Version, Nom, Interface
 function device.GetInformation()
 	return { 
-		version = 2.2, 
+		version = 2.3, 
 		code = 'alge_gaz4', 
 		name = 'Alge Gaz4', 
 		class = 'display', 

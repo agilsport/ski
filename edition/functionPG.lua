@@ -64,6 +64,7 @@ function CreateTableResultat_Info_Bibo();
 		base:Query(strCreate);
 	end
 	ReplaceTableEnvironnement(tResultat_Info_Bibo, 'Resultat_Info_Bibo');
+	tResultat_Info_Bibo = base:GetTable('Resultat_Info_Bibo');
 end
 
 function SortTable2(array)	-- tri des tables 
