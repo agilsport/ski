@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- 1ère version officielles skiffs -->
+<!-- Version 4.0 -->
+	
 <root>
 	<panel name="dashboard">
 		<pen border="0" />
@@ -21,17 +24,17 @@
 		<col value="1,1,1.6cm" />
 		
 		<row value="0.3cm" />
-			<wndtext col_start="1" col_end="3" align="left">"Incrémentation d'un nombre de tour à éffectuer suivant une Plage de Dossard"</wndtext>
+			<wndtext col_start="1" col_end="3" style="ALIGN_LEFT">"Incrémentation d'un nombre de tour à éffectuer suivant une Plage de Dossard"</wndtext>
 		<row value="0.2cm" />
-			<wndtext col_start="1" col_end="3" align="left">"si le concurent arrive directement Tour = 0 sinon mettre le Nb de détect avt le franchissement de la ligne finale"</wndtext>
+			<wndtext col_start="1" col_end="3" style="ALIGN_LEFT">"si le concurent arrive directement Tour = 0 sinon mettre le Nb de détect avt le franchissement de la ligne finale"</wndtext>
 		<row value="1" />
 			<grid col_start="1" col_end="2" name="grid_Option" />
 			<toolbar col_start="3" col_end="0" name="tb_option" style="TB_FLAT,TB_VERTICAL,TB_TEXT" />
 		
 		<row value="0.3cm" />
-			<wndtext col_start="1" col_end="3" align="left" >"Désignation d'un ID Passage suivant le decodeur et la bouble (Loop) utilisée"</wndtext>
+			<wndtext col_start="1" col_end="3" style="ALIGN_LEFT" >"Désignation d'un ID Passage suivant le decodeur et la bouble (Loop) utilisée"</wndtext>
 		<row value="0.2cm" />
-			<wndtext col_start="1" col_end="3" align="left">"Les delais de Timer sont en Mili secondes : 1min = 60000 milisec"</wndtext>
+			<wndtext col_start="1" col_end="3" style="ALIGN_LEFT">"Les delais de Timer sont en Mili secondes : 1min = 60000 milisec"</wndtext>
 		<row value="1" />
 			<grid col_start="1" col_end="2" name="grid_Param" />
 			<toolbar col_start="3" col_end="0" name="tb_param" style="TB_FLAT,TB_VERTICAL,TB_TEXT"/>
@@ -61,7 +64,7 @@
 	<col value="5,5,5" />
 
 	<row value="auto" />
-		<statictext col_start="1" col_end="2"  align="right" label='Numero du fichier à traiter sur le serveur'/>
+		<statictext col_start="1" col_end="2"  style="ALIGN_RIGHT" label='Numero du fichier à traiter sur le serveur'/>
 		<textctrl col_start="3" col_end="0" name="NumFichier"></textctrl>
 		
 	<row value="auto" />
@@ -91,39 +94,47 @@
 		<col w="1,1,1,1,1" />	
 		
 		<row h="auto"/>
-			<statictext col_start="1" col_end="2" align="center" label="Adresse Serveur"/>
-			<textctrl col_start="3" col_end="0" name="config_AdrServeurRaceResult"/>
+			<statictext col_start="1" col_end="2" style="ALIGN_CENTER" label="Adresse Serveur" />
+			<textctrl col_start="3" col_end="0" name="config_AdrServeurRaceResult" style="CB_READONLY"  />
 			
 		<row h="auto"/>
-			<statictext col_start="1" col_end="2" align="center" label="Port"/>
-			<textctrl col_start="3" col_end="4" name="config_PortDecodeur"/>
+			<statictext col_start="1" col_end="2" style="ALIGN_CENTER" label="API_KEY"/>
+			<textctrl col_start="3" col_end="0" name="config_ApiKey"/>
 			
 		<row h="auto"/>
-			<statictext col_start="1" col_end="2" align="center" label="ID Décodeur RaceResult"/>
+			<statictext col_start="1" col_end="2" style="ALIGN_CENTER" label="Type de Box"/>
+			<combobox col_start="3" col_end="4" name="RaceResultTypeBox"/>	
+			
+		<row h="auto"/>
+			<statictext col_start="1" col_end="2" style="ALIGN_CENTER" label="Port" />
+			<textctrl col_start="3" col_end="4" name="config_PortDecodeur" style="CB_READONLY" />
+			
+		<row h="auto"/>
+			<statictext col_start="1" col_end="2" style="ALIGN_CENTER" label="ID Décodeur RaceResult"/>
 			<textctrl col_start="3" col_end="4" name="config_IdDecodeur"/>	
 			
 		<row h="auto"/>
-			<statictext col_start="1" col_end="2" align="center" label="User RaceResult"/>
+			<statictext col_start="1" col_end="2" style="ALIGN_CENTER" label="User RaceResult"/>
 			<textctrl col_start="3" col_end="4" name="config_User"/>
 			
 		<row h="auto"/>
-			<statictext col_start="1" col_end="2" align="center" label="Password RaceResult"/>
+			<statictext col_start="1" col_end="2" style="ALIGN_CENTER" label="Password RaceResult"/>
 			<textctrl col_start="3" col_end="4" name="config_PWD" style="TE_LEFT|TE_PASSWORD" />
 			
 		<row h="auto"/>
-			<statictext col_start="1" col_end="2" align="center" label="N° de Fichier du Webserveur"/>
+			<statictext col_start="1" col_end="2" style="ALIGN_CENTER" label="N° de Fichier du Webserveur"/>
 			<textctrl col_start="3" col_end="3" name="config_NumFichier"/>
 			
 		<row h="auto"/>
-			<statictext col_start="1" col_end="2" align="center" label="N° de Passage"/>
+			<statictext col_start="1" col_end="2" style="ALIGN_CENTER" label="N° de Passage"/>
 			<textctrl col_start="3" col_end="3" name="config_Passage"/>
 		
 		<row h="auto"/>
-			<statictext col_start="1" col_end="2" align="center" label="Systeme Actif"/>
+			<statictext col_start="1" col_end="2" style="ALIGN_CENTER" label="Systeme Actif"/>
 			<checkbox col_start="3" name="checkbox_config_Systeme"/>
 			
 		<row h="auto"/>
-			<statictext col_start="1" col_end="2" align="center" label="Lect. des Dos. en base de temps"/>
+			<statictext col_start="1" col_end="2" style="ALIGN_CENTER" label="Lect. des Dos. en base de temps"/>
 			<checkbox col_start="3" name="checkbox_config_Lect_Dos"/>
 		
 		<toolbar row="auto" col_start="1" col_end= "0" name="tb" style="TB_FLAT,TB_HORIZONTAL,TB_TEXT" />
@@ -134,35 +145,33 @@
 				<pen border="0" />
 				<spacing all="3"/>
 				<col value="1,1,1,1,1" />	
-				
 				<row value="auto"/>
-					<wndtext col_start="1" col_end="2" align="center">'IP décodeur RaceRésult'</wndtext>
+					<wndtext col_start="1" col_end="2" >'IP décodeur RaceRésult'</wndtext>
 					<textctrl col_start="3" col_end="0" name="config_Adr-ServeurRaceResult"/>
 					
 				<row value="auto"/>
-					<wndtext col_start="1" col_end="2" align="center">'Port'</wndtext>
+					<wndtext col_start="1" col_end="2" >'Port'</wndtext>
 					<textctrl col_start="3" col_end="4" name="config_PortDecodeur"/>		
 					
 				<row value="auto"/>
-					<wndtext col_start="1" col_end="2" align="center">'ID Décodeur RaceResult'</wndtext>
+					<wndtext col_start="1" col_end="2" >'ID Décodeur RaceResult'</wndtext>
 					<textctrl col_start="3" col_end="4" name="config_IdDecodeur"/>	
 					
 				<row value="auto"/>
-					<wndtext col_start="1" col_end="2" align="center">'N° de Fichier du décodeur'</wndtext>
+					<wndtext col_start="1" col_end="2" >'N° de Fichier du décodeur'</wndtext>
 					<textctrl col_start="3" col_end="3" name="config_NumFichier"/>
 					
 				<row value="auto"/>
-					<wndtext col_start="1" col_end="2" align="center">'N° de Passage'</wndtext>
+					<wndtext col_start="1" col_end="2" >'N° de Passage'</wndtext>
 					<textctrl col_start="3" col_end="3" name="config_Passage"/>
 				
 				<row value="auto"/>
-					<wndtext col_start="1" col_end="2" align="center">'Systeme Actif'</wndtext>
+					<wndtext col_start="1" col_end="2" >'Systeme Actif'</wndtext>
 					<checkbox col_start="3" name="checkbox_config_Systeme"/>
 					
 				<row value="auto"/>
-					<wndtext col_start="1" col_end="2" align="center">'Lect. des Dos. en base de temps'</wndtext>
+					<wndtext col_start="1" col_end="2" >'Lect. des Dos. en base de temps'</wndtext>
 					<checkbox col_start="3" name="checkbox_config_Lect_Dos"/>
-				
 				<row value="auto" />
 				<toolbar col_start="1" col_end= "0" name="tb" style="TB_FLAT,TB_HORIZONTAL,TB_TEXT" />
 	</panel>
