@@ -78,7 +78,6 @@ function OnTirage(clef1, option1, option2)
 	if string.find(option1, '2.') then
 		base:TableLoad(tResultat, 'Select * From Resultat Where Code_evenement = '..params.code_evenement..' Order By Dossard');
 		tReserve = base:TableLoad('Select Distinct Reserve From Resultat Where Code_evenement = '..params.code_evenement..' Order By Reserve');
-		base:TableLoad(tResultat_Manche, 'Select * From Resultat_Manche Where Code_evenement = '..params.code_evenement..' And Code_manche = -1');
 		for j = 0, tReserve:GetNbRows() -1 do
 			local reserve = tReserve:GetCellInt('Reserve', j)
 			local filtre = '$(Reserve):In('..reserve..')';
@@ -90,12 +89,24 @@ function OnTirage(clef1, option1, option2)
 			end
 			for i = 0, tResultat_Copy:GetNbRows() -1 do
 				local code_coureur = tResultat_Copy:GetCell('Code_coureur', i);
-				local row = tResultat_Manche:AddRow();
+				base:TableLoad(tResultat_Manche, 'Select * From Resultat_Manche Where Code_evenement = '..params.code_evenement.." And Code_manche = 2 And Code_coureur = '"..code_coureur.."'");
+				local row = nil;
+				local addrow = false;
+				if tResultat_Manche:GetNbRows() == 0 then
+					row = tResultat_Manche:AddRow();
+					addrow = true;
+				else
+					row = 0;
+				end
 				tResultat_Manche:SetCell('Code_evenement', row, params.code_evenement);
 				tResultat_Manche:SetCell('Code_manche', row, 2);
 				tResultat_Manche:SetCell('Code_coureur', row, code_coureur);
 				tResultat_Manche:SetCell('Rang', row, rang);
-				base:TableInsert(tResultat_Manche, row);
+				if addrow == true then
+					base:TableInsert(tResultat_Manche, row);
+				else
+					base:TableUpdate(tResultat_Manche, row);
+				end
 				if string.find(option2, '2.') then
 					rang = rang - 1;
 				else
