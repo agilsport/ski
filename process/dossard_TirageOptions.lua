@@ -105,7 +105,7 @@ function OnTirage(clef1, option1, option2)
 				if addrow == true then
 					base:TableInsert(tResultat_Manche, row);
 				else
-					base:TableUpdate(tResultat_Manche, row);
+					base:TableUpdate(tResultat_Manche, row, 'Rang');
 				end
 				if string.find(option2, '2.') then
 					rang = rang - 1;
