@@ -10,9 +10,6 @@ function OnTirageParTiers();
 	-- manche 1 : 1, 2, 3
 	-- manche 2 : 2, 3, 1
 	-- manche 3 : 3, 1, 2
-		local msg = "En cours de réalisation";
-		app.GetAuiFrame():MessageBox(msg, "Attention", msgBoxStyle.OK+msgBoxStyle.ICON_ERROR);
-		return;
 	if tEpreuve:GetCellInt('Nombre_de_manche', 0) ~= 3 then
 		local msg = "Cette course n'est pas paramétrée pour 3 manches";
 		app.GetAuiFrame():MessageBox(msg, "Attention aux erreurs !!!", msgBoxStyle.OK+msgBoxStyle.ICON_ERROR);
@@ -37,10 +34,15 @@ function OnTirageParTiers();
 	NbG1 = tGroupes:GetCellInt('Nb', 0);
 	NbG2 = tGroupes:GetCellInt('Nb', 1);
 	NbG3 = tGroupes:GetCellInt('Nb', 2);
-	tReserve = {};
+	local tReserve = {};
+	table.insert(tReserve, {Manche = 1, Ordre = {1,2,3}});
+	table.insert(tReserve, {Manche = 2, Ordre = {3,1,2}});
+	table.insert(tReserve, {Manche = 3, Ordre = {2,3,1}});
 	for manche = 1, 3 do
+		local tOrdre = tReserve[manche].Ordre;	-- si manche = 2, tOrdre[2] = 1
 		local rang = 1;
-		for reserve = 1, 3 do
+		for ordre = 1, 3 do
+			local reserve = tOrdre[ordre];
 			local filtre = '$(Reserve):In('..reserve..')';
 			tResultat_Copy = tResultat:Copy();
 			tResultat_Copy:Filter(filtre, true);
