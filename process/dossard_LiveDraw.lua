@@ -990,6 +990,10 @@ function OnRAZData(colonne)
 		txt = 'rangs de tirage'
 	elseif colonne == 'Dossard' then
 		txt = 'dossards'
+	elseif colonne == 'Dossard_bibo' then
+		txt = 'dossards du BIBO'
+	elseif colonne == 'Dossard' then
+		txt = 'dossards'
 	elseif colonne == 'All' then
 		txt = 'rangs et les groupes de tirage'
 	elseif colonne == 'Tout' then
@@ -1022,6 +1026,10 @@ function OnRAZData(colonne)
 			tDraw:SetCell('Groupe_tirage', i, 5);
 		elseif colonne == 'Dossard' then
 			tDraw:SetCellNull('Dossard', i);
+		elseif colonne == 'Dossard_bibo' then
+			if tDraw:GetCellInt('Rang_tirage', i) <= 15 then
+				tDraw:SetCellNull('Dossard', i);
+			end
 		elseif colonne == 'Tout' then
 			tDraw:SetCellNull('Rang_tirage', i);
 			tDraw:SetCell('Groupe_tirage', i, 5);
@@ -1029,7 +1037,7 @@ function OnRAZData(colonne)
 			tDraw:SetCellNull('Dossard', i);
 		end
 	end
-	if colonne == 'Dossard' then
+	if colonne == 'Dossard' or colonne == 'Dossard_bibo' then
 		CommandRenvoyerDossards();
 	end
 	RefreshGrid();
@@ -2009,6 +2017,8 @@ function OnAfficheTableau()
 	btnRAZAll = menuRAZ:Append({label="RAZ des deux", image ="./res/32x32_clear.png"});
 	menuRAZ:AppendSeparator();
 	btnRAZDossard = menuRAZ:Append({label="RAZ des dossards", image ="./res/32x32_clear.png"});
+	menuRAZ:AppendSeparator();
+	btnRAZDossardBibo = menuRAZ:Append({label="RAZ des dossards du BIBO", image ="./res/32x32_clear.png"});
 	tbTableau:SetDropdownMenu(btnMenuRAZ:GetId(), menuRAZ);
 	
 	tbTableau:AddSeparator();
@@ -2103,6 +2113,12 @@ function OnAfficheTableau()
 			OnRAZData('Dossard')
 			SendMessage('Board refreshed');
 		end, btnRAZDossard);
+	dlgTableau:Bind(eventType.MENU, 
+		function(evt)
+			draw.skip_question = false;
+			OnRAZData('Dossard_bibo')
+			SendMessage('Board refreshed');
+		end, btnRAZDossardBibo);
 	dlgTableau:Bind(eventType.MENU, 
 		function(evt)
 			draw.skip_question = false;
@@ -2646,7 +2662,7 @@ function main(params_c)
 	draw.height = display:GetSize().height - 30;
 	draw.x = 0;
 	draw.y = 0;
-	draw.version = "2.0";
+	draw.version = "2.1";
 	draw.orderbyCE = 'Rang_tirage, Groupe_tirage, ECSL_points DESC, WCSL_points DESC, ECSL_overall_points DESC, Winner_CC DESC, FIS_pts, Nom, Prenom';
 	draw.orderbyFIS = 'Rang_tirage, Groupe_tirage, FIS_pts, Nom, Prenom';
 	draw.hostname = 'live.fisski.com';
@@ -2665,10 +2681,12 @@ function main(params_c)
 	tResultat_Info_Tirage = base:GetTable('Resultat_Info_Tirage');
 	if tResultat_Info_Tirage == nil then
 		CreateTableResultat_Info_Tirage();
+		tResultat_Info_Tirage = base:GetTable('Resultat_Info_Tirage');
 	end
 	tResultat_Info_Bibo = base:GetTable('Resultat_Info_Bibo');
 	if tResultat_Info_Bibo == nil then
 		CreateTableResultat_Info_Bibo();
+		tResultat_Info_Bibo = base:GetTable('Resultat_Info_Bibo');
 	end
 	tCoureur = base:GetTable('Coureur');
 	tCategorie = base:GetTable('Categorie');
