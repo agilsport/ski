@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- Menu Editions Activité "FOND " suplementaire !-->
-<!-- version="5.6" !-->
+<!-- version="5.7" !-->
 <!-- si possible de faire fonctionne des cond dans les menu -->
 <edition>
 	<menu>
@@ -21,8 +21,8 @@
 		
 		<menu title="Outils" image="./res/32x32_options.png">
 			<menu title="Edition des Séquences Chrono" image="./res/16x16_bib.png" id="chrono_seq" choix_manche="1" action="chrono_seq"/>
-			<menu title="Trans des points de la colonne Points dans Pts_best" image="./res/16x16_fis.png" lua="./edition/PtsFFS_ColPtsBest.lua" />
-			<menu title="Trans du Clt Ds la colonne Pts_best" image="./res/16x16_fis.png" lua="./edition/Clt_EprX-ColPtsBest.lua" />
+			<menu title="Transfert des points de la colonne Points dans Pts_best (Aide pour tirage des Dos. par Pts FIS puis Pts FFS)" image="./res/16x16_fis.png" lua="./edition/PtsFFS_ColPtsBest.lua" />
+			<menu title="Transfert du Clt d'un Evt X Ds la colonne Ordre_niveau pour attribution des Dossards suivant le Clt de l'Evt X" image="./res/16x16_fis.png" lua="./edition/Clt_EprX-ColOrdre_niveau.lua" />
 			<menu title="Configuration des points de passages" image="./res/16x16_text.png" lua="./edition/Config_Passage.lua"  />
 		</menu>
 		

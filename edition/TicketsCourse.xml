@@ -1,0 +1,136 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<root>
+
+<panel name="dashboard">
+		<pen border="0" />
+		<spacing all="2"/>
+		<col value="1"/>
+				
+		<row value="auto"/>
+		
+	</panel>
+
+
+<report id="Edt_TicketCourse" title="Liste de départ Relais " header="1" first_header="0">
+		<column name="Tps_status">chrono.Status(body:GetCellInt('Tps', row))</column>
+		<paper orientation="landscape" />
+		<lua>
+			dofile('./interface/adv.lua');
+			Code_evenement = $(Evenement.Codex);
+			bodyTicketCourse = body:Copy(false);
+			for i=0, body:GetNbRows()-1 do
+				CodeCoureur = body:GetCell('Code_coureur', i):sub(1,3);
+				if CodeCoureur == 'TIC' or CodeCoureur == 'EXT' or CodeCoureur == 'TMP' then
+					bodyTicketCourse:AddRow();
+					sqlTable.CopyRow(bodyTicketCourse, bodyTicketCourse:GetNbRows()-1, body, i);
+				end
+			end
+			body = bodyTicketCourse;
+			
+			entite = $(Evenement.Code_entite);
+			discipline = $(Epreuve.Code_discipline);
+			body:SetCounter('Code_epreuve');
+			
+			if app.DirExists('./tmp/Tickets_Course') == false then
+				app.Mkdir('./tmp/Tickets_Course');
+			end
+
+			if app.FileExists('./tmp/Tickets_Course/TIC_'..Code_evenement..'.txt') == false then
+				filename = './tmp/Tickets_Course/Ticket_'..Code_evenement..'.txt';
+				file = io.open(filename, "r");
+			end
+		
+			Ticketcourse = io.open(filename, "w+");
+			
+			_context_border = true;
+		</lua>
+		<order key="(body:GetCell('Code_coureur', i):sub(1,3)..',Nom,Prenom')"/>
+		
+		<header>
+		<lua>type_edition = id:sub(1,4)</lua>
+		<spacing all="0"/>
+		<background mode="transparent"/>
+		<font name="Calibri" size="14" adjust="max" weight="bold"/>
+		<text row="auto" col="1" font_size_step="18" align="center">$(Evenement.Nom)</text>
+		<text row="auto" align="center">$(Discipline.Libelle)</text>
+		<text row="auto" align="center" cond="params.code_epreuve ~= -1">$(Categorie{$(Epreuve.Code_categorie)}.Libelle)..' - '..$(Sexe{$(Epreuve.Sexe)}.Libelle)</text>
+		<text row="auto" align="center" cond="title" >title</text>
+		<row value="1.5cm"/>
+		
+		<!-- affichage du Compteur des classés si c'est un resultat (id commence par 'res_' et si le first header n'est pas actif) -->
+		<lua>if type_edition == 'res_' and first_header == '0' then</lua>
+			<call option="stat_ranking" cond="editor:GetPageCurrent() == 1" file="./edition/options.xml"/>
+		<lua>end</lua>
+		
+		</header>
+		
+		<label>
+			<row value="auto" />
+			<pen border="all" size="1" />
+			<text col="3" align="center">'Compt.'</text>
+			<text col="6" align="center">'N° de TIC'</text>
+			<text col="3" align="center">'Dos.'</text>
+			<text col="10" align="center">'Nom - Prénom'</text>
+			<text col="2" align="left">'Sexe'</text>
+			<text col="3" align="center">'Année'</text>
+			<text col="3" align="center">'Nation'</text>
+			<text col="3" align="center">'Status'</text>
+			<text col="10" align="center">'Adresse'</text>
+			<text col="3" align="center">'CP.'</text>
+			<text col="10" align="center">'Ville'</text>
+			<text col="3" align="left">'Distance'</text>
+			<row value="0.5cm"/>
+			<lua>
+				LigneEntete = 'Cpt;N°TIC;Dos;Nom - Prénom;S.;An;Etat;Adresse;C.P.;Ville;Date;Distance;Codex_Epreuve'..string.char(13);
+				Ticketcourse:write(LigneEntete);
+			</lua>
+		</label>
+		
+		<body>
+			<lua>
+				status = $(Tps_status);
+				CodeInscrit = $(Code_coureur)
+				TableResultatAdresse = base:GetTable('Resultat_Adresse');
+				TableResultatEpreuve = base:GetTable('Epreuve');
+				cmd = "Select * From Resultat_Adresse Where Code_evenement = "..$(Evenement.Code)..
+							  " and Code_coureur = '"..$(Code_coureur).."'"
+						Adresse = base:TableLoad(TableResultatAdresse, cmd):GetCell('Adresse1', 0)
+						CodePostal = base:TableLoad(TableResultatAdresse, cmd):GetCell('Code_postal', 0)
+						Ville = base:TableLoad(TableResultatAdresse, cmd):GetCell('Ville', 0)
+						
+				cmd1 = "Select * From Epreuve Where Code_evenement = "..$(Evenement.Code)..
+							  " and Distance = '"..$(Distance).."'"
+						Codex_Epreuve = base:TableLoad(TableResultatEpreuve, cmd1):GetCell('Fichier_transfert', 0);		
+						Date_Epreuve = base:TableLoad(TableResultatEpreuve, cmd1):GetCell('Date_epreuve', 0);
+			</lua>
+			<call option="couleur_alternee" file="./edition/options.xml" />
+			<call option="identite" file="./edition/options.xml"/>
+			<font size="10" adjust="ellipsize"/>
+			<spacing left="10" right="10" top="2" bottom="2" />			
+			<row value="auto"/>
+			<text col="3" align="center">row+1</text>
+			<text col="6" align="left">$(Code_coureur)</text>
+			<text col="3" align="left">$(Dossard)</text>
+			<text col="10" align="left">NOM_Prenom</text>
+			<text col="2" align="left">$(Sexe)</text>
+			<text col="3" align="left">$(An)</text>
+			<text col="3" align="left">$(Nation)</text>
+			<text col="3" align="left">ranking.Code(status)</text>
+			<text col="10" align="left">Adresse</text>
+			<text col="3" align="center">CodePostal</text>
+			<text col="10" align="left">Ville</text>
+			<text col="3" align="left">$(Distance)..'Km'</text>
+			<lua>
+				numLigne = row+1;
+				LigneCoureur = tostring(numLigne)..';'..$(Code_coureur)..';'..$(Dossard)..';'..NOM_Prenom..';'..$(Sexe)..';'..$(An)..';'..$(Nation)..';'..Adresse..';'..CodePostal..';'..Ville..';'..Date_Epreuve..';'..$(Distance)..';'..Codex_Epreuve..string.char(13);
+				Ticketcourse:write(LigneCoureur);
+			</lua>	
+		</body>
+		<end>
+			<lua>
+				Ticketcourse:close();
+			</lua>	
+		</end>
+	</report>
+</root>
+

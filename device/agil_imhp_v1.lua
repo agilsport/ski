@@ -6,7 +6,7 @@ dofile('./interface/device.lua');
 -- Information : Numéro de Version, Nom, Interface
 function device.GetInformation()
 	return { 
-		version = 1.2, 
+		version = 1.3, 
 		name = 'AGIL IMHP Version 1', 
 		class = 'chrono', 
 		interface = { { type='serial', baudrate = '19200' } } 

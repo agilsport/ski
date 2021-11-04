@@ -5,7 +5,7 @@ dofile('./interface/device.lua');
 -- Information : Numéro de Version, Nom, Interface
 function device.GetInformation()
 	return { 
-		version = 3.1, 
+		version = 3.2, 
 		name = 'Incrustation', 
 		class = 'display', 
 		interface = {} 
@@ -200,8 +200,8 @@ function device.OnInit(params)
 	local height = tonumber(params.height) or 480;
 	local display = tonumber(params.display) or 0;
 	
-	local bitmap_width = tonumber(params.bitmap_width) or 640;
-	local bitmap_height = tonumber(params.bitmap_height) or 480;
+	local bitmap_width = tonumber(params.bitmap_width) or 1920;
+	local bitmap_height = tonumber(params.bitmap_height) or 1080;
 
 	-- Creation frame ...
 	frame = wnd.CreateFrameEditor({ 
@@ -228,7 +228,8 @@ function device.OnInit(params)
 	wnd.LoadTemplateReportXML({ 
 		xml = './device/incrustation.xml',
 		node_name = 'root/report',
-		report = frame
+		report = frame,
+--		layers = { file ='c:/adv/ski/edition/layer.xml', id = 'entry_form' },
 	});
 	
 	editor = frame:GetEditor();

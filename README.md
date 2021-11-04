@@ -3,7 +3,7 @@
 
 ## Périphériques (Devices)
 4 Familles de périphériques 
-- 1 : Chronomètres et Appareil de Mesure
+- 1 : Chronomètre et Appareil de Mesure
 - 2 : Afficheur et Présentation
 - 3 : Outils et Tableau de bord
 - 4 : Live et Réseau
