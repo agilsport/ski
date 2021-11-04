@@ -534,8 +534,8 @@
 			<font size="9" adjust="ellipsize"/>
 
 			<row h="auto"/>
-			<lua>if manche == 2 then</lua>
-				<text col="4" align="right" label="Rang" font_weight="bold">$(Rang2)</text>
+			<lua>if manche &gt; 1 then</lua>
+				<text col="4" align="right" label="Rang" font_weight="bold">body:GetCellInt('Rang'..manche, row) </text>
 			<lua>end</lua>
 			<text col="4" align="center" label="Dos" font_weight="bold" font_size_step="1">$(Dossard)</text>
 			<text col="7" align="center" label="Code"><font size="8" cond="group =='body'"/>$(Code_coureur):sub(4)</text>
