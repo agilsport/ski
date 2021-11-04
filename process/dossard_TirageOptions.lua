@@ -6,10 +6,81 @@ function GetMenuName()
 	return "Tirage des dossards à la mêlée avec options";
 end
 
-function OnTirage(clef1, option1, option2)
+function OnTirageParTiers();
+	-- manche 1 : 1, 2, 3
+	-- manche 2 : 2, 3, 1
+	-- manche 3 : 3, 1, 2
+		local msg = "En cours de réalisation";
+		app.GetAuiFrame():MessageBox(msg, "Attention", msgBoxStyle.OK+msgBoxStyle.ICON_ERROR);
+		return;
+	if tEpreuve:GetCellInt('Nombre_de_manche', 0) ~= 3 then
+		local msg = "Cette course n'est pas paramétrée pour 3 manches";
+		app.GetAuiFrame():MessageBox(msg, "Attention aux erreurs !!!", msgBoxStyle.OK+msgBoxStyle.ICON_ERROR);
+		return;
+	end
 	local cmd = 'Update Resultat Set Dossard = Null, Reserve = Null Where Code_evenement = '..params.code_evenement;
 	base:Query(cmd);
-	cmd = 'Delete From Resultat_Manche Where Code_evenement = '..params.code_evenement..' And Code_manche > 1';
+	local max_row_g1 = math.ceil(tResultat:GetNbRows() / 3);
+	local max_row_g2 = tResultat:GetNbRows() - max_row_g1;
+	tResultat:OrderRandom();
+	for i = tResultat:GetNbRows() - 1, 0, -1 do
+		if i >= max_row_g2 then
+			tResultat:SetCell('Reserve', i, 3);
+		elseif i >= max_row_g1 then
+			tResultat:SetCell('Reserve', i, 2);
+		else
+			tResultat:SetCell('Reserve', i, 1);
+		end
+	end
+	base:TableBulkUpdate(tResultat, 'Reserve');
+	tGroupes = base:TableLoad('SELECT Reserve, COUNT(*) Nb FROM Resultat WHERE Code_evenement = '..params.code_evenement..' GROUP BY Reserve');
+	NbG1 = tGroupes:GetCellInt('Nb', 0);
+	NbG2 = tGroupes:GetCellInt('Nb', 1);
+	NbG3 = tGroupes:GetCellInt('Nb', 2);
+	tReserve = {};
+	for manche = 1, 3 do
+		local rang = 1;
+		for reserve = 1, 3 do
+			local filtre = '$(Reserve):In('..reserve..')';
+			tResultat_Copy = tResultat:Copy();
+			tResultat_Copy:Filter(filtre, true);
+			tResultat_Copy:OrderRandom();
+			for i = 0, tResultat_Copy:GetNbRows() -1 do
+				local code_coureur = tResultat_Copy:GetCell('Code_coureur', i);
+				base:TableLoad(tResultat_Manche, 'Select * From Resultat_Manche Where Code_evenement = '..params.code_evenement.." And Code_manche = "..manche.." And Code_coureur = '"..code_coureur.."'");
+				local row = nil;
+				local addrow = false;
+				if tResultat_Manche:GetNbRows() == 0 then
+					row = tResultat_Manche:AddRow();
+					addrow = true;
+				else
+					row = 0;
+				end
+				tResultat_Manche:SetCell('Code_evenement', row, params.code_evenement);
+				tResultat_Manche:SetCell('Code_manche', row, manche);
+				tResultat_Manche:SetCell('Code_coureur', row, code_coureur);
+				if manche == 1 then
+					tResultat_Copy:SetCell('Dossard', i, rang);
+					tResultat_Copy:SetCellNull('Rang', i);
+				else
+					tResultat_Manche:SetCell('Rang', row, rang);
+				end
+				if addrow == true then
+					base:TableInsert(tResultat_Manche, row);
+				else
+					base:TableUpdate(tResultat_Manche, row, 'Rang');
+				end
+				rang = rang + 1;
+			end
+			if manche == 1 then
+				base:TableBulkUpdate(tResultat_Copy, 'Dossard', 'Resultat');
+			end
+		end
+	end
+end
+
+function OnTirage(clef1, option1, option2)
+	local cmd = 'Update Resultat Set Dossard = Null, Reserve = Null Where Code_evenement = '..params.code_evenement;
 	base:Query(cmd);
 	local col = nil;
 	if string.find(clef1, '1') then
@@ -203,16 +274,19 @@ function main(params_c)
 	dlgConfig:GetWindowName('clef1'):Append('1. Par Sexe');
 	dlgConfig:GetWindowName('clef1'):Append('2. Par Sexe et par Catégorie');
 	dlgConfig:GetWindowName('clef1'):Append('3. Par Sexe et par Année');
+	dlgConfig:GetWindowName('clef1'):Append('4. Pas de tri particulier');
 	dlgConfig:GetWindowName('clef1'):SetSelection(0);
 		
 	dlgConfig:GetWindowName('option1'):Clear();
 	dlgConfig:GetWindowName('option1'):Append('1. Tirage pour la manche 1 seulement');
 	dlgConfig:GetWindowName('option1'):Append('2. Tirage pour les manches 1 et 2');
+	dlgConfig:GetWindowName('option1'):Append('2. Tirage pour les manches 1, 2 et 3');
 	dlgConfig:GetWindowName('option1'):SetSelection(0);
 
 	dlgConfig:GetWindowName('option2'):Clear();
 	dlgConfig:GetWindowName('option2'):Append("1. Pas d'inversion des dossards dans les groupes de tirage");
 	dlgConfig:GetWindowName('option2'):Append('2. Inversion des dossards dans les groupes de tirage');
+	dlgConfig:GetWindowName('option2'):Append('3. A la mêlée par tiers tournants');
 	dlgConfig:GetWindowName('option2'):SetSelection(0);
 
 	dlgConfig:Bind(eventType.MENU, 
@@ -233,7 +307,11 @@ function main(params_c)
 
 	dlgConfig:Fit();
 	if dlgConfig:ShowModal() == idButton.OK then
-		OnTirage(clef1, option1, option2);
+		if not string.find(option2, '3') then
+			OnTirage(clef1, option1, option2);
+		else
+			OnTirageParTiers()
+		end
 	end
 	return true;
 end
