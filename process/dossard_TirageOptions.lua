@@ -7,16 +7,12 @@ function GetMenuName()
 end
 
 function OnTirageParTiers();
-	-- manche 1 : 1, 2, 3
-	-- manche 2 : 2, 3, 1
-	-- manche 3 : 3, 1, 2
+	-- Ordre des groupes = manche 1 : 1, 2, 3,  manche 2 : 2, 3, 1,  manche 3 : 3, 1, 2
 	if tEpreuve:GetCellInt('Nombre_de_manche', 0) ~= 3 then
 		local msg = "Cette course n'est pas paramétrée pour 3 manches";
 		app.GetAuiFrame():MessageBox(msg, "Attention aux erreurs !!!", msgBoxStyle.OK+msgBoxStyle.ICON_ERROR);
 		return;
 	end
-	local cmd = 'Update Resultat Set Dossard = Null, Reserve = Null Where Code_evenement = '..params.code_evenement;
-	base:Query(cmd);
 	local max_row_g1 = math.ceil(tResultat:GetNbRows() / 3);
 	local max_row_g2 = tResultat:GetNbRows() - max_row_g1;
 	tResultat:OrderRandom();
@@ -82,8 +78,6 @@ function OnTirageParTiers();
 end
 
 function OnTirage(clef1, option1, option2)
-	local cmd = 'Update Resultat Set Dossard = Null, Reserve = Null Where Code_evenement = '..params.code_evenement;
-	base:Query(cmd);
 	local col = nil;
 	if string.find(clef1, '1') then
 		tRaceGroupe = tRaceSexe;
@@ -108,15 +102,6 @@ function OnTirage(clef1, option1, option2)
 		clef = 'M-'..tRaceGroupe:GetCell(col, i);
 		tGroupe_tirage[clef] = groupe;
 	end
-	-- dlgConfig:GetWindowName('clef1'):Append('1. Par Sexe');
-	-- dlgConfig:GetWindowName('clef1'):Append('2. Par Sexe et par Catégorie');
-	-- dlgConfig:GetWindowName('clef1'):Append('3. Par Sexe et par Année');
-	
-	-- dlgConfig:GetWindowName('option1'):Append('1. Tirage pour la manche 1 seulement');
-	-- dlgConfig:GetWindowName('option1'):Append('2. Tirage pour les manches 1 et 2');
-
-	-- dlgConfig:GetWindowName('option2'):Append('1. Sans objet');
-	-- dlgConfig:GetWindowName('option2'):Append('2. Inversion des dossards dans les groupes de tirage');
 
 	local strClef = nil;
 	for i = 0, tResultat:GetNbRows() -1 do
@@ -309,10 +294,14 @@ function main(params_c)
 
 	dlgConfig:Fit();
 	if dlgConfig:ShowModal() == idButton.OK then
+		local cmd = 'Update Resultat Set Dossard = Null, Reserve = Null Where Code_evenement = '..params.code_evenement;
+		base:Query(cmd);
 		if not string.find(option2, '3') then
 			OnTirage(clef1, option1, option2);
 		else
-			OnTirageParTiers()
+			local msg = "Aucun filtrage des coureurs n'est possible dans cette configuration.";
+			app.GetAuiFrame():MessageBox(msg, "Information", msgBoxStyle.OK+msgBoxStyle.ICON_WARNING);
+			OnTirageParTiers();
 		end
 	end
 	return true;
