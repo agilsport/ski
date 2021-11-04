@@ -294,7 +294,7 @@ function main(params_c)
 
 	dlgConfig:Fit();
 	if dlgConfig:ShowModal() == idButton.OK then
-		local cmd = 'Update Resultat Set Dossard = Null, Reserve = Null Where Code_evenement = '..params.code_evenement;
+		local cmd = 'Update Resultat Set Dossard = Null, Rang = Null, Reserve = Null Where Code_evenement = '..params.code_evenement;
 		base:Query(cmd);
 		if not string.find(option2, '3') then
 			OnTirage(clef1, option1, option2);
