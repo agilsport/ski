@@ -280,15 +280,6 @@ function main(params_c)
 			end
 		end
 	else
-		local msg = "Voulez-vous lancer le scénario de tirage au sort ?\n"..
-					"ATTENTION, tous les dossards seront effacés et remplacés par ceux du nouveau tirage.";
-		local reponse =  app.GetAuiFrame():MessageBox(msg,
-						"Lancer le tirage", 
-						msgBoxStyle.YES+msgBoxStyle.NO+msgBoxStyle.NO_DEFAULT+msgBoxStyle.ICON_WARNING
-						);
-		if reponse == msgBoxStyle.NO then
-			return ;
-		end
 		tResultat:OrderBy('Dossard DESC');
 		if tResultat:GetCell('Dossard', 0):len() > 0 then
 			local msg = "ATTENION : Les dossards ont déjà été tirés pour cette course !!!\n"..
