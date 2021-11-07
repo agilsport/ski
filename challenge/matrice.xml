@@ -239,36 +239,36 @@
 		<padding all="3px"/>
 		<matrix col_start="2" row="auto">
 			<col value="3,2" />
-			<statictext row="auto" col_start="1" label="Imprimer le titre "/>
+			<statictext row="auto" col_start="1" style="ALIGN_RIGHT" label="Imprimer le titre "/>
 			<combotable col_start="2" name="texteImprimerHeader" style="CB_READONLY"/>
-			<statictext row="auto" col_start="1" label="Marge haute / page 1 en cm : "/>
+			<statictext row="auto" col_start="1" style="ALIGN_RIGHT" label="Marge haute / page 1 ajouter en cm : "/>
 			<textctrl col_start="2" name="texteMargeHaute1"/>
-			<statictext row="auto" col_start="1" label="Marge haute / page x en cm : "/>
+			<statictext row="auto" style="ALIGN_RIGHT" col_start="1" label="Marge haute / page x ajouter en cm : "/>
 			<textctrl col_start="2" name="texteMargeHaute2"/>
-			<statictext row="auto" col_start="1" label="Imprimer nom complet du club : "/>
+			<statictext row="auto" col_start="1" style="ALIGN_RIGHT" label="Imprimer nom complet du club : "/>
 			<combotable col_start="2" name="texteImprimerClubLong" style="CB_READONLY"/>
-			<statictext row="auto" col_start="1" label="Taille des caractères : "/>
+			<statictext row="auto" col_start="1" style="ALIGN_RIGHT" label="Taille des caractères : "/>
 			<textctrl col_start="2" name="texteFontSize"/>
-			<statictext row="auto" col_start="1" label="Choix du calque actif : "/>
+			<statictext row="auto" col_start="1" style="ALIGN_RIGHT" label="Choix du calque actif : "/>
 			<combobox col_start="2" name="texteImprimerLayer" style="CB_READONLY"/>
-			<statictext row="auto" col_start="1" label="Choix des pages : "/>
+			<statictext row="auto" col_start="1" style="ALIGN_RIGHT" label="Choix des pages : "/>
 			<combobox col_start="2" name="texteImprimerLayerPage" style="CB_READONLY"/>
-			<statictext row="auto" col_start="1" label="Largeur en cm des colonnes des temps : "/>
+			<statictext row="auto" col_start="1" style="ALIGN_RIGHT" label="Largeur en cm des colonnes des temps : "/>
 			<combobox col_start="2" name="texteLargeurLarge" style="CB_READONLY"/>
-			<statictext row="auto" col_start="1" label="Largeur en cm des autres colonnes : "/>
+			<statictext row="auto" col_start="1" style="ALIGN_RIGHT" label="Largeur en cm des autres colonnes : "/>
 			<combobox col_start="2" name="texteLargeurEtroite" style="CB_READONLY"/>
-			<statictext row="auto" col_start="1" label="Imprimer le nombre des départs : "/>
+			<statictext row="auto" col_start="1" style="ALIGN_RIGHT" label="Imprimer le nombre des départs : "/>
 			<combotable col_start="2" name="texteImprimerDeparts" style="CB_READONLY"/>
-			<statictext row="auto" col_start="1" label="Imprimer le tableau des Critères de calcul : "/>
+			<statictext row="auto" col_start="1" style="ALIGN_RIGHT" label="Imprimer le tableau des Critères de calcul : "/>
 			<combotable col_start="2" name="texteImprimerStatCourses" style="CB_READONLY"/>
-			<statictext row="auto" col_start="1" label="Texte à mettre en ligne 2 de celui-ci : "/>
+			<statictext row="auto" col_start="1" style="ALIGN_RIGHT" label="Texte à mettre en ligne 2 de celui-ci : "/>
 			<textctrl col_start="2" name="texteLigne2Texte"/>
-			<statictext row="auto" col_start="1" label="Imprimer le Code coureur complet : "/>
+			<statictext row="auto" col_start="1" style="ALIGN_RIGHT" label="Imprimer le Code coureur complet : "/>
 			<combotable col_start="2" name="texteCodeComplet" style="CB_READONLY"/>
-			<statictext row="auto" col_start="1" label="Présenter un filtrage supplémentaire avant les calculs : "/>
+			<statictext row="auto" col_start="1" style="ALIGN_RIGHT" label="Présenter un filtrage supplémentaire avant les calculs : "/>
 			<combotable col_start="2" name="texteFiltreSupplementaire" style="CB_READONLY"/>
-			<statictext row="auto" col_start="1" col_end="0" label="Nombre de colonnes utilisées pour la présentation des courses en mode horizontal : "/>
-			<combobox row="auto" col_start="2" name="texteNbColPresCourses" style="ALIGN_CENTER|CB_READONLY"/>
+			<statictext row="auto" col_start="1" style="ALIGN_RIGHT" label="Nombre de colonnes utilisées pour la présentation des courses en mode horizontal : "/>
+			<combobox col_start="2" name="texteNbColPresCourses" style="ALIGN_CENTER|CB_READONLY"/>
 		</matrix>
 		<row value="15px"/>
 		<!-- <staticbox col_start="1" col_end="2" row_start="1" row_end="0" label="Paramétrage supplémentaire des impressions"/> -->
@@ -1189,24 +1189,24 @@
 				<font weight="bold" size_step="1" color="(colorpodium)" cond="body:GetCellInt('Clt', row) &lt; 4"/>
 				<font weight="bold" cond="body:GetCellInt('Clt', row) &gt; 3"/>
 				$(Clt)</text>
-			<text col="(codeplus)" align="center" cond="prnColonne.Code_coureur.Imprimer == 1 and texteCodeComplet == 'Non'"><font weight="bold" color="(colorpodium)" size_step="1" adjust="width" cond="body:GetCellInt('Clt', row) &lt; 4"/>string.sub($(Code_coureur),4)</text>
-			<text col="(codeplus)" align="center" cond="prnColonne.Code_coureur.Imprimer == 1 and texteCodeComplet ~= 'Non'"><font weight="bold" color="(colorpodium)"  size_step="1" adjust="width" cond="body:GetCellInt('Clt', row) &lt; 4"/>$(Code_coureur)</text>
-			<text col="(identiteplus)" align="left" cond="prnColonne.Identite.Imprimer == 1"><font weight="bold" color="(colorpodium)" size_step="1" adjust="width" cond="body:GetCellInt('Clt', row) &lt; 4"/>$(Identite)</text>
-			<text col="(sexeplus)" align="(GetAlignCol('Sexe', body:GetCell('Sexe', row)))" cond="prnColonne.Sexe.Imprimer == 1"><font weight="bold" color="(colorpodium)" size_step="1" adjust="width" cond="body:GetCellInt('Clt', row) &lt; 4"/>$(Sexe)</text>
-			<text col="(anplus)" align="(GetAlignCol('An', body:GetCell('An', row)))" cond="prnColonne.An.Imprimer == 1"><font weight="bold" color="(colorpodium)" size_step="1" adjust="width" cond="body:GetCellInt('Clt', row) &lt; 4"/>$(An)</text>
-			<text col="(categplus)" align="(GetAlignCol('Categ', body:GetCell('Categ', row)))" cond="prnColonne.Categ.Imprimer == 1"><font weight="bold" color="(colorpodium)" size_step="1" adjust="width" cond="body:GetCellInt('Clt', row) &lt; 4"/>$(Categ)</text>
-			<text col="(nationplus)" align="(GetAlignCol('Nation', body:GetCell('Nation', row)))" cond="prnColonne.Nation.Imprimer == 1"><font weight="bold" color="(colorpodium)" size_step="1" adjust="width" cond="body:GetCellInt('Clt', row) &lt; 4"/>$(Nation)</text>
-			<text col="(comiteplus)" align="(GetAlignCol('Comite', body:GetCell('Comite', row)))" cond="prnColonne.Comite.Imprimer == 1"><font weight="bold" color="(colorpodium)" size_step="1" adjust="width" cond="body:GetCellInt('Clt', row) &lt; 4"/>$(Comite)</text>
-			<text col="(clubcourtplus)" align="left" cond="prnColonne.Club.Imprimer == 1 and texteImprimerClubLong == 'Non'"><font weight="bold" color="(colorpodium)" size_step="1" adjust="width" cond="body:GetCellInt('Clt', row) &lt; 4"/>$(Club)</text>
-			<text col="(clublongplus)" align="left" cond="prnColonne.Club.Imprimer == 1 and texteImprimerClubLong == 'Oui'"><font weight="bold" color="(colorpodium)" size_step="1" adjust="width" cond="body:GetCellInt('Clt', row) &lt; 4"/>$(Club_long)</text>
-			<text col="(gecplus)" align="(prnColonne.Groupe.Align)" cond="prnColonne.Groupe.Imprimer == 1"><font weight="bold" color="(colorpodium)" size_step="1" adjust="width" cond="body:GetCellInt('Clt', row) &lt; 4"/>$(Groupe)</text>
-			<text col="(gecplus)" align="(prnColonne.Equipe.Align)" cond="prnColonne.Equipe.Imprimer == 1"><font weight="bold" color="(colorpodium)" size_step="1" adjust="width" cond="body:GetCellInt('Clt', row) &lt; 4"/>$(Equipe)</text>
-			<text col="(gecplus)" align="(prnColonne.Critere.Align)" cond="prnColonne.Critere.Imprimer == 1"><font weight="bold" color="(colorpodium)" size_step="1" adjust="width" cond="body:GetCellInt('Clt', row) &lt; 4"/>$(Critere)</text>
-			<text col="(listeplus)" align="center" cond="prnColonne.Liste1.Imprimer == 1 and body:GetCellInt('Clt_liste1', row) &lt; 999999"><font weight="bold" color="(colorpodium)" size_step="1" adjust="width" cond="body:GetCellInt('Clt', row) &lt; 4"/>$(Pts_liste1)..' ('..$(Clt_liste1)..')'</text>
+			<text col="(codeplus)" align="center" cond="prnColonne.Code_coureur.Imprimer == 1 and texteCodeComplet == 'Non'"><font weight="bold" color="(colorpodium)" size_step="1" cond="body:GetCellInt('Clt', row) &lt; 4"/>string.sub($(Code_coureur),4)</text>
+			<text col="(codeplus)" align="center" cond="prnColonne.Code_coureur.Imprimer == 1 and texteCodeComplet ~= 'Non'"><font weight="bold" color="(colorpodium)"  size_step="1" cond="body:GetCellInt('Clt', row) &lt; 4"/>$(Code_coureur)</text>
+			<text col="(identiteplus)" align="left" cond="prnColonne.Identite.Imprimer == 1"><font weight="bold" color="(colorpodium)" size_step="1" cond="body:GetCellInt('Clt', row) &lt; 4"/>$(Identite)</text>
+			<text col="(sexeplus)" align="(GetAlignCol('Sexe', body:GetCell('Sexe', row)))" cond="prnColonne.Sexe.Imprimer == 1"><font weight="bold" color="(colorpodium)" size_step="1" cond="body:GetCellInt('Clt', row) &lt; 4"/>$(Sexe)</text>
+			<text col="(anplus)" align="(GetAlignCol('An', body:GetCell('An', row)))" cond="prnColonne.An.Imprimer == 1"><font weight="bold" color="(colorpodium)" size_step="1" cond="body:GetCellInt('Clt', row) &lt; 4"/>$(An)</text>
+			<text col="(categplus)" align="(GetAlignCol('Categ', body:GetCell('Categ', row)))" cond="prnColonne.Categ.Imprimer == 1"><font weight="bold" color="(colorpodium)" size_step="1" cond="body:GetCellInt('Clt', row) &lt; 4"/>$(Categ)</text>
+			<text col="(nationplus)" align="(GetAlignCol('Nation', body:GetCell('Nation', row)))" cond="prnColonne.Nation.Imprimer == 1"><font weight="bold" color="(colorpodium)" size_step="1" cond="body:GetCellInt('Clt', row) &lt; 4"/>$(Nation)</text>
+			<text col="(comiteplus)" align="(GetAlignCol('Comite', body:GetCell('Comite', row)))" cond="prnColonne.Comite.Imprimer == 1"><font weight="bold" color="(colorpodium)" size_step="1" cond="body:GetCellInt('Clt', row) &lt; 4"/>$(Comite)</text>
+			<text col="(clubcourtplus)" align="left" cond="prnColonne.Club.Imprimer == 1 and texteImprimerClubLong == 'Non'"><font weight="bold" color="(colorpodium)" size_step="1" cond="body:GetCellInt('Clt', row) &lt; 4"/>$(Club)</text>
+			<text col="(clublongplus)" align="left" cond="prnColonne.Club.Imprimer == 1 and texteImprimerClubLong == 'Oui'"><font weight="bold" color="(colorpodium)" size_step="1" cond="body:GetCellInt('Clt', row) &lt; 4"/>$(Club_long)</text>
+			<text col="(gecplus)" align="(prnColonne.Groupe.Align)" cond="prnColonne.Groupe.Imprimer == 1"><font weight="bold" color="(colorpodium)" size_step="1" cond="body:GetCellInt('Clt', row) &lt; 4"/>$(Groupe)</text>
+			<text col="(gecplus)" align="(prnColonne.Equipe.Align)" cond="prnColonne.Equipe.Imprimer == 1"><font weight="bold" color="(colorpodium)" size_step="1" cond="body:GetCellInt('Clt', row) &lt; 4"/>$(Equipe)</text>
+			<text col="(gecplus)" align="(prnColonne.Critere.Align)" cond="prnColonne.Critere.Imprimer == 1"><font weight="bold" color="(colorpodium)" size_step="1" cond="body:GetCellInt('Clt', row) &lt; 4"/>$(Critere)</text>
+			<text col="(listeplus)" align="center" cond="prnColonne.Liste1.Imprimer == 1 and body:GetCellInt('Clt_liste1', row) &lt; 999999"><font weight="bold" color="(colorpodium)" size_step="1" cond="body:GetCellInt('Clt', row) &lt; 4"/>$(Pts_liste1)..' ('..$(Clt_liste1)..')'</text>
 			<text col="(listeplus)" align="center" cond="prnColonne.Liste1.Imprimer == 1 and body:GetCellInt('Clt_liste1', row) == 999999">''</text>
-			<text col="(listeplus)" align="center" cond="prnColonne.Liste2.Imprimer == 1 and body:GetCellInt('Clt_liste2', row) &lt; 999999"><font weight="bold" color="(colorpodium)" size_step="1" adjust="width" cond="body:GetCellInt('Clt', row) &lt; 4"/>$(Pts_liste2)..' ('..$(Clt_liste2)..')'</text>
+			<text col="(listeplus)" align="center" cond="prnColonne.Liste2.Imprimer == 1 and body:GetCellInt('Clt_liste2', row) &lt; 999999"><font weight="bold" color="(colorpodium)" size_step="1" cond="body:GetCellInt('Clt', row) &lt; 4"/>$(Pts_liste2)..' ('..$(Clt_liste2)..')'</text>
 			<text col="(listeplus)" align="center" cond="prnColonne.Liste2.Imprimer == 1 and body:GetCellInt('Clt_liste2', row) == 999999">''</text>
-			<text col="(listeplus)" align="center" cond="prnColonne.Delta.Imprimer == 1"><font weight="bold" color="ltred" size_step="1" adjust="width" cond="body:GetCellInt('Clt', row) &lt; 4"/>$(Delta)</text>
+			<text col="(listeplus)" align="center" cond="prnColonne.Delta.Imprimer == 1"><font weight="bold" color="ltred" size_step="1" cond="body:GetCellInt('Clt', row) &lt; 4"/>$(Delta)</text>
 			<text col="(largeur_total)" align="center">
 				<font weight="bold" size_step="1" cond="body:GetCellInt('Clt', row) &lt; 4"/>
 				<font weight="bold" cond="body:GetCellInt('Clt', row) &gt; 3"/>
@@ -1215,6 +1215,12 @@
 					idxcourse = i + 1;
 					code_discipline = arCourses[idxcourse].Discipline;
 					selection = body:GetCell('Selection'..idxcourse, row);
+					if arCourses[idxcourse].Nb_run == 1 then
+						chaine = 'Pts'..idxcourse..'_run1';
+						if string.find(selection, chaine) then
+							selection = selection..'G';
+						end
+					end
 					rgbx = colorDiscipline[code_discipline];
 			</lua>
 				<lua>if code_discipline == 'CS' then</lua>
@@ -1256,7 +1262,7 @@
 					<lua>for run = 1, arCourses[idxcourse].Nb_run do</lua>
 							<text col="(largeur_large)" align="center" cond="prnColonne.Tpsrun[idxcourse].Imprimer == 1">
 								<font color="(rgbx)" cond="string.find(params.Presentation,'transparent')"/>
-								<font color="red" cond="not string.find(params.Presentation,'transparent')"/>
+								<!-- <font color="red" cond="not string.find(params.Presentation,'transparent') and string.find(selection, 'Pts'..idxcourse..'_run'..run)"/> -->
 									EvaluateTps(row, 'Tps'..idxcourse..'_run'..run, params.AbdDsq)</text>
 							<text col="(largeur_etroite)" align="center" cond="prnColonne.Ptsrun[idxcourse].Imprimer == 1">
 								<font color="(rgbx)" size_step="1" cond="string.find(params.Presentation,'transparent') and string.find(selection, 'Pts'..idxcourse..'_run'..run)"/>
