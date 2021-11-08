@@ -1,0 +1,114 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<root>
+	<panel name="page1">
+		<padding all="2px"/>
+		<col value="1,2"/>
+		<row value="1" />
+		<textctrl row_start="0" align="right" col_start="1" col_end="0" name="race"/>
+		<row value="auto" />
+		<statictext col_start="1" align="right" label="Impulsion manquante : " />
+		<combobox col_start="0" name="impulsion" style="TE_READONLY" />
+		<row value="auto" />
+		<statictext col_start="1" align="right" label="Manche concernée : " />
+		<combobox col_start="0" name="manche" style="TE_READONLY" />
+		<row value="auto" />
+		<statictext col_start="1" align="right" label="Dossard : " />
+		<textctrl col_start="0" name="dossard" align="left"/>
+		<row value="auto" />
+		<statictext col_start="1" align="right" label="Identite : " />
+		<textctrl col_start="0" name="identite" align="left" style="TE_READONLY"/>
+		<row value="auto" />
+		<statictext col_start="1" align="right" label="Dossard précédent : " />
+		<textctrl col_start="0" name="dossard_precedent" align="left"/>
+		<row value="auto" />
+		<textctrl col_start="0" name="identite_precedente" align="left" style="TE_READONLY"/>
+		<row value="1" />
+		<toolbar col_start="1" col_end="0" row_start="0" name="tbh" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT" />
+	</panel>
+	<panel name="saisie">
+		<col value="1,4,2,2,2"/>
+		<row value="60px"/>
+		<textctrl row_start="0" align="center" col_start="1" col_end="0" name="what" style="TE_READONLY|ALIGN_CENTER_HORIZONTAL|TE_MULTILINE"/>
+		<row value="auto"/>
+		<padding all="5px"/>
+		<statictext col_start="1" row_start="2" align="center" label="Dossard " />
+		<statictext col_start="2" row_start="2" align="center" label="Identite" />
+		<statictext col_start="3" row_start="2" align="center" label="Heure" />
+		<statictext col_start="4" row_start="2" align="center" label="Doublage" />
+		<statictext col_start="5" row_start="2" align="center" label="Delta" />
+		<padding all="2px"/>
+		<lua>for idx = 1, 11 do</lua>
+			<row value="25px" />
+			<textctrl col_start="1" name="('bib'..idx)" style="ALIGN_CENTER_HORIZONTAL"/>
+			<textctrl col_start="2" name="('identite'..idx)" style="ALIGN_LEFT"/>
+			<textctrl col_start="3" name="('heure'..idx)" style="ALIGN_CENTER_HORIZONTAL"/>
+			<textctrl col_start="4" name="('doublage'..idx)" style="ALIGN_CENTER_HORIZONTAL"/>
+			<textctrl col_start="5" name="('delta'..idx)" style="TE_READONLY|ALIGN_CENTER_HORIZONTAL"/>
+		<lua>end</lua>
+		<row value="30px" />
+		<statictext col_start="4" align="right" label="Somme des delta  " />
+		<textctrl col_start="5" name="millisecondes" style="TE_READONLY, ALIGN_CENTER_HORIZONTAL" />
+		<row value="auto" />
+		<toolbar col_start="1" col_end="0" row_start="0" name="tbh2" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT" />
+		<row value="1" />
+	</panel>
+	<panel name="print">
+		<header>
+			<spacing all="4" />
+			<padding all="0"/>
+			<col value="1"/>
+			<pen border="all"/>
+			<font name="Calibri" size="13" adjust="none" weight="bold"/>
+			<text row="3cm" align="center">params.evenement_nom.."\n"..params.recherche</text>
+		</header>
+		<first_header />
+		<label>
+			<padding all="0"/>
+			<pen border="all"/>
+			<font name="Calibri" size="10" adjust="none" weight="bold"/>
+			<row value="1cm"/>
+			<text col="1" align="center" >"Dossard"</text>
+			<text col="4" align="center" >"Identité"</text>
+			<text col="2" align="center" >"Heure"</text>
+			<text col="2" align="center" >"Doublage"</text>
+			<text col="2" align="center" >"Delta"</text>
+		</label>
+		<footer>
+			<col value="1,4,2,2,2"/>
+			<row value="0.8cm, 0.8cm, 0.8cm" />
+			<spacing all="0" />
+			<font name="Calibri" size="12" adjust="none" weight="bold"/>
+			<pen border="all" />
+			<!-- <background mode="solid" color=" 253/191/46"/> -->
+			<background mode="solid" color="rgb 253 191 46"/>
+			<text col_start="4" row_start="1" align="center" >"Total en ms"</text>
+			<text col_start="5" row_start="1" align="center">params.millisecondes</text>
+			<text col_start="4" row_start="2" align="center">"Total/10 en ms"</text>
+			<text col_start="5" row_start="2" align="center">params.SommeMilliPar10</text>
+			<text col_start="1" col_end="2" row_start="1" align="center">"Doublage manuel"</text>
+			<text col_start="3" row_start="1" align="center">params.HeureDoublage</text>
+			<text col_start="1" col_end="2" row_start="2" align="center" cond="params.SommeMilliPar10&gt;= 0">"Heure calculée = Doublage + "..params.SommeMilliPar10.." ms"</text>
+			<text col_start="1" col_end="2" row_start="2" align="center" cond="params.SommeMilliPar10&lt; 0">"Heure calculée = Doublage  "..params.SommeMilliPar10.." ms"</text>
+			<text col_start="3" row_start="2" align="center"><font color="red"/>params.HeureCalculee</text>
+			<text col_start="1" col_end="5" row_start="3" align="center">params.difference</text>
+		</footer>	
+
+		<body>
+			<spacing all="0" />
+			<font name="Calibri" size="10" adjust="none" weight="bold"/>
+			<pen border="all" />
+			<row value="0.9cm" />
+			<pen border="all" size="2" />
+			<font name="Calibri" size="10" adjust="both" weight="normal" />
+			<text col= "1" align="center" ><background color="rgb 253 191 46" mode="solid" cond="body:GetCellInt('Coureur',row)==1"/><font size_step="2" weight="bold" cond="body:GetCellInt('Coureur',row)==1"/>$(Dossard)</text>
+			<text col= "4" align="center" ><background color="rgb 253 191 46" mode="solid" cond="body:GetCellInt('Coureur',row)==1"/><font size_step="2" weight="bold"  cond="body:GetCellInt('Coureur',row)==1"/>$(Nom)..' '..$(Prenom)</text>
+			<text col= "2" align="center" cond="body:GetCell('Impulsion', row)=='D' and body:GetCellInt('Coureur', row)==0">app.TimeToString(body:GetCellInt('Heure_depart', row),'%2h:%2m:%2s.%3f')</text>
+			<text col= "2" align="center" cond="body:GetCell('Impulsion', row)=='A' and body:GetCellInt('Coureur', row)==0">app.TimeToString(body:GetCellInt('Heure_arrivee', row),'%2h:%2m:%2s.%3f')</text>
+			<text col= "2" align="center" cond="body:GetCellInt('Coureur', row)==1"><background color="rgb 253 191 46" mode="solid" /><font  weight="bold" size_step="2" color="red"/>'('..params.HeureCalculee..')'</text>
+			<text col= "2" align="center" ><background cond="body:GetCellInt('Coureur', row)==1" color="rgb 253 191 46" mode="solid" /><font cond="body:GetCellInt('Coureur', row)==1"  weight="bold" size_step="2" color="red"/>app.TimeToString(body:GetCellInt('Doublage', row),'%2h:%2m:%2s.%3f')</text>
+			<text col= "2" align="center" cond="body:GetCellInt('Coureur', row)==0 and math.abs(body:GetCellInt('Delta', row))&gt;0">$(Delta)</text>
+			<text col= "2" align="center" cond="body:GetCellInt('Coureur', row)==0 and math.abs(body:GetCellInt('Delta', row))==0">''</text>
+			<text col= "2" align="center" cond="body:GetCellInt('Coureur', row)==1"><background color="rgb 253 191 46" mode="solid" />''</text>
+		</body>
+	</panel>
+</root>

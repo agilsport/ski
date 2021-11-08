@@ -543,7 +543,7 @@
 			<text col="4" align="center" label="Gr." cond="body:GetCellInt('Reserve', row) &gt; 0">$(Reserve)</text>
 			<text col="2" align="center" label="S.">$(Sexe)</text>
 			<text col="4" align="center" label="An">$(An)</text>
-			<text col="7" align="center" label="Cat.">$(Categ)</text>
+			<text col="5" align="center" label="Cat.">$(Categ)</text>
 			<text col="4" align="center" label="Nat" cond="entite == 'FIS'">$(Nation)</text>
 			<text col="3" align="center" label="CS">$(Comite)</text>
 			<text col="12" align="center" label="Club">$(Club)</text>
@@ -631,7 +631,7 @@
 			<text col="7" align="center" label="Code"><font size="8" cond="group =='body'"/>$(Code_coureur):sub(4)</text>
 			<text col="20" align="left" label="Nom - Prénom" font_weight="bold">$(Identite)</text> 
 			<text col="4" align="center" label="An">$(An)</text>
-			<text col="7" align="center" label="Cat.">$(Categ)</text>
+			<text col="6" align="center" label="Cat.">$(Categ)</text>
 			<text col="6" align="left" label="Nat" font_style="italic" cond="entite == 'FIS'">$(Nation)</text>
 			<image col_start="0" adjust="height" align="right" border="0" cond="entite == 'FIS'"><background mode="transparent"/>app.ImageNation($(Nation))</image> 
 			<text col="3" align="center" label="CS" font_style="italic">$(Comite)</text>
