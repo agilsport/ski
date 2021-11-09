@@ -1,11 +1,11 @@
 -- TAG CP-540
 dofile('./interface/adv.lua');
-dofile('./interface/interface.lua');
+dofile('./interface/device.lua');
 
 -- Information : Numéro de Version, Nom, Interface
 function device.GetInformation()
 	return { 
-		version = 3.5, 
+		version = 3.6, 
 		code = 'tag_cp540', 
 		name = 'TAG Heuer CP-540/545', 
 		class = 'chrono', 

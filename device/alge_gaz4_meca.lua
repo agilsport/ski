@@ -1,8 +1,6 @@
--- ALGE Gaz4 Meca
-dofile('./interface/adv.lua');
-dofile('./interface/interface.lua');
----    a verifier avec pierre si on peut l'enlever
-dofile('./interface/wndDisplayBoard.lua');
+-- ALGE Timy
+dofile('./interface/include.lua');
+dofile('./interface/device.lua');
 
 -- Information : Numéro de Version, Nom, Interface
 function device.GetInformation()
@@ -58,12 +56,6 @@ function device.OnInit(params)
 	
 	state = stateBib.RUNNING;
 	OnNotifyBibChange();
-	
-	simulator = params.simulator or false;
-	if simulator then
-		displayBoard = wndDisplayBoard.New({ rows=1, cols=20 });
-	end
-	
 end
 
 function OnNotifyOffsetTime(key, params)
@@ -148,12 +140,6 @@ function SendGaz4_Time(bib, chrono, rk)
 	rs232:WriteString(packet);
 	rs232:WriteByte(asciiCode.CR);
 	rs232:WriteByte(asciiCode.LF);
-
-	if displayBoard ~= nil then
-		displayBoard:MatrixText(string.format('%3d', tonumber(bib)),1,1);
-		displayBoard:MatrixText(app.TimeToString(chrono, "%2h:%2m:%2s.%3f"),1,5);
-		displayBoard:MatrixText(string.format('%2d', tonumber(rk)), 1, 18);
-	end
 	
 	adv.Alert('GAZ4:'..packet);
 end
@@ -175,12 +161,6 @@ function SendGaz4_RunningTime(bib, chrono)
 	rs232:WriteString(packet);
 	rs232:WriteByte(asciiCode.CR);
 	rs232:WriteByte(asciiCode.LF);
-	
-	if displayBoard ~= nil then
-		displayBoard:MatrixText(string.format('%3d', tonumber(bib)),1,1);
-		displayBoard:MatrixText(app.TimeToString(chrono, "%2h:%2m:%2s.%3f"),1,5);
-		displayBoard:MatrixText('  ', 1, 18);
-	end	
 	
 	adv.Alert('GAZ4:'..packet);
 end
