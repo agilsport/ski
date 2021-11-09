@@ -1,0 +1,359 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Editions pour les listes ministérielles hait-niveau -->
+<!-- <background mode="gradient_line_vert" color_start="white" color_end="ltgray" /> -->
+<!-- <font name="Calibri" size="10" /> -->
+<root>
+  <Releve>
+    <Dames>
+      <annee1 c1="-1" c2="-1" c3="-1"/>
+      <annee2 c1="-1" c2="-1" c3="-1"/>
+      <annee3 c1="100" c2="60" c3="-1"/>
+      <annee4 c1="100" c2="60" c3="-1"/>
+      <annee5 c1="100" c2="60" c3="-1"/>
+      <annee6 c1="120" c2="80" c3="100,250"/>
+      <annee7 c1="140" c2="-1" c3="100,250"/>
+      <annee8 c1="160" c2="-1" c3="120,300"/>
+      <annee9 c1="15a,240" c2="-1" c3="125,400"/>
+      <annee10 c1="15a,400" c2="-1" c3="150,500"/>
+    </Dames>
+    <Hommes>
+      <annee1 c1="100" c2="75" c3="-1"/>
+      <annee2 c1="100" c2="75" c3="-1"/>
+      <annee3 c1="100" c2="75" c3="-1"/>
+      <annee4 c1="150" c2="110" c3="-1"/>
+      <annee5 c1="150" c2="110" c3="-1"/>
+      <annee6 c1="200" c2="160" c3="-1"/>
+      <annee7 c1="15a,260" c2="-1" c3="230,350"/>
+      <annee8 c1="20a,400" c2="-1" c3="270,450"/>
+      <annee9 c1="30a" c2="-1" c3="15a,40a"/>
+      <annee10 c1="40a" c2="-1" c3="10a,50a"/>
+    </Hommes>
+  </Releve>
+  <Espoirs>
+    <Dames>
+      <annee1 c1="-1" c2="-1" c3="-1"/>
+      <annee2 c1="-1" c2="-1" c3="-1"/>
+      <annee3 c1="-1" c2="-1" c3="-1"/>
+      <annee4 c1="-1" c2="-1" c3="-1"/>
+      <annee5 c1="-1" c2="-1" c3="-1"/>
+      <annee6 c1="-1" c2="-1" c3="-1"/>
+      <annee7 c1="250" c2="-1" c3="250,500"/>
+      <annee8 c1="300" c2="-1" c3="350,600"/>
+      <annee9 c1="30a" c2="-1" c3="15a,40a"/>
+      <annee10 c1="40a" c2="-1" c3="20a,50a"/>
+    </Dames>
+    <Hommes>
+      <annee1 c1="-1" c2="-1" c3="-1"/>
+      <annee2 c1="-1" c2="-1" c3="-1"/>
+      <annee3 c1="-1" c2="-1" c3="-1"/>
+      <annee4 c1="-1" c2="-1" c3="-1"/>
+      <annee5 c1="-1" c2="-1" c3="-1"/>
+      <annee6 c1="350" c2="-1" c3="250,500"/>
+      <annee7 c1="450" c2="-1" c3="300,600"/>
+      <annee8 c1="550" c2="-1" c3="450,750"/>
+      <annee9 c1="100a" c2="-1" c3="30a,120a"/>
+      <annee10 c1="100a" c2="-1" c3="30a,120a"/>
+    </Hommes>
+  </Espoirs>
+  <CNE>
+    <Dames>
+      <annee1 c1="-1" c2="-1" c3="-1"/>
+      <annee2 c1="-1" c2="-1" c3="-1"/>
+      <annee3 c1="100" c2="60" c3="-1"/>
+      <annee4 c1="100" c2="60" c3="-1"/>
+      <annee5 c1="100" c2="60" c3="-1"/>
+      <annee6 c1="120" c2="80" c3="100,250"/>
+      <annee7 c1="140" c2="-1" c3="100,250"/>
+      <annee8 c1="160" c2="-1" c3="120,300"/>
+      <annee9 c1="15a,240" c2="-1" c3="125,400"/>
+      <annee10 c1="15a,400" c2="-1" c3="150,500"/>
+    </Dames>
+    <Hommes>
+      <annee1 c1="100" c2="75" c3="-1"/>
+      <annee2 c1="100" c2="75" c3="-1"/>
+      <annee3 c1="100" c2="75" c3="-1"/>
+      <annee4 c1="150" c2="110" c3="-1"/>
+      <annee5 c1="150" c2="110" c3="-1"/>
+      <annee6 c1="200" c2="160" c3="-1"/>
+      <annee7 c1="15a,260" c2="-1" c3="230,350"/>
+      <annee8 c1="20a,400" c2="-1" c3="270,450"/>
+      <annee9 c1="30a" c2="-1" c3="15a,40a"/>
+      <annee10 c1="40a" c2="-1" c3="10a,50a"/>
+    </Hommes>
+  </CNE>
+  <CIE>
+    <Dames>
+      <annee1 c1="-1" c2="-1" c3="-1"/>
+      <annee2 c1="-1" c2="-1" c3="-1"/>
+      <annee3 c1="-1" c2="-1" c3="-1"/>
+      <annee4 c1="-1" c2="-1" c3="-1"/>
+      <annee5 c1="-1" c2="-1" c3="-1"/>
+      <annee6 c1="-1" c2="-1" c3="-1"/>
+      <annee7 c1="550" c2="350,700" c3="-1"/>
+      <annee8 c1="600" c2="450,800" c3="-1"/>
+      <annee9 c1="150a" c2="40a,100a" c3="-1"/>
+      <annee10 c1="200a" c2="50a,100a" c3="-1"/>
+    </Dames>
+    <Hommes>
+      <annee1 c1="-1" c2="-1" c3="-1"/>
+      <annee2 c1="-1" c2="-1" c3="-1"/>
+      <annee3 c1="-1" c2="-1" c3="-1"/>
+      <annee4 c1="-1" c2="-1" c3="-1"/>
+      <annee5 c1="-1" c2="-1" c3="-1"/>
+      <annee6 c1="500" c2="500,550" c3="-1"/>
+      <annee7 c1="600" c2="600,750" c3="-1"/>
+      <annee8 c1="750" c2="550,900" c3="-1"/>
+      <annee9 c1="200a" c2="150a,200a" c3="-1"/>
+      <annee10 c1="200a" c2="150a,200a" c3="-1"/>
+    </Hommes>
+  </CIE>
+  <panel name="backoffice">
+    <lua>dofile('./interface/adv.lua')</lua>
+    <padding all="3px"/>
+    <col value="1"/>
+    <statictext row="auto" col_start="1" col_end="0" align="center" label="Back Office - gestion des critères"/>
+    <row value="5px"/>
+    <matrix row="auto">
+      <row value="5px"/>
+      <col value="1,1,1,1"/>
+      <statictext row="auto" col_start="2" align="right" label="Niveau étudié"/>
+      <combobox col_start="3" name="comboNiveau" style="CB_READONLY"/>
+      <statictext row="auto" col_start="2" align="right" label="Sexe des coureurs"/>
+      <combobox col_start="3" name="comboSexe" style="CB_READONLY"/>
+      <statictext row="auto" align="center" label="Indiquer les classements mondiaux selon les critères à définir."/>
+    </matrix>
+    <matrix row="auto">
+      <col value="20px,1,1,1,1,1,1,1,1,20px"/>
+      <row value="5px"/>
+      <statictext row="80px" col_start="2" align="center" label="Année"/>
+      <statictext col_start="3" col_end="4" align="center" label="\nClt / année d\'âge  OU  Clt mondial"/>
+      <statictext col_start="5" align="center" label="\nClt mondial"/>
+      <statictext col_start="6" col_end="7" align="center" label="Discipline Vitesse\nClt / année d\'âge  OU  Clt mondial"/>
+      <statictext col_start="8" col_end="9" align="center" label="Discipline Technique\nClt / année d\'âge  OU  Clt mondial"/>
+      <row value="5px"/>
+      <lua>for i = 1, 10 do</lua>
+      <textctrl row="auto" col_start="2" align="center" name="('annee'..i)" style="TE_READONLY|TE_CENTER"/>
+      <textctrl col_start="3" align="center" name="('unetechniquea'..i)" style="TE_CENTER"/>
+      <textctrl col_start="4" align="center" name="('unetechniqueb'..i)" style="TE_CENTER"/>
+      <textctrl col_start="5" align="center" name="('unevitesse'..i)" style="TE_CENTER"/>
+      <textctrl col_start="6" align="center" name="('deuxvitessea'..i)" style="TE_CENTER"/>
+      <textctrl col_start="7" align="center" name="('deuxvitesseb'..i)" style="TE_CENTER"/>
+      <textctrl col_start="8" align="center" name="('deuxtechniquea'..i)" style="TE_CENTER"/>
+      <textctrl col_start="9" align="center" name="('deuxtechniqueb'..i)" style="TE_CENTER"/>
+      <lua>end</lua>
+      <row value="5px"/>
+      <staticbox row_start="-13" row_end="0" col_start="3" col_end="4" label="Discipline Technique"/>
+      <staticbox row_start="-13" row_end="0" col_start="5" label="Discipline Vitesse"/>
+      <staticbox row_start="-13" row_end="0" col_start="6" col_end="9" label="1 Discipline Vitesse  ET  1 Discipline Technique"/>
+    </matrix>
+    <row value="30px"/>
+    <toolbar row="auto" col_start="1" col_end="0" name="tbedit1" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
+  </panel>
+  <panel name="configgenerale">
+    <lua>dofile('./interface/adv.lua')</lua>
+    <padding all="3px"/>
+    <col value="1,2,1"/>
+    <statictext row="50px" col_start="2" align="center" label="Aide à l\'établissement des listes ministérielles haut niveau"/>
+    <matrix col_start="2" row="auto">
+      <row value="5px"/>
+      <col value="1,2,2,1"/>
+      <statictext row="auto" col_start="2" align="right" label="Liste FIS support"/>
+      <combobox col_start="3" name="comboListe" style="CB_READONLY"/>
+      <statictext row="auto" col_start="2" align="right" label="Niveau étudié"/>
+      <combobox col_start="3" name="comboNiveau" style="CB_READONLY"/>
+      <statictext row="auto" col_start="2" align="right" label="Sexe des coureurs"/>
+      <combobox col_start="3" name="comboSexe" style="CB_READONLY"/>
+      <statictext row="auto" col_start="2" align="right" label="Année de début"/>
+      <combobox col_start="3" name="comboAnneeDebut" style="CB_READONLY"/>
+      <statictext row="auto" col_start="2" align="right" label="Année de fin"/>
+      <combobox col_start="3" name="comboAnneeFin" style="CB_READONLY"/>
+      <row value="20px"/>
+    </matrix>
+    <row value="5px"/>
+    <matrix row="auto" col_start="2">
+      <col value="10px,1,1,100px,1,10px"/>
+      <row value="20px"/>
+      <row value="10px"/>
+      <!-- Critère 1 : 1 discipline technique -->
+      <statictext row="auto" col_start="2" align="center" label="être dans les"/>
+      <textctrl col_start="3" align="center" name="gxpremiers1" style="TE_CENTER"/>
+      <statictext col_start="4" align="left" label="mondiaux"/>
+      <checkbox col_start="5" align="left" name="chk1" label="Par année d\'âge" style="CHK_2STATE|ALIGN_RIGHT"/>
+      <statictext row="auto" col_start="1" align="right" label="OU"/>
+      <statictext col_start="2" align="center" label="être dans les"/>
+      <textctrl col_start="3" align="center" name="gxpremiers2" style="TE_CENTER"/>
+      <statictext col_start="4" align="left" label="mondiaux"/>
+      <checkbox col_start="5" align="left" name="chk2" label="Par année d\'âge" style="CHK_2STATE|ALIGN_RIGHT"/>
+      <row value="10px"/>
+      <staticbox row_start="-5" row_end="0" col_start="1" col_end="0" label="1 Discipline technique"/>
+    </matrix>
+    <row value="5px"/>
+    <matrix row="auto" col_start="2">
+      <col value="10px,1,1,100px,1,10px"/>
+      <row value="20px"/>
+      <row value="10px"/>
+      <!-- Critère 2 : 1 discipline vitesse -->
+      <statictext row="auto" col_start="2" align="center" label="être dans les"/>
+      <textctrl col_start="3" align="center" name="gxpremiers3" style="TE_CENTER"/>
+      <statictext col_start="4" align="left" label="mondiaux"/>
+      <checkbox col_start="5" align="left" name="chk3" label="Par année d\'âge" style="CHK_2STATE|ALIGN_RIGHT"/>
+      <row value="10px"/>
+      <staticbox row_start="-4" row_end="0" col_start="1" col_end="0" label="1 Discipline vitesse"/>
+    </matrix>
+    <row value="10px"/>
+    <row value="10px"/>
+    <matrix row="auto" col_start="2">
+      <col value="10px,1,1,100px,1,10px"/>
+      <row value="20px"/>
+      <row value="10px"/>
+      <!-- Critère 3 : 1 discipline vitesse ET une discipline technique -->
+      <statictext row="auto" col_start="1" align="right" label="En vitesse :"/>
+      <statictext col_start="2" align="center" label="être dans les"/>
+      <textctrl col_start="3" align="center" name="gxpremiers4" style="TE_CENTER"/>
+      <statictext col_start="4" align="left" label="mondiaux"/>
+      <checkbox col_start="5" align="left" name="chk4" label="Par année d\'âge" style="CHK_2STATE|ALIGN_RIGHT"/>
+      <statictext row="auto" col_start="1" align="right" label="ET"/>
+      <statictext row="auto" col_start="1" align="right" label="En technique :"/>
+      <statictext col_start="2" align="center" label="être dans les"/>
+      <textctrl col_start="3" align="center" name="gxpremiers5" style="TE_CENTER"/>
+      <statictext col_start="4" align="left" label="mondiaux"/>
+      <checkbox col_start="5" align="left" name="chk5" label="Par année d\'âge" style="CHK_2STATE|ALIGN_RIGHT"/>
+      <row value="10px"/>
+      <staticbox row_start="-6" row_end="0" col_start="1" col_end="0" label="1 Discipline vitesse ET une discipline technique"/>
+    </matrix>
+    <row value="5px"/>
+    <toolbar row="auto" col_start="1" col_end="0" name="tbedit1" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
+  </panel>
+  <panel id="printanalyse">
+    <layers>
+      <layer id="ffs">
+        <matrix>
+          <row value="0.5cm, 0.8cm"/>
+          <col value="2cm, 1, 2cm"/>
+          <image col_start="2" align="center" adjust="width">
+            <background mode="transparent"/>'./logo/bandeau_fis.png'</image>
+        </matrix>
+        <matrix>
+          <row value="0.4cm, 1.2cm"/>
+          <col value="0.4cm, 1.2cm"/>
+          <image align="center" adjust="width">
+            <background mode="transparent"/>'./logo/logo_ffs.jpg'</image>
+        </matrix>
+        <matrix>
+          <row value="0.4cm, 1.2cm"/>
+          <col value="1, 1.2cm"/>
+          <image align="center" adjust="width">
+            <background mode="transparent"/>'./logo/logo_fis.jpg'</image>
+          <col value="0.4cm"/>
+        </matrix>
+      </layer>
+    </layers>
+    <lua>dofile('./edition/functionPG.lua'); coureurs_critere = 0;</lua>
+    <header>
+      <padding all="1px"/>
+      <spacing all="2"/>
+      <col value="1"/>
+      <pen border="none"/>
+      <font name="Calibri" size="13" adjust="width" weight="bold"/>
+      <text row="auto" align="center">'Analyse des performances pour la liste '..params.Liste..params.Niveau..' (de '..params.AnneeDebut..' à '..params.AnneeFin..')\nLes critères s\'appliquent en cascade (si un critère n\'est pas rempli, on passe au suivant).'</text>
+      <text row="auto" align="center">'Les coureurs sont triés par ordre de leurs meilleurs points en disciplines techniques.'</text>
+      <row value="0.5cm"/>
+      <font name="Calibri" size="12" adjust="width" weight="bold"/>
+      <text row="auto">'Critère 1 : '..params.Critere1..' en discipline technique'</text>
+      <text row="auto">'Critère 2 : '..params.Critere2..' en discipline vitesse'</text>
+      <text row="auto">'Critère 3 : '..params.Critere3</text>
+      <row value="0.5cm"/>
+    </header>
+    <footer>
+      <background mode="transparent"/>
+      <font name="Calibri" size="8" adjust="width" weight="normal"/>
+      <pen border="none"/>
+      <text row="auto" col="1" align="left"/>
+      <line col_start="1" col_end="0" pen_size="2" pen_color="dkgray" border="bottom"/>
+      <row value="auto"/>
+      <matrix col_start="1">
+        <row value="auto"/>
+        <text col="auto" align="left">app.GetName()..' Version '..app.GetVersion()..' / FFS'</text>
+        <image col="0.4cm" adjust="width" align="left">'./res/32x32_ffs.png'</image>
+        <text col="auto" align="left">' / Agil Informatique'</text>
+        <image col="0.4cm" adjust="width" align="left">'./res/32x32_agil.png'</image>
+        <text col="auto" align="left">os.date(' / Edition du %d-%m-%Y à %H:%M:%S')</text>
+        <text col="auto" align="left">' / sript LUA version '..params.Version</text>
+      </matrix>
+      <text align="right">string.format('Page %d/%s',editor:GetPageCurrent(), editor:GetPageCountLabel())</text>
+      <line col_start="1" col_end="0" border="top"/>
+    </footer>
+    <label>
+      <padding all="0"/>
+      <spacing all="10"/>
+      <pen border="all"/>
+      <background color="white" mode="solid"/>
+      <font name="Calibri" size="10" adjust="width" weight="bold"/>
+      <col value="3,1,1,1+50px,1+50px,2,2,1"/>
+      <text row="auto" col_start="1" align="center">'Identité'</text>
+      <text col_start="2" align="center">'Année'</text>
+      <text col_start="3" align="center">'Comité'</text>
+      <text col_start="4" align="center">'Pts/Clt Tech.'</text>
+      <text col_start="5" align="center">'Pts/Clt Vit.'</text>
+      <text col_start="6" align="center">'Pts/Clt Tech./année)'</text>
+      <text col_start="7" align="center">'Pts/Clt Vit./année)'</text>
+      <text col_start="8" align="center">'Critère 3'</text>
+    </label>
+    <body>
+      <padding all="0"/>
+      <pen border="all"/>
+      <col value="3,1,1,1+50px,1+50px,2,2,1"/>
+      <font name="Calibri" font_size_step="-1" adjust="width" weight="normal"/>
+      <!-- <lua>if group == 'body' then</lua> -->
+      <background color="white" mode="solid" cond="row%2 == 0"/>
+      <background color="ltgray" mode="solid" cond="row%2 == 1"/>
+      <!-- <lua>end</lua> -->
+      <lua>if body:GetCellInt('Est_critere',row) &gt; 0 then coureurs_critere = coureurs_critere + 1; end</lua>
+      <text row="auto" col_start="1">
+        <background mode="transparent"/>
+        <font weight="bold" cond="body:GetCellInt('Est_critere', row) &gt; 0"/>$(Identite)</text>
+      <text col_start="2" align="center">
+        <background mode="transparent"/>
+        <font weight="bold" cond="body:GetCellInt('Est_critere', row) &gt; 0"/>$(An)</text>
+      <text col_start="3" align="center">
+        <background mode="transparent"/>
+        <font weight="bold" cond="body:GetCellInt('Est_critere', row) &gt; 0"/>$(Comite)</text>
+      <text col_start="4" align="center" cond="body:GetCellInt('Col1', row) == 0">
+        <background mode="transparent"/>$(Pts_technique)..'/'..$(Clt_technique)</text>
+      <text col_start="4" align="center" cond="body:GetCellInt('Col1', row) == 1">
+        <background mode="transparent"/>
+        <font weight="bold" color="red"/>$(Pts_technique)..'/'..$(Clt_technique)</text>
+      <text col_start="5" align="center" cond="body:GetCellInt('Col2', row) == 0">
+        <background mode="transparent"/>$(Pts_vitesse)..'/'..$(Clt_vitesse)</text>
+      <text col_start="5" align="center" cond="body:GetCellInt('Col2', row) == 1">
+        <background mode="transparent"/>
+        <font weight="bold" color="green"/>$(Pts_vitesse)..'/'..$(Clt_vitesse)</text>
+      <text col_start="6" align="center" cond="body:GetCellInt('Col3', row) == 0">
+        <background mode="transparent"/>$(Pts_technique_annee)..'/'..$(Clt_technique_annee)</text>
+      <text col_start="6" align="center" cond="body:GetCellInt('Col3', row) == 1">
+        <background mode="transparent"/>
+        <font weight="bold" color="red"/>$(Pts_technique_annee)..'/'..$(Clt_technique_annee)</text>
+      <text col_start="7" align="center" cond="body:GetCellInt('Col4', row) == 0">
+        <background mode="transparent"/>$(Pts_vitesse_annee)..'/'..$(Clt_vitesse_annee)</text>
+      <text col_start="7" align="center" cond="body:GetCellInt('Col4', row) == 1">
+        <background mode="transparent"/>
+        <font weight="bold" color="green"/>$(Pts_vitesse_annee)..'/'..$(Clt_vitesse_annee)</text>
+      <text col_start="8" align="center" cond="body:GetCellInt('Col5', row) == 0">
+        <background mode="transparent"/>
+        <font weight="bold"/>''</text>
+      <text col_start="8" align="center" cond="body:GetCellInt('Col5', row) == 1">
+        <background mode="transparent"/>
+        <font weight="bold"/>'X'</text>
+    </body>
+    <end>
+      <col value="1"/>
+      <row value="0.5cm"/>
+      <text row="auto" cond="coureurs_critere &gt; 1">
+        <font name="Calibri" size="11" weight="bold"/>coureurs_critere..' coureurs ont rempli les critères.'</text>
+      <text row="auto" cond="coureurs_critere == 1">
+        <font name="Calibri" size="11" weight="bold"/>coureurs_critere..' coureur a rempli les critères.'</text>
+      <text row="auto" cond="coureurs_critere == 0">
+        <font name="Calibri" size="11" weight="bold"/>'aucun coureur a rempli les critères.'</text>
+    </end>
+  </panel>
+</root>
