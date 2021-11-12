@@ -25,10 +25,6 @@ Pour chaque activité :
 Sous dossier /xml du répertoire principal
 <br>
 Prise en charge des normes XML FIS, FFS et ESF pour l'importation et l'exportation des compétitions.
-
-___
-Les téléchargements Officiels sont téléchargeables sur la page [https://www.agil.fr/ski](https://www.agil.fr/ski) 
-
  
 ## Process
 Sous dossier /process du répertoire principal
@@ -44,8 +40,7 @@ Scripts de création des Matrices de classement
 Sous dossier /res du répertoire principal
 <br>
 Resources internes C++ 
-
-
-
+___
+Les téléchargements Officiels sont téléchargeables sur la page [https://www.agil.fr/ski](https://www.agil.fr/ski) 
 
 
