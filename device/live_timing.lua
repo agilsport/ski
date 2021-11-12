@@ -12,7 +12,7 @@ end
 -- Information : Numéro de Version, Nom, Interface
 function device.GetInformation()
 	return { 
-		version = 6.2;
+		version = 6.3;
 		name = 'Live Timing Async.', 
 		class = 'network'
 	};
@@ -603,12 +603,16 @@ end
 -- fonctions des événements concernant les séquences
 function IncrementationSequenceSend()
 	live.sequence_send = live.sequence_send + 1;
-	live.node:ChangeAttribute('send', live.sequence_send);
+	live.node:ChangeAttribute('send_'..live.codex, live.sequence_send);
+	app.GetXML():SaveFile();
+
 	RefreshCounterSequence();
 end
 
 function SaveSequenceAck()
-	live.node:ChangeAttribute('ack', live.sequence_ack);
+	live.node:ChangeAttribute('ack_'..live.codex, live.sequence_ack);
+	app.GetXML():SaveFile();
+
 	RefreshCounterSequence();
 end
 
@@ -712,10 +716,8 @@ end
 function InitLive()
 	
 	local tEpreuve = live.tables.Epreuve;
-	-- live.sequence_ack = tEpreuve:GetCellInt("Fis_live_ack", 0, 0);
-	-- live.sequence_send = tEpreuve:GetCellInt("Fis_live_send", 0, 0);
-	live.sequence_ack = tonumber(live.node:GetAttribute('ack')) or 0;
-	live.sequence_send = tonumber(live.node:GetAttribute('send')) or 0;
+	live.sequence_ack = tonumber(live.node:GetAttribute('ack_'..live.codex)) or 0;
+	live.sequence_send = tonumber(live.node:GetAttribute('send_'..live.codex)) or 0;
 	RefreshCounterSequence();
 	
 	-- Est ce que tout a été acquitté ?
@@ -1252,8 +1254,8 @@ function CommandClear()
 	-- Remise à  Zéro des compteurs 
 	live.sequence_send = 0;
 	live.sequence_ack = 0;
-	live.node:ChangeAttribute('send', live.sequence_send);
-	live.node:ChangeAttribute('ack', live.sequence_ack);
+	live.node:ChangeAttribute('send_'..live.codex, live.sequence_send);
+	live.node:ChangeAttribute('ack_'..live.codex, live.sequence_ack);
 	live.sequence_last_send = nil;
 
 	local nodeRoot = xmlNode.Create(nil, xmlNodeType.ELEMENT_NODE, "livetiming");

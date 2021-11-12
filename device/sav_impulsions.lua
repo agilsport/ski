@@ -1,11 +1,11 @@
 -- Sauvegarde des inpulsions en continu
 dofile('./interface/adv.lua');
-dofile('./interface/interface.lua');
+dofile('./interface/device.lua');
 
 -- Information : Numéro de Version, Nom, Interface
 function device.GetInformation()
 	return { 
-		version = 2.9, 
+		version = 3.0, 
 		name = 'Sauvegarde des impulsions', 
 		class = 'tools'
 	};
@@ -149,21 +149,21 @@ function device.OnInit(params, node)
 	local mgr = app.GetAuiManager();
 	mgr:AddPane(panel, {
 		icon = './res/32x32_ffs.png',
-		caption = "Sauvegarde des impulsions",
+		caption = "SAV Impulsions",
 		caption_visible = true,
 		close_button = false,
 		pin_button = true,
 		show = true,
 		float = true, 
 		floating_position = {981, 25},
-		floating_size = {250, 90},
+		floating_size = {130, 130},
 		dockable = false
 	});
 	mgr:Update();
 
 	local tb = panel:GetWindowName('tb');
 	btn_statut = tb:AddTool("Feu vert / Feu rouge", sav.statut_image);
-	tb:AddSeparator();
+	tb:AddStretchableSpace(1);
 	local btn_recharger = tb:AddTool("Recharger les séquences", "./res/32x32_download.png");
 	tb:Realize();
 	
@@ -202,7 +202,11 @@ function OnChangeStatut();
 		sav.statut_image = "./res/chrono32x32_ok.png";
 	end
 	local tb = panel:GetWindowName('tb');
-	tb:SetToolNormalBitmap(btn_statut, sav.statut_image);
+	if tb ~= nil and panel ~= nil then
+		tb:SetToolNormalBitmap(btn_statut, sav.statut_image);
+		panel:FitInside();
+		RefreshCompteur(sosDb:SelectInt("Select Max(Seq) From Resultat_Chrono"));
+	end
 end
 
 function OnRechargerSequence();
