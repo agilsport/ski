@@ -1,12 +1,11 @@
 dofile('./interface/adv.lua');
 dofile('./interface/interface.lua');
 
--- version 1.9
+-- version 2.0
 
 -- point a voir avec pierre
 			-- voir si la façon de mettre la police ds le body est ok si qq veut la modifier si format A3 par exemple 
 			-- car sur course nat la ffs a investi dans une imprimante A3 pour sortir les tableaux
-			-- appel de la fenêtre filtrage à l'ouverture
 
 function alert(txt)
 	app.GetAuiMessage():AddLine(txt);
@@ -40,17 +39,8 @@ function main(params)
 		node_value = 'Couloir',			-- Facultatif si le node_name est unique ...	
 	});
 
-	base = sqlBase.Clone();
-	
-	body = base.CreateTableRanking({ 
-		code_evenement = theParams.code_evenement, 
-		code_epreuve = theParams.code_epreuve, 
-		code_manche = theParams.code_manche,
-		Organisateur = theParams.Organisateur,
-		Club = theParams.Club,
-		Comite = theParams.Code_comite,
-		codeActivite = theParams.Code_activite
-	});
+	-- La table body est la table filtrée ou pas ... mais c'est la bonne 
+	body = base:GetTable('body');
 	
 	-- Initialisation des controles ...
 	local comboNbCouloir = dlg:GetWindowName('NbCouloir');
