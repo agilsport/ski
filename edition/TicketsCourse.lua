@@ -8,12 +8,15 @@ end
 
 function main(params)
 	
-	body = sqlBase.CreateTableRanking({ 
-		code_evenement = params.code_evenement, 
-		code_epreuve = params.code_epreuve, 
-		code_manche = params.code_manche
-	});
-	
+	body = base:GetTable('body');
+	tEvenement = base:GetTable('Evenement');
+	cmd = 'select * from Evenement Where Code = '..params.code_evenement
+	base:TableLoad(tEvenement, cmd)
+	Codex = tEvenement:GetCell('Codex', 0);
+	if Codex == '' then
+	  Codex = params.code_evenement
+	end
+	-- alert("codex = "..Codex);
 	-- Filtrage Ticket ...
 	for i=body:GetNbRows()-1, 0, -1 do
 		CodeCoureur = body:GetCell('Code_coureur', i):sub(1,3);
@@ -22,7 +25,12 @@ function main(params)
 		end
 	end
 	
-	filename = './tmp/Ticket_Course_'..params.code_evenement..'.txt';
+-- Verification que le directory ./device/Race-result existe ...
+	if app.DirExists('./tmp/Ticket_Course') == false then
+		app.Mkdir('./tmp/Ticket_Course'); -- Creation du répertoire
+	end
+	Date = os.date("%d_%m_%y");
+	filename = './tmp/Ticket_Course/Ticket_'..Codex..'_'..Date..'.txt';
 	fileTicket = io.open(filename, "w+");
 
 	tResultatAdresse = base:GetTable('Resultat_Adresse');
@@ -95,7 +103,19 @@ function main(params)
 	end
 	fileTicket:close();
 	
-	body:Delete();
 	wnd.MessageBox(app.GetParentFrame(), "Création du fichier "..filename..' ...', 'Information');
-
+		-- Creation du Report
+	report = wnd.LoadTemplateReportXML({
+		xml = './edition/TicketsCourse.xml',
+		node_name = 'root/report',
+		node_attr = 'id',
+		node_value = 'Edt_TicketCourse' ,
+		
+		base = base,
+		body = body,
+		
+		params = params
+	});
+	
+	body:Delete();
 end
