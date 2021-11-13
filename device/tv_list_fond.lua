@@ -5,7 +5,7 @@ dofile('./interface/device.lua');
 
 -- Information : Numéro de Version, Nom, Interface
 function device.GetInformation()
-	return { version = 2.6, name = 'TV Liste Fond', class = 'display', interface = {} };
+	return { version = 2.7, name = 'TV Liste Fond', class = 'display', interface = {} };
 end	
 
 -- Configuration du Device
@@ -19,7 +19,23 @@ function device.OnInit(params)
 	-- Connexion Base MySQL "tv"
 	device.dbTV = sqlBase.ConnectMySQL('localhost', 'tv', 'root', '', 3306);
 	if device.dbTV == nil then
-		adv.Error("Erreur Connexion Base TV");
+		-- Creation Base TV
+		local base = sqlBase.Clone();
+		base:Query("CREATE DATABASE tv");
+		base:Delete();
+		
+		device.dbTV = sqlBase.ConnectMySQL('localhost', 'tv', 'root', '', 3306);
+		if device.dbTV == nil then
+			adv.Error("Erreur Connexion Base TV");
+			return;
+		end
+		-- Creation des Tables 
+		if device.dbTV:ScriptSQL('./process/base_tv.sql') == true then
+			adv.Success("Creation Base TV OK");
+		else
+			adv.Error("Erreur Connexion Base TV");
+			return;
+		end
 	end
 	device.dbTV:Load();
 	
@@ -45,7 +61,6 @@ function device.OnInit(params)
 	tbNavigation:Bind(eventType.MENU, OnModeStartlist, btn_startlist);
 	tbNavigation:Bind(eventType.MENU, OnModeRanking, btn_ranking);
 	tbNavigation:Bind(eventType.MENU, OnWebLive, btn_Web);
-	
 
 	-- Prise valeur offset Horloge PC - Horloge Chrono Officielle
 	local rc, offsetInfo = app.SendNotify('<offset_time_load>');

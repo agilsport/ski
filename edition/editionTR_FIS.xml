@@ -1,0 +1,275 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<root>
+	<panel name="page0">
+		<padding all="15px"/>
+		<col value="15px,1,3,1,15px"/>
+		<row value="25px" />
+		<font name="Calibri" size="10" weight="bold" color="black" adjust="best" />
+		<background mode="solid" />
+		<textctrl row="300px" col_start="3" name="page0Text" style="TE_READONLY|TE_MULTILINE" />
+		<row value="5px" />
+		<staticbox row_start="1" row_end="0" col_start="2" col_end="4" label = "Création du Timing Report FIS" />
+		<row value="1" />
+		<toolbar row="auto" col_start="1" col_end="0" name="tbpage0" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT" />
+		<row value="80px" />
+	</panel>
+	<panel name="page1">
+		<padding all="2px"/>
+		<col value="1,1"/>
+		<row value="15px" />
+		<!-- Chef des calculs -->
+		<matrix row="auto" col_start="1">
+			<row value="25px" />
+			<col value="15px,1,3,15px" />
+			<statictext row="auto" col_start="2" align="right" label="Nom " />
+			<textctrl col_start="3" name="chiefoftiming_Lastname"/>
+			<statictext row="auto" col_start="2" align="right" label="Prénom " />
+			<textctrl col_start="3" name="chiefoftiming_Firstname"/>
+			<statictext row="auto" col_start="2" align="right" label="Nation " />
+			<textctrl col_start="3" name="chiefoftiming_Nation"/>
+			<statictext row="auto" col_start="2" align="right" label="Adresse mail " />
+			<textctrl col_start="3" name="chiefoftiming_Email"/>
+			<statictext row="auto" col_start="2" align="right" label="n° de téléphone " />
+			<textctrl col_start="3" name="chiefoftiming_Phonenbr"/>
+			<statictext row="auto" col_start="2" align="right" label="" />
+			<row value="12px" />
+			<staticbox row_start="1" row_end="0" col_start="1" col_end="0" label="Chef des calculs" />
+		</matrix>
+		<!-- chronométreur -->
+		<matrix col_start="2">
+			<row value="25px" />
+			<col value="15px,1,3,15px" />
+			<statictext row="auto" col_start="2" align="right" label="Nom " />
+			<textctrl col_start="3" name="timekeeper_Lastname"/>
+			<statictext row="auto" col_start="2" align="right" label="Prénom " />
+			<textctrl col_start="3" name="timekeeper_Firstname"/>
+			<statictext row="auto" col_start="2" align="right" label="Nation " />
+			<textctrl col_start="3" name="timekeeper_Nation"/>
+			<statictext row="auto" col_start="2" align="right" label="Adresse mail " />
+			<textctrl col_start="3" name="timekeeper_Email"/>
+			<statictext row="auto" col_start="2" align="right" label="n° de téléphone " />
+			<textctrl col_start="3" name="timekeeper_Phonenbr"/>
+			<statictext row="auto" col_start="2" align="right" label="Société (si applicable) " />
+			<textctrl col_start="3" name="timekeeper_Company"/>
+			<row value="5px" />
+			<staticbox row_start="1" row_end="0" col_start="1" col_end="0" label="Chronométreur" />
+		</matrix>
+		<!-- <row value="5px" /> -->
+		<!-- Système A -->
+		<matrix row="auto" col_start="1">
+			<row value="25px" />
+			<col value="15px,2,3,3,2,2,2,15px" />
+			<statictext row="30px" col_start="3" align="center" label="Marque" />
+			<statictext col_start="4" align="center" label="Modèle" />
+			<statictext col_start="5" align="center" label="n° série" />
+			<statictext col_start="6" align="center" label="homologation" />
+			<statictext col_start="7" align="center" label="image" />
+			<statictext row="auto" col_start="2" align="right" label="Chronomètres" />
+			<combotable col_start="3" name="timersystemA_Brand" style = "CB_READONLY"/>
+			<combobox col_start="4" name="timersystemA_Model" style = "CB_READONLY"/>
+			<textctrl col_start="5" name="timersystemA_Serial" />
+			<textctrl col_start="6" name="timersystemA_Homologation" style="TE_READONLY"/>
+			<statictext row="auto" col_start="2" align="right" label="('(au départ)')" />
+			<combotable col_start="3" name="timer_startsystemA_Brand" style = "CB_READONLY"/>
+			<combobox col_start="4" name="timer_startsystemA_Model" style = "CB_READONLY"/>
+			<textctrl col_start="5" name="timer_startsystemA_Serial" />
+			<textctrl col_start="6" name="timer_startsystemA_Homologation" style="TE_READONLY"/>
+			<statictext row="auto" col_start="2" align="right" label="Cellules" />
+			<wndimage row_start="-2" row_end="0" col_start="7" name="imagea" adjust="best"><background mode="solid" />'./logo/logo_fis.jpg'</wndimage>
+			<combotable col_start="3" name="finishcellssystemA_Brand" style = "CB_READONLY"/>
+			<combobox col_start="4" name="finishcellssystemA_Model" style = "CB_READONLY"/>
+			<textctrl col_start="5" name="finishcellssystemA_Serial" />
+			<textctrl col_start="6" name="finishcellssystemA_Homologation" style="TE_READONLY"/>
+			<statictext row="auto" col_start="2" align="right" label="Portillon" />
+			<combotable col_start="3" name="startdevice_Brand" style = "CB_READONLY"/>
+			<combobox col_start="4" name="startdevice_Model" style = "CB_READONLY"/>
+			<textctrl col_start="5" name="startdevice_Serial" />
+			<textctrl col_start="6" name="startdevice_Homologation" style="TE_READONLY"/>
+			<statictext row="auto" col_start="2" align="right" label="('(Horloge départ)')" />
+			<textctrl col_start="3" name="startclock_Brand"/>
+			<textctrl col_start="4" name="startclock_Model" />
+			<textctrl col_start="5" name="startclock_Serial" />
+			<textctrl col_start="6" name="startclock_Homologation" style="TE_READONLY"/>
+			<statictext row="auto" col_start="2" align="right" label="('(Photo finish)')" />
+			<textctrl col_start="3" name="photofinishsystemA_Brand"/>
+			<textctrl col_start="4" name="photofinishsystemA_Model"/>
+			<textctrl col_start="5" name="photofinishsystemA_Serial" />
+			<textctrl col_start="6" name="photofinishsystemA_Homologation" style="TE_READONLY"/>
+			<row value="15px" />
+			<staticbox row_start="1" row_end="0" col_start="1" col_end="0" label="Système A" />
+		</matrix>
+		<!-- Système B -->
+		<matrix col_start="2">
+			<row value="25px" />
+			<col value="15px,2,3,3,2,2,2,15px" />
+			<statictext row="30px" col_start="3" align="center" label="Marque" />
+			<statictext col_start="4" align="center" label="Modèle" />
+			<statictext col_start="5" align="center" label="n° série" />
+			<statictext col_start="6" align="center" label="homologation" />
+			<statictext col_start="7" align="center" label="image" />
+			<statictext row="auto" col_start="2" align="right" label="Chronomètres" />
+			<combotable col_start="3" name="timersystemB_Brand" style = "CB_READONLY"/>
+			<combobox col_start="4" name="timersystemB_Model" style = "CB_READONLY"/>
+			<textctrl col_start="5" name="timersystemB_Serial" />
+			<textctrl col_start="6" name="timersystemB_Homologation" style="TE_READONLY"/>
+			<statictext row="auto" col_start="2" align="right" label="('(au départ)')" />
+			<combotable col_start="3" name="timer_startsystemB_Brand" style = "CB_READONLY"/>
+			<combobox col_start="4" name="timer_startsystemB_Model" style = "CB_READONLY"/>
+			<textctrl col_start="5" name="timer_startsystemB_Serial" />
+			<textctrl col_start="6" name="timer_startsystemB_Homologation" style="TE_READONLY"/>
+			<statictext row="auto" col_start="2" align="right" label="Cellules" />
+			<wndimage row_start="-2" row_end="0" col_start="7" name="imageb" adjust="best"><background mode="solid" />'./logo/logo_fis.jpg'</wndimage>
+			<combotable col_start="3" name="finishcellssystemB_Brand" style = "CB_READONLY"/>
+			<combobox col_start="4" name="finishcellssystemB_Model" style = "CB_READONLY"/>
+			<textctrl col_start="5" name="finishcellssystemB_Serial" />
+			<textctrl col_start="6" name="finishcellssystemB_Homologation" style="TE_READONLY"/>
+			<statictext row="auto" col_start="2" align="right" label="('(Photo finish)')" />
+			<textctrl col_start="3" name="photofinishsystemB_Brand"/>
+			<textctrl col_start="4" name="photofinishsystemB_Model" />
+			<textctrl col_start="5" name="photofinishsystemB_Serial" />
+			<textctrl col_start="6" name="photofinishsystemB_Homologation" style="TE_READONLY"/>
+			<row value="15px" />
+			<staticbox row_start="1" row_end="0" col_start="1" col_end="0" label="Système B" />
+		</matrix>
+		<!-- DT -->
+		<matrix row="auto" col_start="1">
+			<row value="15px" />
+			<row value="10px" />
+			<col value="15px,1,3,15px" />
+			<statictext row="auto" col_start="2" align="right" label="Nom " />
+			<textctrl col_start="3" name="technicaldelegate_Lastname"/>
+			<statictext row="auto" col_start="2" align="right" label="Prénom " />
+			<textctrl col_start="3" name="technicaldelegate_Firstname"/>
+			<statictext row="auto" col_start="2" align="right" label="Nation " />
+			<textctrl col_start="3" name="technicaldelegate_Nation"/>
+			<statictext row="auto" col_start="2" align="right" label="Adresse mail " />
+			<textctrl col_start="3" name="technicaldelegate_Email"/>
+			<statictext row="auto" col_start="2" align="right" label="n° de DT " />
+			<textctrl col_start="3" name="technicaldelegate_Number"/>
+			<staticbox row_start="1" row_end="0" col_start="1" col_end="0" label="Délégué technique" />
+		</matrix>
+		<!-- Divers -->
+		<matrix col_start="2">
+			<row value="15px" />
+			<col value="15px,1,1,1,1,15px" />
+			<statictext row="auto" col_start="2" align="right" label="Date " />
+			<textctrl col_start="3" name="Racedate" style = "TE_READONLY"/>
+			<statictext col_start="4" align="right" label="Communications Syst.A " />
+			<combobox col_start="5" name="modesystemA_Mode" style="CB_READONLY" />
+			<statictext row="auto" col_start="2" align="right" label="Codex " />
+			<textctrl col_start="3" name="Codex" style = "TE_READONLY"/>
+			<statictext col_start="4" align="right" label="Communications Syst.B " />
+			<combobox col_start="5" name="modesystemB_Mode" style="CB_READONLY" />
+			<statictext row="auto" col_start="2" align="right" label="Logiciel " />
+			<statictext col_start="4" align="right" label="Communications Voix " />
+			<textctrl col_start="3" name="software" style="TE_READONLY"/>
+			<combobox col_start="5" name="modevoice_Voice" style="CB_READONLY" />
+			<statictext row="auto" col_start="2" align="right" label="Version " />
+			<textctrl col_start="3" name="software_version" style = "TE_READONLY"/>
+			<statictext row="auto" col_start="2" align="right" label="Catégorie FIS " />
+			<textctrl col_start="3" name="Categorie" style = "TE_READONLY"/>
+		</matrix>
+		<row value="1" />
+		<toolbar row="auto" col_start="1" col_end="0" name="tbpage1" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT" />
+		<row value="80px" />
+
+	</panel>
+	<panel name="page2">
+		<padding all="5px"/>
+		<col value="10px,1,10px" />
+		<row value="20px" />
+		<!-- Synchronisation -->
+		<matrix row="auto" col_start="2">
+			<row value="20px" />
+			<col value="10px,1+30px,1,1,1,1,1,1,10px" />
+			<statictext row="auto" col_start="3" align="center" label="Système A (arrivée)" />
+			<statictext col_start="4" align="center" label="Système B (arrivée)" />
+			<statictext col_start="5" align="center" label="Doublage manuel" />
+			<statictext col_start="6" align="center" label="Système A (départ)" />
+			<statictext col_start="7" align="center" label="Système B (départ)" />
+			<statictext row="auto" col_start="2" align="right" label="Heure de synchro" />
+			<textctrl col_start="3" name="Synchronisation_Sync" align="center" style="TE_CENTER"/>
+			<textctrl col_start="5" name="Synchronisation_Handsync" align="center" style="TE_CENTER"/>
+			<statictext row="auto" col_start="2" align="right" label="Confirmation de la synchro" />
+			<textctrl col_start="3" name="syncchecksystemA_Synccheck" align="center" style="TE_CENTER"/>
+			<textctrl col_start="4" name="syncchecksystemB_Synccheck" align="center" style="TE_CENTER"/>
+			<textctrl col_start="6" name="syncchecksystemA_Start_Synccheck" align="center" style="TE_CENTER"/>
+			<textctrl col_start="7" name="syncchecksystemB_Start_Synccheck" align="center" style="TE_CENTER"/>
+			<row value="15px" />
+			<staticbox row_start="1" row_end="0" col_start="1" col_end="0" label="Synchronisation des chronomètres" />
+		</matrix>
+		<!-- <row value="5px" /> -->
+		<matrix row="auto" col_start="2" >
+			<row value="15px" />
+			<col value="10px,1+30px,1,1,1,1,1,1,10px" />
+			<wndtext row="40px" align="center" col_start="3" col_end="5" ><font size="10" color="red"/><background mode="solid" color="ltgray" />'Manche1'</wndtext>
+			<wndtext align="center" col_start="6" col_end="8" ><font size="10" color="red"/><background mode="solid" color="ltgray" />'Manche2'</wndtext>
+			<statictext row="auto" col_start="2" align="center" label="Coureurs avec données complètes" />
+			<statictext col_start="3" align="center" label="Système A" />
+			<statictext col_start="4" align="center" label="Système B" />
+			<statictext col_start="5" align="center" label="Doublage" />
+			<statictext col_start="6" align="center" label="Système A" />
+			<statictext col_start="7" align="center" label="Système B" />
+			<statictext col_start="8" align="center" label="Doublage" />
+			<!-- run 1 système A -->
+			<textctrl row="auto" col_start="3" name="Run1BibfirstsystemA_Start" align="center" style="TE_CENTER|TE_READONLY"/>
+			<statictext col_start="2" align="right" label="Heure de départ du 1er" />
+			<textctrl row="auto" col_start="3" name="Run1BibfirstsystemA_Finish" align="center" style="TE_CENTER|TE_READONLY"/>
+			<statictext col_start="2" align="right" label="Heure d\'arrivée du 1er" />
+			<!-- <textctrl col_start="4" name="Run1BibfirstBib" align="center" style="TE_CENTER|TE_READONLY"/> -->
+			<textctrl row="auto" col_start="3" name="Run1Bibfirst_Net" align="center" style="TE_CENTER|TE_READONLY"/>
+			<statictext col_start="2" align="right" label="Temps net Syst.A - (Dossard) " />
+			<textctrl row="auto" col_start="3" name="Run1BiblastsystemA_Start" align="center" style="TE_CENTER|TE_READONLY"/>
+			<statictext col_start="2" align="right" label="Heure de départ du dernier" />
+			<textctrl row="auto" col_start="3" name="Run1BiblastsystemA_Finish" align="center" style="TE_CENTER|TE_READONLY"/>
+			<statictext col_start="2" align="right" label="Heure d\'arrivée du dernier" />
+			<!-- <textctrl col_start="4" name="Run1BiblastBib" align="center" style="TE_CENTER|TE_READONLY"/> -->
+			<textctrl row="auto" col_start="3" name="Run1Biblast_Net" align="center" style="TE_CENTER|TE_READONLY"/>
+			<statictext col_start="2" align="right" label="Temps net Syst.A - (Dossard) "/>
+			<wndtext row="40px" col_start="2" align="right"><font size="10" color="red"/><background mode="solid" color="ltgray" />'Meilleur de la manche'</wndtext>
+			<textctrl col_start="3" col_end="4" name="Run1BestAName" align="center" style="TE_READONLY" />
+			<textctrl row="auto" col_start="3" name="Run1BestA_Time" align="center" style="TE_CENTER|TE_READONLY"/>
+			<textctrl col_start="4" name="Run1BestA_Bib" align="center" style="TE_CENTER|TE_READONLY"/>
+			<statictext col_start="2" align="right" label="Temps net Syst.A - (Dossard) "/>
+			<!-- run 1 système B -->
+			<textctrl row_start="4" col_start="4" name="Run1BibfirstsystemB_Start" align="center" style="TE_CENTER"/>
+			<textctrl row_start="5" col_start="4" name="Run1BibfirstsystemB_Finish" align="center" style="TE_CENTER"/>
+			<textctrl row_start="7" col_start="4" name="Run1BiblastsystemB_Start" align="center" style="TE_CENTER"/>
+			<textctrl row_start="8" col_start="4" name="Run1BiblastsystemB_Finish" align="center" style="TE_CENTER"/>
+			<!-- run 1 système Hand -->
+			<textctrl row_start="4" col_start="5" name="Run1BibfirstsystemHand_Start" align="center" style="TE_CENTER"/>
+			<textctrl row_start="5" col_start="5" name="Run1BibfirstsystemHand_Finish" align="center" style="TE_CENTER"/>
+			<textctrl row_start="7" col_start="5" name="Run1BiblastsystemHand_Start" align="center" style="TE_CENTER"/>
+			<textctrl row_start="8" col_start="5" name="Run1BiblastsystemHand_Finish" align="center" style="TE_CENTER"/>
+			<!-- run 2 système A -->
+			<textctrl row_start="4" col_start="6" name="Run2BibfirstsystemA_Start" align="center" style="TE_CENTER|TE_READONLY"/>
+			<textctrl row_start="5" col_start="6" name="Run2BibfirstsystemA_Finish" align="center" style="TE_CENTER|TE_READONLY"/>
+			<textctrl row_start="6" col_start="6" name="Run2Bibfirst_Net" align="center" style="TE_CENTER|TE_READONLY"/>
+			<!-- <textctrl row_start="6" col_start="7" name="Run2BibfirstBib" align="center" style="TE_CENTER|TE_READONLY"/> -->
+			<textctrl row_start="7" col_start="6" name="Run2BiblastsystemA_Start" align="center" style="TE_CENTER|TE_READONLY"/>
+			<textctrl row_start="8" col_start="6" name="Run2BiblastsystemA_Finish" align="center" style="TE_CENTER|TE_READONLY"/>
+			<textctrl row_start="9" col_start="6" name="Run2Biblast_Net" align="center" style="TE_CENTER|TE_READONLY"/>
+			<!-- <textctrl row_start="9" col_start="7" name="Run2BiblastBib" align="center" style="TE_CENTER|TE_READONLY"/> -->
+			<!-- run 2 système B -->
+			<textctrl row_start="4" col_start="7" name="Run2BibfirstsystemB_Start" align="center" style="TE_CENTER"/>
+			<textctrl row_start="5" col_start="7" name="Run2BibfirstsystemB_Finish" align="center" style="TE_CENTER"/>
+			<textctrl row_start="7" col_start="7" name="Run2BiblastsystemB_Start" align="center" style="TE_CENTER"/>
+			<textctrl row_start="8" col_start="7" name="Run2BiblastsystemB_Finish" align="center" style="TE_CENTER"/>
+			<!-- run 2 système Hand -->
+			<textctrl row_start="4" col_start="8" name="Run2BibfirstsystemHand_Start" align="center" style="TE_CENTER"/>
+			<textctrl row_start="5" col_start="8" name="Run2BibfirstsystemHand_Finish" align="center" style="TE_CENTER"/>
+			<textctrl row_start="7" col_start="8" name="Run2BiblastsystemHand_Start" align="center" style="TE_CENTER"/>
+			<textctrl row_start="8" col_start="8" name="Run2BiblastsystemHand_Finish" align="center" style="TE_CENTER"/>
+			
+			<textctrl row_start="10" col_start="6" col_end="7" name="Run2BestAName" align="center" style="TE_READONLY" />
+			<textctrl row_start="11" col_start="6" name="Run2BestA_Time" align="center" style="TE_CENTER|TE_READONLY"/>
+			<textctrl row_start="11" col_start="7" name="Run2BestA_Bib" align="center" style="TE_CENTER|TE_READONLY"/>
+
+			<row value="15px" />
+			<staticbox row_start="1" row_end="0" col_start="1" col_end="0" label="Données du chronométrage en heure du jour et au moins au millième" />
+		</matrix>
+		<row value="1" />
+		<toolbar row="auto" col_start="2" col_end="3" name="tbpage2" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT" />
+		<row value="80px" />
+	</panel>
+</root>

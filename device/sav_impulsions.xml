@@ -13,7 +13,13 @@
 	<panel name="sav">
 		<padding all="2px" />
 		<col value="1" />
-		<toolbar row="1" name="tb" style="TB_FLAT|TB_HORIZONTAL" />
-		<statictext row="auto" name="sequence" label="Sequence : "/>
+	
+		<toolbar col_start="1" row="1" name="tb" style="TB_FLAT|TB_HORIZONTAL" />
+		<wndtext col_start="1" row="1" 
+			align="center" adjust="best" 
+			bk_mode="solid" bk_color="black" 
+			font_color="yellow" font_size="12" font_weight="bold" 
+			name="sequence" 
+		/>
 	</panel>
 </root>

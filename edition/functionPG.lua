@@ -264,8 +264,12 @@ function GetDisciplines(Table_critere)
 	end
 		-- Course|1|SG|au maximum|50%sur9
 	for i = 1, #Table_critere do
+		-- ex : Table_critere[i].Critere = Course|1|*|au maximum|2sur3	
 		local arTableCritere = Table_critere[i].Critere:Split('|');
 		for j = 1, #arDiscipline do
+			if arTableCritere[3] == "*" then
+				arDiscipline[j].Discipline = '*';
+			end
 			if arTableCritere[3]:find(arDiscipline[j].Discipline) then
 				if arTableCritere[5]:find('sur') then		-- 5 sur 9
 					local arsur = arTableCritere[5]:Split('sur');
@@ -843,8 +847,8 @@ function InitPrnColonnes()
 					prnColonne.Clt[idxcourse].Imprimer = 1;
 				end
 				if prnColonne.Tpsrun[idxcourse].Imprimer == 1 then
-					prnColonne.Tpsrun[idxcourse].Imprimer = 1;
-					prnColonne.Tps[idxcourse].Imprimer = 0;
+					prnColonne.Tpsrun[idxcourse].Imprimer = 0;
+					prnColonne.Tps[idxcourse].Imprimer = 1;
 				end
 				if prnColonne.Diffrun[idxcourse].Imprimer == 1 then
 					prnColonne.Diffrun[idxcourse].Imprimer = 0;
@@ -855,7 +859,7 @@ function InitPrnColonnes()
 					prnColonne.Pts[idxcourse].Imprimer = 1;
 				end
 				if prnBlocx.Ptstotal.Imprimer == 1 then
-					prnColonne.Pts[idxcourse].Imprimer = 0;
+					prnColonne.Pts[idxcourse].Imprimer = 1;
 				end
 			end
 	-- bloc1 : Clt,0|Tps,0|Diff,0|Pts,1|Cltrun,0|Tpsrun,0|Diffrun,0|Ptsrun,1|Ptstotal,1	/ EtapeClt,0|EtapePts,0

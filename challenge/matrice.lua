@@ -574,18 +574,17 @@ function SetPtsTotalCourse(idxcourse, idxcoureur);	-- calcule et enregistre les 
 			end
 		end
 	elseif string.find(matrice.course[idxcourse].Prendre, '2') then
-		if idxcoureur < 0 then  
-			ptscourse = matrice.course[idxcourse].MaxCourse;
+		if raceData.Clt > 0 then
+			ptscourse = raceData.Pts;
 		else
-			for i = 1, matrice.course[idxcourse].Nombre_de_manche do
-				local clt = tMatrice_Ranking:GetCellInt('Clt'..idxcourse..'_run'..i);
-				if clt > 0 then
-					local pts = tMatrice_Ranking:GetCellDouble('Pts'..idxcourse..'_run'..i, idxcoureur, -1);
-					ptscourse = ptscourse + pts;
-				end
+			if raceData.Tps == -500 or raceData.Tps == -800 or raceData.Tps == -600 then
+				ptscourse = matrice.defaut_point;
 			end
-			ptscourse = ptscourse;
 		end
+		if tMatrice_Ranking:GetCell('Code_coureur', idxcoureur) == code_coureur_pour_debug then
+			adv.Alert('dans SetPtsTotalCourse, course '..idxcourse..', ptscourse = '..tostring(ptscourse));
+		end
+
 	elseif string.find(matrice.course[idxcourse].Prendre, '3') then
 		if idxcoureur < 0 then  
 			ptscourse = matrice.course[idxcourse].MaxCourse;
@@ -819,7 +818,7 @@ function SetPtsTotalMatrice(idxcoureur, courseData);	-- calcul des points totaux
 	-- 3 = critere avec bloc : Idem matrice.numTypeCritere2 avec gestion des blocs et possibilité d'aller chercher dans le même bloc x meilleures manches de la discipline indépendament des courses en plus.
 	-- 4 = critere avec bloc : Idem 3 mais on va chercher les manches indépendemment des blocs.
 	local prise = 0;
-	local ptsMatrice = -1;
+	local ptsMatrice = 0;
 	local ajouter = 0;
 	local ptsBloc1 = -1;
 	local tbolCritere = {};
@@ -931,13 +930,22 @@ function SetPtsTotalMatrice(idxcoureur, courseData);	-- calcul des points totaux
 					courseData[idxcourseData].Prise = 1;
 				end
 				local disciplineok = false;
-				if courseData[idxcourseData].BestPts >= 0 then
-					ajouter = 1;
-				end
 				local selection = tMatrice_Ranking:GetCell('Selection'..idxcourse, idxcoureur);
 				local nombre_de_manche = matrice.course[idxcourse].Nombre_de_manche;
 				local idxrun = courseData[idxcourseData].Run;
+				if matrice.table_critere[idxcritere].Discipline == '*' then
+					courseData[idxcourseData].Discipline = '*';
+				end
+				if tMatrice_Ranking:GetCell('Code_coureur', idxcoureur) == code_coureur_pour_debug then
+					adv.Alert('--------------------------------------------');
+					adv.Alert('passage 1');
+					adv.Alert('if string.find(courseData['..idxcourseData..'].Discipline, '..matrice.table_critere[idxcritere].Discipline..') then')	-- la course est dans la discipline du critère
+				end
 				if string.find(courseData[idxcourseData].Discipline, matrice.table_critere[idxcritere].Discipline) then	-- la course est dans la discipline du critère
+					if tMatrice_Ranking:GetCell('Code_coureur', idxcoureur) == code_coureur_pour_debug then
+						adv.Alert('--------------------------------------------');
+						adv.Alert('la course '..idxcourseData..' en '..courseData[idxcourseData].Discipline..' est dans la discipline du critère : '..matrice.table_critere[idxcritere].Discipline);
+					end
 					if courseData[idxcourseData].Obligatoire < 0 then
 						if courseData[idxcourseData].PtsTotal < 0 then							
 							bolcritere = false;
@@ -946,6 +954,10 @@ function SetPtsTotalMatrice(idxcoureur, courseData);	-- calcul des points totaux
 						end
 					end
 					if courseData[idxcourseData].Prise == 0 then	-- course pas encore prise
+						if tMatrice_Ranking:GetCell('Code_coureur', idxcoureur) == code_coureur_pour_debug then
+							adv.Alert('--------------------------------------------');
+							adv.Alert('Type critère = 1, la course '..idxcourseData.." n'est pas encore prise");
+						end
 						if courseData[idxcourseData].BestRun > 0 or courseData[idxcourseData].BestRun == -100 or courseData[idxcourseData].Obligatoire < 0 then	-- course en une manche ou il y a un Pts_total;
 							if nb_courses_prises < matrice.table_critere[idxcritere].NbCombien then
 								courseData[idxcourseData].Prise = 1;
@@ -979,6 +991,7 @@ function SetPtsTotalMatrice(idxcoureur, courseData);	-- calcul des points totaux
 							end
 						end
 					end
+				else
 				end
 			end
 			if string.find(matrice.table_critere[idxcritere].Prendre, 'minimum') and nb_courses_prises < nbcombienx then
@@ -2039,7 +2052,7 @@ function Calculer(panel_name)		-- fonction de calcul du résultat du Challenge/Co
 							end
 						end
 						if matrice.comboTypePoint == 'Points course' then
-							raceData.Pts = GetPtsCourse(idxcourse, raceData.Tps, matrice.course[idxcourse].best_time, matrice.course[idxcourse].facteur_f);
+							raceData.Pts = GetPtsCourse(idxcourse, raceData.Tps, matrice.course[idxcourse].Best_time, matrice.course[idxcourse].Facteur_f);
 							if raceData.Tps == -500 or raceData.Tps == -800 then
 								if matrice.numMalusAbdDsq >= 10 then	-- on rajoute des points course
 									raceData.Pts = raceData.Pts + matrice.numMalusAbdDsq;
@@ -2239,7 +2252,8 @@ function Calculer(panel_name)		-- fonction de calcul du résultat du Challenge/Co
 						tMatrice_Ranking:SetCell('Pts'..idxcourse, idxcoureur, raceData.PtsTotal);
 					end
 				end
-				if string.find(matrice.course[idxcourse].Prendre, '2') or string.find(matrice.course[idxcourse].Prendre, '3') then
+				-- if string.find(matrice.course[idxcourse].Prendre, '2') or string.find(matrice.course[idxcourse].Prendre, '3') then
+				if string.find(matrice.course[idxcourse].Prendre, '3') then
 					if tMatrice_Ranking:GetCell('Code_coureur', idxcoureur) == code_coureur_pour_debug or idxcoureur == -1 then
 						adv.Alert('	-- table.insert(coursesData de la course : Ordre = '..matrice.course[idxcourse].Ordre..', Pts = '..raceData.Pts);
 					end
@@ -2932,11 +2946,24 @@ function GetCritere()	-- lecture de toutes les variables des critères de calculs
 		if matrice.table_critere[i].Discipline ~= '*' then
 			if matrice.table_critere[i].NbCombien > matrice.table_critere[i].Sur then
 				matrice['criteres_bloc'..bloc] = matrice['criteres_bloc'..bloc]..virgule_bloc[bloc]..matrice.table_critere[i].Prendre..' '..matrice.table_critere[i].NbCombien..' '..matrice.table_critere[i].Discipline;
+				adv.Alert("1 - matrice['criteres_bloc'..bloc] = "..matrice['criteres_bloc'..bloc]);
 			else
-				matrice['criteres_bloc'..bloc] = matrice['criteres_bloc'..bloc]..virgule_bloc[bloc]..matrice.table_critere[i].Prendre..' '..matrice.table_critere[i].NbCombien..' '..matrice.table_critere[i].Discipline.. ' sur '..matrice.table_critere[i].Sur;
+				local sur = matrice.table_critere[i].Sur;
+				if string.find(matrice.comboPrendreBloc1, '2.') then
+					sur = sur * 2;
+				end
+				matrice['criteres_bloc'..bloc] = matrice['criteres_bloc'..bloc]..virgule_bloc[bloc]..matrice.table_critere[i].Prendre..' '..matrice.table_critere[i].NbCombien..' '..matrice.table_critere[i].Discipline.. ' sur '..sur;
+				adv.Alert("1 - matrice['criteres_bloc'..bloc] = "..matrice['criteres_bloc'..bloc]);
 			end
 		else
-			matrice['criteres_bloc'..bloc] = matrice['criteres_bloc'..bloc]..virgule_bloc[bloc]..matrice.table_critere[i].Prendre..' '..matrice.table_critere[i].NbCombien..' courses sur '..matrice.table_critere[i].Sur..virgule_bloc[bloc];
+			local sur = matrice.table_critere[i].Sur;
+			local quoi = ' course(s) ';
+			if string.find(matrice.comboPrendreBloc1, '2.') then
+				sur = sur * 2;
+				quoi = ' manche(s) ';
+			end
+			matrice['criteres_bloc'..bloc] = matrice['criteres_bloc'..bloc]..virgule_bloc[bloc]..matrice.table_critere[i].Prendre..' '..matrice.table_critere[i].NbCombien..quoi..' sur '..sur..virgule_bloc[bloc];
+			adv.Alert("\n2 - matrice['criteres_bloc'..bloc] = "..matrice['criteres_bloc'..bloc]);
 		end
 	end
 	for i = 0, tMatrice_Courses:GetNbRows() -1 do
@@ -7064,7 +7091,7 @@ function OnSavedlgConfiguration()	-- sauvegarde des paramètres de la matrice.
 	-- suppression de tous les enregistrements présents dans la table Evenement_Matrice sauf les [code et critere;
 	-- récupération de la valeur de Evenement_selection, suppression de toutes les valeurs et création de la totalité des valeurs
 	-- relecture des variables de Evenement_Matrice pour recréer les variables du tableau associatif matrice{}
-	if string.find(dlgConfiguration:GetWindowName('comboPresentationCourses'):GetValue(), 'Chrono') then
+	if string.find(dlgConfiguration:GetWindowName('comboPresentationCourses'):GetValue(), 'Chrono') and matrice.comboEntite == 'FIS' then
 		if dlgConfiguration:MessageBox(
 				"Voulez-vous revenir aux paramètres par défaut\nde la présentation horizontale ?",
 				"Paramétrage par défaut", 
@@ -7075,8 +7102,6 @@ function OnSavedlgConfiguration()	-- sauvegarde des paramètres de la matrice.
 				code_course = tMatrice_Courses:GetCell('Code',i);
 				local racine = '['..code_course..']_';
 				local strin = apostrophe..racine.."numBloc"..apostrophe..
-							virgule..apostrophe..racine.."comboPrendre"..apostrophe..
-							virgule..apostrophe..racine.."comboPrendre"..apostrophe..
 							virgule..apostrophe..racine.."comboObligatoire"..apostrophe..
 							virgule..apostrophe..racine.."comboSkip"..apostrophe..
 							virgule..apostrophe..racine.."coefCourse"..apostrophe..
@@ -7085,7 +7110,6 @@ function OnSavedlgConfiguration()	-- sauvegarde des paramètres de la matrice.
 				local cmd = "Delete From Evenement_Matrice Where Code_evenement = "..matrice.code_evenement..' And Cle In('..strin..") Or Cle Like 'imprimer%'";
 				base:Query(cmd);
 			end
-			dlgConfiguration:GetWindowName('comboTypePoint'):SetValue('Points Place');
 			dlgConfiguration:GetWindowName('comboGrille'):SetValue('Point Place Coupe du Monde FIS');
 			dlgConfiguration:GetWindowName('comboAbdDsq'):SetValue('Non');
 			dlgConfiguration:GetWindowName('comboOrientation'):SetValue('Paysage');
@@ -7095,7 +7119,7 @@ function OnSavedlgConfiguration()	-- sauvegarde des paramètres de la matrice.
 			dlgConfiguration:GetWindowName('coefPourcentageMaxiBloc1'):SetValue('0');
 			dlgConfiguration:GetWindowName('coefReduction'):SetValue('0');
 			dlgConfiguration:GetWindowName('comboGarderInfQuota'):SetValue('Oui');
-			matrice.imprimerBloc1 = 'Clt,0,|Tps,0,|Diff,0,|Pts,1,|Cltrun,0,|Tpsrun,0,|Diffrun,0,|Ptsrun,0,|Ptstotal,0,|EtapeClt,0,|EtapePts,0,';
+			matrice.imprimerBloc1 = 'Clt,0|Tps,0|Diff,0|Pts,1|Cltrun,0|Tpsrun,0|Diffrun,0|Ptsrun,0|Ptstotal,0|EtapeClt,0|EtapePts,0';
 			matrice.imprimerBloc2 = 'Clt,0|Tps,0|Diff,0|Pts,1|Cltrun,0|Tpsrun,0|Diffrun,0|Ptsrun,0|Ptstotal,0';
 			matrice.imprimerColonnes = 'Code_coureur,Code,center,1|Identite,Identité,left,1|Sexe,S.,center,0|An,An,center,1|Categ,Cat.,center,1|Nation,Nat.,center,0|Comite,CR,center,1|Club,Club,left,1|Groupe,Groupe,left,0|Equipe,Equipe,left,0|Critere,Critère,left,0|Liste1,Liste,center,0|Liste2,Liste,center,0|Delta,Delta,center,0';
 			matrice.Bloc2 = false;
@@ -7495,7 +7519,7 @@ function OnConfiguration(cparams)
 	matrice.dlgPosit.x = 1;
 	matrice.dlgPosit.y = 1;
 	base = base or sqlBase.Clone();
-	code_coureur_pour_debug = "FIS6191338";		-- provoque tous les affichages pour débug propres à ce Code_coureur
+	code_coureur_pour_debug = "FFS2684739";		-- provoque tous les affichages pour débug propres à ce Code_coureur
 	matrice.debug = false;
 	if matrice.debug == false then
 		code_coureur_pour_debug = '';

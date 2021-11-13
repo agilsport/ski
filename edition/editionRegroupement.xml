@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root title="Regroupement de coureurs" script="editionRegroupement.lua" config="OnConfiguration">
+	<panel name="config_generale">
+		<padding all="3px"/>
+		<col value="1,1,1"/>
+		<row value="30px" />
+		<matrix col_start="1" col_end="0" row="auto">
+			<col value="1,1,1,1,1"/>
+			<row value="30px" />
+			<statictext row="auto" col_start="2" align="center" label="Colonne du regroupement" />
+			<statictext col_start="3" align="center" label="Additionner" />
+			<statictext col_start="4" align="center" label="Prendre" />
+			<combobox row="auto" col_start="2" name="comboGroupe" style="CB_READONLY" />
+			<combobox col_start="3" name="comboTpsPts" style="CB_READONLY" />
+			<combobox col_start="4" name="comboQuoi" style="CB_READONLY" />
+			<row value="10px" />
+			<checkbox row="auto" col_start="2" col_end="3" name="chkCoureurEquipe" label="Retrouver le Comité d\'origine pour les coureurs en Equipe de France  " style="CHK_2STATE|ALIGN_RIGHT"/>
+			<checkbox row="auto" col_start="2" col_end="3" name="chkNonClasses" label="Eliminer les équipes non classées ne rentrant pas dans les critères  " style="CHK_2STATE|ALIGN_RIGHT"/>
+			<checkbox row="auto" col_start="2" col_end="3" name="chkMulti" label="Cocher cette case si les groupes peuvent constituer plusieurs équipes  " style="CHK_2STATE|ALIGN_RIGHT"/>
+			<statictext col_start="4" col_end="5" align="left" label=" avec un maximum de 9 équipes par groupe" />
+		</matrix>
+		<row value="10px" />
+		<!-- critère n°1 -->
+		<matrix col_start="1" row="auto">
+			<col value="1,1,2,30px"/>
+			<row value="30px" />
+			<statictext row="auto" col_start="1" align="right" label="Prendre" />
+			<combobox col_start="2" name="prendre1" align="center"/>
+			<combobox col_start="3" name="comboPrendre1" align="center" style="CB_READONLY" />
+			<statictext row="auto" col_start="2" align="right" label="Catégorie" />
+			<combobox col_start="3" name="comboCateg1" align="center" style="CB_READONLY" />
+			<statictext row="auto" col_start="1" col_end="2" align="right" label="ou né(e)s entre" />
+			<matrix col_start="3" >
+				<col value="2,1,2" />
+				<combobox row="auto" col_start="1" name="anneeDebut1" align="center" style="CB_READONLY" />
+				<statictext col_start="2" align="center" label="et" />
+				<combobox col_start="3" name="anneeFin1" align="center" style="CB_READONLY" />
+			</matrix>
+			<row value="10px" />
+			<staticbox row_start="1" row_end="0" col_start="1" col_end="4" label="Critère n°1" />
+		</matrix>
+
+		<row value="10px" />
+		<!-- critère n°2 -->
+		<matrix col_start="1" row="auto">
+			<col value="1,1,2,30px"/>
+			<row value="30px" />
+			<statictext row="auto" col_start="1" align="right" label="Prendre" />
+			<combobox col_start="2" name="prendre2" align="center"/>
+			<combobox col_start="3" name="comboPrendre2" align="center" style="CB_READONLY" />
+			<statictext row="auto" col_start="2" align="right" label="Catégorie" />
+			<combobox col_start="3" name="comboCateg2" align="center" style="CB_READONLY" />
+			<statictext row="auto" col_start="1" col_end="2" align="right" label="ou né(e)s entre" />
+			<matrix col_start="3" >
+				<col value="2,1,2" />
+				<combobox row="auto" col_start="1" name="anneeDebut2" align="center" style="CB_READONLY" />
+				<statictext col_start="2" align="center" label="et" />
+				<combobox col_start="3" name="anneeFin2" align="center" style="CB_READONLY" />
+			</matrix>
+			<row value="10px" />
+			<staticbox row_start="1" row_end="0" col_start="1" col_end="4" label="Critère n°2" />
+		</matrix>
+
+		<!-- critère n°3 -->
+		<matrix col_start="2" row="auto" row_start="-3">
+			<col value="1,1,2,30px"/>
+			<row value="30px" />
+			<statictext row="auto" col_start="1" align="right" label="Prendre" />
+			<combobox col_start="2" name="prendre3" align="center"/>
+			<combobox col_start="3" name="comboPrendre3" align="center" style="CB_READONLY" />
+			<statictext row="auto" col_start="2" align="right" label="Catégorie" />
+			<combobox col_start="3" name="comboCateg3" align="center" style="CB_READONLY" />
+			<statictext row="auto" col_start="1" col_end="2" align="right" label="ou né(e)s entre" />
+			<matrix col_start="3" >
+				<col value="2,1,2" />
+				<combobox row="auto" col_start="1" name="anneeDebut3" align="center" style="CB_READONLY" />
+				<statictext col_start="2" align="center" label="et" />
+				<combobox col_start="3" name="anneeFin3" align="center" style="CB_READONLY" />
+			</matrix>
+			<row value="10px" />
+			<staticbox row_start="1" row_end="0" col_start="1" col_end="4" label="Critère n°3" />
+		</matrix>
+
+		<!-- critère n°4 -->
+		<matrix col_start="2" row="auto" row_start="-2">
+			<col value="1,1,2,30px"/>
+			<row value="30px" />
+			<statictext row="auto" col_start="1" align="right" label="Prendre" />
+			<combobox col_start="2" name="prendre4" align="center"/>
+			<combobox col_start="3" name="comboPrendre4" align="center" style="CB_READONLY" />
+			<statictext row="auto" col_start="2" align="right" label="Catégorie" />
+			<combobox col_start="3" name="comboCateg4" align="center" style="CB_READONLY" />
+			<statictext row="auto" col_start="1" col_end="2" align="right" label="ou né(e)s entre" />
+			<matrix col_start="3" >
+				<col value="2,1,2" />
+				<combobox row="auto" col_start="1" name="anneeDebut4" align="center" style="CB_READONLY" />
+				<statictext col_start="2" align="center" label="et" />
+				<combobox col_start="3" name="anneeFin4" align="center" style="CB_READONLY" />
+			</matrix>
+			<row value="10px" />
+			<staticbox row_start="1" row_end="0" col_start="1" col_end="4" label="Critère n°4" />
+		</matrix>
+
+		<!-- critère n°5 -->
+		<matrix col_start="3" row="auto" row_start="-5">
+			<col value="1,1,2,30px"/>
+			<row value="30px" />
+			<statictext row="auto" col_start="1" align="right" label="Prendre" />
+			<combobox col_start="2" name="prendre5" align="center"/>
+			<combobox col_start="3" name="comboPrendre5" align="center" style="CB_READONLY" />
+			<statictext row="auto" col_start="2" align="right" label="Catégorie" />
+			<combobox col_start="3" name="comboCateg5" align="center" style="CB_READONLY" />
+			<statictext row="auto" col_start="1" col_end="2" align="right" label="ou né(e)s entre" />
+			<matrix col_start="3" >
+				<col value="2,1,2" />
+				<combobox row="auto" col_start="1" name="anneeDebut5" align="center" style="CB_READONLY" />
+				<statictext col_start="2" align="center" label="et" />
+				<combobox col_start="3" name="anneeFin5" align="center" style="CB_READONLY" />
+			</matrix>
+			<row value="10px" />
+			<staticbox row_start="1" row_end="0" col_start="1" col_end="4" label="Critère n°5" />
+		</matrix>
+
+		<!-- critère n°6 -->
+		<matrix col_start="3" row="auto" row_start="-4">
+			<col value="1,1,2,30px"/>
+			<row value="30px" />
+			<statictext row="auto" col_start="1" align="right" label="Prendre" />
+			<combobox col_start="2" name="prendre6" align="center"/>
+			<combobox col_start="3" name="comboPrendre6" align="center" style="CB_READONLY" />
+			<statictext row="auto" col_start="2" align="right" label="Catégorie" />
+			<combobox col_start="3" name="comboCateg6" align="center" style="CB_READONLY" />
+			<statictext row="auto" col_start="1" col_end="2" align="right" label="ou né(e)s entre" />
+			<matrix col_start="3" >
+				<col value="2,1,2" />
+				<combobox row="auto" col_start="1" name="anneeDebut6" align="center" style="CB_READONLY" />
+				<statictext col_start="2" align="center" label="et" />
+				<combobox col_start="3" name="anneeFin6" align="center" style="CB_READONLY" />
+			</matrix>
+			<row value="10px" />
+			<staticbox row_start="1" row_end="0" col_start="1" col_end="4" label="Critère n°6" />
+		</matrix>
+		<row value="10px" />
+		<staticbox row_start="1" row_end="0" col_start="1" col_end="0" label="Paramètres généraux" />
+		<toolbar row="50px" col_start="1" col_end="0" name="tbedit" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT" />
+		<row value="30px" />
+	</panel>
+	<report id="print" >
+		<lua>dofile('./interface/adv.lua');</lua>
+		<lua>dofile('./edition/functionPG.lua'); InitRegroupement(params.Code_evenement)</lua>
+
+		<lua>body:SetCounter('Groupe')</lua>
+		<order key="Clt_equipe" />
+		
+		<rupture key="Groupe, Clt_equipe">
+			<before>
+				<lua>bloc = (params.NbEquipiers + 2)</lua>
+				<need h="(bloc..'cm')" />
+				<padding all="5px" />
+				<spacing all="2" />
+				<font size="13"/>
+				<row value="0.8cm" />
+				<lua>codeGroupe = $(Groupe)</lua>
+				<text row="auto" col="1" cond="params.Multi == 0">$(Clt_equipe)..') '..$(Groupe)</text>
+				<text row="auto" col="1" cond="params.Multi == 1">$(Clt_equipe)..') '..$(Groupe)..' - '..$(Rang)</text>
+			</before>
+		</rupture>
+		<header>
+			<spacing all="4" />
+			<padding all="0"/>
+			<col value="1"/>
+			<pen border="none"/>
+			<font name="Calibri" size="13" adjust="width" weight="bold"/>
+			<text row="1cm" align="center" >Evenement:GetCell('Nom', 0)</text>
+			<text row="0.8cm" align="center" cond="params.IndexQuoi == 0">params.Titre..' sur le classement général'</text>
+			<text row="0.8cm" align="center" cond="params.IndexQuoi == 1">params.Titre..' sur la meilleure manche'</text>
+			<text row="0.8cm" align="center" cond="params.IndexQuoi &gt; 1">params.Titre..' sur les '..params.IndexQuoi..' meilleures manches sur '..params.NbManches;</text>
+			<row value="0.5cm" />
+		</header>		
+				
+		<footer>
+			<background mode="transparent"/>
+			<font name="Calibri" size="8" adjust="width" weight="normal"/>
+			<pen border="none" />
+			<text row="auto" col="1" align="left"></text>
+			<line col_start="1" col_end="0" pen_size="2" pen_color="dkgray" border="bottom"/>
+			<row value="auto" />
+			<matrix col_start="1">
+				<row value="auto"/>
+				<text col="auto" align="left">app.GetName()..' Version '..app.GetVersion()..' / FFS'</text>
+				<image col="0.4cm" adjust="width" align="left">'./res/32x32_ffs.png'</image>
+				<text col="auto" align="left">' / Agil Informatique'</text>
+				<image col="0.4cm" adjust="width" align="left">'./res/32x32_agil.png'</image>
+				<text col="auto" align="left">'/ Ph.Guérindon '..os.date(' / édité le %d-%m-%Y à %H:%M:%S')</text>
+				<text col="auto" align="left">' / script LUA version '..params.Version</text>
+			</matrix>	
+			<text align="right">string.format('Page %d/%s',editor:GetPageCurrent(), editor:GetPageCountLabel())</text>
+			<line col_start="1" col_end="0" border="top" />
+			<text row="auto" col_start="1" col_end="0" align="left" >params.Criteres</text>
+			<text row="auto" align="left" cond="Evenement:GetCell('Commentaire', 0):len() &gt; 0 and txt1:len() == 0">$(Evenement.Commentaire)</text>
+		</footer>
+		
+		<label>
+			<background color="white" mode="solid" />
+			<font name="Calibri" size="10" adjust="width" weight="bold"/>
+			<col value="1,2,1,2,2,1,7,1,3"/>
+			<row value="auto" />
+			<pen border="all" />
+			<text row="auto" col_start="1" align="center" >'Dos.'</text>
+			<text col_start="2" align="center" >'Code'</text>
+			<text col_start="3" align="center" >'S.'</text>
+			<text col_start="4" align="center" >'An'</text>
+			<text col_start="5" align="center" >'Cat'</text>
+			<text col_start="6" align="center" >'C.r.'</text>
+			<text col_start="7" align="center" >'Identité'</text>
+			<text col_start="8" align="center" >'Clt'</text>
+			<text col_start="9" align="center" cond="params.TpsPts == 'T'">'Temps'</text>
+			<text col_start="9" align="center" cond="params.TpsPts == 'P'">'Points'</text>
+		</label>
+		
+		<body>
+			<font name="Calibri" size="9" adjust="width" color='black' weight="normal"/>
+			<pen border="all" />
+			<col value="1,2,1,2,2,1,7,1,3"/>
+			<lua>for i = 1, tonumber(params.NbEquipiers) do</lua>
+				<lua>code_coureur = body:GetCell('Code'..i, row); data_coureur = body:GetCell('Data'..i, row)</lua>
+				<lua>index = GetRowEquipier(code_coureur)</lua>
+				<row value="auto"/>
+				<text col_start="1" align="center">GetEquipierData('Dossard', index)</text>
+				<text col_start="2" align="center">code_coureur</text>
+				<text col_start="3" align="center">GetEquipierData('Sexe', index)</text>
+				<text col_start="4" align="center">GetEquipierData('An', index)</text>
+				<text col_start="5" align="center">GetEquipierData('Categ', index)</text>
+				<text col_start="6" align="center">GetEquipierData('Comite', index)</text>
+				<text col_start="7">GetEquipierData('Identite', index)</text>
+				<text col_start="8" align="center" cond="body:GetCellInt('Clt'..i, row) &gt; 0">body:GetCell('Clt'..i, row)</text>
+				<text col_start="8" align="center" cond="body:GetCellInt('Clt'..i, row) == 0">''</text>
+				<text col_start="9" align="center"  cond="body:GetCellInt('Clt'..i, row) &gt; 0">data_coureur</text>
+				<text col_start="9" align="center"  cond="body:GetCellInt('Clt'..i, row) == 0">''</text>
+				<text row="auto" col_start="9" align="center" cond="i == tonumber(params.NbEquipiers)"><font size="10" weight="bold"/>body:GetCell('Txt_data_equipe', row)</text>
+			<lua>end</lua>
+		</body>
+	</report>
+</root>
+

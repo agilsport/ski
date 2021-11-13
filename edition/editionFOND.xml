@@ -27,7 +27,7 @@
 			<menu title="Liste de départ Par Comite" image="./res/16x16_bib.png" page_break="1" orderby="Comite" id="lst_officielle_Filtrer"/>
 			<menu title="Liste de départ Par Club" image="./res/16x16_bib.png" page_break="1" orderby="Club" id="lst_officielle_Filtrer"/>
 			<menu title="Liste de départ Par Epreuve (speaker)" image="./res/16x16_bib.png" id="lst_officielle_epreuve" officiel="0"/>
-			<menu title="Edition des couloirs" image="./res/16x16_text.png" lua="./edition/couloir.lua" cond="discipline:In('POURS')" />
+			<menu title="Edition des couloirs" image="./res/16x16_text.png" filter="before" lua="./edition/couloir.lua" cond="discipline:In('POURS')" />
 		</menu>
 		
 		<menu title="Résultats (Jour 1 et Poursuite) " image="./res/32x32_ranking.png">
