@@ -162,35 +162,31 @@
 
 <list_officiel activite="FS,SB">
 <!-- Jury -->
-	<officiel code="TechnicalDelegate" label="Délégué Technique" label_inter="FIS Technical Delegate" /> 
+	<officiel code="TechnicalDelegate" label="Délégué Technique" label_inter="FIS Technical Delegate"required="1" /> 
 	<officiel code="ChiefCompetition" label="Chef de Compétition" label_inter="Chief of Compétition" required="1" /> 
 	<officiel code="RaceDirector" label="Directeur de course" label_inter="Race Director" required="1" />
-	<officiel code="Referee" label="Arbitre" label_inter="Referee" /> 
-	<officiel code="AssistantReferee" label="Arbitre Adjoint" label_inter="Assistant Referee" required="1" /> 
-	<officiel code="Chiefofresult" label="Responsable des Résultats" label_inter="Chief of result" />
+	<officiel code="Referee" label="Arbitre" label_inter="Referee" required="1" /> 
+	<officiel code="AssistantReferee" label="Arbitre Adjoint" label_inter="Assistant Referee" required="0,1" /> 
+	<officiel code="Chiefofresult" label="Responsable des Résultats" label_inter="Chief of result" required="1" />
 <!-- Officials -->
-
-	<officiel code="StartReferee" label="Juge au Départ" label_inter="Start Referee" /> 
-	<officiel code="FinishReferee" label="Juge à l'arrivée" label_inter="Finish Referee" />
+	<officiel code="StartReferee" label="Juge au Départ" label_inter="Start Referee" required="0,1" /> 
+	<officiel code="FinishReferee" label="Juge à l'arrivée" label_inter="Finish Referee" required="0,1" />
 	<officiel code="ChiefCourse" label="Chef de Piste" label_inter="Chief of Course" required="0,1" />
-	<officiel code="CourseBuilder" label="Course Builder" label_inter="Course Builder" /> 
-	<officiel code="CourseAdvisor" label="Course Advisor" label_inter="Course Advisor" /> 
-	<officiel code="TechAdvisor" label="Tech-advisor" label_inter="Technical advisor" /> 	
-	<officiel code="CourseDesigner" label="Course Designer" label_inter="Course Designer" />
-	<officiel code="VideoControleur" label="Video Controleur" label_inter="Video Controleur" />
-	<officiel code="HeadJudge" label="Chef des juges" label_inter="Head Judge" required="1" />
-	<officiel code="ContestDirector" label="Chef des juges" label_inter="ContestDirector" required="0,1" />
+	<officiel code="CourseBuilder" label="Course Builder" label_inter="Course Builder" required="0,1" /> 
+	<officiel code="CourseAdvisor" label="Course Advisor" label_inter="Course Advisor" required="0,1" /> 
+	<officiel code="TechAdvisor" label="Tech-advisor" label_inter="Technical advisor" required="0,1" /> 	
+	<officiel code="CourseDesigner" label="Course Designer" label_inter="Course Designer" required="0,1" />
+	<officiel code="VideoControleur" label="Video Controleur" label_inter="Video Controleur" required="0,1" />
+	<officiel code="HeadJudge" label="Chef des juges" label_inter="Head Judge" required="0,1" />
+	<officiel code="ContestDirector" label="Directeur des Protets" label_inter="ContestDirector" required="0,1" />
 	<officiel code="Judges" label="Juge" label_inter="Judges" required="0,10" />	
 	<officiel code="ChiefRace" label="Directeur d'épreuve" label_inter="Chief Race" /> 
-	
 <!-- sécurité FFS -->
 	<officiel code="ffs_medecin" label="Médecin de course" label_inter="Race doctor" required="0,1" />
 	<officiel code="ffs_secours" label="Secours" label_inter="Rescue" required="1,3" />
-	
-	<!-- autre FFS -->
+<!-- autre FFS -->
 	<officiel code="ffs_benevole" label="Bénévole" label_inter="Volunteer" required="0,6" />
 	<officiel code="ffs_informatique" type="pool" label="Responsable Informatique" label_inter="Chief Computer" required="0,1" /> 
-
 </list_officiel>
 
 <list_officiel activite="FOND,ROL,BIATH,SAUT,CN">
@@ -388,7 +384,7 @@
 <panel name="param_ffs">
 	<lua>entite = entite or 'FFS'</lua>
 	<wnd name="statictext" style="ALIGN_RIGHT" />
-	<padding all="1px"/>
+	<padding all="2px"/>
 	<col w="1" />
 	
 	<staticbox row="auto" col_start="1" label="Paramètres Généraux" >
@@ -599,9 +595,7 @@
 		<row h="auto"/>
 		<statictext col_start="1" col_end="2" label="Homologation Chrono." />
 		<searchctrlbutton col_start="3" col_end="0" name="search_chrono" uppercase="1" validator="Epreuve_Alpine.Homologation_chrono"/>
-		
-		<row h="auto"/>
-		<button col_start="3" col_end="0" label="Ajouter manuellement la Piste" name="btn_piste_add" />
+
 	</staticbox>
 	<toolbar row="auto" col_start="1" col_end="0" name="tb" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT" />
 </panel>
@@ -936,25 +930,6 @@
 		name="banner" 
 	/>
 	<row h="1" />
-	<toolbar row="auto" col_start="1" col_end="0" name="tb" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT" />
-</panel>
-
-<!-- Ré-Homologation -->
-<panel name="re_homologation">
-	<padding all="2px"/>
-	<col w="1,1"/>
-	
-	<wndtext row="32px" col_start="1" col_end="0" 
-		align="center" adjust="best" 
-		bk_mode="solid" bk_color="black" 
-		font_color="yellow" font_size="14" font_weight="bold" 
-		name="banner" 
-	/>
-
-	<row h="auto"/>
-	<statictext col_start="1" style="ALIGN_RIGHT" label="Mot de passe" />
-	<textctrl col_start="2" name="pwd" style="TE_LEFT|TE_PASSWORD" />
-	
 	<toolbar row="auto" col_start="1" col_end="0" name="tb" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT" />
 </panel>
 

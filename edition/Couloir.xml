@@ -56,7 +56,7 @@
 			<spacing left="5" right="10" top="2" bottom="2" />
 			<text col="6" align="right" label="Dos.">$(Dossard) </text>
 			<text col="25" align="center" label="Heure de Départ" cond="Affich_heureDepart == 1" >$(Heure_depart2)</text>
-			<text col="25" align="center" label="Ecart de départ" cond="Affich_Ecart == 1" >$(Diff1, '%-1m%2s.%1f')</text>
+			<text col="25" align="center" label="Ecart de départ" cond="Affich_Ecart == 1" >$(Diff_heure_depart2, '%-1m%2s.%1f')</text>
 		</body>
 	</report>
 
