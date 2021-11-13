@@ -137,7 +137,7 @@
 	<officiel code="ServicePersonnal" label="Personnel de Service" label_inter="Service Personnal" required="0,99" />
 </list_officiel>
 
-<list_officiel activite="ALP,TM,FS,SB,SS">
+<list_officiel activite="ALP,TM,SS">
 	<officiel code="TechnicalDelegate" label="Délégué Technique" label_inter="Technical Delegate" /> 
 	<officiel code="Referee" label="Arbitre" label_inter="Referee" /> 
 	<officiel code="AssistantReferee" label="Arbitre Adjoint" label_inter="Assistant Referee" required="0,1" /> 
@@ -158,6 +158,39 @@
 	<officiel code="ServicePersonnal" type="pool" label="Personnel de Service" label_inter="Service Personnal" required="0,99" />
 	<officiel code="ffs_informatique" type="pool" label="Responsable Informatique" label_inter="Chief Computer" required="0,1" /> 
 	<officiel code="ffs_juge_porte" type="pool" label="Juge de Porte" label_inter="Gate Referee" required="0,99" /> 
+</list_officiel>
+
+<list_officiel activite="FS,SB">
+<!-- Jury -->
+	<officiel code="TechnicalDelegate" label="Délégué Technique" label_inter="FIS Technical Delegate" /> 
+	<officiel code="ChiefCompetition" label="Chef de Compétition" label_inter="Chief of Compétition" required="1" /> 
+	<officiel code="RaceDirector" label="Directeur de course" label_inter="Race Director" required="1" />
+	<officiel code="Referee" label="Arbitre" label_inter="Referee" /> 
+	<officiel code="AssistantReferee" label="Arbitre Adjoint" label_inter="Assistant Referee" required="1" /> 
+	<officiel code="Chiefofresult" label="Responsable des Résultats" label_inter="Chief of result" />
+<!-- Officials -->
+
+	<officiel code="StartReferee" label="Juge au Départ" label_inter="Start Referee" /> 
+	<officiel code="FinishReferee" label="Juge à l'arrivée" label_inter="Finish Referee" />
+	<officiel code="ChiefCourse" label="Chef de Piste" label_inter="Chief of Course" required="0,1" />
+	<officiel code="CourseBuilder" label="Course Builder" label_inter="Course Builder" /> 
+	<officiel code="CourseAdvisor" label="Course Advisor" label_inter="Course Advisor" /> 
+	<officiel code="TechAdvisor" label="Tech-advisor" label_inter="Technical advisor" /> 	
+	<officiel code="CourseDesigner" label="Course Designer" label_inter="Course Designer" />
+	<officiel code="VideoControleur" label="Video Controleur" label_inter="Video Controleur" />
+	<officiel code="HeadJudge" label="Chef des juges" label_inter="Head Judge" required="1" />
+	<officiel code="ContestDirector" label="Chef des juges" label_inter="ContestDirector" required="0,1" />
+	<officiel code="Judges" label="Juge" label_inter="Judges" required="0,10" />	
+	<officiel code="ChiefRace" label="Directeur d'épreuve" label_inter="Chief Race" /> 
+	
+<!-- sécurité FFS -->
+	<officiel code="ffs_medecin" label="Médecin de course" label_inter="Race doctor" required="0,1" />
+	<officiel code="ffs_secours" label="Secours" label_inter="Rescue" required="1,3" />
+	
+	<!-- autre FFS -->
+	<officiel code="ffs_benevole" label="Bénévole" label_inter="Volunteer" required="0,6" />
+	<officiel code="ffs_informatique" type="pool" label="Responsable Informatique" label_inter="Chief Computer" required="0,1" /> 
+
 </list_officiel>
 
 <list_officiel activite="FOND,ROL,BIATH,SAUT,CN">
@@ -211,8 +244,6 @@
 	<!-- sécurité FFS -->
 	<officiel code="ffs_medecin" label="Médecin de course" label_inter="Race doctor" required="0,1" />
 	<officiel code="ffs_secours" label="Secours" label_inter="Rescue" required="1,3" />
-	
-	<!-- staff juge saut FFS -->
 	
 	<!-- autre FFS -->
 	<officiel code="ffs_benevole" label="Bénévole" label_inter="Volunteer" required="0,6" />
@@ -669,6 +700,50 @@
 	<toolbar row="auto" col_start="1" col_end="0" name="tb" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT" />
 </panel>
 
+<!-- Entete Piste SB et FS -->
+<panel name="piste_SB">
+	<padding all="2px"/>
+	<wnd name="statictext" style="ALIGN_RIGHT" />
+	
+	<row h="1" />
+	<staticbox col="1" label="Caractéristiques de la Piste" >
+		<col w="1,1,1,1" />
+		<row h="auto"/>
+		<statictext col_start="1" label="Nom" />
+		<searchctrlbutton col_start="2" col_end="0" name="search_piste" />
+		
+		<row h="auto"/>
+		<statictext col_start="1" col_end="-1" label="Matricule Piste" />
+		<textctrl col_start="0" name="matricule_piste" style="TE_RIGHT|TE_READONLY" validator="Epreuve_Alpine_Manche.Code_piste" />
+
+		<row h="auto"/>
+		<statictext col_start="1" col_end="-1" label="Altitude Départ" />
+		<textctrl col_start="0" name="altitude_depart" style="TE_RIGHT" validator="Epreuve_Alpine_Manche.Altitude_Depart" />
+		
+		<row h="auto"/>
+		<statictext col_start="1" col_end="-1" label="Altitude Arrivée" />
+		<textctrl col_start="0" name="altitude_arrivee" style="TE_RIGHT" validator="Epreuve_Alpine_Manche.Altitude_Arrivee" />
+
+		<row h="auto"/>
+		<statictext col_start="1" col_end="-1" label="Dénivelée" />
+		<textctrl col_start="0" name="denivelee" style="TE_RIGHT|TE_READONLY" />
+		
+		<row h="auto"/>
+		<statictext col_start="1" col_end="-1" label="Longueur" />
+		<textctrl col_start="0" name="longueur" style="TE_RIGHT" validator="Epreuve_Alpine_Manche.Longueur" />
+
+		<row h="auto"/>
+		<statictext col_start="1" col_end="2" label="Homologation Piste" />
+		<textctrl col_start="3" col_end="0" name="homologation_piste" style="TE_LEFT" />
+
+		<row h="auto"/>
+		<statictext col_start="1" col_end="2" label="Homologation Chrono." />
+		<searchctrlbutton col_start="3" col_end="0" name="search_chrono" uppercase="1" validator="Epreuve_Alpine.Homologation_chrono"/>
+
+	</staticbox>
+	<toolbar row="auto" col_start="1" col_end="0" name="tb" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT" />
+</panel>
+
 <!-- Entete Epreuve Nordique (FOND - BIATHLON) -->
 <panel name="epreuve_nordique">
 	<padding all="2px"/>
@@ -794,6 +869,17 @@
 <panel name="homologation">
 	<padding all="2px"/>
 	<wnd name="statictext" style="ALIGN_CENTER" />
+
+	<col w="1"/>
+	<staticbox col_start="1" label="Phase" name="staticbox_RapAccident">
+		<row h="auto"/>
+		<statictext col="40" label="Cet évènement a t'il fait l\'objet d'une déclaration d'accident  " />
+		<checkbox col="3" style="CHK_2STATE,ALIGN_RIGHT" name="Rap_accident" label="Non" />
+		<row h="auto"/>
+		<statictext col="40" label="Nombre de déclaration d'accident  " />
+		<spinctrl col="auto" style="ALIGN_RIGHT|SP_ARROW_KEYS" name="nb_Rap_accident" validator="Epreuve_Transfert.Declaration_accident" />
+	</staticbox>
+
 
 	<col w="1"/>
 	<scrolledwindow row="1" name="scrolled_epreuves">
