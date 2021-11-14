@@ -2,9 +2,30 @@
 <!-- Matrice Individuelle PG -->
 <!-- <background mode="gradient_line_vert" color_start="white" color_end="ltgray" /> -->
 <root title="Tirage des dossards avec options">
-  <config clef1="3. Par Sexe et par Année" option1="2. Tirage pour les manches 1 et 2" option2="2. Inversion des dossards dans les groupes de tirage"/>
-  <panel name="config">
+  <config course1="39" clef1="0" option1="1" option2="1"/>
+  <panel name="bibo">
     <padding all="10px"/>
+    <col value="1"/>
+    <row value="50px"/>
+    <matrix row="auto">
+      <col value="30px,1,1,30px"/>
+      <row value="40px"/>
+      <statictext row="auto" col_start="2" style="ALIGN_RIGHT" label="Nombre de coureurs du BIBO (0 = à la mêlée): "/>
+      <textctrl col_start="3" name="bibo"/>
+      <statictext row="auto" col_start="2" style="ALIGN_RIGHT" label="Indiquer le numéro du premier dossard : "/>
+      <textctrl col_start="3" name="dossard"/>
+      <row value="20px"/>
+      <staticbox row_start="1" row_end="0" col_start="2" col_end="3" label="Configuration du nombre de coureurs du BIBO"/>
+      <row value="20px"/>
+      <toolbar row="auto" col_start="1" col_end="0" name="tbbibo" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
+    </matrix>
+    <row value="1"/>
+  </panel>
+  <panel name="config">
+    <lua>dofile('./interface/adv.lua');
+		dofile('./edition/functionPG.lua');
+		</lua>
+    <padding all="5px"/>
     <col value="1"/>
     <row value="50px"/>
     <matrix row="auto">
@@ -19,6 +40,23 @@
       <row value="20px"/>
       <staticbox row_start="1" row_end="0" col_start="2" col_end="3" label="Configuration du tirage au sort"/>
       <row value="20px"/>
+      <lua>if params.niveau:In('N_U14', 'N_U16', 'ARG_U14', 'ARG_U16') then</lua>
+      <matrix row="auto" col_start="2" col_end="3">
+        <col value="1,1,3"/>
+        <statictext row="auto" col_start="1" col_end="0" style="ALIGN_CENTER" label="Courses concernées pour le tirage"/>
+        <row value="5px"/>
+        <statictext row="auto" col_start="1" style="ALIGN_RIGHT" label="Course 1 : "/>
+        <textctrl col_start="2" name="course1"/>
+        <textctrl col_start="3" name="course1_nom"/>
+        <statictext row="auto" col_start="1" style="ALIGN_RIGHT" label="Course 2 : "/>
+        <textctrl col_start="2" name="course2"/>
+        <textctrl col_start="3" name="course2_nom"/>
+      </matrix>
+      <row value="10px"/>
+      <staticbox row_start="-3" row_end="0" col_start="2" col_end="3" label="Courses Nationales ou Coupes d\'Argent U14/U16"/>
+      <row value="10px"/>
+      <lua>end</lua>
+      <row value="20px"/>
       <toolbar row="auto" col_start="1" col_end="0" name="tbconfig" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
     </matrix>
     <row value="1"/>
@@ -28,7 +66,7 @@
 			dofile('./edition/functionPG.lua');
 			tableDossards1 = params.tableDossards1 or {};
 			tableDossards2 = params.tableDossards2 or {};
-			
+
 			params.Draw = params.Draw or 0;
 			params.NbGroupe1 = params.NbGroupe1 or 0;
 			params.NC = params.NC or 0;
