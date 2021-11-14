@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Arborescence pour la Navigation des Compétitions skiFFS -->
+<list_item image="./res/32x32_competition.png">
+	<style_band name="ffs" image="./res/32x32_ffs.png" bk_color_start="rgb 8 159 224" bk_color_end="rgb 46 106 186" txt_color="white" />
+	<style_band name="web_ffs" image="./res/32x32_cloud.png" bk_color_start="rgb 46 106 186" bk_color_end="rgb 8 159 224" txt_color="white" />
+	<style_band name="esf" image="./res/32x32_esf.png" bk_color_start="rgb 204 32 28" bk_color_end="rgb 228 33 34" txt_color="white" />
+	<style_band name="web_esf" image="./res/32x32_cloud.png" bk_color_start="rgb 228 33 34" bk_color_end="rgb 204 32 28" txt_color="white" />
+
+	<!-- Local FFS -->
+	<item name ="Base Locale FFS" label="" style_band="ffs" >
+		<item name ="Toutes les Compétitions" label="" image="./res/32x32_ffs.png" bold="true">
+			<item name ="Alpin" image="./res/16x16_directory.png" activite="ALP" bold="true">
+				<item name ="F.F.S." image="./res/32x32_ffs.png" entite="FFS" bold="true">
+					<item name="Slalom" image="./res/ski/32x32_slalom.png" discipline="SL"/>
+					<item name="Géant" image="./res/ski/32x32_slalom.png" discipline="GS"/>
+					<item name="Super-Géant" image="./res/ski/32x32_descente.png" discipline="SG"/>
+					<item name="Descente" image="./res/ski/32x32_descente.png" discipline="DH"/>
+					<item name="Parallèle" image="./res/ski/32x32_slalom.png" discipline="P"/>
+				</item>	
+				<item name ="F.I.S." image="./res/ski/32x32_fis.png" entite="FIS" bold="true">
+					<item name="Slalom" image="./res/ski/32x32_slalom.png" discipline="SL" />
+					<item name="Géant" image="./res/ski/32x32_slalom.png" discipline="GS"/>
+					<item name="Super-Géant" image="./res/ski/32x32_descente.png" discipline="SG"/>
+					<item name="Descente" image="./res/ski/32x32_descente.png" discipline="DH"/>
+					<item name="Parallèle" image="./res/ski/32x32_slalom.png" discipline="P"/>
+				</item>	
+			</item>	
+			<item name ="Nordique" image="./res/16x16_directory.png" sql="And Ev.Code_activite In ('FOND', 'BIATH', 'SAUT', 'CN', 'ROL')" bold="true">
+				<item name="Fond" image="./res/ski/32x32_fond.png" activite="FOND"/>
+				<item name="Biathlon" image="./res/ski/32x32_biathlon.png" activite="BIATH"/>
+				<item name="Saut" image="./res/ski/32x32_saut.png" activite="SAUT"/>
+				<item name="Combiné-Nordique" image="./res/ski/32x32_combine_nordique.png" activite="CN"/>
+				<item name="Rollerski" image="./res/ski/32x32_fond.png" activite="ROL"/>
+			</item>	
+			<item name ="Snowboard" image="./res/16x16_directory.png" activite="SB" bold="true">
+				<item name="Snowboardcross" image="./res/ski/32x32_snowboard_cross.png" discipline="SBX"/>
+				<item name="Géant" image="./res/ski/32x32_snowboard_geant.png" discipline="PGS"/>
+				<item name="Slopestyle" image="./res/ski/32x32_snowboard.png" discipline="SBS"/>
+				<item name="Halfpipe" image="./res/ski/32x32_snowboard_bosse.png" discipline="HP"/>
+			</item>	
+			<item name ="Freestyle" image="./res/16x16_directory.png" activite="FS" bold="true">
+				<item name="Skiercross" image="./res/ski/32x32_skiercross.png" discipline="SX"/>
+				<item name="Bosse" image="./res/ski/32x32_freestyle_bosse.png" discipline="BO"/>
+				<item name="Slopestyle" image="./res/ski/32x32_freestyle_slopestyle.png" discipline="SLS"/>
+				<item name="Halfpipe" image="./res/ski/32x32_freestyle.png" discipline="HP"/>
+			</item>	
+			<item name ="Télémark" image="./res/ski/32x32_telemark.png" activite="TM" bold="true"/>
+			<item name ="Ski de Vitesse" image="./res/ski/32x32_descente.png" activite="SS" bold="true"/>
+			<item name ="Challenge et Combiné" image="./res/16x16_directory.png" activite="CHA-CMB" bold="true">
+				<item name="Challenge" image="./res/16x16_sum.png" discipline="CHA"/>
+				<item name="Combiné" image="./res/16x16_sum.png" discipline="CMB"/>
+			</item>	
+		</item>
+	</item>
+	<!-- Web FFS -->
+	<item name ="Web F.F.S." style_band="web_ffs" db="web_ffs">
+		<item name ="Web FFS" image="./res/32x32_ffs.png">
+			<item name ="Alpin" activite="ALP" image="./res/16x16_directory.png"/>
+			<item name ="Fond" activite="FOND" image="./res/16x16_directory.png" />
+			<item name ="Ski de fond d'été" activite="ROL" image="./res/16x16_directory.png" />
+			<item name ="Biathlon" activite="BIATH" image="./res/16x16_directory.png" />
+			<item name ="Saut" activite="SAUT" image="./res/16x16_directory.png" />
+		</item>
+	</item>
+
+	<!-- ESF Base Locale -->
+	<item name ="Base Locale ESF" label="" style_band="esf" >
+		<item name ="Toutes les Compétitions" label="" image="./res/ski/32x32_esf_logo_gb.png">
+			<item name ="Ski Open" image="./res/ski/32x32_esf_logo_gb.png" entite="ESF" circuit="SKIOPEN" bold="true">
+				<item name="Flèche" image="./res/esf/fle-or.png" discipline="F"/>
+				<item name="Chamois" image="./res/esf/cham-or.png" discipline="C"/>
+				<item name="Fusée" image="./res/esf/fus-or.png" discipline="FUS"/>
+			</item>	
+
+			<item name="Saut" image="./res/esf/saut-o.png" entite="ESF" discipline="SAUT"/>
+			<item name="Record" image="./res/ski/32x32_descente.png" entite="ESF" discipline="R"/>
+			<item name="X-Boarder" image="./res/ski/32x32_snowboard_cross.png" entite="ESF" discipline="XB"/>
+			<item name="Nordi-X" image="./res/ski/32x32_biathlon.png" entite="ESF" discipline="N-CROSS"/>
+			<item name="Biathlon" image="./res/ski/32x32_biathlon.png" entite="ESF" discipline="BTH"/>
+			
+			<item name ="ESF Ski-Tour" image="./res/ski/32x32_esf_logo_gb.png" entite="ESF" circuit="CLUBESF" bold="true">
+				<item name="Flèche" image="./res/esf/fle-or.png" discipline="F"/>
+				<item name="Chamois" image="./res/esf/cham-or.png" discipline="C"/>
+				<item name="Fusée" image="./res/esf/fus-or.png" discipline="FUS"/>
+				<item name="SkierCross" image="./res/ski/32x32_skiercross.png" discipline="SX"/>
+				<item name="Saut" image="./res/esf/saut-o.png" discipline="SAUT"/>
+				<item name="Record" image="./res/ski/32x32_descente.png" discipline="R"/>
+			</item>	
+		</item>
+
+		<item name ="Tests Etoiles" image="./res/ski/32x32_esf_logo_gb.png" entite="ESF" discipline="OURSON,FLOCON,ETOILE1,ETOILE2,ETOILE3,ETBRONZE,ETOR" bold="true">
+			<item name="Ourson" image="./res/ski/32x32_skiercross.png" discipline="OURSON"/>
+			<item name="Flocon" image="./res/ski/32x32_skiercross.png" discipline="FLOCON"/>
+			<item name="1ère Etoile" image="./res/ski/32x32_skiercross.png" discipline="ETOILE1"/>
+			<item name="2ième Etoile" image="./res/ski/32x32_skiercross.png" discipline="ETOILE2"/>
+			<item name="3ième Etoile" image="./res/ski/32x32_skiercross.png" discipline="ETOILE3"/>
+			<item name="Etoile de Bronze" image="./res/ski/32x32_skiercross.png" discipline="ETBRONZE"/>
+			<item name="Etoile d'Or" image="./res/ski/32x32_skiercross.png" discipline="ETOR"/>
+		</item>
+		
+		<item name ="Compétitions Moniteurs" image="./res/ski/32x32_esf_logo_gb.png" entite="ESF" circuit="MEMO" bold="true">
+			<item name="Géant" image="./res/esf/fle-or.png" discipline="GS"/>
+			<item name="Slalom" image="./res/esf/cham-or.png"  discipline="SL"/>
+			<item name ="Bank-Slalom Boarder" image="./res/ski/32x32_snowboard_cross.png" circuit="BSB"/>
+			<item name ="Qualification Stagiaires" image="./res/esf/fle-or.png" circuit="QUALSTAG"/>
+		</item>	
+	</item>
+
+	<!-- Web ESF -->
+	<item name ="Web E.S.F." label="" style_band="web_esf" db="web_esf">
+
+		<item name="Web E.S.F. Privé" image="./res/16x16_lock_yellow.png" activite="ESF" db="web_esf_private">
+			<item name="Flèche" image="./res/esf/fle-or.png" discipline="F"/>
+			<item name="Chamois" image="./res/esf/cham-or.png" discipline="C"/>
+			<item name="Fusée" image="./res/esf/fus-or.png" discipline="FUS"/>
+
+			<item name ="Tests Etoiles" image="./res/ski/32x32_esf_logo_gb.png" discipline="OURSON,FLOCON,ETOILE1,ETOILE2,ETOILE3,ETBRONZE,ETOR">
+				<item name="Ourson" image="./res/ski/32x32_skiercross.png" discipline="OURSON"/>
+				<item name="Flocon" image="./res/ski/32x32_skiercross.png" discipline="FLOCON"/>
+				<item name="1ère Etoile" image="./res/ski/32x32_skiercross.png" discipline="ETOILE1"/>
+				<item name="2ième Etoile" image="./res/ski/32x32_skiercross.png" discipline="ETOILE2"/>
+				<item name="3ième Etoile" image="./res/ski/32x32_skiercross.png" discipline="ETOILE3"/>
+				<item name="Etoile de Bronze" image="./res/ski/32x32_skiercross.png" discipline="ETBRONZE"/>
+					<item name="Etoile d'Or" image="./res/ski/32x32_skiercross.png" discipline="ETOR"/>
+			</item>
+		</item>
+
+		<item name ="Web E.S.F. Public" image="./res/16x16_unlock_blue.png" db="web_esf">
+			<item name ="Compétitions Elèves" image="./res/ski/32x32_esf_logo_gb.png">
+				<item name ="ESF Ski-Tour" image="./res/ski/32x32_esf_logo_gb.png" circuit="CLUBESF">
+					<item name="Flèche" image="./res/esf/fle-or.png" discipline="F"/>
+					<item name="Chamois" image="./res/esf/cham-or.png" discipline="C"/>
+					<item name="Fusée" image="./res/esf/fus-or.png" discipline="FUS"/>
+					<item name="SkierCross" image="./res/ski/32x32_skiercross.png" discipline="SX"/>
+					<item name="Saut" image="./res/esf/saut-o.png" discipline="SAUT"/>
+					<item name="Record" image="./res/ski/32x32_descente.png" discipline="R"/>
+				</item>	
+			
+				<item name="Etoile d'Or" image="./res/esf/fle-or.png" circuit="ETOR" />
+				<item name="Ski d'Or" image="./res/esf/fle-or.png" circuit="SKIOR" />
+
+			</item>
+
+			<item name ="Compétitions Moniteurs" image="./res/ski/32x32_esf_logo_gb.png" circuit="MEMO">
+				<item name="Géant" image="./res/esf/fle-or.png" discipline="GS"/>
+				<item name="Slalom" image="./res/esf/cham-or.png"  discipline="SL"/>
+				<item name ="Bank-Slalom Boarder" image="./res/ski/32x32_snowboard_cross.png" circuit="BSB"/>
+				<item name ="Qualification Stagiaires" image="./res/esf/fle-or.png" circuit="QUALSTAG"/>
+			</item>
+			<item name ="Inscription Formations S.N.M.S.F." image="./res/ski/32x32_esf_logo_gb.png" circuit="STAGE" />
+			<item name ="Challenge des Moniteurs" image="./res/ski/32x32_esf_logo_gb.png" circuit="CHALLENGE" />
+		</item>
+	</item>
+</list_item>
