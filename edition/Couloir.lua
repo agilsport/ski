@@ -52,13 +52,12 @@ function main(params)
 	if body:GetNbRows() > 0 then
 		local best_heure_depart2 = body:GetCellInt('Heure_depart2',0);
 		for i=0, body:GetNbRows()-1 do
-			if tonumber(i) == 0 then
-				body:SetCell('Diff_heure_depart2', i, 1);
-			end
 			if body:GetCellInt('Heure_depart2', i, -1) >= best_heure_depart2 then 
 				body:SetCell('Diff_heure_depart2', i, body:GetCellInt('Heure_depart2',i) - best_heure_depart2);
 			end
-
+			if tonumber(i) == 0 then
+				body:SetCell('Diff_heure_depart2', i, 1);
+			end
 		end
 	end
 	
