@@ -162,7 +162,7 @@
 
 <list_officiel activite="FS,SB">
 <!-- Jury -->
-	<officiel code="TechnicalDelegate" label="Délégué Technique" label_inter="FIS Technical Delegate"required="1" /> 
+	<officiel code="TechnicalDelegate" label="Délégué Technique" label_inter="FIS Technical Delegate" required="1" /> 
 	<officiel code="ChiefCompetition" label="Chef de Compétition" label_inter="Chief of Compétition" required="1" /> 
 	<officiel code="RaceDirector" label="Directeur de course" label_inter="Race Director" required="1" />
 	<officiel code="Referee" label="Arbitre" label_inter="Referee" required="1" /> 
