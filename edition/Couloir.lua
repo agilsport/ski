@@ -1,12 +1,12 @@
 dofile('./interface/adv.lua');
 dofile('./interface/interface.lua');
 
--- version 1.9
-
+-- version 2.1
+	-- calcul du diff Heure_depart2 
+	
 -- point a voir avec pierre
 			-- voir si la façon de mettre la police ds le body est ok si qq veut la modifier si format A3 par exemple 
-			-- car sur course nat la ffs a investi dans une imprimante A3 pour sortir les tableaux
-			-- appel de la fenêtre filtrage à l'ouverture
+
 
 function alert(txt)
 	app.GetAuiMessage():AddLine(txt);
@@ -40,17 +40,22 @@ function main(params)
 		node_value = 'Couloir',			-- Facultatif si le node_name est unique ...	
 	});
 
-	base = sqlBase.Clone();
+	-- La table body est la table filtrée ou pas ... mais c'est la bonne 
+	body = base:GetTable('body');
 	
-	body = base.CreateTableRanking({ 
-		code_evenement = theParams.code_evenement, 
-		code_epreuve = theParams.code_epreuve, 
-		code_manche = theParams.code_manche,
-		Organisateur = theParams.Organisateur,
-		Club = theParams.Club,
-		Comite = theParams.Code_comite,
-		codeActivite = theParams.Code_activite
-	});
+	-- Tri du body
+	body:OrderBy('Heure_depart2 Asc' );
+
+	-- Ajout et Mise à Jour de la colonne Diff_Heure_depart2
+	body:AddColumn({ name = 'Diff_heure_depart2', label = 'Diff_heure_depart2', type = sqlType.CHRONO });	
+	if body:GetNbRows() > 0 then
+		local best_heure_depart2 = body:GetCellInt('Heure_depart2',0);
+		for i=0, body:GetNbRows()-1 do
+			if body:GetCellInt('Heure_depart2', i, -1) >= best_heure_depart2 then 
+				body:SetCell('Diff_heure_depart2', i, body:GetCellInt('Heure_depart2',i) - best_heure_depart2);
+			end
+		end
+	end
 	
 	-- Initialisation des controles ...
 	local comboNbCouloir = dlg:GetWindowName('NbCouloir');
@@ -106,7 +111,9 @@ function LectureDonnees(evt)
 end
 
 function editionCouloir_n(evt, params, base, body, NumCouloir, NbCouloir)
+
 	bodyCouloir = body:Copy(false);
+	
 	for i=0, body:GetNbRows()-1 do
 		Dossard = tonumber(body:GetCell('Dossard', i)) or 0;
 		if Dossard % NbCouloir == NumCouloir then

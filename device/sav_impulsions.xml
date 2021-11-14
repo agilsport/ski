@@ -12,11 +12,10 @@
 	
 	<panel name="sav">
 		<padding all="2px" />
-		<col value="1, 1" />
-		<row value="1" />
-		
-		<toolbar col_start="1" name="tb" style="TB_FLAT|TB_HORIZONTAL" />
-		<wndtext col_start="2" 
+		<col value="1" />
+	
+		<toolbar col_start="1" row="1" name="tb" style="TB_FLAT|TB_HORIZONTAL" />
+		<wndtext col_start="1" row="1" 
 			align="center" adjust="best" 
 			bk_mode="solid" bk_color="black" 
 			font_color="yellow" font_size="12" font_weight="bold" 
