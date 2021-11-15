@@ -1,8 +1,9 @@
 dofile('./interface/adv.lua');
 dofile('./interface/interface.lua');
 
--- version 2.1
-	-- calcul du diff Heure_depart2 
+-- version 2.2
+	-- calcul du diff Heure_depart2
+	-- mise de 00.0 au premier Dos au lieu d'avoir la case vide pour l'ecart
 	
 -- point a voir avec pierre
 			-- voir si la façon de mettre la police ds le body est ok si qq veut la modifier si format A3 par exemple 
@@ -53,6 +54,9 @@ function main(params)
 		for i=0, body:GetNbRows()-1 do
 			if body:GetCellInt('Heure_depart2', i, -1) >= best_heure_depart2 then 
 				body:SetCell('Diff_heure_depart2', i, body:GetCellInt('Heure_depart2',i) - best_heure_depart2);
+			end
+			if tonumber(i) == 0 then
+				body:SetCell('Diff_heure_depart2', i, 1);
 			end
 		end
 	end
