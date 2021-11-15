@@ -104,6 +104,23 @@ function ReadAckXML(stringXml)
 	return false;
 end
 
+function OnLiveState(evt)
+	local tb = dlgTableau:GetWindowName('tbtableau');
+
+	if tb ~= nil then
+		if draw.state == true then
+			draw.state = false;
+			tb:SetToolNormalBitmap(btnMenuCommande, './res/chrono32x32_ko.png');
+		else
+			draw.state = true;
+			tb:SetToolNormalBitmap(btnMenuCommande, './res/chrono32x32_ok.png');
+		end
+		tb:EnableTool(btnMenuSend:GetId(), draw.state);
+		tb:EnableTool(btnSendMessage:GetId(), draw.state);
+	end
+end
+
+
 function RefreshCounterSequence()
 	dlgTableau:GetWindowName('sequence'):SetValue('Trame '..draw.sequence_ack..' / '..draw.sequence_send);
 	dlgTableau:Refresh();
@@ -159,9 +176,6 @@ function OnSocketLive(evt)
 		Warning("CONNEXION FIS PERDUE ...");
 		draw.socket_state = false;
 	end
-	tbTableau:EnableTool(btnSendMessage:GetId(), draw.socket_state);
-	tbTableau:EnableTool(btnClear:GetId(), draw.socket_state);
-	tbTableau:EnableTool(btnMenuSend:GetId(), draw.socket_state);
 end
 
 function OnAide()
@@ -351,7 +365,6 @@ function OnPrintEtiquettes(orderby)
 			end
 		end
 		estce = 1;
-		Info('row_separation = '..row_separation);
 	end
 	local vitesse = 0;
 	if draw.bolVitesse then
@@ -931,6 +944,10 @@ function CommandRaceInfo()
 end
 
 function CreateXML(nodeRoot)
+	if draw.state == false then
+		Error("Feu au Rouge : Aucune Action possible ...");
+		return false;
+	end
 	if not draw.socket_state then
 		dlgTableau:GetWindowName('info'):SetValue('Pas de connexion à la FIS !!!');
 		Error('Pas de connexion à la FIS !!!');
@@ -2003,13 +2020,24 @@ function OnAfficheTableau()
 	
 	tbTableau = dlgTableau:GetWindowName('tbtableau');
 	tbTableau:AddStretchableSpace();
-	btnSendMessage = tbTableau:AddTool("Envoyer un message", "./res/32x32_journal.png");
+	btnSendMessage = tbTableau:AddTool("Messages", "./res/32x32_journal.png");
 	tbTableau:AddSeparator();
-	btnMenuRAZ = tbTableau:AddTool("RAZ des données", "./res/32x32_journal.png",'', itemKind.DROPDOWN);
+	
+	
+	btnMenuCommande = tbTableau:AddTool("Commandes", "./res/chrono32x32_ko.png",'', itemKind.DROPDOWN);
+	menuCommande = menu.Create();
+	menuCommande:AppendSeparator();
+	btnClear = menuCommande:Append({label="RAZ à la FIS", image ="./res/32x32_clear.png"});
+	menuCommande:AppendSeparator();
+	btnState = menuCommande:Append({label="Activation ou Désactivation du Live...", image ="./res/32x32_fis.png"});
+	tbTableau:SetDropdownMenu(btnMenuCommande:GetId(), menuCommande);
+	
+	tbTableau:AddSeparator();
+	
+	btnMenuRAZ = tbTableau:AddTool("Menu des RAZ", "./res/32x32_journal.png",'', itemKind.DROPDOWN);
 	tbTableau:AddSeparator();
 	btnOrder = tbTableau:AddTool("Trier le tableau", "./res/32x32_bib.png");
 	tbTableau:AddSeparator();
-	btnClear = tbTableau:AddTool("RAZ à la FIS", "./res/32x32_clear.png");
 	
 	menuRAZ = menu.Create();
 	btnRAZRang = menuRAZ:Append({label="RAZ des rangs", image ="./res/32x32_clear.png"});
@@ -2024,7 +2052,7 @@ function OnAfficheTableau()
 	tbTableau:SetDropdownMenu(btnMenuRAZ:GetId(), menuRAZ);
 	
 	tbTableau:AddSeparator();
-	btnMenuSend = tbTableau:AddTool("Menu des envois", "./res/32x32_send.png",'', itemKind.DROPDOWN);
+	btnMenuSend = tbTableau:AddTool("Envois", "./res/32x32_send.png",'', itemKind.DROPDOWN);
 
 	menuSend = menu.Create();
 	btnSendTableau = menuSend:Append({label="Envoi du tableau à la FIS", image ="./res/32x32_send.png"});
@@ -2034,7 +2062,7 @@ function OnAfficheTableau()
 	tbTableau:SetDropdownMenu(btnMenuSend:GetId(), menuSend);
 
 	tbTableau:AddSeparator();
-	btnValider = tbTableau:AddTool("Menu des validations", "./res/32x32_send.png",'', itemKind.DROPDOWN);
+	btnValider = tbTableau:AddTool("Validations", "./res/32x32_send.png",'', itemKind.DROPDOWN);
 	menuValider = menu.Create();
 	btnValiderSelection = menuValider:Append({label="Validation des coureurs filtrés", image ="./res/32x32_down.png"});
 	menuValider:AppendSeparator();
@@ -2047,7 +2075,7 @@ function OnAfficheTableau()
 	tbTableau:SetDropdownMenu(btnValider:GetId(), menuValider);
 		
 	tbTableau:AddSeparator();
-	btnMenuPrint = tbTableau:AddTool("Menu des impressions", "./res/32x32_printer.png",'', itemKind.DROPDOWN);
+	btnMenuPrint = tbTableau:AddTool("Impressions", "./res/32x32_printer.png",'', itemKind.DROPDOWN);
 	menuPrint = menu.Create();
 	menuPrint:AppendSeparator();
 	btnPrintDoubleTirageBibo = menuPrint:Append({label="Impression du double tirage du BIBO", image ="./res/32x32_printer.png"});
@@ -2063,7 +2091,7 @@ function OnAfficheTableau()
 	tbTableau:SetDropdownMenu(btnMenuPrint:GetId(), menuPrint);
 
 	tbTableau:AddSeparator();
-	btnOutils = tbTableau:AddTool("Menu des outils", "./res/32x32_tools.png",'', itemKind.DROPDOWN);
+	btnOutils = tbTableau:AddTool("Outils", "./res/32x32_tools.png",'', itemKind.DROPDOWN);
 	menuOutils = menu.Create();
 	menuOutils:AppendSeparator();
 	btnTirageDossardsBIBO = menuOutils:Append({label="Double tirage à la mêlée du BIBO", image ="./res/32x32_bib.png"});
@@ -2091,6 +2119,8 @@ function OnAfficheTableau()
 	tbTableau:AddStretchableSpace();
 	
  	tbTableau:Realize();
+	tbTableau:EnableTool(btnMenuSend:GetId(), draw.state);
+	tbTableau:EnableTool(btnSendMessage:GetId(), draw.state);
 	-- tbTableau:EnableTool(btnSendMessage:GetId(), draw.socket_state);
 	-- tbTableau:EnableTool(btnClear:GetId(), draw.socket_state);
 	-- tbTableau:EnableTool(btnMenuSend:GetId(), draw.socket_state);
@@ -2108,6 +2138,8 @@ function OnAfficheTableau()
 	dlgTableau:Bind(eventType.TIMER, OnTimerRunning, draw.timer);
 	draw.timer:Start(480000);	-- toutes les 8 minutes (8x60x1000ms) on envoie une commande keepalive
 
+	dlgTableau:Bind(eventType.MENU, OnLiveState, btnState);
+	dlgTableau:Bind(eventType.MENU, OnLiveState, btnMenuCommande);
 	dlgTableau:Bind(eventType.MENU, OnSendMessage, btnSendMessage);
 	dlgTableau:Bind(eventType.MENU, 
 		function(evt)
@@ -2237,6 +2269,7 @@ function OnAfficheTableau()
 		, btnSendDossards);
 	dlgTableau:Bind(eventType.MENU, 
 		function(evt)
+			-- les coureurs ont un rang de tirage <= 15
 			ChecktDraw();
 			local msg = "Cliquer sur Oui pour lancer le double tirage du BIBO.\n"..
 					"Les coureurs doivent être validés sur le tableau au préalable.\n\n"..
@@ -2257,9 +2290,11 @@ function OnAfficheTableau()
 			end
 			draw.start_Bib = nil;
 			-- draw.EnableToolPrintBibo = true;
+			-- en technique, on a deux sous groupes
+			-- en vitesse, on a 1 seul groupe
 			tDrawG6 = tDraw:Copy();
 			ReplaceTableEnvironnement(tDrawG6, 'DrawG6');
-			for i = tDrawG6:GetNbRows() -1, 0, -1 do
+			for i = tDrawG6:GetNbRows() -1, 0, -1 do -- traitement du groupe 1
 				local groupe_tirage = tDrawG6:GetCellInt('Groupe_tirage', i, -1);
 				if groupe_tirage < 0 or groupe_tirage > 1 then
 					tDrawG6:RemoveRowAt(i);
@@ -2365,72 +2400,76 @@ function OnAfficheTableau()
 					local rang_tirage = tDraw:GetCellInt('Rang_tirage', i);
 					local groupe_tirage = tDraw:GetCellInt('Groupe_tirage', i);
 					local code_coureur = tDraw:GetCell('Code_coureur', i);
-					if dossard == 0 then
-						dossard = rang_tirage;
-						tDraw:SetCell('Dossard', i, dossard);
-						local cmd = "Update Resultat Set Dossard = "..dossard..", Critere = '"..string.format('%03d', rang_tirage).."' Where Code_evenement = "..draw.code_evenement.." And Code_coureur = '"..code_coureur.."'";
-						base:Query(cmd);
-					elseif dossard == 1000 then
-						tDraw:SetCellNull('Dossard', i)
-						local cmd = "Update Resultat Set Dossard = NULL, Critere = '"..string.format('%03d', rang_tirage).."' Where Code_evenement = "..draw.code_evenement.." And Code_coureur = '"..code_coureur.."'";
-						base:Query(cmd);
+					if tDraw:GetCellInt('Rang_tirage', i) > 15 then
+						if dossard == 0 then
+							dossard = rang_tirage;
+							tDraw:SetCell('Dossard', i, dossard);
+							local cmd = "Update Resultat Set Dossard = "..dossard..", Critere = '"..string.format('%03d', rang_tirage).."' Where Code_evenement = "..draw.code_evenement.." And Code_coureur = '"..code_coureur.."'";
+							base:Query(cmd);
+						elseif dossard == 1000 then
+							tDraw:SetCellNull('Dossard', i)
+							local cmd = "Update Resultat Set Dossard = NULL, Critere = '"..string.format('%03d', rang_tirage).."' Where Code_evenement = "..draw.code_evenement.." And Code_coureur = '"..code_coureur.."'";
+							base:Query(cmd);
+						end
 					end
 				end
 			else
+				-- les coureurs ont un rang de tirage > 15
 				tDraw:OrderBy('Rang_tirage')
 				for i = 0, tDraw:GetNbRows() -1 do
 					if tDraw:GetCellDouble('FIS_pts', i) == 0 then
 						break;
 					end
-					local dossard = tDraw:GetCellInt('Dossard', i);
-					local rang_tirage = tDraw:GetCellInt('Rang_tirage', i);
-					local groupe_tirage = tDraw:GetCellInt('Groupe_tirage', i);
-					if draw.bolVitesse then
-						if dossard == 0 and i < 30 then
-							if #draw.tDossardsAvailable > 0 then
-								dossard = draw.tDossardsAvailable[1];
-								table.remove(draw.tDossardsAvailable, 1);
+					if tDraw:GetCellInt('Rang_tirage', i) > 15 then
+						local dossard = tDraw:GetCellInt('Dossard', i);
+						local rang_tirage = tDraw:GetCellInt('Rang_tirage', i);
+						local groupe_tirage = tDraw:GetCellInt('Groupe_tirage', i);
+						if draw.bolVitesse then
+							if dossard == 0 and i < 30 then
+								if #draw.tDossardsAvailable > 0 then
+									dossard = draw.tDossardsAvailable[1];
+									table.remove(draw.tDossardsAvailable, 1);
+									tDraw:SetCell('Dossard', i, dossard);
+									local cmd = "Update Resultat Set Dossard = "..dossard..", Critere = '"..string.format('%03d', tDraw:GetCellInt('Rang_tirage', i)).."' Where Code_evenement = "..draw.code_evenement.." And Code_coureur = '"..tDraw:GetCell('Code_coureur', i).."'";
+									base:Query(cmd);
+								end
+							end
+						end
+						if dossard == 0 then
+							if not draw.tRows_nepastirer[rang_tirage] then
+								local dossard = rang_tirage;
 								tDraw:SetCell('Dossard', i, dossard);
 								local cmd = "Update Resultat Set Dossard = "..dossard..", Critere = '"..string.format('%03d', tDraw:GetCellInt('Rang_tirage', i)).."' Where Code_evenement = "..draw.code_evenement.." And Code_coureur = '"..tDraw:GetCell('Code_coureur', i).."'";
 								base:Query(cmd);
-							end
-						end
-					end
-					if dossard == 0 then
-						Info('dossard = 0, i = '..i..', draw.tRows_nepastirer['..rang_tirage..'] = '..tostring(draw.tRows_nepastirer[rang_tirage]));
-						if not draw.tRows_nepastirer[rang_tirage] then
-							local dossard = rang_tirage;
-							tDraw:SetCell('Dossard', i, dossard);
-							local cmd = "Update Resultat Set Dossard = "..dossard..", Critere = '"..string.format('%03d', tDraw:GetCellInt('Rang_tirage', i)).."' Where Code_evenement = "..draw.code_evenement.." And Code_coureur = '"..tDraw:GetCell('Code_coureur', i).."'";
-							base:Query(cmd);
-						else
-							tDrawG6 = tDraw:Copy();
-							ReplaceTableEnvironnement(tDrawG6, 'DrawG6');
-							for i = tDrawG6:GetNbRows() -1, 0, -1 do
-								if tDrawG6:GetCellInt('Rang_tirage', i, -1) ~= rang_tirage then
-									tDrawG6:RemoveRowAt(i);
+							else
+								tDrawG6 = tDraw:Copy();
+								ReplaceTableEnvironnement(tDrawG6, 'DrawG6');
+								for i = tDrawG6:GetNbRows() -1, 0, -1 do
+									if tDrawG6:GetCellInt('Rang_tirage', i, -1) ~= rang_tirage then
+										tDrawG6:RemoveRowAt(i);
+									end
 								end
-							end
-							tDrawG6:OrderRandom('FIS_pts');
-							local tShuffle = {};
-							for i = 0, tDrawG6:GetNbRows() -1 do
-								-- table.insert(tShuffle, i+1);
-								table.insert(tShuffle, rang_tirage + i);
-							end
-							tShuffle = Shuffle(tShuffle, true);
-							for i = 0, tDrawG6:GetNbRows() -1 do
-								local valeur_shuffle = tShuffle[i+1];
-								local dossard = valeur_shuffle ;
-								local code_coureur = tDrawG6:GetCell('Code_coureur', i)
-								local r = tDraw:GetIndexRow('Code_coureur', code_coureur);
-								if r >= 0 then
-									if draw.tirage_auto then
-										tDraw:SetCell('Dossard', r, dossard);
+								tDrawG6:OrderRandom('FIS_pts');
+								local tShuffle = {};
+								for i = 0, tDrawG6:GetNbRows() -1 do
+									-- table.insert(tShuffle, i+1);
+									table.insert(tShuffle, rang_tirage + i);
+								end
+								tShuffle = Shuffle(tShuffle, true);
+								for i = 0, tDrawG6:GetNbRows() -1 do
+									local valeur_shuffle = tShuffle[i+1];
+									local dossard = valeur_shuffle ;
+									local code_coureur = tDrawG6:GetCell('Code_coureur', i)
+									local r = tDraw:GetIndexRow('Code_coureur', code_coureur);
+									if r >= 0 then
+										if draw.tirage_auto then
+											tDraw:SetCell('Dossard', r, dossard);
+										end
 									end
 								end
 							end
 						end
-					end						
+					end
 				end
 			end
 			RefreshGrid()
@@ -2664,7 +2703,7 @@ function main(params_c)
 	draw.height = display:GetSize().height - 30;
 	draw.x = 0;
 	draw.y = 0;
-	draw.version = "2.2";
+	draw.version = "2.3";
 	draw.orderbyCE = 'Rang_tirage, Groupe_tirage, ECSL_points DESC, WCSL_points DESC, ECSL_overall_points DESC, Winner_CC DESC, FIS_pts, Nom, Prenom';
 	draw.orderbyFIS = 'Rang_tirage, Groupe_tirage, FIS_pts, Nom, Prenom';
 	draw.hostname = 'live.fisski.com';
@@ -2763,7 +2802,7 @@ function main(params_c)
 	end
 	draw.targetName = draw.hostname..':'..draw.port;
 	draw.web = 'live.fis-ski.com/lv-'..string.lower(string.sub(draw.code_activite,1,2))..draw.codex..'.htm';
-	draw.state = true;
+	draw.state = false;
 	draw.double_tirage_bibo = false;
 	draw.tRows_nepastirer = {};
 	draw.tRang_tirageauto = {};
