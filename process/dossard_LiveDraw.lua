@@ -21,6 +21,10 @@ function GetMenuName()
 	return "Tirage en ligne des dossards sur le site de la FIS";
 end
 
+function GetActivite()
+	return "ALP,TM";
+end
+
 function Error(txt)
 	adv.Error(txt);
 end
@@ -2703,7 +2707,7 @@ function main(params_c)
 	draw.height = display:GetSize().height - 30;
 	draw.x = 0;
 	draw.y = 0;
-	draw.version = "2.3";
+	draw.version = "2.4";
 	draw.orderbyCE = 'Rang_tirage, Groupe_tirage, ECSL_points DESC, WCSL_points DESC, ECSL_overall_points DESC, Winner_CC DESC, FIS_pts, Nom, Prenom';
 	draw.orderbyFIS = 'Rang_tirage, Groupe_tirage, FIS_pts, Nom, Prenom';
 	draw.hostname = 'live.fisski.com';

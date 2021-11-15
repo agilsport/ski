@@ -5,12 +5,19 @@ function GetMenuName()
 	return "Double Tirage au sort des dossards (RIS)";
 end
 
+function GetActivite()
+	return "ALP,TM";
+end
+
 function OnPrintDoubleTirage(groupe)
 	if params.print_alone then
 		params.tableDossards1, params.tableDossards2 = OnDecodeJsonBibo(params.code_evenement, groupe);
 	else
 		OnEncodeJsonBibo(params.code_evenement, groupe);
 		params.tableDossards1, params.tableDossards2 = OnDecodeJsonBibo(params.code_evenement, groupe);
+	end
+	if params.bibo then
+		return false;
 	end
 	if tResultat_Info_Bibo:GetNbRows() == 0 then
 		if groupe == 1 then
@@ -229,11 +236,15 @@ function main(params_c)
 		return false;
 	end
 	params = params_c;
-	params.version = '2.7';
+	params.version = '2.8';
 	params.code_evenement = params.code_evenement or -1;
 	if params.code_evenement < 0 then
 		return;
 	end
+	params.width = display:GetSize().width / 3;
+	params.height = display:GetSize().height / 3;
+	params.x = (display:GetSize().width - params.width) / 2;
+	params.y = 200;
 	params.origine = params.origine or 'scenario';	
 	base = base or sqlBase.Clone();
 	tResultat = base:GetTable('Resultat');
@@ -244,6 +255,7 @@ function main(params_c)
 	params.evenementNom = tEvenement:GetCell('Nom', 0);
 	tEpreuve = base:GetTable('Epreuve');
 	base.TableLoad(tEpreuve, 'Select * From Epreuve Where Code_evenement = '..params.code_evenement);
+	params.code_niveau = tEpreuve:GetCell('Code_niveau', 0);
 	tResultat_Info_Bibo = base:GetTable('Resultat_Info_Bibo');
 	if tResultat_Info_Bibo == nil then
 		CreateTableResultat_Info_Bibo();
@@ -294,10 +306,51 @@ function main(params_c)
 			end
 		end
 	end
+	if params.code_niveau:In('N_U14', 'N_U16') then
+		-- Ouverture Document XML 
+		local XML = "./process/dossard_DoubleTirage.xml";
+		dlgConfig = wnd.CreateDialog(
+			{
+			width = params.width,
+			height = params.height,
+			x = params.x,
+			y = params.y,
+			label='Configuration du tirage', 
+			icon='./res/32x32_ffs.png'
+			});
+		
+		dlgConfig:LoadTemplateXML({ 
+			xml = XML,
+			node_name = 'root/panel', 
+			node_attr = 'name', 
+			discipline = params.discipline,
+			node_value = 'bibo',
+			params = {Niveau = params.code_niveau}
+		});
+
+		-- Toolbar Principale ...
+		local tbconfig = dlgConfig:GetWindowName('tbconfig');
+		tbconfig:AddStretchableSpace();
+		local btnSave = tbconfig:AddTool("Valider", "./res/vpe32x32_save.png");
+		tbconfig:AddStretchableSpace();
+		tbconfig:Realize();
+		local message = app.GetAuiMessage();
+		
+		dlgConfig:GetWindowName('bibo'):SetValue(15);
+		dlgConfig:Bind(eventType.MENU, 
+			function(evt) 
+				params.bibo = tonumber(dlgConfig:GetWindowName('bibo'):GetValue()) or 15;
+				dlgConfig:EndModal(idButton.OK);
+			end, btnSave); 
+		dlgConfig:Fit();
+		dlgConfig:ShowModal();
+	end
+	
 	bolSplitBibo = false;
 	tResultat:OrderBy('Point');
 	params.pts_7 = tResultat:GetCellDouble('Point', 6);
 	params.pts_15 = tResultat:GetCellDouble('Point', 14);
+	params.pts_bibo_jeunes = tResultat:GetCellDouble('Point', params.bibo -1);
 	params.last_row_bibo = nil; params.row_pts7 = nil;
 	GetBibo();
 	if not params.print_alone then
@@ -334,7 +387,11 @@ function main(params_c)
 		else
 			limite = tResultat:GetNbRows();
 		end
-		for row = params.nb_bibo, limite -1 do
+		local depart = params.nb_bibo;
+		if params.bibo then
+			depart = params.bibo;
+		end
+		for row = depart, limite -1 do
 			if tResultat:GetCellInt('Dossard', row) == 0 then
 				local dossard = row + 1;
 				tResultat:SetCell('Dossard', row, dossard) ;
@@ -354,7 +411,11 @@ function main(params_c)
 		end
 --      BuildTableTirage(row_first, row_last, rang_tirage, bib_first, shuffle);
 		if not bolSplitBibo then
-			BuildTableTirage(0, params.nb_bibo -1, nil, 1, true) -- tirage du bibo
+			if not params.bibo then
+				BuildTableTirage(0, params.nb_bibo -1, nil, 1, true) -- tirage du bibo
+			else
+				BuildTableTirage(0, params.bibo -1, nil, 1, true) -- tirage du bibo
+			end
 		end
 	end
 	base:TableBulkUpdate(tResultat, 'Dossard, Rang', 'Resultat');
@@ -370,9 +431,26 @@ function main(params_c)
 			ReplaceTableEnvironnement(tDrawG6, 'DrawG6');
 			for i = tDrawG6:GetNbRows() -1, 0, -1 do
 				local pts = tDrawG6:GetCellDouble('Point', i, -1);
-				if pts < 0 or pts > params.pts_15 then
+				if pts < 0 then
+					tResultat:SetCell('Reserve', i, 3);
 					tDrawG6:RemoveRowAt(i);
+				elseif pts > params.pts_bibo_jeunes then
+					tResultat:SetCell('Reserve', i, 2);
+				else
+					tResultat:SetCell('Reserve', i, 1);
 				end
+				if not params.bibo then
+					if pts > params.pts_15 then
+						tDrawG6:RemoveRowAt(i);
+					end
+				else
+					if pts > params.pts_bibo_jeunes then
+						tDrawG6:RemoveRowAt(i);
+					end
+				end
+			end
+			if params.bibo then
+				base:TableBulkUpdate(tResultat,'Reserve','Resultat');
 			end
 		end
 		OnPrintDoubleTirage(1);
