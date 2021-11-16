@@ -236,7 +236,7 @@ function main(params_c)
 		return false;
 	end
 	params = params_c;
-	params.version = '2.8';
+	params.version = '2.9';
 	params.code_evenement = params.code_evenement or -1;
 	if params.code_evenement < 0 then
 		return;
@@ -350,9 +350,12 @@ function main(params_c)
 	tResultat:OrderBy('Point');
 	params.pts_7 = tResultat:GetCellDouble('Point', 6);
 	params.pts_15 = tResultat:GetCellDouble('Point', 14);
-	params.pts_bibo_jeunes = tResultat:GetCellDouble('Point', params.bibo -1);
+	if params.bibo then
+		params.pts_bibo_jeunes = tResultat:GetCellDouble('Point', params.bibo -1);
+	end
 	params.last_row_bibo = nil; params.row_pts7 = nil;
 	GetBibo();
+
 	if not params.print_alone then
 		local cmd = 'Delete From Resultat_Info_Bibo Where Code_evenement = '..params.code_evenement;
 		base:Query(cmd);
@@ -421,6 +424,9 @@ function main(params_c)
 	base:TableBulkUpdate(tResultat, 'Dossard, Rang', 'Resultat');
 	local cmd = 'Update Resultat Set Rang = NULL Where Code_evenement = '..params.code_evenement;
 	base:Query(cmd);
+
+
+
 	if tEpreuve:GetCell('Code_entite', 0) == 'FIS' and tEpreuve:GetCell('Code_niveau', 0):In('EC', 'NC') and tEpreuve:GetCell('Code_discipline', 0):In('SL','GS') then
 		bolSplitBibo = true;
 	end
@@ -432,20 +438,22 @@ function main(params_c)
 			for i = tDrawG6:GetNbRows() -1, 0, -1 do
 				local pts = tDrawG6:GetCellDouble('Point', i, -1);
 				if pts < 0 then
-					tResultat:SetCell('Reserve', i, 3);
-					tDrawG6:RemoveRowAt(i);
-				elseif pts > params.pts_bibo_jeunes then
-					tResultat:SetCell('Reserve', i, 2);
-				else
-					tResultat:SetCell('Reserve', i, 1);
-				end
-				if not params.bibo then
-					if pts > params.pts_15 then
-						tDrawG6:RemoveRowAt(i);
+					if params.bibo then
+						tResultat:SetCell('Reserve', i, 3);
 					end
+					tDrawG6:RemoveRowAt(i);
 				else
-					if pts > params.pts_bibo_jeunes then
-						tDrawG6:RemoveRowAt(i);
+					if params.bibo then
+						if pts > params.pts_bibo_jeunes then
+							tResultat:SetCell('Reserve', i, 2);
+							tDrawG6:RemoveRowAt(i);
+						else
+							tResultat:SetCell('Reserve', i, 1);
+						end
+					else
+						if pts > params.pts_15 then
+							tDrawG6:RemoveRowAt(i);
+						end
 					end
 				end
 			end
