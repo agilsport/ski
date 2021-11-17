@@ -397,9 +397,11 @@
 			end
 			orderby = rupture..", Nom, Prenom";
 			somme_rupture = 0;
+			nb_etrangers = 0;
 			comite = {};
 			page_break = 1;
 			bolAjouter = false;
+
 		</lua>
 		<call option="comite_origine" file="./edition/options.xml" />
 		<order key="(orderby)" />
@@ -430,7 +432,9 @@
 					else
 						bolAjouter = true;
 					end
-				end</lua>
+				end
+				if $(Nation) ~= 'FRA' then nb_etrangers = nb_etrangers + 1; end
+				</lua>
 			<call option="couleur_alternee" file="./edition/options.xml" />
 
 			<row value="auto"/>
@@ -475,6 +479,7 @@
 						<text col_start="1" align="center" cond="comite[rupture_label1].EQ &gt; 0 and counter_col1 &gt; 0">rupture_label1..' : '..body:GetCounter(rupture):GetCell(1,i)..'    (+ '..comite[rupture_label1].EQ..' EQ)'</text>
 						<text col_start="2" align="center" cond="rupture ~= 'Nation'">rupture_label2..' : '..body:GetCounter('Nation'):GetCell(1,i)</text>
 						<text row="auto" col_start="1" align="center" cond="i == max_ligne_recap -1">somme_rupture..' participants ont la colonne '..rupture..' renseignée'</text>
+						<text col_start="2" align="center" cond="i == max_ligne_recap -1">'Nombre total d\'étrangers '..(nb_etrangers -1)</text>
 				<lua>end</lua>
 			<lua>end</lua>
 		</end>
