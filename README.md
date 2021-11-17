@@ -31,6 +31,11 @@ Sous dossier /process du répertoire principal
 <br>
 Développements spécifiques en LUA
 
+## Navigation
+Sous dossier /navigation du répertoire principal
+<br>
+Ressources competition.xml permetant la gestion des onglets de navigation FFS / ESF en base local ou Cloud ou navigation perso
+
 ## Challenge
 Sous dossier /challenge du répertoire principal
 <br>
