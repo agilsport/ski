@@ -260,13 +260,13 @@
 			<col w="11cm,0.5cm,8cm"/>
 			<row h="0.3cm"/>
 			<row h="0.5cm"/>
-			<row h="0.5cm"/>
-			<row h="0.5cm"/>
-			<row h="0.5cm"/>
-			<row h="0.5cm"/>
-			<row h="0.5cm"/>
-			<row h="0.5cm"/>
 			<row h="3cm"/>
+			<row h="0.5cm"/>
+			<row h="0.5cm"/>
+			<row h="0.5cm"/>
+			<row h="0.5cm"/>
+			<row h="0.5cm"/>
+			<row h="0.5cm"/>
 			<lua>
 				TableEpreuveTransfert = base:GetTable('Epreuve_Transfert');
 						cmd3 = "Select * From Epreuve_Transfert Where Code_evenement = "..$(Evenement.Code)
@@ -303,17 +303,12 @@
 			</lua>
 
 				<!-- colonne de gauche -->
-				<text row_start="2" col_start="1" align="Left" >'Cet événement à-t\'il fait l\'objet d\'une déclaration d\'accident: '..Declarationaccident</text>
-				<text row_start="3" col_start="1" align="Left" >'Si oui elle doit être impérativement jointe à l\'envoie de ce bordereau'</text>
-				<text row_start="4" row_end="6" col_start="1" align="Left" border="all" >'Signature DT:\n'..GetIdentiteOfficiels('TechnicalDelegate')..' - '..dt_code</text>
-				<text row_start="8" col_start="1" col_end="2" align="Left" >'Commentaire éventuels:'</text>
-				<text row_start="9" col_start="1" col_end="0" style="TE_LEFT|TE_MULTILINE" border="all" >commentaire</text>
-				<!-- colonne de gauche -->
-				<text row_start="2" col_start="3" align="Left" >'Transmission des résultats'</text>
-				<text row_start="3" col_start="3" align="Left" >'Date: '..date..'  Heure:'..heure</text>
-				<text row_start="4" col_start="3" align="Left" >'Transfert: '..transfert</text>
-				<text row_start="5" col_start="3" align="Left" >'Responsable transmission: '..IdentiteResTransmission</text>
-				<text row_start="6" row_end="7" col_start="3" align="Left" border="all" >'Signature:'</text>
+				<text row_start="2" col_start="1" col_end="2" align="Left" >'Commentaire éventuels:'</text>
+				<text row_start="3" col_start="1" col_end="0" style="TE_LEFT|TE_MULTILINE" border="all" >commentaire</text>
+				<text row_start="4" col_start="1" align="Left" >'Cet événement à-t\'il fait l\'objet d\'une déclaration d\'accident: '..Declarationaccident</text>
+				<text row_start="5" col_start="1" align="Left" >'Si oui elle doit être impérativement jointe à l\'envoie de ce bordereau'</text>
+				<text row_start="6" row_end="8" col_start="3" align="Left" border="all" >'Signature DT:\n'..GetIdentiteOfficiels('TechnicalDelegate')..' - '..dt_code</text>
+								
 			</matrix>
 		</end>
 	</report>	
@@ -533,13 +528,13 @@
 			<col w="11cm,0.5cm,8cm"/>
 			<row h="0.3cm"/>
 			<row h="0.5cm"/>
-			<row h="0.5cm"/>
-			<row h="0.5cm"/>
-			<row h="0.5cm"/>
-			<row h="0.5cm"/>
-			<row h="0.5cm"/>
-			<row h="0.5cm"/>
 			<row h="3cm"/>
+			<row h="0.5cm"/>
+			<row h="0.5cm"/>
+			<row h="0.5cm"/>
+			<row h="0.5cm"/>
+			<row h="0.5cm"/>
+			<row h="0.5cm"/>
 			<lua>
 				TableEpreuveTransfert = base:GetTable('Epreuve_Transfert');
 						cmd3 = "Select * From Epreuve_Transfert Where Code_evenement = "..$(Evenement.Code)
@@ -576,17 +571,12 @@
 			</lua>
 
 				<!-- colonne de gauche -->
-				<text row_start="2" col_start="1" align="Left" >'Cet événement à-t\'il fait l\'objet d\'une déclaration d\'accident: '..Declarationaccident</text>
-				<text row_start="3" col_start="1" align="Left" >'Si oui elle doit être impérativement jointe à l\'envoie de ce bordereau'</text>
-				<text row_start="4" row_end="6" col_start="1" align="Left" border="all" >'Signature DT:\n'..GetIdentiteOfficiels('TechnicalDelegate')..' - '..dt_code</text>
-				<text row_start="8" col_start="1" col_end="2" align="Left" >'Commentaire éventuels:'</text>
-				<text row_start="9" col_start="1" col_end="0" style="TE_LEFT|TE_MULTILINE" border="all" >commentaire</text>
-				<!-- colonne de gauche -->
-				<text row_start="2" col_start="3" align="Left" >'Transmission des résultats'</text>
-				<text row_start="3" col_start="3" align="Left" >'Date: '..date..'  Heure:'..heure</text>
-				<text row_start="4" col_start="3" align="Left" >'Transfert: '..transfert</text>
-				<text row_start="5" col_start="3" align="Left" >'Responsable transmission: '..IdentiteResTransmission</text>
-				<text row_start="6" row_end="7" col_start="3" align="Left" border="all" >'Signature:'</text>
+				<text row_start="2" col_start="1" col_end="2" align="Left" >'Commentaire éventuels:'</text>
+				<text row_start="3" col_start="1" col_end="0" style="TE_LEFT|TE_MULTILINE" border="all" >commentaire</text>
+				<text row_start="4" col_start="1" align="Left" >'Cet événement à-t\'il fait l\'objet d\'une déclaration d\'accident: '..Declarationaccident</text>
+				<text row_start="5" col_start="1" align="Left" >'Si oui elle doit être impérativement jointe à l\'envoie de ce bordereau'</text>
+				<text row_start="6" row_end="8" col_start="3" align="Left" border="all" >'Signature DT:\n'..GetIdentiteOfficiels('TechnicalDelegate')..' - '..dt_code</text>
+				
 			</matrix>
 		</end>
 	</report>

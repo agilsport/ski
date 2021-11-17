@@ -23,7 +23,8 @@
 			<menu title="Liste de départ" image="./res/16x16_official.png" header="1" first_header="0" id="lst_officielle" officiel="0"/>
 			<menu title="Liste de départ Officielle" image="./res/16x16_official.png" id="lst_officielle" Qrcode="0" officiel="1"/>
 			<menu title="Liste de départ avec Qrcode Live" image="./res/16x16_official.png" id="lst_officielle" Qrcode="1" officiel="1"/>
-			<menu title="Officielle poursuite" image="./res/16x16_official.png" id="lst_officielle_pours" choix_manche="1" cond="discipline:In('POURS')"/>
+			<menu title="Liste de départ Officielle poursuite" image="./res/16x16_official.png" id="lst_officielle_pours" choix_manche="1" cond="discipline:In('POURS')" officiel="1"/>
+			<menu title="Liste de départ poursuite (avec ecart)" image="./res/16x16_official.png" id="lst_officielle_pours" choix_manche="1" cond="discipline:In('POURS')" officiel="0"/>
 			<menu title="Liste de départ Par Nation" image="./res/16x16_bib.png" page_break="1" orderby="Nation" id="lst_officielle_Filtrer"/>
 			<menu title="Liste de départ Par Comite" image="./res/16x16_bib.png" page_break="1" orderby="Comite" id="lst_officielle_Filtrer"/>
 			<menu title="Liste de départ Par Club" image="./res/16x16_bib.png" page_break="1" orderby="Club" id="lst_officielle_Filtrer"/>
@@ -399,11 +400,29 @@
 
 	<!-- Listes de départ officiels poursuite-->
 	<report id="lst_officielle_pours" title="Liste de Départ Officielle" header="1" first_header="1" >
-		<lua>entite = $(Evenement.Code_entite)</lua>
-		<lua>discipline = $(Epreuve.Code_discipline)</lua>
-		<lua>rang = 'Rang'..manche</lua>
-		<lua>Hdpt = 'Heure_depart'..manche</lua>
-		<order key="(Hdpt), Dossard, Identite" />
+		<lua>
+			manche = 2
+			entite = $(Evenement.Code_entite)
+			discipline = $(Epreuve.Code_discipline)
+			officiel = tonumber(params.officiel)
+			rang = 'Rang'..manche
+			Hdpt = 'Heure_depart'..manche
+			body:OrderBy('Heure_depart2 Asc' );
+
+			body:AddColumn({ name = 'Diff_heure_depart2', label = 'Diff_heure_depart2', type = sqlType.CHRONO });	
+			if body:GetNbRows() > 0 then
+				local best_heure_depart2 = body:GetCellInt('Heure_depart2',0);
+				for i=0, body:GetNbRows()-1 do
+					if body:GetCellInt('Heure_depart2', i, -1) >= best_heure_depart2 then 
+						body:SetCell('Diff_heure_depart2', i, body:GetCellInt('Heure_depart2',i) - best_heure_depart2);
+					end
+					if tonumber(i) == 0 then
+						body:SetCell('Diff_heure_depart2', i, 1);
+					end
+				end
+			end
+		</lua>
+		<order key="Heure_depart2, Dossard, Identite" />
 
 		<body>
 			<call option="color_alternate" file="./edition/options.xml" />

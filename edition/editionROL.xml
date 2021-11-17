@@ -458,10 +458,25 @@
 
 	<!-- Listes de départ officiels poursuite-->
 	<report id="lst_officielle_pours" title="(params.title or '')" header="1" first_header="1" >
-		<lua>entite = $(Evenement.Code_entite)</lua>
-		<lua>discipline = $(Epreuve.Code_discipline)</lua>
-		<lua>rang = 'Rang'..manche</lua>
-		<lua>Hdpt = 'Heure_depart'..manche</lua>
+		<lua>
+			entite = $(Evenement.Code_entite)
+			discipline = $(Epreuve.Code_discipline)
+			officiel = tonumber(params.officiel)
+			body:OrderBy('Heure_depart2 Asc' );
+
+			body:AddColumn({ name = 'Diff_heure_depart2', label = 'Diff_heure_depart2', type = sqlType.CHRONO });	
+			if body:GetNbRows() > 0 then
+				local best_heure_depart2 = body:GetCellInt('Heure_depart2',0);
+				for i=0, body:GetNbRows()-1 do
+					if body:GetCellInt('Heure_depart2', i, -1) >= best_heure_depart2 then 
+						body:SetCell('Diff_heure_depart2', i, body:GetCellInt('Heure_depart2',i) - best_heure_depart2);
+					end
+					if tonumber(i) == 0 then
+						body:SetCell('Diff_heure_depart2', i, 1);
+					end
+				end
+			end
+		</lua>
 		<order key="Heure_depart2, Dossard, Identite" />
 
 		<body>
@@ -483,7 +498,8 @@
 			<text col="12" align="left" label="Club" cond="entite == 'FFS'">$(Club)</text>
 			<text col="6" align="right" label="Points" cond="entite == 'FFS'">$(Point)</text>
 			<text col="9" align="right" label="H. Départ" cond="discipline:In('FS','KO-QLF')">$(Heure_depart1, "%-1h%-1m%2s")</text>
-			<text col="11" align="right" label="H. Dépt. Pours" cond="discipline:In('POURS') and manche>=2">$(Heure_depart2, "%-1h%-1m%2s")</text>
+			<text col="11" align="right" label="H. Dépt. Pours" cond="discipline:In('POURS') and manche>=2 and officiel==1 ">$(Heure_depart2, "%-1h%-1m%2s")</text>
+			<text col="11" align="right" label="Ecart. Pours" cond="discipline:In('POURS') and manche>=2 and officiel==0 ">$(Diff_heure_depart2, '%-1m%2s.%1f')</text>
 			<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
 		</body>
 	</report>
