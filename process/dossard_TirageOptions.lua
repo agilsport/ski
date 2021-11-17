@@ -6,6 +6,10 @@ function GetMenuName()
 	return "Tirage des dossards ou des rangs de départ avec options de tirage";
 end
 
+function GetActivite()
+	return "ALP,TM";
+end
+
 function GetBibo(bibo)
 	dlgBibo = wnd.CreateDialog(
 		{
@@ -657,7 +661,7 @@ function main(params_c)
 	params.height = display:GetSize().height / 2;
 	params.x = (display:GetSize().width - params.width) / 2;
 	params.y = 200;
-	params.version = "1.1";
+	params.version = "1.2";
 	base = base or sqlBase.Clone();
 	tEvenement = base:GetTable('Evenement');
 	base:TableLoad(tEvenement, 'Select * From Evenement Where Code = '..params.code_evenement);

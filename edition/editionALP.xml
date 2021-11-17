@@ -397,9 +397,11 @@
 			end
 			orderby = rupture..", Nom, Prenom";
 			somme_rupture = 0;
+			nb_etrangers = 0;
 			comite = {};
 			page_break = 1;
 			bolAjouter = false;
+
 		</lua>
 		<call option="comite_origine" file="./edition/options.xml" />
 		<order key="(orderby)" />
@@ -412,7 +414,11 @@
 				<lua>codelu = body:GetCell(rupture, row);
 					if codelu:len() > 0 then
 						somme_rupture = somme_rupture + body:GetCounterValue(rupture, codelu);
-					end</lua>
+					end
+					if body:GetCell('Nation', row) ~= 'FRA' then
+						nb_etrangers = nb_etrangers + body:GetCounterValue(rupture, codelu);
+					end
+					</lua>
 				<text row="auto" col="1" cond="codelu:len() &gt; 0">codelu..' ('..body:GetCounterValue(rupture, codelu)..')'</text>
 				<text row="auto" col="1" cond="codelu:len() == 0">'Non renseigné ('..body:GetCounterValue(rupture, codelu)..')'</text>
 			</before>
@@ -430,7 +436,8 @@
 					else
 						bolAjouter = true;
 					end
-				end</lua>
+				end
+				</lua>
 			<call option="couleur_alternee" file="./edition/options.xml" />
 
 			<row value="auto"/>
@@ -475,6 +482,7 @@
 						<text col_start="1" align="center" cond="comite[rupture_label1].EQ &gt; 0 and counter_col1 &gt; 0">rupture_label1..' : '..body:GetCounter(rupture):GetCell(1,i)..'    (+ '..comite[rupture_label1].EQ..' EQ)'</text>
 						<text col_start="2" align="center" cond="rupture ~= 'Nation'">rupture_label2..' : '..body:GetCounter('Nation'):GetCell(1,i)</text>
 						<text row="auto" col_start="1" align="center" cond="i == max_ligne_recap -1">somme_rupture..' participants ont la colonne '..rupture..' renseignée'</text>
+						<text col_start="2" align="center" cond="i == max_ligne_recap -1 and nb_etrangers &gt; 0">'Nombre total d\'étrangers '..nb_etrangers</text>
 				<lua>end</lua>
 			<lua>end</lua>
 		</end>
@@ -534,9 +542,7 @@
 			<font size="9" adjust="ellipsize"/>
 
 			<row h="auto"/>
-			<lua>if manche &gt; 1 then</lua>
-				<text col="4" align="right" label="Rang" font_weight="bold">body:GetCellInt('Rang'..manche, row) </text>
-			<lua>end</lua>
+			<text col="4" cond="body:GetCellInt('Rang'..manche, row) &gt; 0" align="right" label="Rang" font_weight="bold">body:GetCellInt('Rang'..manche, row) </text>
 			<text col="4" align="center" label="Dos" font_weight="bold" font_size_step="1">$(Dossard)</text>
 			<text col="7" align="center" label="Code"><font size="8" cond="group =='body'"/>$(Code_coureur):sub(4)</text>
 			<text col="20" align="left" label="Nom - Prénom" font_weight="bold" font_size_step="1">$(Identite)</text> 
