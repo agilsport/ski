@@ -2,7 +2,7 @@
 <!-- Matrice Individuelle PG -->
 <!-- <background mode="gradient_line_vert" color_start="white" color_end="ltgray" /> -->
 <root title="Tirage des dossards avec options">
-  <config course1="39" clef1="0" option1="1" option2="1"/>
+  <config course1="424" clef1="3" option1="4" option2="4"/>
   <panel name="bibo">
     <padding all="10px"/>
     <col value="1"/>

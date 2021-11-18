@@ -435,13 +435,13 @@ function OnTirageNationales(course, code_evenement)
 		for manche = 1, 4 do
 			params.rang_depart = 1;
 			if manche == 1 then
-				if course == 1 then
+				--if course == 1 then
 				-- if code_evenement ~= params.course1 then
 					row_debut = 0;
 					row_fin = tResultat:GetNbRows()-1;
 					step = 1;
 					OnTirageManchex(code_evenement, manche, row_debut, row_fin, step);
-				end
+				--end
 			elseif manche == 2 then
 				row_debut = tResultat:GetNbRows()-1;
 				row_fin = 0;
@@ -661,7 +661,7 @@ function main(params_c)
 	params.height = display:GetSize().height / 2;
 	params.x = (display:GetSize().width - params.width) / 2;
 	params.y = 200;
-	params.version = "1.2";
+	params.version = "1.3";
 	base = base or sqlBase.Clone();
 	tEvenement = base:GetTable('Evenement');
 	base:TableLoad(tEvenement, 'Select * From Evenement Where Code = '..params.code_evenement);
@@ -903,7 +903,7 @@ function main(params_c)
 				end
 			end
 		end
-		local cmd = 'Update Resultat Set Rang = NULL Where Code_evenement = '..params.course1;
+		local cmd = 'Update Resultat Set Rang = NULL Where Code_evenement IN('..params.course1..','..params.course2..')';
 		base:Query(cmd);
 	end
 	return true;
