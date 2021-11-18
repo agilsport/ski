@@ -333,7 +333,8 @@ function SetDossard(course)
 		params.bibo = params.bibo or 30;
 		local cmd = 'Update Resultat Set Dossard = Null Where Code_evenement IN('..params.course1..','..params.course2..')';
 		base:Query(cmd);
-		cmd = 'Update Resultat_Manche Set Rang = Null Where Code_evenement IN('..params.course1..','..params.course2..')';
+		-- cmd = 'Update Resultat_Manche Set Rang = Null Where Code_evenement IN('..params.course1..','..params.course2..')';
+		cmd = 'Delete From Resultat_Manche Where Code_evenement IN('..params.course1..','..params.course2..')';
 		base:Query(cmd);
 		base:TableLoad(tResultat, 'Select * From Resultat Where Code_evenement = '..params.course1);
 		params.nb_groupe1 = math.ceil(tResultat:GetNbRows()) / 2;
@@ -449,18 +450,18 @@ function OnTirageNationales(course, code_evenement)
 				OnTirageManchex(code_evenement, manche, row_debut, row_fin, step);
 			elseif manche == 3 then 
 				-- manche 3 ex de 51 à 100 
-				row_debut = params.nb_groupe1 + 1 ;
-				row_fin = tResultat:GetNbRows();
+				row_debut = params.nb_groupe1  ;
+				row_fin = tResultat:GetNbRows() -1;
 				step = 1;
 				OnTirageManchex(code_evenement, manche, row_debut, row_fin, step);
 				-- manche 3 ex de 1 à 50
 				row_debut = 0;
-				row_fin = params.nb_groupe1;
+				row_fin = params.nb_groupe1 -1;
 				step = 1;
 				OnTirageManchex(code_evenement, manche, row_debut, row_fin, step);
 			elseif manche == 4 then 
 				-- manche 4 ex de 50 à 1
-				row_debut = params.nb_groupe1;
+				row_debut = params.nb_groupe1 -1;
 				row_fin = 0;
 				step = -1;
 				OnTirageManchex(code_evenement, manche, row_debut, row_fin, step);
@@ -512,6 +513,7 @@ function OnTirageNationales(course, code_evenement)
 end
 
 function OnTirageManchex(code_evenement, manche, debut, fin, step)
+	adv.Alert('OnTirageManchex( code_evenement = '..code_evenement..', manche = '..manche..', row debut = '..debut..', row fin = '..fin..', step = '..step..')')
 	for i = debut, fin, step do
 		local code_coureur = tResultat:GetCell('Code_coureur', i);
 		base:TableLoad(tResultat_Manche, 'Select * From Resultat_Manche Where Code_evenement = '..code_evenement.." And Code_manche = "..manche.." And Code_coureur = '"..code_coureur.."'");
@@ -661,7 +663,7 @@ function main(params_c)
 	params.height = display:GetSize().height / 2;
 	params.x = (display:GetSize().width - params.width) / 2;
 	params.y = 200;
-	params.version = "1.3";
+	params.version = "1.4";
 	base = base or sqlBase.Clone();
 	tEvenement = base:GetTable('Evenement');
 	base:TableLoad(tEvenement, 'Select * From Evenement Where Code = '..params.code_evenement);
