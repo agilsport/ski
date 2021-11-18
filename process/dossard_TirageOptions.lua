@@ -513,7 +513,6 @@ function OnTirageNationales(course, code_evenement)
 end
 
 function OnTirageManchex(code_evenement, manche, debut, fin, step)
-	adv.Alert('OnTirageManchex( code_evenement = '..code_evenement..', manche = '..manche..', row debut = '..debut..', row fin = '..fin..', step = '..step..')')
 	for i = debut, fin, step do
 		local code_coureur = tResultat:GetCell('Code_coureur', i);
 		base:TableLoad(tResultat_Manche, 'Select * From Resultat_Manche Where Code_evenement = '..code_evenement.." And Code_manche = "..manche.." And Code_coureur = '"..code_coureur.."'");
