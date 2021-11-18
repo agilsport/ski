@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- Menu Editions Activité "FOND" !-->
-<!-- version="5.6" !-->
+<!-- version="5.7" !-->
+<!-- Activation de la fenetre filtrage epreuves pour une edition gerer par un .lua => Option filter="before" -->
 <!-- calcul de la note poursuite 2éme jour !-->
 <!-- si possible de faire fonctionner les cond="discipline:In('POURS')" dans les <menus> ?? dans <marging> et dans les <options> -->
 <!-- <paper orientation="landscape" cond="Nb_tps_inter >= 4 "/> -->
-<!-- appel de la fenetre de filtrage epreuves dans couloir.lua -->
+
 
 <edition>
 	<menu>
@@ -22,7 +23,8 @@
 			<menu title="Liste de départ" image="./res/16x16_official.png" header="1" first_header="0" id="lst_officielle" officiel="0"/>
 			<menu title="Liste de départ Officielle" image="./res/16x16_official.png" id="lst_officielle" Qrcode="0" officiel="1"/>
 			<menu title="Liste de départ avec Qrcode Live" image="./res/16x16_official.png" id="lst_officielle" Qrcode="1" officiel="1"/>
-			<menu title="Officielle poursuite" image="./res/16x16_official.png" id="lst_officielle_pours" choix_manche="1" cond="discipline:In('POURS')" officiel="1"/>
+			<menu title="Liste de départ Officielle poursuite" image="./res/16x16_official.png" id="lst_officielle_pours" choix_manche="1" cond="discipline:In('POURS')" officiel="1"/>
+			<menu title="Liste de départ poursuite (avec ecart)" image="./res/16x16_official.png" id="lst_officielle_pours" choix_manche="1" cond="discipline:In('POURS')" officiel="0"/>
 			<menu title="Liste de départ Par Nation" image="./res/16x16_bib.png" page_break="1" orderby="Nation" id="lst_officielle_Filtrer"/>
 			<menu title="Liste de départ Par Comite" image="./res/16x16_bib.png" page_break="1" orderby="Comite" id="lst_officielle_Filtrer"/>
 			<menu title="Liste de départ Par Club" image="./res/16x16_bib.png" page_break="1" orderby="Club" id="lst_officielle_Filtrer"/>
@@ -37,7 +39,7 @@
 			<menu title="Résultats Officiels poursuite 2éme Jour" image="./res/16x16_official.png" id="res_off_Pours" officiel="1" />
 			<menu title="Résultats par épreuve / catégories et sexe" image="./res/16x16_ranking.png" id="res_categ" header="1" first_header="0" choix_clt_max="1"/>
 			<menu title="Multi épreuve(poursuite)" image="./res/16x16_juges.png"  id="res_epr2"/>
-			<menu title="édition des tickets courses " image="./res/16x16_text.png" lua="./edition/TicketsCourse.lua"  />
+			<menu title="édition des tickets courses " filter="before" image="./res/16x16_text.png" lua="./edition/TicketsCourse.lua"  />
 		</menu>
 	</menu>
 
@@ -480,9 +482,24 @@
 		<lua>
 			entite = $(Evenement.Code_entite)
 			discipline = $(Epreuve.Code_discipline)
-			officiel = tonumber(params.officiel) 
+			officiel = tonumber(params.officiel)
+			rang = 'Rang'..manche
+			Hdpt = 'Heure_depart'..manche
+			body:OrderBy('Heure_depart'..manche..' Asc' );
+			body:AddColumn({ name = 'Diff_heure_depart2', label = 'Diff_heure_depart'..manche, type = sqlType.CHRONO });	
+			if body:GetNbRows() > 0 then
+				local best_heure_depart2 = body:GetCellInt('Heure_depart'..manche,0);
+				for i=0, body:GetNbRows()-1 do
+					if body:GetCellInt('Heure_depart'..manche, i, -1) >= best_heure_depart2 then 
+						body:SetCell('Diff_heure_depart2', i, body:GetCellInt('Heure_depart'..manche,i) - best_heure_depart2);
+					end
+					if tonumber(i) == 0 then
+						body:SetCell('Diff_heure_depart2', i, 1);
+					end
+				end
+			end
 		</lua>
-		<order key="Heure_depart2, Dossard, Identite" />
+		<order key="('Rang, Heure_depart'..manche..', Dossard, Identite')" />
 
 		<body>
 			<call option="color_alternate" file="./edition/options.xml" />
@@ -490,8 +507,8 @@
 			<font size="9" adjust="ellipsize"/>
 			<spacing left="5" right="10" top="2" bottom="2" />
 			<row h="auto"/>
-			<!-- <text col="4" align="right" label="Rg.">$(Rang2) </text> -->
-			<text col="4" align="right" label="Dos">$(Dossard) </text>
+			<text col="4" align="right" label="Rg.">body:GetCell(rang,row)</text>
+			<text col="4" align="right" label="Dos">$(Dossard)</text>
 			<text col="7" align="center" label="Code"><font size="8" cond="group =='body'"/>$(Code_coureur):sub(4)</text>
 			<lua>
 				if officiel == 0 then
@@ -521,8 +538,9 @@
 			<text col="4" align="center" label="CS." cond="entite == 'FFS'">$(Comite)</text>
 			<text col="12" align="left" label="Club" cond="entite == 'FFS'">$(Club)</text>
 			<text col="6" align="right" label="Points" cond="entite == 'FFS'">$(Point)</text>
-			<text col="9" align="right" label="H. Départ" cond="discipline:In('FS','KO-QLF')">$(Heure_depart1, "%2hh%2m:%2s")</text>
-			<text col="11" align="right" label="H. Dépt. Pours" cond="discipline:In('POURS') and manche>=2">$(Heure_depart2, "%2hh%2m:%2s")</text>
+			<!-- <text col="9" align="right" label="H. Départ" cond="discipline:In('FS','KO-QLF')">$(Heure_depart1, "%2hh%2m:%2s")</text> -->
+			<text col="11" align="right" label="H. Dépt.Pours" cond="officiel==1 " >body:GetCell(Hdpt, row, '%2hh%2m:%2s')</text>
+			<text col="11" align="right" label="('Ecart. '..discipline)" cond="officiel==0 ">$(Diff_heure_depart2, '%-1m%2s.%1f')</text>
 			<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
 		</body>
 	</report>
