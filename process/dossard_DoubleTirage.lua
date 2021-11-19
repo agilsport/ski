@@ -236,7 +236,7 @@ function main(params_c)
 		return false;
 	end
 	params = params_c;
-	params.version = '2.9';
+	params.version = '2.91';
 	params.code_evenement = params.code_evenement or -1;
 	if params.code_evenement < 0 then
 		return;
@@ -248,7 +248,15 @@ function main(params_c)
 	params.origine = params.origine or 'scenario';	
 	base = base or sqlBase.Clone();
 	tResultat = base:GetTable('Resultat');
-	base:TableLoad(tResultat, 'Select * From Resultat Where Code_evenement = '..params.code_evenement);
+	base:TableLoad(tResultat, 'Select * From Resultat Where Code_evenement = '..params.code_evenement..' Order By Dossard');
+	params.bolDossardExiste = false;
+	if tResultat:GetCellInt('Dossard', 0) > 0 then
+		params.bolDossardExiste = true;;
+	end
+	if not params.bolDossardExiste then
+		local cmd = 'Delete From Resultat_Info_Bibo Where Code_evenement = '..params.code_evenement;
+		base:Query(cmd);
+	end
 	tEvenement = base:GetTable('Evenement');
 	base:TableLoad(tEvenement, 'Select * From Evenement Where Code = '..params.code_evenement);
 	params.evenementNom = tEvenement:GetCell('Nom', 0);
@@ -294,7 +302,7 @@ function main(params_c)
 	else
 		tResultat:OrderBy('Dossard DESC');
 		if tResultat:GetCell('Dossard', 0):len() > 0 then
-			local msg = "ATTENION : Les dossards ont déjà été tirés pour cette course !!!\n"..
+			local msg = "ATTENTION : Les dossards ont déjà été tirés pour cette course !!!\n"..
 						"Confirmez-vous le double tirage au sort des dossards?\n"..
 						"Les dossards présents seront alors effacés et remplacés par ceux du nouveau tirage.";
 			local reponse =  app.GetAuiFrame():MessageBox(msg,

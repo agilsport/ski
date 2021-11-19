@@ -395,7 +395,7 @@
 			if rupture ~= 'Nation' then
 				body:SetCounter('Nation');
 			end
-			orderby = rupture..", Nom, Prenom";
+			orderby = rupture..", Sexe, Nom, Prenom";
 			somme_rupture = 0;
 			nb_etrangers = 0;
 			comite = {};
