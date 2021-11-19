@@ -319,6 +319,7 @@ end
 
 function SetDossard(course)
 	if course == 1 then
+		tCoureur = {};
 		base:TableLoad(tResultat, 'Select * From Resultat Where Code_evenement = '..params.course1..' And Dossard > 0');
 		if tResultat:GetNbRows() > 0 then
 			local msg = "Les dossards ont déjà été tirés.\nVoulez-vous les remplacer ?";
@@ -337,24 +338,31 @@ function SetDossard(course)
 		cmd = 'Delete From Resultat_Manche Where Code_evenement IN('..params.course1..','..params.course2..')';
 		base:Query(cmd);
 		base:TableLoad(tResultat, 'Select * From Resultat Where Code_evenement = '..params.course1);
-		params.nb_groupe1 = math.ceil(tResultat:GetNbRows()) / 2;
+		params.nb_groupe1 = math.ceil(tResultat:GetNbRows() / 2);
 		-- manche 1 de la course 1 : toujours un tirage à la mêlée.
 		tResultat:OrderRandom();
 		for i = 0, tResultat:GetNbRows() -1 do
+			local code_coureur = tResultat:GetCell('Code_coureur', i);
+			local reserve = nil;
 			tResultat:SetCell('Dossard', i, i+1);
 			tResultat:SetCell('Rang', i, i+1);
 			if string.find(option1, '5%.') then		-- 4 manches 
-				if i <= params.nb_groupe1 then
+				if i < params.nb_groupe1 then
 					reserve = 1;
-					tResultat:SetCell('Reserve', i, 1);
+					tResultat:SetCell('Reserve', i, reserve);
 				else
-					tResultat:SetCell('Reserve', i, 2);
+					reserve = 2;
+					tResultat:SetCell('Reserve', i, reserve);
 				end
 			else
 				tResultat:SetCellNull('Reserve', i);
 			end
+			tCoureur[code_coureur] = {};
+			tCoureur[code_coureur].Dossard = i+1;
 		end
 		base:TableBulkUpdate(tResultat);
+		tResultat1 = tResultat:Copy();
+		tResultat1:OrderBy('Dossard');
 	else
 		base:TableLoad(tResultat_Manche, 'Select * From Resultat_Manche Where Code_evenement = '..params.course2..' And Code_manche = 1');
 		base:TableLoad(tResultat, 'Select * From Resultat Where Code_evenement = '..params.course2);
@@ -366,16 +374,20 @@ function SetDossard(course)
 		for i = 0, tResultat2:GetNbRows() -1 do
 			rang = rang + 1;
 			local code_coureur = tResultat2:GetCell('Code_coureur', i);
-			local dossard = GetDossard(tResultat, code_coureur);
-			if dossard > 0 then
-				tResultat2:SetCell('Dossard', i, dossard);
+			local dossard = nil;
+			if tCoureur[code_coureur] then
+				dossard = tCoureur[code_coureur].Dossard;
 			end
+			tResultat2:SetCell('Rang', i, rang);
+			tResultat2:SetCell('Dossard', i, dossard);
+			tResultat2:SetCell('Rang', i, rang);
 			if string.find(option1, '5%.') then		-- 4 manches 
-				tResultat2:SetCell('Rang', i, rang);
-				if i <= params.nb_groupe1 then
-					tResultat2:SetCell('Reserve', i, 1);
+				if i < params.nb_groupe1 then
+					reserve = 1;
+					tResultat2:SetCell('Reserve', i, reserve);
 				else
-					tResultat2:SetCell('Reserve', i, 2);
+					reserve = 2;
+					tResultat2:SetCell('Reserve', i, reserve);
 				end
 			else
 				tResultat2:SetCellNull('Reserve', i);
@@ -662,7 +674,7 @@ function main(params_c)
 	params.height = display:GetSize().height / 2;
 	params.x = (display:GetSize().width - params.width) / 2;
 	params.y = 200;
-	params.version = "1.4";
+	params.version = "1.5";
 	base = base or sqlBase.Clone();
 	tEvenement = base:GetTable('Evenement');
 	base:TableLoad(tEvenement, 'Select * From Evenement Where Code = '..params.code_evenement);
