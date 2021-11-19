@@ -12,23 +12,24 @@
 	<menu>
 		<menu title="Listes des Participants " image="./res/32x32_juges.png">
 			<menu title="Par Ordre Alphabétique" image="./res/16x16_juges.png" id="part_officiel" />
-			<menu title="Par Ordre de Points" image="./res/16x16_juges.png" id="part_officiel_points" />
 			<menu title="Par Nation / Alphabétique" image="./res/16x16_juges.png" page_break="1" orderby="Nation" id="participants" />
 			<menu title="Par Comité / Alphabétique" image="./res/16x16_juges.png" page_break="1" orderby="Comite" id="participants" />
 			<menu title="Par Club / Alphabétique" image="./res/16x16_juges.png" page_break="1" orderby="Club" id="participants" />
+			<menu title="Par Ordre de Points" image="./res/16x16_juges.png" id="part_officiel_points" />
 			<menu title="Par Epreuve / Alphabétique" image="./res/16x16_juges.png" id="part_epreuve" />
+			<menu title="édition des tickets courses " image="./res/16x16_text.png" lua="./edition/TicketsCourse.lua"  />
 		</menu>
 		
 		<menu title="Listes de Départ" image="./res/32x32_bib.png">
-			<menu title="Liste de départ" image="./res/16x16_official.png" header="1" first_header="0" id="lst_officielle" officiel="0"/>
-			<menu title="Liste de départ Officielle" image="./res/16x16_official.png" id="lst_officielle" Qrcode="0" officiel="1"/>
-			<menu title="Liste de départ avec Qrcode Live" image="./res/16x16_official.png" id="lst_officielle" Qrcode="1" officiel="1"/>
-			<menu title="Liste de départ Officielle poursuite" image="./res/16x16_official.png" id="lst_officielle_pours" choix_manche="1" cond="discipline:In('POURS')" officiel="1"/>
-			<menu title="Liste de départ poursuite (avec ecart)" image="./res/16x16_official.png" id="lst_officielle_pours" choix_manche="1" cond="discipline:In('POURS')" officiel="0"/>
-			<menu title="Liste de départ Par Nation" image="./res/16x16_bib.png" page_break="1" orderby="Nation" id="lst_officielle_Filtrer"/>
-			<menu title="Liste de départ Par Comite" image="./res/16x16_bib.png" page_break="1" orderby="Comite" id="lst_officielle_Filtrer"/>
-			<menu title="Liste de départ Par Club" image="./res/16x16_bib.png" page_break="1" orderby="Club" id="lst_officielle_Filtrer"/>
-			<menu title="Liste de départ Par Epreuve (speaker)" image="./res/16x16_bib.png" id="lst_officielle_epreuve" officiel="0"/>
+			<menu title="Sans entête" image="./res/16x16_official.png" header="1" first_header="0" id="lst_officielle" officiel="0"/>
+			<menu title="Officielle" image="./res/16x16_official.png" id="lst_officielle" Qrcode="0" officiel="1"/>
+			<menu title="Par Nation" image="./res/16x16_bib.png" page_break="1" orderby="Nation" id="lst_officielle_Filtrer"/>
+			<menu title="Par Comite" image="./res/16x16_bib.png" page_break="1" orderby="Comite" id="lst_officielle_Filtrer"/>
+			<menu title="Par Club" image="./res/16x16_bib.png" page_break="1" orderby="Club" id="lst_officielle_Filtrer"/>
+			<menu title="Officielle poursuite" image="./res/16x16_official.png" id="lst_officielle_pours" choix_manche="1" cond="discipline:In('POURS')" officiel="1"/>
+			<menu title="Poursuite (avec ecart)" image="./res/16x16_official.png" id="lst_officielle_pours" choix_manche="1" cond="discipline:In('POURS')" officiel="0"/>
+			<menu title="Avec Qrcode Live" image="./res/16x16_official.png" id="lst_officielle" Qrcode="1" officiel="1"/>
+			<menu title="Par Epreuve (speaker)" image="./res/16x16_bib.png" id="lst_officielle_epreuve" officiel="0"/>
 			<menu title="Edition des couloirs" image="./res/16x16_text.png" filter="before" lua="./edition/couloir.lua" cond="discipline:In('POURS')" />
 		</menu>
 		
@@ -39,7 +40,7 @@
 			<menu title="Résultats Officiels poursuite 2éme Jour" image="./res/16x16_official.png" id="res_off_Pours" officiel="1" />
 			<menu title="Résultats par épreuve / catégories et sexe" image="./res/16x16_ranking.png" id="res_categ" header="1" first_header="0" choix_clt_max="1"/>
 			<menu title="Multi épreuve(poursuite)" image="./res/16x16_juges.png"  id="res_epr2"/>
-			<menu title="édition des tickets courses " filter="before" image="./res/16x16_text.png" lua="./edition/TicketsCourse.lua"  />
+			
 		</menu>
 	</menu>
 

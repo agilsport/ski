@@ -19,12 +19,8 @@
 			<lua>type_edition = id:sub(1,4)</lua>
 			<spacing all="0"/>
 			<background mode="transparent"/>
-			<font name="Calibri" size="14" adjust="max" weight="bold"/>
+			<font name="Calibri" size="16" adjust="max" weight="bold"/>
 			<text row="auto" col="1" font_size_step="18" align="center">$(Evenement.Nom)</text>
-			<text row="auto" align="center" cond="title" >$(Evenement.Codex)</text>
-			<text row="auto" align="center" cond="title" >'Le '..$(Epreuve.Date_epreuve,'%2D/%2M/%4Y')..' / '..$(Evenement.Station)</text>
-			<text row="auto" align="center" cond="title" >$(Evenement.Club)..' / '..$(Evenement.Organisateur)</text>
-			<text row="auto" align="center" cond="title" >os.date(' Edité le %d-%m-%Y à %H:%M:%S')</text>
 			<text row="auto" align="center">$(Discipline.Libelle)</text>
 			<text row="auto" align="center" cond="params.code_epreuve ~= -1">$(Categorie{$(Epreuve.Code_categorie)}.Libelle)..' - '..$(Sexe{$(Epreuve.Sexe)}.Libelle)</text>
 			<text row="auto" align="center" cond="title" >title</text>

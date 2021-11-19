@@ -7,15 +7,17 @@ function alert(txt)
 end
 
 function main(params)
-	
 	body = base:GetTable('body');
 	tEvenement = base:GetTable('Evenement');
 	cmd = 'select * from Evenement Where Code = '..params.code_evenement
 	base:TableLoad(tEvenement, cmd)
 	Codex = tEvenement:GetCell('Codex', 0);
 	if Codex == '' then
-	  Codex = params.code_evenement
+		NameFichier = params.code_evenement
+	else
+		NameFichier = Codex..'-'..params.code_evenement
 	end
+	
 	-- alert("codex = "..Codex);
 	-- Filtrage Ticket ...
 	for i=body:GetNbRows()-1, 0, -1 do
@@ -29,8 +31,8 @@ function main(params)
 	if app.DirExists('./tmp/Ticket_Course') == false then
 		app.Mkdir('./tmp/Ticket_Course'); -- Creation du répertoire
 	end
-	Date = os.date("%d_%m_%y");
-	filename = './tmp/Ticket_Course/Ticket_'..Codex..'_'..Date..'.txt';
+	Date = os.date("%d-%m-%y");
+	filename = './tmp/Ticket_Course/Ticket_'..NameFichier..'_'..Date..'.txt';
 	fileTicket = io.open(filename, "w+");
 
 	tResultatAdresse = base:GetTable('Resultat_Adresse');
@@ -53,11 +55,11 @@ function main(params)
 	fileTicket:write(separator);
 	fileTicket:write('Status');
 	fileTicket:write(separator);
+	fileTicket:write('Adresse');
+	fileTicket:write(separator);
 	fileTicket:write('CP');
 	fileTicket:write(separator);
 	fileTicket:write('Ville');
-	fileTicket:write(separator);
-	fileTicket:write('Adresse');
 	fileTicket:write(separator);
 	fileTicket:write('Distance');
 	fileTicket:write(separator);
@@ -85,13 +87,14 @@ function main(params)
 		fileTicket:write(separator);
 		fileTicket:write(body:GetCell('Nation', i));
 		fileTicket:write(separator);
-		fileTicket:write(chrono.Status(body:GetCellInt('Tps', i)));
+		fileTicket:write(ranking.Code(chrono.Status(body:GetCellInt('Tps', i))));
+		--fileTicket:write(chrono.Status(body:GetCellInt('Tps', i)));
+		fileTicket:write(separator);
+		fileTicket:write(tResultatAdresse:GetCell('Adresse1', 0));
 		fileTicket:write(separator);
 		fileTicket:write(tResultatAdresse:GetCell('Code_postal', 0));
 		fileTicket:write(separator);
 		fileTicket:write(tResultatAdresse:GetCell('Ville', 0));
-		fileTicket:write(separator);
-		fileTicket:write(tResultatAdresse:GetCell('Adresse1', 0));
 		fileTicket:write(separator);
 		fileTicket:write(body:GetCell('Distance', i));
 		fileTicket:write(separator);
