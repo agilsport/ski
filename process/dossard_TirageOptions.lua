@@ -257,6 +257,8 @@ function OnTirageManche2Special()
 			end
 		end
 	end
+	cmd = 'Update Resultat_Manche Set Reserve = Null  Where Code_evenement = '..params.code_evenement..' And Code_manche = 1';
+	base:Query(cmd);
 end
 function OnTirageParTiers();
 	-- Ordre des groupes = manche 1 : 1, 2, 3,  manche 2 : 2, 3, 1,  manche 3 : 3, 1, 2
@@ -680,7 +682,7 @@ function main(params_c)
 	params.height = display:GetSize().height / 2;
 	params.x = (display:GetSize().width - params.width) / 2;
 	params.y = 200;
-	params.version = "1.6";
+	params.version = "1.7";
 	base = base or sqlBase.Clone();
 	tEvenement = base:GetTable('Evenement');
 	base:TableLoad(tEvenement, 'Select * From Evenement Where Code = '..params.code_evenement);
