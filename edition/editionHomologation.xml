@@ -306,7 +306,7 @@
 				<text row_start="2" col_start="1" col_end="2" align="Left" >'Commentaire éventuels:'</text>
 				<text row_start="3" col_start="1" col_end="0" style="TE_LEFT|TE_MULTILINE" border="all" >commentaire</text>
 				<text row_start="4" col_start="1" align="Left" >'Cet événement à-t\'il fait l\'objet d\'une déclaration d\'accident: '..Declarationaccident</text>
-				<text row_start="5" col_start="1" align="Left" >'Si oui elle doit être impérativement jointe à l\'envoie de ce bordereau'</text>
+				<text row_start="5" col_start="1" align="Left" >'Si oui elle doit être impérativement jointe à l\'envoi de ce bordereau'</text>
 				<text row_start="6" row_end="8" col_start="3" align="Left" border="all" >'Signature DT:\n'..GetIdentiteOfficiels('TechnicalDelegate')..' - '..dt_code</text>
 								
 			</matrix>
@@ -574,7 +574,7 @@
 				<text row_start="2" col_start="1" col_end="2" align="Left" >'Commentaire éventuels:'</text>
 				<text row_start="3" col_start="1" col_end="0" style="TE_LEFT|TE_MULTILINE" border="all" >commentaire</text>
 				<text row_start="4" col_start="1" align="Left" >'Cet événement à-t\'il fait l\'objet d\'une déclaration d\'accident: '..Declarationaccident</text>
-				<text row_start="5" col_start="1" align="Left" >'Si oui elle doit être impérativement jointe à l\'envoie de ce bordereau'</text>
+				<text row_start="5" col_start="1" align="Left" >'Si oui elle doit être impérativement jointe à l\'envoi de ce bordereau'</text>
 				<text row_start="6" row_end="8" col_start="3" align="Left" border="all" >'Signature DT:\n'..GetIdentiteOfficiels('TechnicalDelegate')..' - '..dt_code</text>
 				
 			</matrix>
