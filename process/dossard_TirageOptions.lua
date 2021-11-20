@@ -161,6 +161,16 @@ function OnTirageManche1()
 	
 end
 function OnTirageManche2Special()
+	-- on supprime les records qui pourraient traîner chez ceux qui ont testé les premières versions du script
+	cmd = 'Delete From Resultat_Manche Where Code_evenement = '..params.code_evenement..' And Code_manche = 2 And Tps_chrono = -600';
+	base:Query(cmd);
+	base:TableLoad(tResultat, 'Select * From Resultat Where Code_evenement = '..params.code_evenement);
+	tCoureur = {};
+	for i = 0, tResultat:GetNbRows() -1 do
+		local code_coureur = tResultat:GetCell('Code_coureur', i);
+		tCoureur[code_coureur] = {};
+		tCoureur[code_coureur].Dossard = tResultat:GetCellInt('Dossard', i);
+	end
 	base:TableLoad(tResultat_Manche, 'Select * From Resultat_Manche Where Code_evenement = '..params.code_evenement..' And Code_manche = 2');
 	tResultat_Manche:OrderBy('Rang DESC');
 	local rangx = tResultat_Manche:GetCellInt('Rang', 0);
@@ -178,28 +188,33 @@ function OnTirageManche2Special()
 	params.bibo = params.bibo or 30;
 	base:TableLoad(tResultat_Manche, 'Select * From Resultat_Manche Where Code_evenement = '..params.code_evenement..' And Code_manche = 1');
 	tResultat_Manche:SetRanking('Clt_chrono', 'Tps_chrono', '');
-	tResultat_Manche:OrderBy('Tps_chrono');
-	tResultat_Manche1 = tResultat_Manche:Copy();
-	tResultat_Manche1:AddColumn({ name = 'Dossard', type = sqlType.LONG, style = sqlStyle.NULL });
-	for i = 0, tResultat_Manche1:GetNbRows() -1 do
-		local code_coureur = tResultat_Manche1:GetCell('Code_coureur', i);
-		local dossard = GetDossard(tResultat, code_coureur);
-		local clt = tResultat_Manche1:GetCellInt('Clt_chrono', i);
-		local tps = tResultat_Manche1:GetCellInt('Tps_chrono', i);
-		local tps_dsq = tResultat_Manche1:GetCellInt('Reserve', i);
-		local reserve = 4;
-		if tps > 0 then
+	tResultat_Manche:OrderBy('Clt_chrono');
+	for i = 0, tResultat_Manche:GetNbRows() -1 do
+		local clt = tResultat_Manche:GetCellInt('Clt_chrono', i);
+		local tps = tResultat_Manche:GetCellInt('Tps_chrono', i);
+		local reserve = nil;
+		if clt > 0 then
 			if clt <= params.bibo then
 				reserve = 1;
 			else
 				reserve = 2;
 			end
-		elseif tps == -500 then
-			reserve = 3;
-		elseif tps_dsq > 100 then
-			reserve = 3;
+		else
+			if tps == -500 or tps == -800 then
+				reserve = 3;
+			else
+				reserve = 4;
+			end
 		end
-		tResultat_Manche1:SetCell('Reserve', i, reserve);
+		tResultat_Manche:SetCell('Reserve', i, reserve);
+	end
+	base:TableBulkUpdate(tResultat_Manche);
+	tResultat_Manche1 = tResultat_Manche:Copy();
+	tResultat_Manche1:AddColumn({ name = 'Dossard', type = sqlType.LONG, style = sqlStyle.NULL });
+	ReplaceTableEnvironnement(tResultat_Manche1, '_Resultat_Manche1')
+	for i = 0, tResultat_Manche1:GetNbRows() -1 do
+		local code_coureur = tResultat_Manche1:GetCell('Code_coureur', i);
+		local dossard = tCoureur[code_coureur].Dossard;
 		tResultat_Manche1:SetCell('Dossard', i, dossard);
 	end
 
@@ -242,7 +257,6 @@ function OnTirageManche2Special()
 			end
 		end
 	end
-	tResultat_Manche:Snapshot('tResultat_Manche.db3');
 end
 function OnTirageParTiers();
 	-- Ordre des groupes = manche 1 : 1, 2, 3,  manche 2 : 2, 3, 1,  manche 3 : 3, 1, 2
@@ -332,10 +346,11 @@ function SetDossard(course)
 			params.bibo, params.dossard = GetBibo(0);
 		end
 		params.bibo = params.bibo or 30;
-		local cmd = 'Update Resultat Set Dossard = Null Where Code_evenement IN('..params.course1..','..params.course2..')';
+		local cmd = 'Update Resultat Set Dossard = Null, Rang = null Where Code_evenement IN('..params.course1..','..params.course2..')';
 		base:Query(cmd);
-		-- cmd = 'Update Resultat_Manche Set Rang = Null Where Code_evenement IN('..params.course1..','..params.course2..')';
-		cmd = 'Delete From Resultat_Manche Where Code_evenement IN('..params.course1..','..params.course2..')';
+		cmd = 'Delete From Resultat_Manche Where Code_coureur = Null Or Dossard = Null Code_evenement IN('..params.course1..','..params.course2..')';
+		base:Query(cmd);
+		cmd = 'Update Resultat_Manche Set Rang = Null Where Code_evenement IN('..params.course1..','..params.course2..')';
 		base:Query(cmd);
 		base:TableLoad(tResultat, 'Select * From Resultat Where Code_evenement = '..params.course1);
 		params.nb_groupe1 = math.ceil(tResultat:GetNbRows() / 2);
@@ -396,15 +411,6 @@ function SetDossard(course)
 		base:TableBulkUpdate(tResultat2, 'Rang, Dossard, Reserve', 'Resultat');
 	end
 	return true;
-end
-
-function GetDossard(tablex, code_coureur);
-	local dossard = -1;
-	local r = tablex:GetIndexRow('Code_coureur', code_coureur);
-	if r and r >= 0 then
-		dossard = tablex:GetCellInt('Dossard', r)
-	end
-	return dossard;
 end
 
 function OnTirageNationales(course, code_evenement)
@@ -674,7 +680,7 @@ function main(params_c)
 	params.height = display:GetSize().height / 2;
 	params.x = (display:GetSize().width - params.width) / 2;
 	params.y = 200;
-	params.version = "1.5";
+	params.version = "1.6";
 	base = base or sqlBase.Clone();
 	tEvenement = base:GetTable('Evenement');
 	base:TableLoad(tEvenement, 'Select * From Evenement Where Code = '..params.code_evenement);
