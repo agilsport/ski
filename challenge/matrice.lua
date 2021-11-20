@@ -2979,18 +2979,11 @@ function TransformeCombien(discipline, bloc, combien)
 	elseif string.find(combien, '%%') then				-- on a un pourcentage 75% -> 75/100
 		combien = string.gsub(combien, "%D", "");
 		combien = tonumber(combien) or 0;
+		if string.find(matrice['comboPrendreBloc'..bloc], 'à') then
+			combien = combien * 2;
+		end
 		retour = math.ceil(Round(nb_disciplines * combien / 100, 0));
 		if retour < 1 then retour = 1; end
-	-- elseif string.find(combien, 'sur') then				-- on a 5 sur 9
-		-- local arcombien = combien:Split('sur');
-		-- for i = 1, #arcombien do
-			-- arcombien[i] = arcombien[i]:Trim();
-		-- end
-		-- if #arcombien < 2 then
-			-- retour = 0;
-		-- else
-			-- retour = tonumber(arcombien[1]) or 0;
-		-- end
 	else
 		retour = tonumber(combien) or 0;
 	end
@@ -7396,20 +7389,23 @@ function SetEnableControldlgConfiguration();
 		dlgConfiguration:GetWindowName('coefDefautMancheBloc2'):Enable(Eval(matrice.comboTypePoint, 'Points place'));
 		dlgConfiguration:GetWindowName('comboPrendreBloc2'):Enable(Eval(matrice.comboTypePoint, 'Points place'));
 		dlgConfiguration:GetWindowName('coefPourcentageMaxiBloc2'):Enable(Eval(matrice.comboTypePoint, 'Points place'));
-	end
-	if Eval(matrice.comboTypePoint, 'Points place') then
-		if string.find(matrice.comboPrendreBloc1, '1')then
-			dlgConfiguration:GetWindowName('coefDefautMancheBloc1'):Enable(false);
-		elseif string.find(matrice.comboPrendreBloc1, 'à') then
-			dlgConfiguration:GetWindowName('coefDefautCourseBloc1'):Enable(false);
+		if string.find(matrice.comboTypePoint, 'place') then
+			if string.find(matrice.comboPrendreBloc2, '1') then
+				dlgConfiguration:GetWindowName('coefDefautMancheBloc2'):Enable(false);
+			elseif string.find(matrice.comboPrendreBloc2, 'à') then
+				dlgConfiguration:GetWindowName('coefDefautCourseBloc2'):Enable(false);
+			end
 		end
-		if matrice.bloc2 == true then
-			if string.find(matrice.comboTypePoint, 'place') then
-				if string.find(matrice.comboPrendreBloc2, '1') then
-					dlgConfiguration:GetWindowName('coefDefautMancheBloc2'):Enable(false);
-				elseif string.find(matrice.comboPrendreBloc2, 'à') then
-					dlgConfiguration:GetWindowName('coefDefautCourseBloc2'):Enable(false);
-				end
+	else
+		dlgConfiguration:GetWindowName('coefDefautCourseBloc2'):Enable(false);
+		dlgConfiguration:GetWindowName('coefDefautMancheBloc2'):Enable(false);
+		dlgConfiguration:GetWindowName('comboPrendreBloc2'):Enable(false);
+		dlgConfiguration:GetWindowName('coefPourcentageMaxiBloc2'):Enable(false);
+		if Eval(matrice.comboTypePoint, 'Points place') then
+			if string.find(matrice.comboPrendreBloc1, '1')then
+				dlgConfiguration:GetWindowName('coefDefautMancheBloc1'):Enable(false);
+			elseif string.find(matrice.comboPrendreBloc1, 'à') then
+				dlgConfiguration:GetWindowName('coefDefautCourseBloc1'):Enable(false);
 			end
 		end
 	end
@@ -7518,7 +7514,7 @@ function OnConfiguration(cparams)
 	else
 		return false;
 	end
-	matrice.version_script = '4.4';
+	matrice.version_script = '4.41';
 	matrice.OS = app.GetOsDescription();
 	-- vérification de l'existence d'une version plus récente du script.
 	local url = 'https://live.ffs.fr/maj_pg/challenge/last_version.txt'
