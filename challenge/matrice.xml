@@ -564,6 +564,7 @@
 		<padding all="2px"/>
 		<col value="1, 1, 1"/>
 		<row value="50px"/>
+		<wnd name="statictext" style="ALIGN_RIGHT" />
 		<matrix col_start="2" row="auto">
 			<col value="1,4,1" />
 			<statictext row="auto" col_start="1" style="ALIGN_CENTER" label="Code coureur"/>
@@ -643,8 +644,10 @@
 	<panel name="coursesupport">
 		<col value="1,1"/>
 		<pen border="0"/>
-		<padding all="3px"/>
+		<padding all="5px"/>
+		<spacing all="5"/>
 		<row value="20px"/>
+		<wnd name="statictext" style="ALIGN_RIGHT" />
 		<matrix row="auto" row_start="2" col_start="1" col_end="1">
 			<row value="15px"/>
 			<col value="1,2"/>
@@ -701,8 +704,8 @@
 		<statictext row="30px" col_start="2" style="ALIGN_LEFT" label="Choisissez une course ou laissez à blanc."/>
 		<matrix row="auto" col_start="2">
 			<col value="1,5"/>
-			<statictext row="auto" col_start="1" style="ALIGN_CENTER" label="N° de la course"/>
-			<statictext col_start="2" style="ALIGN_CENTER" label="Titre"/>
+			<statictext row="auto" col_start="1" style="ALIGN_RIGHT" label="N° de la course"/>
+			<statictext col_start="2" style="ALIGN_RIGHT" label="Titre"/>
 			<textctrl row="auto" col_start="1" name="copycoursecode"/>
 			<textctrl col_start="2" name="copycoursetitre" style="TE_MULTILINE, TE_READONLY"/>
 		</matrix>
@@ -960,9 +963,9 @@
 			<lua>if liste1:len() &gt; 0 then txt1 = txt1..'Points et Classement sur la liste '..liste1..' en '..liste1Classement..' avec primauté '..comboListePrimaute; end</lua>
 			<lua>if liste2:len() &gt; 0 then txt1 = txt1..' | Points  et Classement sur la liste '..liste2..' en '..liste2Classement..' avec primauté '..comboListePrimaute; end</lua>
 
-			<text row="auto" cond="tEvenement:GetCell('Commentaire', 0):len() &gt; 0 and txt1:len() == 0">$(tEvenement.Commentaire)</text>
+			<text row="auto" cond="tEvenement:GetCell('Commentaire', 0):len() &gt; 0 and txt1:len() == 0">tEvenement:GetCell('Commentaire', 0)</text>
 			<text row="auto" cond="txt1:len() &gt; 0">
-				<font adjust="both" weight="normal"/>$(Evenement.Commentaire)..' - N.B. '..txt1</text>
+				<font adjust="both" weight="normal"/>tEvenement:GetCell('Commentaire', 0)..' - N.B. '..txt1</text>
 			<text row="auto" cond="params.CoefMaxiBlocs:len() &gt; 65">params.CoefMaxiBlocs</text>
 		</footer>
 		<label>
@@ -1268,7 +1271,7 @@
 								<font color="(rgbx)" size_step="1" cond="string.find(params.Presentation,'transparent') and string.find(selection, 'Pts'..idxcourse..'_run'..run)"/>
 								<font color="red" size_step="1" cond="not string.find(params.Presentation,'transparent') and string.find(selection, 'Pts'..idxcourse..'_run'..run)"/>
 								EvaluatePts(row, idxcourse, 'Pts'..idxcourse..'_run'..run, params.AbdDsq)</text>
-							<text col="(largeur_etroite)" align="center" cond="prnColonne.Diffrun[idxcourse].Imprimer == 1"><font adjust="both"/>'g'..EvaluateDiff(body:GetCellInt('Tps'..idxcourse..'_run'..run..'_diff', row))</text>
+							<text col="(largeur_etroite)" align="center" cond="prnColonne.Diffrun[idxcourse].Imprimer == 1"><font adjust="both"/>EvaluateDiff(body:GetCellInt('Tps'..idxcourse..'_run'..run..'_diff', row))</text>
 							<text col="(largeur_etroite)" align="center" cond="prnColonne.Cltrun[idxcourse].Imprimer == 1">
 								<font color="(rgbx)" cond="string.find(params.Presentation,'transparent')"/>
 								EvaluateClt(body:GetCellInt('Clt'..idxcourse..'_run'..run, row, -1))</text>

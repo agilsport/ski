@@ -939,7 +939,6 @@ function SetPtsTotalMatrice(idxcoureur, courseData);	-- calcul des points totaux
 				if tMatrice_Ranking:GetCell('Code_coureur', idxcoureur) == code_coureur_pour_debug then
 					adv.Alert('--------------------------------------------');
 					adv.Alert('passage 1');
-					adv.Alert('if string.find(courseData['..idxcourseData..'].Discipline, '..matrice.table_critere[idxcritere].Discipline..') then')	-- la course est dans la discipline du critère
 				end
 				if string.find(courseData[idxcourseData].Discipline, matrice.table_critere[idxcritere].Discipline) then	-- la course est dans la discipline du critère
 					if tMatrice_Ranking:GetCell('Code_coureur', idxcoureur) == code_coureur_pour_debug then
@@ -980,7 +979,6 @@ function SetPtsTotalMatrice(idxcoureur, courseData);	-- calcul des points totaux
 								end
 								tMatrice_Ranking:SetCell('Selection'..idxcourse, idxcoureur, selection);
 								if nb_courses_prises == matrice.table_critere[idxcritere].NbCombien then
-									bolcritere = true;
 									if string.find(matrice.table_critere[idxcritere].Prendre, 'maximum') or string.find(matrice.table_critere[idxcritere].Prendre, 'exactement') then
 										if tMatrice_Ranking:GetCell('Code_coureur', idxcoureur) == code_coureur_pour_debug then
 											adv.Alert('le critère '..idxcritere..' est rempli, on fait break !!');
@@ -989,9 +987,10 @@ function SetPtsTotalMatrice(idxcoureur, courseData);	-- calcul des points totaux
 									end
 								end
 							end
+						else
+							ptsMatrice = ptsMatrice + matrice.defaut_point;
 						end
 					end
-				else
 				end
 			end
 			if string.find(matrice.table_critere[idxcritere].Prendre, 'minimum') and nb_courses_prises < nbcombienx then
@@ -1003,7 +1002,7 @@ function SetPtsTotalMatrice(idxcoureur, courseData);	-- calcul des points totaux
 				end
 			end
 			if string.find(matrice.table_critere[idxcritere].Prendre, 'maximum') then
-				bolcritere = bolcritere or true
+				bolcritere = bolcritere or true;
 			end
 			if bolcritere == false then
 				tbolCritere[#tbolCritere] = false;
@@ -1190,31 +1189,6 @@ function SetPtsTotalMatrice(idxcoureur, courseData);	-- calcul des points totaux
 			adv.Alert('en fin de fonction SetPtsTotalMatrice, ptsBloc1 = '..ptsBloc1..', ptsMatrice = '..ptsMatrice);
 		end
 		return ptsBloc1, ptsMatrice;
-
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
 	else  	-- critère de type 2 = courses du bloc 1 et 2
 			-- critère de type 3 = courses du bloc 1 et 2 + manches du bloc 1 et 2
 			-- critère de type 4 = courses du bloc 1 et 2 + manches de n'importe que bloc
@@ -2001,7 +1975,7 @@ function Calculer(panel_name)		-- fonction de calcul du résultat du Challenge/Co
 			raceData.Tps = tMatrice_Ranking:GetCellInt('Tps'..idxcourse, idxcoureur, -600); -- absent par défaut
 			if raceData.Tps == -1 then raceData.Tps = -600; end
 			raceData.Clt = tMatrice_Ranking:GetCellInt('Clt'..idxcourse, idxcoureur, -1);	-- = -1 par defaut
-			raceData.Pts = -1;
+			raceData.Pts = matrice.defaut_point;
 			raceData.Bestrun = -1;
 			raceData.Bestclt = -1;
 			raceData.Bestpts = -1;
@@ -2110,8 +2084,6 @@ function Calculer(panel_name)		-- fonction de calcul du résultat du Challenge/Co
 						tMatrice_Ranking:SetCell('Pts'..idxcourse, idxcoureur, raceData.Pts);
 						tMatrice_Ranking:SetCell('Pts'..idxcourse..'_total', idxcoureur, raceData.Pts);
 					end
-				else
-					raceData.Pts = matrice.defaut_point;
 				end
 			else	-- on est dans un combi saut
 				if raceData.Tps > 0 then	-- on peut calculer les points
@@ -2188,6 +2160,7 @@ function Calculer(panel_name)		-- fonction de calcul du résultat du Challenge/Co
 							tMatrice_Ranking:SetCell('Pts'..idxcourse..'_best', idxcoureur, raceData.Bestpts);
 							-- tMatrice_Ranking:SetCell('Txt_tps'..idxcourse..'_run'..idxrun, idxcoureur, tMatrice_Ranking:GetCell('Tps'..idxcourse..'_run'..idxrun, idxcoureur));
 						elseif runData[idxrun].Tps == -500 or runData[idxrun].Tps == -800 or runData[idxrun].Tps == -600 then
+							runData[idxrun].Pts = matrice.defaut_point;
 							if matrice.comboTpsDuDernier == 'Oui' then
 								runData[idxrun].Clt = last_clt + 1;
 								tMatrice_Ranking:SetCell('Clt'..idxcourse..'_run'..idxrun, idxcoureur, runData[idxrun].Clt);
@@ -2916,6 +2889,14 @@ function LitMatrice()	-- lecture des variables et affectation des valeurs dans l
 end
 
 function GetCritere()	-- lecture de toutes les variables des critères de calculs s'ils existent
+	if not matrice.Evenement_selection or matrice.Evenement_selection:len() == 0 then
+		dlgConfiguration:MessageBox(
+			"Vous devez ajouter au moins une course pour définir un critère.",
+			"Merci de saisir une course", 
+			msgBoxStyle.OK + msgBoxStyle.ICON_WARNING
+			) ;
+		return
+	end
 	if matrice.numTypeCritere == 1 then
 		matrice.criteres_bloc1 = 'Prendre ';
 		matrice.criteres_bloc2 = 'Prendre ';
@@ -2946,14 +2927,12 @@ function GetCritere()	-- lecture de toutes les variables des critères de calculs
 		if matrice.table_critere[i].Discipline ~= '*' then
 			if matrice.table_critere[i].NbCombien > matrice.table_critere[i].Sur then
 				matrice['criteres_bloc'..bloc] = matrice['criteres_bloc'..bloc]..virgule_bloc[bloc]..matrice.table_critere[i].Prendre..' '..matrice.table_critere[i].NbCombien..' '..matrice.table_critere[i].Discipline;
-				adv.Alert("1 - matrice['criteres_bloc'..bloc] = "..matrice['criteres_bloc'..bloc]);
 			else
 				local sur = matrice.table_critere[i].Sur;
 				if string.find(matrice.comboPrendreBloc1, '2.') then
 					sur = sur * 2;
 				end
 				matrice['criteres_bloc'..bloc] = matrice['criteres_bloc'..bloc]..virgule_bloc[bloc]..matrice.table_critere[i].Prendre..' '..matrice.table_critere[i].NbCombien..' '..matrice.table_critere[i].Discipline.. ' sur '..sur;
-				adv.Alert("1 - matrice['criteres_bloc'..bloc] = "..matrice['criteres_bloc'..bloc]);
 			end
 		else
 			local sur = matrice.table_critere[i].Sur;
@@ -2963,7 +2942,6 @@ function GetCritere()	-- lecture de toutes les variables des critères de calculs
 				quoi = ' manche(s) ';
 			end
 			matrice['criteres_bloc'..bloc] = matrice['criteres_bloc'..bloc]..virgule_bloc[bloc]..matrice.table_critere[i].Prendre..' '..matrice.table_critere[i].NbCombien..quoi..' sur '..sur..virgule_bloc[bloc];
-			adv.Alert("\n2 - matrice['criteres_bloc'..bloc] = "..matrice['criteres_bloc'..bloc]);
 		end
 	end
 	for i = 0, tMatrice_Courses:GetNbRows() -1 do
@@ -3001,18 +2979,11 @@ function TransformeCombien(discipline, bloc, combien)
 	elseif string.find(combien, '%%') then				-- on a un pourcentage 75% -> 75/100
 		combien = string.gsub(combien, "%D", "");
 		combien = tonumber(combien) or 0;
+		if string.find(matrice['comboPrendreBloc'..bloc], 'à') then
+			combien = combien * 2;
+		end
 		retour = math.ceil(Round(nb_disciplines * combien / 100, 0));
 		if retour < 1 then retour = 1; end
-	-- elseif string.find(combien, 'sur') then				-- on a 5 sur 9
-		-- local arcombien = combien:Split('sur');
-		-- for i = 1, #arcombien do
-			-- arcombien[i] = arcombien[i]:Trim();
-		-- end
-		-- if #arcombien < 2 then
-			-- retour = 0;
-		-- else
-			-- retour = tonumber(arcombien[1]) or 0;
-		-- end
 	else
 		retour = tonumber(combien) or 0;
 	end
@@ -3222,6 +3193,14 @@ function OnSavedlgCritere1();	-- lecture et écriture des variables pour un critè
 end
 
 function AffichedlgCritere1()	-- boîte de dialogue pour un critère de type 1
+	if not matrice.Evenement_selection or matrice.Evenement_selection:len() == 0 then
+		dlgConfiguration:MessageBox(
+			"Vous devez rajouter au moins une course\navant de définir un critère de calcul",
+			"Merci de saisir une course", 
+			msgBoxStyle.OK + msgBoxStyle.ICON_WARNING
+			) ;
+		return
+	end
 	dlgCritere1 = wnd.CreateDialog(
 		{
 		width = matrice.dlgPosit.width,
@@ -3438,6 +3417,14 @@ function OnSavedlgCritere2();	-- lecture et écriture des variables pour un critè
 end
 
 function AffichedlgCritere2()	-- boîte de dialogue pour un critère de type 2
+	if not matrice.Evenement_selection or matrice.Evenement_selection:len() == 0 then
+		dlgConfiguration:MessageBox(
+			"Vous devez rajouter au moins une course\navant de définir un critère de calcul",
+			"Merci de saisir une course", 
+			msgBoxStyle.OK + msgBoxStyle.ICON_WARNING
+			) ;
+		return
+	end
 	matrice.numTypeCritere = 2;
 	local arparams = {};
 	dlgCritere2 = wnd.CreateDialog(
@@ -3808,6 +3795,14 @@ function OnSavedlgCritere4();	-- lecture et écriture des variables pour un critè
 end
 
 function AffichedlgCritere4()	-- boîte de dialogue pour un critère de type 3 ou 4 selon qu'il y a des manches 'flotantes' ou pas
+	if not matrice.Evenement_selection or matrice.Evenement_selection:len() == 0 then
+		dlgConfiguration:MessageBox(
+			"Vous devez rajouter au moins une course\navant de définir un critère de calcul",
+			"Merci de saisir une course", 
+			msgBoxStyle.OK + msgBoxStyle.ICON_WARNING
+			) ;
+		return
+	end
 	matrice.numTypeCritere = 4;
 	dlgCritere4 = wnd.CreateDialog(
 		{
@@ -5969,6 +5964,14 @@ function AffichedlgConfiguration()
 		, btnRAZCritere);
 	tbedit1:Bind(eventType.MENU, 
 		function(evt)
+			if not matrice.Evenement_selection or matrice.Evenement_selection:len() == 0 then
+				dlgConfiguration:MessageBox(
+					"Il n'y a rien à filtrer, la matrice ne contient aucune course.",
+					"Merci de saisir une course", 
+					msgBoxStyle.OK + msgBoxStyle.ICON_WARNING
+					) ;
+				return
+			end
 			local cmd = 'Select * From Resultat Where Code_evenement In(-1,'..matrice.Evenement_selection..')';
 			base:TableLoad(tResultat, cmd);
 			if matrice.Cle_filtrage then
@@ -7386,20 +7389,23 @@ function SetEnableControldlgConfiguration();
 		dlgConfiguration:GetWindowName('coefDefautMancheBloc2'):Enable(Eval(matrice.comboTypePoint, 'Points place'));
 		dlgConfiguration:GetWindowName('comboPrendreBloc2'):Enable(Eval(matrice.comboTypePoint, 'Points place'));
 		dlgConfiguration:GetWindowName('coefPourcentageMaxiBloc2'):Enable(Eval(matrice.comboTypePoint, 'Points place'));
-	end
-	if Eval(matrice.comboTypePoint, 'Points place') then
-		if string.find(matrice.comboPrendreBloc1, '1')then
-			dlgConfiguration:GetWindowName('coefDefautMancheBloc1'):Enable(false);
-		elseif string.find(matrice.comboPrendreBloc1, 'à') then
-			dlgConfiguration:GetWindowName('coefDefautCourseBloc1'):Enable(false);
+		if string.find(matrice.comboTypePoint, 'place') then
+			if string.find(matrice.comboPrendreBloc2, '1') then
+				dlgConfiguration:GetWindowName('coefDefautMancheBloc2'):Enable(false);
+			elseif string.find(matrice.comboPrendreBloc2, 'à') then
+				dlgConfiguration:GetWindowName('coefDefautCourseBloc2'):Enable(false);
+			end
 		end
-		if matrice.bloc2 == true then
-			if string.find(matrice.comboTypePoint, 'place') then
-				if string.find(matrice.comboPrendreBloc2, '1') then
-					dlgConfiguration:GetWindowName('coefDefautMancheBloc2'):Enable(false);
-				elseif string.find(matrice.comboPrendreBloc2, 'à') then
-					dlgConfiguration:GetWindowName('coefDefautCourseBloc2'):Enable(false);
-				end
+	else
+		dlgConfiguration:GetWindowName('coefDefautCourseBloc2'):Enable(false);
+		dlgConfiguration:GetWindowName('coefDefautMancheBloc2'):Enable(false);
+		dlgConfiguration:GetWindowName('comboPrendreBloc2'):Enable(false);
+		dlgConfiguration:GetWindowName('coefPourcentageMaxiBloc2'):Enable(false);
+		if Eval(matrice.comboTypePoint, 'Points place') then
+			if string.find(matrice.comboPrendreBloc1, '1')then
+				dlgConfiguration:GetWindowName('coefDefautMancheBloc1'):Enable(false);
+			elseif string.find(matrice.comboPrendreBloc1, 'à') then
+				dlgConfiguration:GetWindowName('coefDefautCourseBloc1'):Enable(false);
 			end
 		end
 	end
@@ -7508,7 +7514,7 @@ function OnConfiguration(cparams)
 	else
 		return false;
 	end
-	matrice.version_script = '4.2';
+	matrice.version_script = '4.41';
 	matrice.OS = app.GetOsDescription();
 	-- vérification de l'existence d'une version plus récente du script.
 	local url = 'https://live.ffs.fr/maj_pg/challenge/last_version.txt'
@@ -7519,7 +7525,7 @@ function OnConfiguration(cparams)
 	matrice.dlgPosit.x = 1;
 	matrice.dlgPosit.y = 1;
 	base = base or sqlBase.Clone();
-	code_coureur_pour_debug = "FFS2684739";		-- provoque tous les affichages pour débug propres à ce Code_coureur
+	code_coureur_pour_debug = "FFS2661185";		-- provoque tous les affichages pour débug propres à ce Code_coureur
 	matrice.debug = false;
 	if matrice.debug == false then
 		code_coureur_pour_debug = '';
