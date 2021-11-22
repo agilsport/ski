@@ -511,7 +511,7 @@ function EvaluatePts(row, idxcourse, colpts, abddsq)
 			if abddsq == 'Oui' then
 				return txt_tps;
 			else
-				return '';
+				return '-';
 			end
 		end
 	else	-- Ptstotal
