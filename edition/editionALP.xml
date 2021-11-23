@@ -77,9 +77,9 @@
 		<font name="Calibri" size="14" adjust="max" weight="bold"/>
 		<text row="auto" col="1" align="center">$(Evenement.Nom)</text>
 		<text row="auto" align="center">$(Discipline.Libelle)</text>
-		<text row="auto" align="center">$(Categorie{$(Epreuve.Code_categorie)}.Libelle)..' - '..$(Sexe{$(Epreuve.Sexe)}.Libelle)</text>
+		<text row="auto" align="center" cond="title_filter == nil">$(Categorie{$(Epreuve.Code_categorie)}.Libelle)..' - '..$(Sexe{$(Epreuve.Sexe)}.Libelle)</text>
+		<text row="auto" align="center" cond="title_filter ~= nil">title_filter</text>
 		<text row="auto" align="center" cond="title" >title</text>
-		<text row="auto" align="center" cond="title_filter">title_filter</text>
 
 		<!-- <text row="3cm" align="left"><font orientation="90" origin="left,bottom"/>'HELLO'</text> -->
 		<row value="0.5cm"/>
