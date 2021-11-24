@@ -951,6 +951,16 @@ function Telechargement(url, disponible2)
 	os.execute(localFile);
 end
 
+function TelechargementImages(url)
+	local localFile = string.format("%s/tmp/TimingReportImages.exe", app:GetPath());
+	localFile = string.gsub(localFile, app.GetPathSeparator(), "/");
+	if curl.DownloadFile(url, localFile) ~= true then
+		return;
+	end
+	-- lancement  
+	dlgPage0:EndModal(idButton.CANCEL);
+	os.execute(localFile);
+end
 
 function OnCurlReturn(evt)
 	if evt:GetInt() == 1 then
@@ -972,7 +982,7 @@ end
 
 -- Point Entree Principal
 function main(params)
-	-- vérification de l'existance d'une version plus récente du script.
+	-- vérification de l'existence d'une version plus récente du script.
 	local url = 'https://live.ffs.fr/maj_pg/tr/last_version.txt'
 	local version = curl.AsyncGET(wnd.GetParentFrame(), url);
 	base = base or sqlBase.Clone();
@@ -983,7 +993,7 @@ function main(params)
 	TR.height = display:GetSize().height;
 	TR.x = 0;
 	TR.y = 0;
-	TR.version = "4.1";
+	TR.version = "4.2";
 	TR.OK = true;
 	TR.errormessage = "";
 	TR.code_evenement = params.code_evenement or -1;
@@ -1343,6 +1353,14 @@ function AfficheDialog1()
 			TR.doc.Delete();
 		end
 	end
+	if not app.FileExists('./res/tr/ETS2.jpg') then
+		local msg = "Voulez-vous télécharger les images manquantes des appareils homologués ?";
+		if app.GetAuiFrame():MessageBox(msg, "Télécharger les images manquantes", msgBoxStyle.YES_NO+msgBoxStyle.ICON_WARNING) == msgBoxStyle.YES then
+			local url = 'http://188.165.236.85/maj_pg/tr/TimingReportImages.exe';
+			TelechargementImages(url);
+		end
+	end
+
 	GetCartouche();
 	ControlData();  
 	SetValuesPage1();
