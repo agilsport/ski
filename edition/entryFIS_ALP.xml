@@ -601,9 +601,9 @@
 					<text col="auto" font_style="italic" font_size_step="-2">'(please print and sign)'</text>
 				</matrix>
 				<matrix col_start="1" row_start="2">
-					<col value="3,2,2" />
+					<col value="3,1,2" />
 					<text col_start="1" align="center" adjust="width" >GetOfficiel(params.code_evenement,'ResponsibleEntry')</text>
-					<image col_start="3" align="center" adjust="best"><background mode="transparent"/>GetOfficielSignature(params.code_evenement,'NationalAssociation')</image>
+					<image col_start="3" adjust="best"><background mode="transparent"/>GetOfficielSignature(params.code_evenement, 'ResponsibleEntry', false)</image>
 				</matrix>
 			</matrix>
 			<!-- data -->
