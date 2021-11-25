@@ -350,7 +350,7 @@ function SetDossard(course)
 		params.bibo = params.bibo or 30;
 		local cmd = 'Update Resultat Set Dossard = Null, Rang = null Where Code_evenement IN('..params.course1..','..params.course2..')';
 		base:Query(cmd);
-		cmd = 'Delete From Resultat_Manche Where Code_coureur = Null Or Dossard = Null And Code_evenement IN('..params.course1..','..params.course2..')';
+		cmd = 'Delete From Resultat_Manche Where Code_coureur = Null And Code_evenement IN('..params.course1..','..params.course2..')';
 		base:Query(cmd);
 		cmd = 'Update Resultat_Manche Set Rang = Null Where Code_evenement IN('..params.course1..','..params.course2..')';
 		base:Query(cmd);
@@ -469,23 +469,23 @@ function OnTirageNationales(course, code_evenement)
 				step = -1;
 				OnTirageManchex(code_evenement, manche, row_debut, row_fin, step);
 			elseif manche == 3 then 
-				-- manche 3 ex de 51 à 100 
+				-- manche 3 ex de 51 à 100   row de 50 à 99
 				row_debut = params.nb_groupe1  ;
 				row_fin = tResultat:GetNbRows() -1;
 				step = 1;
 				OnTirageManchex(code_evenement, manche, row_debut, row_fin, step);
-				-- manche 3 ex de 1 à 50
+				-- manche 3 ex de 1 à 50  row de 0 à 49
 				row_debut = 0;
 				row_fin = params.nb_groupe1 -1;
 				step = 1;
 				OnTirageManchex(code_evenement, manche, row_debut, row_fin, step);
 			elseif manche == 4 then 
-				-- manche 4 ex de 50 à 1
+				-- manche 4 ex de 50 à 1  row de 49 à 0
 				row_debut = params.nb_groupe1 -1;
 				row_fin = 0;
 				step = -1;
 				OnTirageManchex(code_evenement, manche, row_debut, row_fin, step);
-				-- manche 4 ex de 100 à 51
+				-- manche 4 ex de 100 à 51   row de 99 à 50
 				row_debut = tResultat:GetNbRows() -1;
 				row_fin = params.nb_groupe1;
 				step = -1;
@@ -497,14 +497,14 @@ function OnTirageNationales(course, code_evenement)
 			params.rang_depart = 1;
 			if manche == 1 then
 				if code_evenement == params.course2 then
-					-- manche 1 ex de 51 à 100 
-					row_debut = params.nb_groupe1 + 1 ;
-					row_fin = tResultat:GetNbRows();
+					-- manche 1 ex de 51 à 100   row de 50 à 99
+					row_debut = params.nb_groupe1;
+					row_fin = tResultat:GetNbRows() -1;
 					step = 1;
 					OnTirageManchex(code_evenement, manche, row_debut, row_fin, step);
-					-- manche 1 ex de 1 à 50
+					-- manche 1 ex de 1 à 50  row de 0 à 49
 					row_debut = 0;
-					row_fin = params.nb_groupe1;
+					row_fin = params.nb_groupe1 -1;
 					step = 1;
 					OnTirageManchex(code_evenement, manche, row_debut, row_fin, step);
 				end
@@ -516,12 +516,12 @@ function OnTirageNationales(course, code_evenement)
 					step = -1;
 					OnTirageManchex(code_evenement, manche, row_debut, row_fin, step);
 				else
-					-- manche 2 ex de 50 à 1
-					row_debut = params.nb_groupe1;
+					-- manche 2 ex de 50 à 1  row de 49 à 0
+					row_debut = params.nb_groupe1 -1;
 					row_fin = 0;
 					step = -1;
 					OnTirageManchex(code_evenement, manche, row_debut, row_fin, step);
-					-- manche 2 ex de 100 à 51
+					-- manche 2 ex de 100 à 51   row de 99 à 50
 					row_debut = tResultat:GetNbRows() -1;
 					row_fin = params.nb_groupe1;
 					step = -1;
@@ -682,7 +682,7 @@ function main(params_c)
 	params.height = display:GetSize().height / 2;
 	params.x = (display:GetSize().width - params.width) / 2;
 	params.y = 200;
-	params.version = "1.7";
+	params.version = "1.8";
 	base = base or sqlBase.Clone();
 	tEvenement = base:GetTable('Evenement');
 	base:TableLoad(tEvenement, 'Select * From Evenement Where Code = '..params.code_evenement);
