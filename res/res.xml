@@ -163,9 +163,9 @@
 <list_officiel activite="FS,SB">
 <!-- Jury -->
 	<officiel code="TechnicalDelegate" label="Délégué Technique" label_inter="FIS Technical Delegate" required="1" /> 
-	<officiel code="ChiefCompetition" label="Chef de Compétition" label_inter="Chief of Compétition" required="1" /> 
+	<officiel code="ChiefCompetition" label="Chef de Compétition" label_inter="Chief of Competition" required="1" /> 
 	<officiel code="RaceDirector" label="Directeur de course" label_inter="Race Director" required="1" />
-	<officiel code="Referee" label="Arbitre" label_inter="Referee" required="1" /> 
+	<officiel code="Referee" label="Réferent" label_inter="Referee" required="1" /> 
 	<officiel code="AssistantReferee" label="Arbitre Adjoint" label_inter="Assistant Referee" required="0,1" /> 
 	<officiel code="Chiefofresult" label="Responsable des Résultats" label_inter="Chief of result" required="1" />
 <!-- Officials -->
@@ -183,7 +183,7 @@
 	<officiel code="ChiefRace" label="Directeur d'épreuve" label_inter="Chief Race" /> 
 <!-- sécurité FFS -->
 	<officiel code="ffs_medecin" label="Médecin de course" label_inter="Race doctor" required="0,1" />
-	<officiel code="ffs_secours" label="Secours" label_inter="Rescue" required="1,3" />
+	<officiel code="ffs_secours" label="Secours" label_inter="Rescue" required="0,3" />
 <!-- autre FFS -->
 	<officiel code="ffs_benevole" label="Bénévole" label_inter="Volunteer" required="0,6" />
 	<officiel code="ffs_informatique" type="pool" label="Responsable Informatique" label_inter="Chief Computer" required="0,1" /> 
@@ -245,7 +245,7 @@
 	<officiel code="ffs_benevole" label="Bénévole" label_inter="Volunteer" required="0,6" />
 	
 	<!-- autre FFS ou FIS-->
-	<officiel code="TIMEKEEPER" label="Sociétée de chronomérie" label_inter="Timekeeper" required="0,1" />
+	<officiel code="TIMEKEEPER" label="Société de chronométrie" label_inter="Timekeeper" required="0,1" />
 </list_officiel>
 
 <!-- Barre de Status -->
@@ -694,6 +694,8 @@
 		<textctrl col_start="2" col_end="3" name="meteo" style="TE_LEFT" validator="Epreuve_Alpine_Manche.Meteo_course"/>
 		<statictext col_start="4" label="Neige" />
 		<textctrl col_start="5" col_end="0" name="neige" style="TE_LEFT" validator="Epreuve_Alpine_Manche.Neige_course" />
+		<statictext col_start="4" label="Vent" />
+		<textctrl col_start="5" col_end="0" name="vent" style="TE_LEFT" validator="Epreuve_Alpine_Manche.Vent_course" />
 	</staticbox>
 
 	<toolbar row="auto" col_start="1" col_end="0" name="tb" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT" />
