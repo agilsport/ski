@@ -350,7 +350,7 @@ function SetDossard(course)
 		params.bibo = params.bibo or 30;
 		local cmd = 'Update Resultat Set Dossard = Null, Rang = null Where Code_evenement IN('..params.course1..','..params.course2..')';
 		base:Query(cmd);
-		cmd = 'Delete From Resultat_Manche Where Code_coureur = Null Or Dossard = Null Code_evenement IN('..params.course1..','..params.course2..')';
+		cmd = 'Delete From Resultat_Manche Where Code_coureur = Null Or Dossard = Null And Code_evenement IN('..params.course1..','..params.course2..')';
 		base:Query(cmd);
 		cmd = 'Update Resultat_Manche Set Rang = Null Where Code_evenement IN('..params.course1..','..params.course2..')';
 		base:Query(cmd);
