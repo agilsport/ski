@@ -2226,7 +2226,7 @@ function Calculer(panel_name)		-- fonction de calcul du résultat du Challenge/Co
 					end
 				end
 				-- if string.find(matrice.course[idxcourse].Prendre, '2') or string.find(matrice.course[idxcourse].Prendre, '3') then
-				if string.find(matrice.course[idxcourse].Prendre, '3') then
+				if string.find(matrice.course[idxcourse].Prendre, '3') and matrice.course[idxcourse].Nombre_de_manche > 1 then
 					if tMatrice_Ranking:GetCell('Code_coureur', idxcoureur) == code_coureur_pour_debug or idxcoureur == -1 then
 						adv.Alert('	-- table.insert(coursesData de la course : Ordre = '..matrice.course[idxcourse].Ordre..', Pts = '..raceData.Pts);
 					end
@@ -2924,22 +2924,21 @@ function GetCritere()	-- lecture de toutes les variables des critères de calculs
 		nb_critere[bloc] = nb_critere[bloc] or 0;
 		nb_critere[bloc] = nb_critere[bloc] + 1;
 		if nb_critere[bloc] > 1 then virgule_bloc[bloc] = ','; end
+		matrice.table_critere[i].NbCombien = tonumber(matrice.table_critere[i].NbCombien) or 0;
+		matrice.table_critere[i].Sur = tonumber(matrice.table_critere[i].Sur) or 1;
 		if matrice.table_critere[i].Discipline ~= '*' then
 			if matrice.table_critere[i].NbCombien > matrice.table_critere[i].Sur then
 				matrice['criteres_bloc'..bloc] = matrice['criteres_bloc'..bloc]..virgule_bloc[bloc]..matrice.table_critere[i].Prendre..' '..matrice.table_critere[i].NbCombien..' '..matrice.table_critere[i].Discipline;
 			else
 				local sur = matrice.table_critere[i].Sur;
-				if string.find(matrice.comboPrendreBloc1, '2.') then
-					sur = sur * 2;
-				end
 				matrice['criteres_bloc'..bloc] = matrice['criteres_bloc'..bloc]..virgule_bloc[bloc]..matrice.table_critere[i].Prendre..' '..matrice.table_critere[i].NbCombien..' '..matrice.table_critere[i].Discipline.. ' sur '..sur;
 			end
 		else
 			local sur = matrice.table_critere[i].Sur;
 			local quoi = ' course(s) ';
-			if string.find(matrice.comboPrendreBloc1, '2.') then
-				sur = sur * 2;
-				quoi = ' manche(s) ';
+			if nb_resultats then
+				sur = nb_resultats;
+				quoi = ' résultats ';
 			end
 			matrice['criteres_bloc'..bloc] = matrice['criteres_bloc'..bloc]..virgule_bloc[bloc]..matrice.table_critere[i].Prendre..' '..matrice.table_critere[i].NbCombien..quoi..' sur '..sur..virgule_bloc[bloc];
 		end
@@ -2959,42 +2958,56 @@ function TransformeCombien(discipline, bloc, combien)
 	local retour = 0;
 	local arDiscipline = discipline:Split(',');
 	local nb_disciplines = 0;
-	for i = 1, #arDiscipline do
-		local discipline = arDiscipline[i];
-		if matrice.disciplines[discipline] and matrice.disciplines[discipline][1] then
-			nb_disciplines = nb_disciplines + matrice.disciplines[discipline][1].nombre;
+
+	if arDiscipline[1] == '*' then
+		for idx = 1, #matrice.course do
+			if matrice.course[idx].Bloc == bloc then
+				if string.find(matrice['comboPrendreBloc'..bloc], '2%.') then
+					nb_disciplines = nb_disciplines + matrice.course[idx].Nombre_de_manche;
+				elseif string.find(matrice.comboPrendreBloc1, '3%.') then	
+					if matrice.course[idx].Nombre_de_manche == 1 then
+						nb_disciplines = nb_disciplines + 1;
+					else
+						nb_disciplines = nb_disciplines + matrice.course[idx].Nombre_de_manche + 1;
+					end
+				else
+					nb_disciplines = nb_disciplines + 1;
+				end
+			end
+		end
+	else
+		for i = 1, #arDiscipline do
+			local discipline = arDiscipline[i];
+			if matrice.disciplines[discipline] and matrice.disciplines[discipline][1] then
+				nb_disciplines = nb_disciplines + matrice.disciplines[discipline][1].nombre;
+			end
 		end
 	end
 	if string.find(combien, 'sur') then				-- on a 5 sur 9
 		local arcombien = combien:Split('sur');
-		combien = arcombien[1];
+		retour = arcombien[1];
 		nb_disciplines = arcombien[2];
 	end
 	if string.find(combien,'/') then	-- on a une fraction ex : 2/3
 		arcombien = combien:Split('/');
 		numerateur = tonumber(arcombien[1]) or 0;
 		denominateur = tonumber(arcombien[2]) or 1;
-		retour = math.ceil(Round(nb_disciplines * numerateur / denominateur, 0));
-		if retour < 1 then retour = 1; end
+		retour = math.floor(nb_disciplines * numerateur / denominateur);
 	elseif string.find(combien, '%%') then				-- on a un pourcentage 75% -> 75/100
-		combien = string.gsub(combien, "%D", "");
-		combien = tonumber(combien) or 0;
-		if string.find(matrice['comboPrendreBloc'..bloc], 'à') then
-			combien = combien * 2;
-		end
-		retour = math.ceil(Round(nb_disciplines * combien / 100, 0));
-		if retour < 1 then retour = 1; end
+		retour = string.gsub(combien, "%D", "");
+		retour = tonumber(retour) or 0;
+		retour = math.floor(nb_disciplines * retour / 100);
 	else
 		retour = tonumber(combien) or 0;
 	end
-	return retour;
+	if retour < 1 then retour = 1; end
+	return retour, nb_disciplines;
 end
-
 
 function SplitCritere(critere, idxcritere)
 	-- Course|1|SG|au maximum|1/2	
 	if matrice.debug == true then
-		adv.Alert('\nSplitCritere : critere = '..critere..', idxcritere = '..idxcritere);
+		adv.Alert('\nfunction SplitCritere('..critere..', '..idxcritere..')');
 	end
 	local arcritere = critere:Split('|');
 	local item = arcritere[1];
@@ -3002,7 +3015,6 @@ function SplitCritere(critere, idxcritere)
 	local discipline = arcritere[3];
 	local prendre = arcritere[4];
 	local combien = arcritere[5];
-	local nbcombien = TransformeCombien(discipline, bloc, combien)
 	
 	local arDiscipline = discipline:Split(',');
 	local nb_disciplines = 0;
@@ -3010,11 +3022,11 @@ function SplitCritere(critere, idxcritere)
 	for i = 1, #arDiscipline do
 		local discipline = arDiscipline[i];
 		if not matrice.disciplines[discipline] then
-			-- app.GetAuiFrame():MessageBox(
-					-- "Attention : le critère n° "..idxcritere.." est incompatible\navec les courses à prendre en compte !!!\nUne ou plusieurs diciplines contenues dans\ncelui-ci n'existent pas dans les courses.",
-					-- "Erreur sur le critère n° "..idxcritere, 
-					-- msgBoxStyle.OK + msgBoxStyle.ICON_WARNING
-					-- ) 
+			app.GetAuiFrame():MessageBox(
+					"Attention : le critère n° "..idxcritere.." est incompatible\navec les courses à prendre en compte !!!\nUne ou plusieurs diciplines contenues dans\ncelui-ci n'existent pas dans les courses.",
+					"Erreur sur le critère n° "..idxcritere, 
+					msgBoxStyle.OK + msgBoxStyle.ICON_WARNING
+					) 
 			break;
 		end
 		if matrice.disciplines[discipline] and matrice.disciplines[discipline][bloc] then
@@ -3026,7 +3038,8 @@ function SplitCritere(critere, idxcritere)
 			matrice.disciplines[discipline][bloc].nombre = 0;
 		end
 	end
-	local sur = nb_disciplines;
+	-- local sur = nb_disciplines;
+	local nbcombien, sur = TransformeCombien(discipline, bloc, combien);
 	if ok == true then
 		if matrice.debug == true then
 			adv.Alert('\nOn insère le critère dans la table matrice.table_critere');
@@ -7094,7 +7107,7 @@ function OnSavedlgConfiguration()	-- sauvegarde des paramètres de la matrice.
 	-- suppression de tous les enregistrements présents dans la table Evenement_Matrice sauf les [code et critere;
 	-- récupération de la valeur de Evenement_selection, suppression de toutes les valeurs et création de la totalité des valeurs
 	-- relecture des variables de Evenement_Matrice pour recréer les variables du tableau associatif matrice{}
-	if string.find(dlgConfiguration:GetWindowName('comboPresentationCourses'):GetValue(), 'Chrono') and matrice.comboEntite == 'FIS' then
+	if string.find(dlgConfiguration:GetWindowName('comboPresentationCourses'):GetValue(), 'Chrono') then
 		if dlgConfiguration:MessageBox(
 				"Voulez-vous revenir aux paramètres par défaut\nde la présentation horizontale ?",
 				"Paramétrage par défaut", 
@@ -7402,10 +7415,11 @@ function SetEnableControldlgConfiguration();
 		dlgConfiguration:GetWindowName('comboPrendreBloc2'):Enable(false);
 		dlgConfiguration:GetWindowName('coefPourcentageMaxiBloc2'):Enable(false);
 		if Eval(matrice.comboTypePoint, 'Points place') then
-			if string.find(matrice.comboPrendreBloc1, '1')then
+			if string.find(matrice.comboPrendreBloc1, '1%.')then
 				dlgConfiguration:GetWindowName('coefDefautMancheBloc1'):Enable(false);
-			elseif string.find(matrice.comboPrendreBloc1, 'à') then
+			elseif string.find(matrice.comboPrendreBloc1, '2%.') then
 				dlgConfiguration:GetWindowName('coefDefautCourseBloc1'):Enable(false);
+				dlgConfiguration:GetWindowName('coefDefautMancheBloc1'):Enable(false);
 			end
 		end
 	end
@@ -7514,7 +7528,7 @@ function OnConfiguration(cparams)
 	else
 		return false;
 	end
-	matrice.version_script = '4.41';
+	matrice.version_script = '4.5';
 	matrice.OS = app.GetOsDescription();
 	-- vérification de l'existence d'une version plus récente du script.
 	local url = 'https://live.ffs.fr/maj_pg/challenge/last_version.txt'
@@ -7525,7 +7539,7 @@ function OnConfiguration(cparams)
 	matrice.dlgPosit.x = 1;
 	matrice.dlgPosit.y = 1;
 	base = base or sqlBase.Clone();
-	code_coureur_pour_debug = "FFS2661185";		-- provoque tous les affichages pour débug propres à ce Code_coureur
+	code_coureur_pour_debug = "FFS2674462";		-- provoque tous les affichages pour débug propres à ce Code_coureur
 	matrice.debug = false;
 	if matrice.debug == false then
 		code_coureur_pour_debug = '';

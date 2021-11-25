@@ -4,30 +4,28 @@
 	<menu>
 		<menu title="Listes des Participants" image="./res/32x32_juges.png">
 			<menu title="Par Ordre-Alphabétique" image="./res/16x16_juges.png" id="parti_alpha"/>
-			<menu title="Par Nation" image="./res/16x16_juges.png" rupture="Nation" id="parti_factorise"/>
-			<menu title="Par Comité" image="./res/16x16_juges.png" label="Comité" rupture="Comite" id="parti_factorise"/>
 			<menu title="Par Club" image="./res/16x16_juges.png" rupture="Club" id="parti_factorise"/>
+			<menu title="Par Comité" image="./res/16x16_juges.png" label="Comité" rupture="Comite" id="parti_factorise"/>
+			<menu title="Par Nation" image="./res/16x16_juges.png" rupture="Nation" id="parti_factorise"/>
 			<menu title="Par Points" image="./res/16x16_juges.png" id="parti_point"/>
-			<menu title="édition des tickets courses " image="./res/16x16_text.png" lua="./edition/TicketsCourse.lua"  />
-			<menu title="Format Etiquettes" image="./res/32x32_juges.png">
-				<menu title="Avec Drapeaux des Pays par ordre de points" ecsl="1" orderby="Point, Identite" image="./res/16x16_juges.png" id="parti_etiquette_factorise"/>
-				<menu title="Avec Drapeaux des Pays par ordre alphabétique" ecsl="1" orderby="Identite" image="./res/16x16_juges.png" id="parti_etiquette_factorise"/>
-				<menu title="Avec Drapeaux des Pays par Nation, Identité" ecsl="1" orderby="Nation, Identite" image="./res/16x16_juges.png" id="parti_etiquette_factorise"/>
-				<menu title="Avec Drapeaux des Pays par Nation, Points" ecsl="1" orderby="Nation, Point" image="./res/16x16_juges.png" id="parti_etiquette_factorise"/>
-			</menu>
+			<menu title="Edition des tickets courses " image="./res/16x16_text.png" lua="./edition/TicketsCourse.lua"  />
+			<menu title="Etiquettes avec Drapeaux des Pays par ordre de points" ecsl="1" orderby="Point, Identite" image="./res/16x16_juges.png" id="parti_etiquette_factorise"/>
+			<menu title="Etiquettes avec Drapeaux des Pays par ordre alphabétique" ecsl="1" orderby="Identite" image="./res/16x16_juges.png" id="parti_etiquette_factorise"/>
+			<menu title="Etiquettes avec Drapeaux des Pays par Nation, Identité" ecsl="1" orderby="Nation, Identite" image="./res/16x16_juges.png" id="parti_etiquette_factorise"/>
+			<menu title="Etiquettes avec Drapeaux des Pays par Nation, Points" ecsl="1" orderby="Nation, Point" image="./res/16x16_juges.png" id="parti_etiquette_factorise"/>
 		</menu>
 
 		<menu title="Listes de Départ" image="./res/32x32_bib.png">
-			<menu title="Officielle" image="./res/16x16_official.png" id="lst_officiel" choix_manche="1"/>
-			<menu title="Par Nation" image="./res/16x16_bib.png" rupture="Nation" id="lst_factorise"/>
-			<menu title="Par Comité" image="./res/16x16_bib.png" label="Comité" rupture="Comite" id="lst_factorise"/>
+			<menu title="Officielle" image="./res/16x16_official.png" id="lst_officiel" choix_manche="1"/> 
 			<menu title="Par Club" image="./res/16x16_bib.png" rupture="Club" id="lst_factorise"/>
+			<menu title="Par Comité" image="./res/16x16_bib.png" label="Comité" rupture="Comite" id="lst_factorise"/>
+			<menu title="Par Nation" image="./res/16x16_bib.png" rupture="Nation" id="lst_factorise"/>
 		</menu>
 
 		<menu title="Résultats" image="./res/32x32_ranking.png">
 			<menu title="D'une Manche" image="./res/16x16_ranking.png" id="res_manche" choix_manche="1"/>
 			<menu title="Officieux" image="./res/16x16_ranking.png" id="res_officiel" officiel="0"/>
-			<!-- <menu title="Calcul de la Pénalité" image="./res/16x16_calc.png" language="en" action="penalite" /> -->
+			<menu title="Calcul de la Pénalité" image="./res/16x16_calc.png" language="en" action="penalite" />
 			<menu title="Officiels" image="./res/16x16_official.png" id="res_officiel" officiel="1"/>
 			<menu title="Par Catégories (filtrage des coureurs apres le calcul des points)" filter="after" image="./res/16x16_ranking.png" id="res_categ" choix_clt_max="1"/>
 			<menu title="Meilleurs Temps" image="./res/16x16_ranking.png" id="res_best" />
@@ -79,9 +77,9 @@
 		<font name="Calibri" size="14" adjust="max" weight="bold"/>
 		<text row="auto" col="1" align="center">$(Evenement.Nom)</text>
 		<text row="auto" align="center">$(Discipline.Libelle)</text>
-		<text row="auto" align="center">$(Categorie{$(Epreuve.Code_categorie)}.Libelle)..' - '..$(Sexe{$(Epreuve.Sexe)}.Libelle)</text>
+		<text row="auto" align="center" cond="title_filter == nil">$(Categorie{$(Epreuve.Code_categorie)}.Libelle)..' - '..$(Sexe{$(Epreuve.Sexe)}.Libelle)</text>
+		<text row="auto" align="center" cond="title_filter ~= nil">title_filter</text>
 		<text row="auto" align="center" cond="title" >title</text>
-		<text row="auto" align="center" cond="title_filter">title_filter</text>
 
 		<!-- <text row="3cm" align="left"><font orientation="90" origin="left,bottom"/>'HELLO'</text> -->
 		<row value="0.5cm"/>
@@ -398,11 +396,13 @@
 			if rupture ~= 'Nation' then
 				body:SetCounter('Nation');
 			end
-			orderby = rupture..", Nom, Prenom";
+			orderby = rupture..", Sexe, Nom, Prenom";
 			somme_rupture = 0;
+			nb_etrangers = 0;
 			comite = {};
 			page_break = 1;
 			bolAjouter = false;
+
 		</lua>
 		<call option="comite_origine" file="./edition/options.xml" />
 		<order key="(orderby)" />
@@ -415,7 +415,11 @@
 				<lua>codelu = body:GetCell(rupture, row);
 					if codelu:len() > 0 then
 						somme_rupture = somme_rupture + body:GetCounterValue(rupture, codelu);
-					end</lua>
+					end
+					if body:GetCell('Nation', row) ~= 'FRA' then
+						nb_etrangers = nb_etrangers + body:GetCounterValue(rupture, codelu);
+					end
+					</lua>
 				<text row="auto" col="1" cond="codelu:len() &gt; 0">codelu..' ('..body:GetCounterValue(rupture, codelu)..')'</text>
 				<text row="auto" col="1" cond="codelu:len() == 0">'Non renseigné ('..body:GetCounterValue(rupture, codelu)..')'</text>
 			</before>
@@ -433,7 +437,8 @@
 					else
 						bolAjouter = true;
 					end
-				end</lua>
+				end
+				</lua>
 			<call option="couleur_alternee" file="./edition/options.xml" />
 
 			<row value="auto"/>
@@ -478,6 +483,7 @@
 						<text col_start="1" align="center" cond="comite[rupture_label1].EQ &gt; 0 and counter_col1 &gt; 0">rupture_label1..' : '..body:GetCounter(rupture):GetCell(1,i)..'    (+ '..comite[rupture_label1].EQ..' EQ)'</text>
 						<text col_start="2" align="center" cond="rupture ~= 'Nation'">rupture_label2..' : '..body:GetCounter('Nation'):GetCell(1,i)</text>
 						<text row="auto" col_start="1" align="center" cond="i == max_ligne_recap -1">somme_rupture..' participants ont la colonne '..rupture..' renseignée'</text>
+						<text col_start="2" align="center" cond="i == max_ligne_recap -1 and nb_etrangers &gt; 0">'Nombre total d\'étrangers '..nb_etrangers</text>
 				<lua>end</lua>
 			<lua>end</lua>
 		</end>
@@ -537,16 +543,14 @@
 			<font size="9" adjust="ellipsize"/>
 
 			<row h="auto"/>
-			<lua>if manche &gt; 1 then</lua>
-				<text col="4" align="right" label="Rang" font_weight="bold">body:GetCellInt('Rang'..manche, row) </text>
-			<lua>end</lua>
+			<text col="4" cond="body:GetCellInt('Rang'..manche, row) &gt; 0" align="right" label="Rang" font_weight="bold">body:GetCellInt('Rang'..manche, row) </text>
 			<text col="4" align="center" label="Dos" font_weight="bold" font_size_step="1">$(Dossard)</text>
 			<text col="7" align="center" label="Code"><font size="8" cond="group =='body'"/>$(Code_coureur):sub(4)</text>
 			<text col="20" align="left" label="Nom - Prénom" font_weight="bold" font_size_step="1">$(Identite)</text> 
 			<text col="4" align="center" label="Gr." cond="body:GetCellInt('Reserve'..manche, row) &gt; 0">body:GetCellInt('Reserve'..manche, row)</text>
 			<text col="2" align="center" label="S.">$(Sexe)</text>
 			<text col="4" align="center" label="An">$(An)</text>
-			<text col="7" align="center" label="Cat.">$(Categ)</text>
+			<text col="5" align="center" label="Cat.">$(Categ)</text>
 			<text col="4" align="center" label="Nat" cond="entite == 'FIS'">$(Nation)</text>
 			<text col="3" align="center" label="CS">$(Comite)</text>
 			<text col="12" align="center" label="Club">$(Club)</text>
@@ -634,7 +638,7 @@
 			<text col="7" align="center" label="Code"><font size="8" cond="group =='body'"/>$(Code_coureur):sub(4)</text>
 			<text col="20" align="left" label="Nom - Prénom" font_weight="bold">$(Identite)</text> 
 			<text col="4" align="center" label="An">$(An)</text>
-			<text col="7" align="center" label="Cat.">$(Categ)</text>
+			<text col="6" align="center" label="Cat.">$(Categ)</text>
 			<text col="6" align="left" label="Nat" font_style="italic" cond="entite == 'FIS'">$(Nation)</text>
 			<image col_start="0" adjust="height" align="right" border="0" cond="entite == 'FIS'"><background mode="transparent"/>app.ImageNation($(Nation))</image> 
 			<text col="3" align="center" label="CS" font_style="italic">$(Comite)</text>
