@@ -350,7 +350,7 @@ function SetDossard(course)
 		params.bibo = params.bibo or 30;
 		local cmd = 'Update Resultat Set Dossard = Null, Rang = null Where Code_evenement IN('..params.course1..','..params.course2..')';
 		base:Query(cmd);
-		cmd = 'Delete From Resultat_Manche Where Code_coureur = Null And Code_evenement IN('..params.course1..','..params.course2..')';
+		cmd = 'Delete From Resultat_Manche Where Code_evenement IN('..params.course1..','..params.course2..')'.."And (Code_coureur = '' Or Tps_chrono =  Null or Tps_Chrono = -1" ;
 		base:Query(cmd);
 		cmd = 'Update Resultat_Manche Set Rang = Null Where Code_evenement IN('..params.course1..','..params.course2..')';
 		base:Query(cmd);
@@ -682,7 +682,7 @@ function main(params_c)
 	params.height = display:GetSize().height / 2;
 	params.x = (display:GetSize().width - params.width) / 2;
 	params.y = 200;
-	params.version = "1.8";
+	params.version = "1.9";
 	base = base or sqlBase.Clone();
 	tEvenement = base:GetTable('Evenement');
 	base:TableLoad(tEvenement, 'Select * From Evenement Where Code = '..params.code_evenement);
@@ -922,6 +922,10 @@ function main(params_c)
 				if bolOK then
 					OnTirageNationales(2, params.course2);
 				end
+			end
+			if string.find(option1, '6%.') then
+				local cmd = 'Delete From Resultat_Manche Where Code_evenement IN('..params.course1..','..params.course2..') And Code_manche > 2';
+				base:Query(cmd);
 			end
 		end
 		local cmd = 'Update Resultat Set Rang = NULL Where Code_evenement IN('..params.course1..','..params.course2..')';
