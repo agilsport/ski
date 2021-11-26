@@ -100,12 +100,11 @@
 				<matrix col_start="1">
 					<padding left="0.2cm"/>
 					<row value="auto" />
-					<text col="auto" font_weight="bold">'Competition'</text>
-					<padding left="0"/>
-					<text col="auto" font_style="italic">' (Name/Place) '</text>
-					<text col="auto" font_style="italic" font_size_step="-2">' /Manifestation(Nom/Lieu) / '</text>
+					<col value="2.5cm,1" />
+					<text col_start="1" font_weight="bold">'Competition'</text>
+					<text col_start="2" font_style="italic" font_size_step="-2">' (Name/Place) / (Manifestation(Nom/Lieu)'</text>
 					<row value="auto" />
-					<text col_start="1" col_end="0" font_style="italic" font_size_step="-2">'Veranstaltung (Name/Ort)'</text>
+					<text col_start="1" col_end="0" font_style="italic" font_size_step="-2">' / (Veranstaltung (Name/Ort)'</text>
 					<row value="1" />
 					<lua>nom = tEvenement:GetCell('Nom', 0)</lua>
 					<text cond="string.sub(nom, 1, 1) == ' '" col_start="1" col_end="0" font_weight="bold" align="center">$(Evenement.Station)</text>
@@ -120,9 +119,10 @@
 				<matrix col_start="2" >
 					<padding left="0.2cm"/>
 					<row value="auto" />
-					<text col="auto" font_weight="bold">'Date of race'</text>
+					<col value="2.4cm,1" />
+					<text col_start="1" font_weight="bold">'Date of race'</text>
 					<padding left="0"/>
-					<text col="auto" font_style="italic" font_size_step="-2">' / Date de la course / Datum des wettkampfs'</text>
+					<text col_start="2" font_style="italic" font_size_step="-2">' / Date de la course / Datum des wettkampfs'</text>
 					<row value="auto" />
 					<row value="1" />
 					<text col_start="1" col_end="0" font_weight="bold" align="center" cond="tEpreuve:GetNbRows() &gt; 1">tEpreuve:GetCell('Date_epreuve', 0)..' - '..tEpreuve:GetCell('Date_epreuve', tEpreuve:GetNbRows() -1)</text>
@@ -135,9 +135,10 @@
 				<matrix col_start="1">
 					<padding left="0.2cm"/>
 					<row value="auto" />
-					<text col="auto" font_weight="bold">'Responsible for Entry '</text>
+					<col value="4cm,1" />
+					<text col_start="1" font_weight="bold">'Responsible for Entry '</text>
 					<padding left="0"/>
-					<text col="auto" font_style="italic" font_size_step="-2">' / Responsable de l\'inscription / Verantwortlich '</text>
+					<text col_start="2" font_style="italic" font_size_step="-2">' / Responsable de l\'inscription / Verantwortlich '</text>
 					<padding left="0.2cm"/>
 					<row value="1" />
 					<text col_start="1" col_end="0" font_weight="bold" align="center">GetOfficiel(params.code_evenement, 'ResponsibleEntry', true)</text>
@@ -149,150 +150,129 @@
 				<row value="2.5cm" />
 				<matrix col_start="1">
 					<padding left="0.2cm"/>
+					<col value="2.5cm,1.5cm,1"/>
 					<row value="auto" />
-					<text col="auto" font_weight="bold">'National Association'</text>
+					<text col_start="1" col_end="2" font_weight="bold">'National Association'</text>
 					<padding left="0"/>
-					<text col="auto" font_style="italic" font_size_step="-2">' / Fédération nationale / Nationaler Verband  '</text>
+					<text col_start="3" font_style="italic" font_size_step="-2">' / Fédération nationale / Nationaler Verband  '</text>
 					<row value="1" />
 					<text col_start="2" col_end="0" font_weight="bold" align="center" font_size_step="-1">GetOfficiel(params.code_evenement, 'NationalAssociation', true)</text>
 				</matrix>
 				<matrix col_start="1">
 					<col value="0.2cm,2cm,1"/>
 					<row value="0.5cm,1" />
-					<!-- <text col_start="1">'toto'</text> -->
-					<!-- <image col_start="2" align="center" adjust="best" ><background mode="solid"/>GetOfficielSignature(params.code_evenement, 'NationalAssociation', true)</image> -->
 					<image col_start="2" align="center" adjust="best" ><background mode="solid"/>'./res/logo_ffs.jpg'</image>
 				</matrix>
 				<padding left="0"/>
 				<text col_start="1" border="all" pen_size="2" />
 
 				<!-- Bloc Catégorie -->
+				<lua>val_row = '0.1cm,0.8cm'</lua>
+				<padding left="0.1cm"/>
 				<matrix col_start="2" row_start="-1" row_end="0">
-					<padding left="0.2cm"/>
 					<col value="1,1,1" />
-					<text row="auto" col_start="1" col_end="0" font_weight="bold">'Category'</text>
-					<text row="auto" col_start="1" col_end="0" font_size_step="-2">'Catégorie'</text>
-					<text row="auto" col_start="1" col_end="0" font_size_step="-2">'Kategorie'</text>
-					<row value="1" count="3" />
+					<text row="0.5cm" col_start="1" col_end="0" font_weight="bold">'Category'</text>
+					<text row="0.4cm" col_start="1" col_end="0" font_size_step="-2">'Catégorie'</text>
+					<text row="0.4cm" col_start="1" col_end="0" font_size_step="-2">'Kategorie'</text>
+					<row value="1.3cm" count="3" />
 					<!-- <font size_step="1"/> -->
 					<matrix row_start="-2" col_start="1">
-						<row value="1,0.6cm, 1"/>
-						<col value="1,0.6cm, 1"/>
-						<padding left="0.2cm"/>
-						<text row_start="1" row_end="0" col_start="1" col_end="0" >'COC'</text>
-						<padding all="0"/>
-						<line row_start="2" col_start="2" border="left|top|bottom|right" />
+						<col value="1.3cm,0.8cm,1.3cm"/>
+						<row value="(val_row)" />
+						<text align="right" row_start="2" col_start="1"><pen border="none"/>'COC'</text>
+						<line row_start="2" align="left" col_start="2" border="left|top|bottom|right" />
 						<lua>if params.code_regroupement:In('COC', 'EC', 'CE') then</lua>
 							<pen color="red" size="5" />
-							<line row_start="2" col_start="2" border="diag_up|diag_down" />
-							<pen color="black" size="1" />
+							<line row_start="2" align="left" col_start="2" border="diag_up|diag_down" />
 						<lua>end</lua>
 					</matrix>
 					
 					<matrix row_start="-1" col_start="1">
-						<row value="1,0.6cm, 1"/>
-						<col value="1,0.6cm, 1"/>
-						<padding left="0.2cm"/>
-						<text row_start="1" row_end="0" col_start="1" col_end="0" >'CIT'</text>
-						<padding all="0"/>
-						<line row_start="2" col_start="2" border="left|top|bottom|right" />
+						<col value="1.3cm,0.8cm,1.3cm"/>
+						<row value="(val_row)" />
+						<text align="right" row_start="2" col_start="1"><pen border="none"/>'CIT'</text>
+						<line row_start="2" align="left" col_start="2" border="left|top|bottom|right" />
 						<lua>if params.code_regroupement:In('CIT','CITWC') then</lua>
 							<pen color="red" size="5" />
-							<line row_start="2" col_start="2" border="diag_up|diag_down" />
-							<pen color="black" size="1" />
+							<line row_start="2" align="left" col_start="2" border="diag_up|diag_down" />
 						<lua>end</lua>
 					</matrix>
 
 					<matrix row_start="0" col_start="1">
-						<row value="1,0.6cm, 1"/>
-						<col value="1,0.6cm, 1"/>
-						<padding left="0.2cm"/>
-						<text row_start="1" row_end="0" col_start="1" col_end="0" >'NJR'</text>
-						<padding all="0"/>
-						<line row_start="2" col_start="2" border="left|top|bottom|right" />
+						<col value="1.3cm,0.8cm,1.3cm"/>
+						<row value="(val_row)" />
+						<text align="right" row_start="2" col_start="1"><pen border="none"/>'NJR'</text>
+						<line row_start="2" align="left" col_start="2" border="left|top|bottom|right" />
 						<lua>if params.code_regroupement:In('JUN', 'EL-PJ', 'NJR', 'FJ') then</lua>
 							<pen color="red" size="5" />
-							<line row_start="2" col_start="2" border="diag_up|diag_down" />
-							<pen color="black" size="1" />
+							<line row_start="2" align="left" col_start="2" border="diag_up|diag_down" />
 						<lua>end</lua>
 					</matrix>
 
 					<matrix row_start="-2" col_start="2">
-						<row value="1,0.6cm, 1"/>
-						<col value="1,0.6cm, 1"/>
-						<padding left="0.2cm"/>
-						<text row_start="1" row_end="0" col_start="1" col_end="0" >'FIS'</text>
-						<padding all="0"/>
-						<line row_start="2" col_start="2" border="left|top|bottom|right" />
+						<col value="1.3cm,0.8cm,1.3cm"/>
+						<row value="(val_row)" />
+						<text align="right" row_start="2" col_start="1"><pen border="none"/>'FIS'</text>
+						<line row_start="2" align="left" col_start="2" border="left|top|bottom|right" />
 						<lua>if params.code_regroupement:In('FIS','ELIT','FIS-B','ENL') then</lua>
 							<pen color="red" size="5" />
-							<line row_start="2" col_start="2" border="diag_up|diag_down" />
-							<pen color="black" size="1" />
+							<line row_start="2" align="left" col_start="2" border="diag_up|diag_down" />
 						<lua>end</lua>
 					</matrix>
 					
 					<matrix row_start="-1" col_start="2">
-						<row value="1,0.6cm, 1"/>
-						<col value="1,0.6cm, 1"/>
-						<padding left="0.2cm"/>
-						<text row_start="1" row_end="0" col_start="1" col_end="0" >'UNI'</text>
-						<padding all="0"/>
-						<line row_start="2" col_start="2" border="left|top|bottom|right" />
+						<col value="1.3cm,0.8cm,1.3cm"/>
+						<row value="(val_row)" />
+						<text align="right" row_start="2" col_start="1"><pen border="none"/>'UNI'</text>
+						<line row_start="2" align="left" col_start="2" border="left|top|bottom|right" />
 						<lua>if params.code_regroupement:In('UNI') then</lua>
 							<pen color="red" size="5" />
-							<line row_start="2" col_start="2" border="diag_up|diag_down" />
-							<pen color="black" size="1" />
+							<line row_start="2" align="left" col_start="2" border="diag_up|diag_down" />
 						<lua>end</lua>
 					</matrix>
 
 					<matrix row_start="0" col_start="2">
-						<row value="1,0.6cm, 1"/>
-						<col value="1,0.6cm, 1"/>
-						<padding left="0.2cm"/>
-						<text row_start="1" row_end="0" col_start="1" col_end="0" >'CHI'</text>
-						<padding all="0"/>
-						<line row_start="2" col_start="2" border="left|top|bottom|right" />
+						<col value="1.3cm,0.8cm,1.3cm"/>
+						<row value="(val_row)" />
+						<text align="right" row_start="2" col_start="1"><pen border="none"/>'CHI'</text>
+						<line row_start="2" align="left" col_start="2" border="left|top|bottom|right" />
 						<lua>if params.code_regroupement:In('CHI') then</lua>
 							<pen color="red" size="5" />
-							<line row_start="2" col_start="2" border="diag_up|diag_down" />
-							<pen color="black" size="1" />
+							<line row_start="2" align="left" col_start="2" border="diag_up|diag_down" />
 						<lua>end</lua>
 					</matrix>
 
 					<matrix row_start="-2" col_start="3">
-						<row value="1,0.6cm, 1"/>
-						<col value="1,0.6cm, 1"/>
-						<padding left="0.2cm"/>
-						<text row_start="1" row_end="0" col_start="1" col_end="0" >'NC'</text>
-						<padding all="0"/>
-						<line row_start="2" col_start="2" border="left|top|bottom|right" />
+						<col value="1.3cm,0.8cm,1.3cm"/>
+						<row value="(val_row)" />
+						<text align="right" row_start="2" col_start="1"><pen border="none"/>'NC'</text>
+						<line row_start="2" align="left" col_start="2" border="left|top|bottom|right" />
 						<lua>if params.code_regroupement:In('F','FC','FCJ','NC') then</lua>
 							<pen color="red" size="5" />
-							<line row_start="2" col_start="2" border="diag_up|diag_down" />
-							<pen color="black" size="1" />
+							<line row_start="2" align="left" col_start="2" border="diag_up|diag_down" />
 						<lua>end</lua>
 					</matrix>
 
 					<matrix row_start="-1" col_start="3">
-						<row value="1,0.6cm, 1"/>
-						<col value="1,0.6cm, 1"/>
-						<padding left="0.2cm"/>
-						<text row_start="1" row_end="0" col_start="1" col_end="0" >'ENL'</text>
-						<padding all="0"/>
-						<line row_start="2" col_start="2" border="left|top|bottom|right" />
+						<col value="1.3cm,0.8cm,1.3cm"/>
+						<row value="(val_row)" />
+						<text align="right" row_start="2" col_start="1"><pen border="none"/>'ENL'</text>
+						<line row_start="2" align="left" col_start="2" border="left|top|bottom|right" />
 						<lua>if params.code_regroupement:In('ENL') then</lua>
 							<pen color="red" size="5" />
-							<line row_start="2" col_start="2" border="diag_up|diag_down" />
-							<pen color="black" size="1" />
+							<line row_start="2" align="left" col_start="2" border="diag_up|diag_down" />
 						<lua>end</lua>
 					</matrix>
 
 					<matrix row_start="0" col_start="3">
-						<row value="1,0.6cm, 1"/>
-						<col value="1,0.6cm, 1"/>
-						<padding left="0.2cm"/>
-						<text row_start="1" row_end="0" col_start="1" col_end="0" align="left">'Other'</text>
-						<padding all="0"/>
+						<col value="1.3cm,0.8cm,1.3cm"/>
+						<row value="(val_row)" />
+						<text align="right" row_start="2" col_start="1"><pen border="none"/>'Other'</text>
+						<line row_start="2" align="left" col_start="2" border="left|top|bottom|right" />
+						<lua>if not params.code_regroupement:In('COC','EC','CE','CIT','CITWC','JUN', 'EL-PJ', 'NJR', 'FJ','FIS','ELIT','FIS-B','ENL','UNI','CHI','F','FC','FCJ','NC','ENL') then</lua>
+							<pen color="red" size="5" />
+							<line row_start="2" align="left" col_start="2" border="diag_up|diag_down" />
+						<lua>end</lua>
 					</matrix>
 					<font size_step="0"/>
 
@@ -417,20 +397,23 @@
 				<font name="Calibri" size="10" adjust="both" weight="normal" />
 				<row value="0.6cm" />
 				<matrix col_start="1" col_end ="10">
-					<text col="auto" ><font weight="bold" size="10"/>'Entry with FIS points'</text>
-					<text col="auto" font_style="italic" >'/ Inscription avec points FIS / Anmeldung mit FIS Punkten'</text>
+					<col value="3.5cm,1" />
+					<text col_start="1" font_weight="bold" font_size="10">'Entry with FIS points'</text>
+					<text col_start="2" font_style="italic" >'/ Inscription avec points FIS / Anmeldung mit FIS Punkten'</text>
 				</matrix>
 				<text col_start="11" align="center"><pen border="all"/>nb_with_pts</text>
 				<row value="0.6cm" />
 				<matrix col_start="1" col_end ="10">
-					<text col="auto" ><font weight="bold" size="10"/>'Entry Without FIS points (X)'</text>
-					<text col="auto" font_style="italic" >'/ Inscription sans points FIS / Anmeldung ohne FIS punkte'</text>
+					<col value="4.5cm,1" />
+					<text col_start="1" font_weight="bold" font_size="10">'Entry Without FIS points (X)'</text>
+					<text col_start="2" font_style="italic" >'/ Inscription sans points FIS / Anmeldung ohne FIS punkte'</text>
 				</matrix>
-				<text col_start="11" align="center"><pen border="all"/>nb_without_pts</text>
+				<text col_start="11" align="center"><pen border="all" />nb_without_pts</text>
 				<row value="0.6cm" />
 				<matrix col_start="1" col_end ="10">
-					<text col="auto" font_weight="bold">'No entry'</text>
-					<text col="auto" font_style="italic" >'/ Pas de participation / Keine Teilnahme'</text>
+					<col value="2cm,1" />
+					<text col_start="1" font_weight="bold">'No entry'</text>
+					<text col_start="2" font_style="italic">'/ Pas de participation / Keine Teilnahme'</text>
 				</matrix>
 				<text col_start="11" align="center"><pen border="all"/>''</text>
 				<matrix row_start="-2" row_end="0" col_start="8" col_end ="10" >
@@ -456,7 +439,7 @@
 			dofile('./edition/functionPG.lua');
 		</lua>
 		<layers>
-			<layer id="entryformfis">
+			<layer id="entry_form">
 			</layer>
 		</layers>
 		<header>
@@ -492,9 +475,6 @@
 			<lua>for lng = 1, 20 do</lua>
 				<row value="0.9cm" />
 				<text col_start="4" row_start="0"><pen border="all"/></text>
-				<!-- <lua>for c = 1, 4 do</lua> -->
-					<!-- <text col_start="(c)" row_start="0"><pen border="all"/>'Z'</text> -->
-				<!-- <lua>end</lua> -->
 			<lua>end</lua>
 			<row value="1.6cm" />
 			<text col_start="1" col_end="2" row_start="0"><pen border="all"/></text>
@@ -504,8 +484,9 @@
 			<lua>r=1</lua>
 			<matrix row_start="(r)" col_start="1" col_end="4">
 				<padding left="0.2cm"/>
-				<text col="auto" align="left" font_weight="bold">'Official'</text>
-				<text col="auto" font_style="italic" >'/ Officiels / Offizielle'</text>
+				<col value="2.5cm,1" />
+				<text col_start="1" align="left" font_weight="bold">'Official'</text>
+				<text col_start="2" font_style="italic" >'/ Officiels / Offizielle'</text>
 			</matrix>
 			
 			<lua>r=r+1</lua>
@@ -546,65 +527,48 @@
 			<matrix row_start="-20" col_start="4">
 				<row value="1,1" />
 				<padding left="0.1cm"/>
-				<text col="auto" row_start="1" font_weight="bold">'Team Captain'</text>
-				<text col="auto" row_start="1" font_style="italic" >'/ Chef d\'équipe'</text>
+				<col value="2.9cm,1" />
+				<text col_start="1" row_start="1" font_weight="bold">'Team Captain'</text>
+				<text col_start="2" row_start="1" font_style="italic" >'/ Chef d\'équipe'</text>
 				<text col_start="1" col_end="2" row_start="2" font_style="italic" >'Mannschaftsführer'</text>
 			</matrix>
 			<matrix row_start="-19" col_start="4">
 				<row value="auto" />
 				<padding left="0.1cm"/>
-				<text col="auto" row_start="0" font_weight="bold">'Trainer'</text>
-				<text col="auto" row_start="0" font_style="italic" >'/ Entraîneur'</text>
-				<text col="auto" row_start="0" font_style="italic" >'/ Trainer'</text>
+				<col value="1.5cm,1" />
+				<text col_start="1" font_weight="bold">'Trainer'</text>
+				<text col_start="2" font_style="italic" >'/ Entraîneur / Trainer'</text>
 			</matrix>
 			<matrix row_start="-13" col_start="4">
 				<row value="auto" />
 				<padding left="0.1cm"/>
-				<text col="auto" row_start="0" font_weight="bold">'Doctor'</text>
-				<text col="auto" row_start="0" font_style="italic" >'/ Médecin'</text>
-				<text col="auto" row_start="0" font_style="italic" >'/ Arzt'</text>
+				<col value="2cm,1" />
+				<text col_start="1" font_weight="bold">'Doctor'</text>
+				<text col_start="2" font_style="italic" >'/ Médecin / Arzt'</text>
 			</matrix>
 			<matrix row_start="-11" col_start="4">
-				<row value="auto" />
+				<row value="1,1" />
 				<padding left="0.1cm"/>
-				<text col="3" row_start="0" font_weight="bold">'Physiotherapist'</text>
-				<text col="2" row_start="0" font_style="italic" >'/ Masseur'</text>
-				<text col="2" row_start="0" font_style="italic" >'/ Masseur'</text>
+				<col value="3cm,1" />
+				<text col_start="1" row_start="1" font_weight="bold">'Physiotherapist'</text>
+				<text col_start="2" row_start="1" font_style="italic" >'/ Masseur'</text>
+				<text col_start="1" row_start="2" font_style="italic" >'/ Masseur'</text>
 			</matrix>
 			<matrix row_start="-9" col_start="4">
-				<row value="auto" />
+				<row value="1,1" />
 				<padding left="0.1cm"/>
-				<text col="12" row_start="0" font_weight="bold">'Technicians'</text>
-				<text col="13" row_start="0" font_style="italic" >'/ Techniciens'</text>
-				<text col="11" row_start="0" font_style="italic" >'/ Techniker'</text>
+				<col value="2.5cm,1" />
+				<text col_start="1" row_start="1" font_weight="bold">'Technicians'</text>
+				<text col_start="2" row_start="1" font_style="italic" >'/ Techniciens'</text>
+				<text col_start="1" row_start="2" font_style="italic" >'/ Techniker'</text>
 			</matrix>
 			<matrix row_start="-8" col_start="4">
 				<row value="1,1" />
 				<padding left="0.1cm"/>
-				<text col="auto" row_start="1" font_weight="bold">'Service personnel'</text>
-				<text col="auto" row_start="1" font_style="italic" >'/ Personnel de'</text>
-				<text col_start="1" col_end="2" row_start="2" font_style="italic" >'service / Servicepersonal'</text>
-			</matrix>
-			<matrix row_start="0" col_start="1">
-				<row value="1,1" />
-				<padding left="0.1cm"/>
-				<text col="auto" row_start="1" font_weight="bold">'Place, Date'</text>
-				<text col="auto" row_start="1" font_style="italic" >'/ Lieu, date / Ort, Datum'</text>
-			</matrix>
-			<matrix row_start="0" col_start="3" col_end="0">
-				<col value="1" />
-				<row value="1,3" />
-				<matrix col_start="1" row_start="1">
-					<padding all="0"/>
-					<text col="auto" font_weight="bold">'Signature'</text>
-					<text col="auto" font_style="italic" >'/ Signature / Unterschrift'</text>
-					<text col="auto" font_style="italic" font_size_step="-2">'(please print and sign)'</text>
-				</matrix>
-				<matrix col_start="1" row_start="2">
-					<col value="3,1,2" />
-					<text col_start="1" align="center" adjust="width" >GetOfficiel(params.code_evenement,'ResponsibleEntry')</text>
-					<image col_start="3" adjust="best"><background mode="transparent"/>GetOfficielSignature(params.code_evenement, 'ResponsibleEntry', false)</image>
-				</matrix>
+				<col value="3.5cm,1" />
+				<text col_start="1" row_start="1" font_weight="bold">'Service personnel'</text>
+				<text col_start="2" row_start="1" font_style="italic" >'/ Personnel'</text>
+				<text col_start="1" col_end="0" row_start="2" font_style="italic" >' de service / Servicepersonal'</text>
 			</matrix>
 			<!-- data -->
 			<spacing all="0" />
@@ -653,9 +617,25 @@
 				<text col_start="2" row_start="(i+14)" cond="tEvenement_Officiel:GetCell('Nom', i-1):len() == 0"><pen border="all" /></text>
 				<text col_start="3" row_start="(i+14)" cond="tEvenement_Officiel:GetCell('Nom', i-1):len() == 0"><pen border="all" /></text>
 			<lua>end</lua>
-			<padding top="0.4cm"/>
-			<lua>tEvenement_Officiel = GetOfficiel(params.code_evenement, 'NationalAssociation', false, true);</lua>
-			<text row="2cm" col_start="1" row_start="23">'  '..tEvenement_Officiel:GetCell('Ville', 0):upper()..' LE '..os.date("%d/%m/%Y")</text>
+			<matrix row_start="23" col_start="1" col_end="2">
+				<row value="1,1" />
+				<padding all="0.1cm"/>
+				<col value="2.5cm,1" />
+				<text row_start="1" col_start="1" font_weight="bold">'Place, Date'</text>
+				<text row_start="1" col_start="2" font_style="italic" font_size_step="-2" >' / Lieu, date / Ort, Datum'</text>
+				<lua>tEvenement_Officiel = GetOfficiel(params.code_evenement, 'NationalAssociation', false, true);</lua>
+				<text row_start="2" col_start="1" col_end="0">'  '..tEvenement_Officiel:GetCell('Ville', 0):upper()..' LE '..os.date("%d/%m/%Y")</text>
+			</matrix>
+			<matrix row_start="23" col_start="3" col_end="0">
+				<padding all="0.1cm"/>
+				<col value="2cm,1,1" />
+				<row value="1,1" />
+				<text row_start="1" col_start="1" font_weight="bold">'Signature'</text>
+				<text row_start="1" col_start="2" font_style="italic" font_size_step="-2" >'/ Signature / Unterschrift'</text>
+				<text row_start="1" col_start="3" font_style="italic" font_size_step="-2">'(please print and sign)'</text>
+				<text row_start="2" col_start="1" col_end="2" align="center" adjust="width" >GetOfficiel(params.code_evenement,'ResponsibleEntry')</text>
+				<image row_start="1" row_end="2" col_start="3" adjust="best"><background mode="transparent"/>GetOfficielSignature(params.code_evenement, 'ResponsibleEntry', false)</image>
+			</matrix>
 		</end>
 	</report>
 </edition>
