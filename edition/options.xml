@@ -214,5 +214,48 @@
 		end
 		</lua>
 	</option>
+	
+	<option id="traduction">
+		<lua>
+			function traduction(value)
+				if lang == nil or lang == 'fr' then 
+					return value;
+				else
+					if tTraduction == nil then
+						tTraduction = {};
+						
+						tTraduction.en = {};
+						tTraduction.en['An'] = 'YB';
+						tTraduction.en['Dos'] = 'Bib';
+						tTraduction.en['Categ'] = 'Categ';
+						tTraduction.en['Code'] = 'FIS Number';
+						tTraduction.en['Identité'] = 'Identity';
+						tTraduction.en['Nat'] = 'NSA';
+						tTraduction.en['Nation'] = 'NSA';
+						tTraduction.en['Nom'] = 'Name';
+						tTraduction.en['Points'] = 'Points';
+						tTraduction.en['Prénom'] = 'First Name';
+						tTraduction.en['Sexe'] = 'Gender';
+						tTraduction.en['S.'] = 'G.';
+						
+						
+						tTraduction.it = {};
+						tTraduction.it.Dos = '???';
+					end
+					
+					if tTraduction[lang] ~= nil then
+						local value_lang = tTraduction[lang][value];
+						if value_lang ~= nil then
+							return value_lang;
+						end
+					end
+					return value;
+				end
+			end
+		</lua>
+	</option>
+	
+
+	
 </edition>
 
