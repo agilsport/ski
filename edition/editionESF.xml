@@ -5,7 +5,6 @@
 		<menu title="Listes des Participants" image="./res/32x32_juges.png">
 			<menu title="Par Ordre Alphabétique" image="./res/16x16_juges.png" id="participants_alpha"/>
 			<menu title="Par Ordre de Points" image="./res/16x16_juges.png" id="participants_point"/>
-			<menu title="Pointage Etoile d'Or" image="./res/16x16_juges.png" id="participants_etor_alpha"/>
 		</menu>
 		<menu title="Listes de Départ" image="./res/32x32_bib.png">
 			<menu title="Liste de Départ" image="./res/16x16_bib.png" id="lst_officiel" choix_manche="1"/>
@@ -18,7 +17,15 @@
 			<menu title="Résultats Record ou Vitesse" image="./res/16x16_official.png" id="res_vitesse" choix_manche="1" />
 			<menu title="Résultats Multi-Tours" image="./res/16x16_official.png" id="res_lap" choix_manche="1" mode_lap="1" />
 			<menu title="Résultats Multi-Passages" image="./res/16x16_official.png" id="res_passage" choix_manche="1" mode_lap="2" />
-			</menu>
+		</menu>
+		<menu title="Etoiles et Flocons" image="./res/32x32_snow_esf.png">
+			<menu title="Résultats des 3 Critères par Dossard" image="./res/16x16_official.png" id="res_etoile_3_dossard" />
+			<menu title="Résultats des 3 Critères par Identite" image="./res/16x16_official.png" id="res_etoile_3_identite" />
+			<menu title="Résultats des 3 Critères par Moniteur" image="./res/16x16_official.png" id="res_etoile_3_moniteur" />
+			<menu title="Résultats Etoile Or ou Argent avec les Temps" image="./res/16x16_official.png" id="res_etoile_tps" />
+		
+		</menu>
+
 		<menu title="Outils" image="./res/32x32_tools.png">
 			<menu title="Edition des Séquences Chrono" image="./res/16x16_bib.png" id="chrono_seq" choix_manche="1" action="chrono_seq"/>
 			<menu title="Statistiques Fin de Saison" image="./res/16x16_bib.png" id="stat_esf" action="stat_esf"/>
@@ -144,28 +151,6 @@
 			<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
 		</body>
 	</report>
-	
-	<!-- Liste des participants Etoile d'or par ordre alphabétique -->
-	<report id="participants_etor_alpha" title="Liste des Participants par ordre alphabétique" first_header="0">
-		<order key="Nom, Prenom" />
-		
-		<body>
-			<call option="couleur_alternee" file="./edition/options.xml" />
-
-			<row value="auto"/>
-			<text col="12" align="center" label="Code"><font size="8" cond="group =='body'"/>$(Code_coureur)</text>
-			<text col="25" align="left" label="Nom - Prénom" font_weight="bold" font_size_step="1">$(Identite)</text> 
-			<text col="2" align="center" label="S.">$(Sexe)</text>
-			<text col="4" align="center" label="An">$(An)</text>
-			<text col="6" align="center" label="Cat.">$(Categ)</text>
-			<text col="20" align="center" label="E.S.F." font_weight="bold">$(Equipe)</text>
-			<text col="14" align="center" label="Jour">$(Groupe)</text>
-			<text col="6" align="right" label="P.Open">$(Point)</text>
-			
-			<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
-		</body>
-	</report>
-
 	
 	<!-- Liste des participants par ordre alphabétique -->
 	<report id="participants_point" title="Liste des Participants par ordre de Points" first_header="0">
@@ -425,6 +410,119 @@
 		</body>
 	</report>
 	
+	<report id="res_etoile_3_dossard" title="Résultats" first_header="0">
+		<order key="Dossard" />
+	
+		<body>
+			<call option="couleur_alternee" file="./edition/options.xml" />
+			<font size="9" adjust="ellipsize"/>
+	
+			<row value="auto"/>
+			<lua>obtention = $(@OBTENTION_ETOILE)</lua>
+			<text col="3" align="right" label="D.">$(Dossard)</text>
+			<text col="25" align="left" label="Nom - Prénom" font_weight="bold">$(Identite)</text> 
+			<text col="4" align="center" label="Cat.">$(Categ)</text>
+			<text col="12" align="center" label="Critère 1.">$(@CRITERE_ETOILE1)</text>
+			<text col="12" align="center" label="Critère 2.">$(@CRITERE_ETOILE2)</text>
+			<text col="12" align="center" label="Critère 3.">$(@CRITERE_ETOILE2)</text>
+			
+			<text col="14" cond="obtention ~= 'OUI'" align="center" label="Obtention">obtention</text>
+			<text col="14" cond="obtention == 'OUI'" align="center" label="Obtention" bk_color="green" font_color="white" font_weight="bold">obtention</text>
+			<image col_start="0" align="right" cond="group =='body' and obtention == 'OUI' " adjust="width">
+				<background mode="transparent"/><pen border="0" />app.ImageMedailleESF('Or')
+			</image>
+
+			<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
+		</body>
+	</report>
+	
+	<report id="res_etoile_3_identite" title="Résultats" first_header="0">
+		<order key="Identite" />
+	
+		<body>
+			<call option="couleur_alternee" file="./edition/options.xml" />
+			<font size="9" adjust="ellipsize"/>
+	
+			<row value="auto"/>
+			<lua>obtention = $(@OBTENTION_ETOILE)</lua>
+			<text col="25" align="left" label="Nom - Prénom" font_weight="bold">$(Identite)</text> 
+			<text col="4" align="center" label="Cat.">$(Categ)</text>
+			<text col="12" align="center" label="Critère 1.">$(@CRITERE_ETOILE1)</text>
+			<text col="12" align="center" label="Critère 2.">$(@CRITERE_ETOILE2)</text>
+			<text col="12" align="center" label="Critère 3.">$(@CRITERE_ETOILE2)</text>
+
+			<text col="14" cond="obtention ~= 'OUI'" align="center" label="Obtention">obtention</text>
+			<text col="14" cond="obtention == 'OUI'" align="center" label="Obtention" bk_color="green" font_color="white" font_weight="bold">obtention</text>
+			<image col_start="0" align="right" cond="group =='body' and obtention == 'OUI' " adjust="width">
+				<background mode="transparent"/><pen border="0" />app.ImageMedailleESF('Or')
+			</image>
+
+			<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
+		</body>
+	</report>
+
+	<report id="res_etoile_3_moniteur" title="Résultats" first_header="0">
+		<order key="Moniteur, Identite" />
+
+		<rupture key="Moniteur">
+			<before>
+				<need h="2cm" />
+				<font size="14"/>
+				<row value="0.4cm"/>
+				<text row="auto" col="1" >$(Moniteur)</text>
+			</before>
+		</rupture>
+
+		<body>
+			<call option="couleur_alternee" file="./edition/options.xml" />
+			<font size="9" adjust="ellipsize"/>
+	
+			<row value="auto"/>
+			<lua>obtention = $(@OBTENTION_ETOILE)</lua>
+			<text col="25" align="left" label="Nom - Prénom" font_weight="bold">$(Identite)</text> 
+			<text col="4" align="center" label="Cat.">$(Categ)</text>
+			<text col="12" align="center" label="Critère 1.">$(@CRITERE_ETOILE1)</text>
+			<text col="12" align="center" label="Critère 2.">$(@CRITERE_ETOILE2)</text>
+			<text col="12" align="center" label="Critère 3.">$(@CRITERE_ETOILE2)</text>
+			
+			<text col="14" cond="obtention ~= 'OUI'" align="center" label="Obtention">obtention</text>
+			<text col="14" cond="obtention == 'OUI'" align="center" label="Obtention" bk_color="green" font_color="white" font_weight="bold">obtention</text>
+			<image col_start="0" align="right" cond="group =='body' and obtention == 'OUI' " adjust="width">
+				<background mode="transparent"/><pen border="0" />app.ImageMedailleESF('Or')
+			</image>
+
+			<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
+		</body>
+	</report>
+	
+	<report id="res_etoile_tps" title="Résultats" first_header="0">
+		<order key="Identite" />
+	
+		<body>
+			<call option="couleur_alternee" file="./edition/options.xml" />
+			<font size="9" adjust="ellipsize"/>
+	
+			<row value="auto"/>
+			<lua>obtention = $(@OBTENTION_ETOILE)</lua>
+			<text col="25" align="left" label="Nom - Prénom" font_weight="bold">$(Identite)</text> 
+			<text col="4" align="center" label="Cat.">$(Categ)</text>
+			<text col="8" align="center" label="Temps.">$(Tps_chrono1)</text>
+			<text col="8" align="center" label="%">$(Pts1)</text>
+			<text col="12" align="center" label="Critère 1.">$(@CRITERE_ETOILE1)</text>
+			<text col="12" align="center" label="Critère 2.">$(@CRITERE_ETOILE2)</text>
+			<text col="12" align="center" label="Critère 3.">$(@CRITERE_ETOILE2)</text>
+			
+			<text col="14" cond="obtention ~= 'OUI'" align="center" label="Obtention">obtention</text>
+			<text col="14" cond="obtention == 'OUI'" align="center" label="Obtention" bk_color="green" font_color="white" font_weight="bold">obtention</text>
+			<image col_start="0" align="right" cond="group =='body' and obtention == 'OUI' " adjust="width">
+				<background mode="transparent"/><pen border="0" />app.ImageMedailleESF('Or')
+			</image>
+
+			<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
+		</body>
+
+	</report>
+
 	<!-- Résultats Multi-Tours -->
 	<report id="res_lap" title="Résultats Multi-Tours" first_header="0">
 
