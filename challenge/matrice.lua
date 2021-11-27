@@ -132,15 +132,19 @@ function BuildFilterSupport()	-- filtre additionnel des coureurs avec inclusion 
 		tMatrice_Ranking:Filter(inclusion, true);
 	end
 	if matrice.support_exclusion > 0 then
-		local cmd = 'Select * From Resultat Where Code_evenement = '..matrice.support_exclusion;
+		local tCode_exclusion = {};
+		local cmd = 'Select * From Resultat Where Code_evenement = '..matrice.support_exclusion.." And Sexe = '"..matrice.comboSexe.."'";
 		base:TableLoad(tResultat, cmd);
 		-- tResultat:Snapshot('Resultat.db3');
+		for i = tResultat:GetNbRows() -1, 0, -1 do
+			local code_coureur = tResultat:GetCell('Code_coureur', i);
+			tCode_exclusion[code_coureur] = {};
+		end
 		for i = tMatrice_Ranking:GetNbRows() -1, 0, -1 do
 			local code_coureur = tMatrice_Ranking:GetCell('Code_coureur', i);
-			local r = tResultat:GetIndexRow('Code_coureur', code_coureur);
-			if r and r >= 0 then
+			if type(tCode_exclusion[code_coureur]) == 'table' then
 				tMatrice_Ranking:RemoveRowAt(i);
-			end
+			end			
 		end
 	end
 end
@@ -387,9 +391,9 @@ function CreateMatriceRanking()	-- création de la table tMatrice_Ranking sans te
 		tMatrice_Ranking:Filter(matrice.Cle_filtrage, true);
 	end
 	
-	SetRankingBody();
 	-- vérifier les courses support. On retourne tMatrice_Ranking filtrée le cas échéant
 	BuildFilterSupport()
+	SetRankingBody();
 	
 	-- tMatrice_Ranking ne contient que les bons coureurs
 	-- tMatrice_Ranking:Snapshot('tMatrice_Ranking.db3');
@@ -5623,7 +5627,7 @@ function BuildTableRanking()
 	if matrice.comboSexe then
 		cmd = cmd.." And Sexe = '"..matrice.comboSexe.."'";
 	end
-	cmd = cmd..' Group By Code_coureur';
+	cmd = cmd..' Group By Sexe, Code_coureur';
 	tMatrice_Ranking = base:TableLoad(cmd);
 	ReplaceTableEnvironnement(tMatrice_Ranking, '_tMatrice_Ranking');
  	tMatrice_Ranking:AddColumn({ name = 'Clt', label = 'Clt', type = sqlType.LONG, style = sqlStyle.NULL});
@@ -7528,7 +7532,7 @@ function OnConfiguration(cparams)
 	else
 		return false;
 	end
-	matrice.version_script = '4.5';
+	matrice.version_script = '4.51';
 	matrice.OS = app.GetOsDescription();
 	-- vérification de l'existence d'une version plus récente du script.
 	local url = 'https://live.ffs.fr/maj_pg/challenge/last_version.txt'
