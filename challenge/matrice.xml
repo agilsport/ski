@@ -1036,6 +1036,7 @@
 						<lua>end</lua>
 					<lua>else</lua>
 							<matrix col_start="1" row="1.5cm" row_start="-1">
+								<pen border="none"/>
 								<image align="center" adjust="best">texteImageStatCourses</image>
 							</matrix>
 							<lua>row_start = row_start -2;</lua>
