@@ -2855,6 +2855,7 @@ function LitMatrice()	-- lecture des variables et affectation des valeurs dans l
 	matrice.texteMargeHaute1 = matrice.texteMargeHaute1 or 1;
 	matrice.texteMargeHaute2 = matrice.texteMargeHaute2 or 1;
 	matrice.texteNbColPresCourses = matrice.texteNbColPresCourses or GetValue ("texteNbColPresCourses", '3');
+	matrice.texteImageStatCourses = matrice.texteImageStatCourses or GetValue ("texteImageStatCourses", '')
 	
 	BuildRegroupement();
 
@@ -4851,6 +4852,9 @@ function OnSavedlgTexte()
 	AddRowEvenement_Matrice('texteNbColPresCourses', matrice.texteNbColPresCourses);
 	matrice.texteLigne2Texte = dlgTexte:GetWindowName('texteLigne2Texte'):GetValue();
 	AddRowEvenement_Matrice('texteLigne2Texte', matrice.texteLigne2Texte);
+	matrice.texteImageStatCourses = dlgTexte:GetWindowName('texteImageStatCourses'):GetValue();
+	AddRowEvenement_Matrice('texteImageStatCourses', matrice.texteImageStatCourses);
+
 	matrice.texteCodeComplet = dlgTexte:GetWindowName('texteCodeComplet'):GetValue();
 	AddRowEvenement_Matrice('texteCodeComplet', matrice.texteCodeComplet);
 	matrice.texteFiltreSupplementaire = dlgTexte:GetWindowName('texteFiltreSupplementaire'):GetValue();
@@ -4941,8 +4945,9 @@ function AffichedlgTexte()		-- boîte de dialogue pour le choix des textes à impr
 	dlgTexte:GetWindowName('texteImprimerLayerPage'):Append('Sur la page 2 et suivante');
 	dlgTexte:GetWindowName('texteImprimerStatCourses'):SetTable(tOuiNon, 'Choix', 'Choix');
 	dlgTexte:GetWindowName('texteImprimerStatCourses'):SetValue(matrice.texteImprimerStatCourses);
-	
 	dlgTexte:GetWindowName('texteLigne2Texte'):SetValue(matrice.texteLigne2Texte);
+	dlgTexte:GetWindowName('texteImageStatCourses'):SetValue(matrice.texteImageStatCourses);
+	
 
 	for i = 1, #matrice.layers do
 		dlgTexte:GetWindowName('texteImprimerLayer'):Append(matrice.layers[i]);
@@ -4965,7 +4970,6 @@ function AffichedlgTexte()		-- boîte de dialogue pour le choix des textes à impr
 	dlgTexte:GetWindowName('texteCodeComplet'):SetTable(tOuiNon, 'Choix', 'Choix');
 	dlgTexte:GetWindowName('texteCodeComplet'):SetValue(matrice.texteCodeComplet);
 
-
 	-- Bind
 	tbtexte:Bind(eventType.MENU, 
 		function(evt) 
@@ -4978,6 +4982,23 @@ function AffichedlgTexte()		-- boîte de dialogue pour le choix des textes à impr
 			matrice.action = 'close';
 		end, 
 		btnSaveEdit);
+		
+	dlgTexte:Bind(eventType.BUTTON, 
+		function(evt) 
+			local returnPath = "";
+			local fileDialog = wnd.CreateFileDialog(dlgTexte,
+				"Sélection du fichier image des critères de calcul",
+				app.GetPath()..app.GetPathSeparator()..'logo', 
+				filename,
+				"*.jpg, *.gif, *.png|*.jpg;*.gif;*.png", fileDialogStyle.OPEN);
+			if fileDialog:ShowModal() == idButton.OK then
+				matrice.texteImageStatCourses = string.gsub(fileDialog:GetPath(), '\\', '/');
+			else
+				matrice.texteImageStatCourses = '';
+			end
+				dlgTexte:GetWindowName('texteImageStatCourses'):SetValue(matrice.texteImageStatCourses);
+		end, 
+		dlgTexte:GetWindowName('pathimagestat'));
 	dlgTexte:Bind(eventType.COMBOBOX, 
 		function(evt) 
 			dlgTexte:GetWindowName('texteLigne2Texte'):Enable(dlgTexte:GetWindowName('texteImprimerStatCourses'):GetValue() == 'Oui');
@@ -7297,6 +7318,8 @@ function OnSavedlgConfiguration()	-- sauvegarde des paramètres de la matrice.
 	AddRowEvenement_Matrice('texteImprimerLayerPage', matrice.texteImprimerLayerPage);
 	AddRowEvenement_Matrice('texteLargeurLarge', matrice.texteLargeurLarge);
 	AddRowEvenement_Matrice('texteLargeurEtroite', matrice.texteLargeurEtroite);
+	AddRowEvenement_Matrice('texteImageStatCourses', matrice.texteImageStatCourses);
+
 	AddRowEvenement_Matrice('texteImprimerDeparts', matrice.texteImprimerDeparts);
 	AddRowEvenement_Matrice('texteImprimerStatCourses', matrice.texteImprimerStatCourses);
 	AddRowEvenement_Matrice('texteNbColPresCourses', matrice.texteNbColPresCourses);
@@ -7532,7 +7555,7 @@ function OnConfiguration(cparams)
 	else
 		return false;
 	end
-	matrice.version_script = '4.51';
+	matrice.version_script = '4.52';
 	matrice.OS = app.GetOsDescription();
 	-- vérification de l'existence d'une version plus récente du script.
 	local url = 'https://live.ffs.fr/maj_pg/challenge/last_version.txt'

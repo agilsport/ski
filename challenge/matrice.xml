@@ -236,11 +236,11 @@
 	</panel>
 	<panel name="texte">
 		<row value="0.5cm"/>
-		<col value="1,3,2"/>
+		<col value="2,7,4"/>
 		<pen border="0"/>
 		<padding all="3px"/>
 		<matrix col_start="2" row="auto">
-			<col value="3,2" />
+			<col value="3,2,80px" />
 			<statictext row="auto" col_start="1" style="ALIGN_RIGHT" label="Imprimer le titre "/>
 			<combotable col_start="2" name="texteImprimerHeader" style="CB_READONLY"/>
 			<statictext row="auto" col_start="1" style="ALIGN_RIGHT" label="Marge haute / page 1 ajouter en cm : "/>
@@ -265,6 +265,9 @@
 			<combotable col_start="2" name="texteImprimerStatCourses" style="CB_READONLY"/>
 			<statictext row="auto" col_start="1" style="ALIGN_RIGHT" label="Texte à mettre en ligne 2 de celui-ci : "/>
 			<textctrl col_start="2" name="texteLigne2Texte"/>
+			<statictext row="auto" col_start="1" style="ALIGN_RIGHT" label="Imprimer une image à la place : "/>
+			<textctrl col_start="2" name="texteImageStatCourses" style = "TE_READONLY"/>
+			<button col_start="3" name="pathimagestat" label=".../..." />
 			<statictext row="auto" col_start="1" style="ALIGN_RIGHT" label="Imprimer le Code coureur complet : "/>
 			<combotable col_start="2" name="texteCodeComplet" style="CB_READONLY"/>
 			<statictext row="auto" col_start="1" style="ALIGN_RIGHT" label="Présenter un filtrage supplémentaire avant les calculs : "/>
@@ -918,6 +921,7 @@
 			comboOrientation = GetValuePG('comboOrientation', 'Portrait');
 			comboEntite = GetValuePG('comboEntite', 'FFS');
 			texteImprimerStatCourses = GetValuePG('texteImprimerStatCourses', 'Oui');
+			texteImageStatCourses = GetValuePG('texteImageStatCourses', '');
 			liste1 = GetValuePG('comboListe1', '');
 			liste2 = GetValuePG('comboListe2', '');
 			liste1Classement = GetValuePG('comboListe1Classement', '');
@@ -1021,15 +1025,24 @@
 								<text row_start="(0 - enlever)" align="center"  >sommeSur</text>
 								<text row_start="0" align="center"  cond="params.Criteres1 ~= nil">sommeCombien</text>
 						</matrix>
-				<lua>elseif params.Criteres1 ~= nil and params.Criteres1:len() &gt; 15 then</lua>
-					<pen border="none"/>
-					<font weight="bold"/>
-					<text row="auto" col_start="1" col_end="0" cond="params.Criteres1:len() &gt; 0">params.Criteres1</text>
-					<text row="auto" col_start="1" col_end="0" cond="params.Criteres1:len() &gt; 0">params.Criteres2</text>
-				<lua>row_start = row_start -2;
-					end
-				end</lua>
-				<text row="auto" col_start="1" col_end="0" cond="params.PenalisationSaut:len() &gt; 0"><pen border="none"/><font weight="bold"/>params.PenalisationSaut</text>
+				<lua>else</lua>
+					<lua>if texteImageStatCourses:len() == 0 then</lua>
+						<lua>if params.Criteres1 ~= nil and params.Criteres1:len() &gt; 15 then</lua>
+								<pen border="none"/>
+								<font weight="bold"/>
+								<text row="auto" col_start="1" col_end="0" cond="params.Criteres1:len() &gt; 0">params.Criteres1</text>
+								<text row="auto" col_start="1" col_end="0" cond="params.Criteres1:len() &gt; 0">params.Criteres2</text>
+								<lua>row_start = row_start -2;</lua>
+						<lua>end</lua>
+					<lua>else</lua>
+							<matrix col_start="1" row="1.5cm" row_start="-1">
+								<image align="left" adjust="best">texteImageStatCourses</image>
+							</matrix>
+							<lua>row_start = row_start -2;</lua>
+					<lua>end</lua>
+				<lua>end</lua>
+			<lua>end</lua>
+			<text row="auto" col_start="1" col_end="0" cond="params.PenalisationSaut:len() &gt; 0"><pen border="none"/><font weight="bold"/>params.PenalisationSaut</text>
 			<lua>if string.find(params.Presentation,'horizontale') then
 					nb_ligne = math.ceil(tMatrice_Courses:GetNbRows() / texteNbColPresCourses);
 					nb_cell = nb_ligne * texteNbColPresCourses;
