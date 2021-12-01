@@ -132,15 +132,19 @@ function BuildFilterSupport()	-- filtre additionnel des coureurs avec inclusion 
 		tMatrice_Ranking:Filter(inclusion, true);
 	end
 	if matrice.support_exclusion > 0 then
-		local cmd = 'Select * From Resultat Where Code_evenement = '..matrice.support_exclusion;
+		local tCode_exclusion = {};
+		local cmd = 'Select * From Resultat Where Code_evenement = '..matrice.support_exclusion.." And Sexe = '"..matrice.comboSexe.."'";
 		base:TableLoad(tResultat, cmd);
 		-- tResultat:Snapshot('Resultat.db3');
+		for i = tResultat:GetNbRows() -1, 0, -1 do
+			local code_coureur = tResultat:GetCell('Code_coureur', i);
+			tCode_exclusion[code_coureur] = {};
+		end
 		for i = tMatrice_Ranking:GetNbRows() -1, 0, -1 do
 			local code_coureur = tMatrice_Ranking:GetCell('Code_coureur', i);
-			local r = tResultat:GetIndexRow('Code_coureur', code_coureur);
-			if r and r >= 0 then
+			if type(tCode_exclusion[code_coureur]) == 'table' then
 				tMatrice_Ranking:RemoveRowAt(i);
-			end
+			end			
 		end
 	end
 end
@@ -387,9 +391,9 @@ function CreateMatriceRanking()	-- création de la table tMatrice_Ranking sans te
 		tMatrice_Ranking:Filter(matrice.Cle_filtrage, true);
 	end
 	
-	SetRankingBody();
 	-- vérifier les courses support. On retourne tMatrice_Ranking filtrée le cas échéant
 	BuildFilterSupport()
+	SetRankingBody();
 	
 	-- tMatrice_Ranking ne contient que les bons coureurs
 	-- tMatrice_Ranking:Snapshot('tMatrice_Ranking.db3');
@@ -2851,6 +2855,7 @@ function LitMatrice()	-- lecture des variables et affectation des valeurs dans l
 	matrice.texteMargeHaute1 = matrice.texteMargeHaute1 or 1;
 	matrice.texteMargeHaute2 = matrice.texteMargeHaute2 or 1;
 	matrice.texteNbColPresCourses = matrice.texteNbColPresCourses or GetValue ("texteNbColPresCourses", '3');
+	matrice.texteImageStatCourses = matrice.texteImageStatCourses or GetValue ("texteImageStatCourses", '')
 	
 	BuildRegroupement();
 
@@ -4847,6 +4852,9 @@ function OnSavedlgTexte()
 	AddRowEvenement_Matrice('texteNbColPresCourses', matrice.texteNbColPresCourses);
 	matrice.texteLigne2Texte = dlgTexte:GetWindowName('texteLigne2Texte'):GetValue();
 	AddRowEvenement_Matrice('texteLigne2Texte', matrice.texteLigne2Texte);
+	matrice.texteImageStatCourses = dlgTexte:GetWindowName('texteImageStatCourses'):GetValue();
+	AddRowEvenement_Matrice('texteImageStatCourses', matrice.texteImageStatCourses);
+
 	matrice.texteCodeComplet = dlgTexte:GetWindowName('texteCodeComplet'):GetValue();
 	AddRowEvenement_Matrice('texteCodeComplet', matrice.texteCodeComplet);
 	matrice.texteFiltreSupplementaire = dlgTexte:GetWindowName('texteFiltreSupplementaire'):GetValue();
@@ -4937,8 +4945,9 @@ function AffichedlgTexte()		-- boîte de dialogue pour le choix des textes à impr
 	dlgTexte:GetWindowName('texteImprimerLayerPage'):Append('Sur la page 2 et suivante');
 	dlgTexte:GetWindowName('texteImprimerStatCourses'):SetTable(tOuiNon, 'Choix', 'Choix');
 	dlgTexte:GetWindowName('texteImprimerStatCourses'):SetValue(matrice.texteImprimerStatCourses);
-	
 	dlgTexte:GetWindowName('texteLigne2Texte'):SetValue(matrice.texteLigne2Texte);
+	dlgTexte:GetWindowName('texteImageStatCourses'):SetValue(matrice.texteImageStatCourses);
+	
 
 	for i = 1, #matrice.layers do
 		dlgTexte:GetWindowName('texteImprimerLayer'):Append(matrice.layers[i]);
@@ -4961,7 +4970,6 @@ function AffichedlgTexte()		-- boîte de dialogue pour le choix des textes à impr
 	dlgTexte:GetWindowName('texteCodeComplet'):SetTable(tOuiNon, 'Choix', 'Choix');
 	dlgTexte:GetWindowName('texteCodeComplet'):SetValue(matrice.texteCodeComplet);
 
-
 	-- Bind
 	tbtexte:Bind(eventType.MENU, 
 		function(evt) 
@@ -4974,6 +4982,23 @@ function AffichedlgTexte()		-- boîte de dialogue pour le choix des textes à impr
 			matrice.action = 'close';
 		end, 
 		btnSaveEdit);
+		
+	dlgTexte:Bind(eventType.BUTTON, 
+		function(evt) 
+			local returnPath = "";
+			local fileDialog = wnd.CreateFileDialog(dlgTexte,
+				"Sélection du fichier image des critères de calcul",
+				app.GetPath()..app.GetPathSeparator()..'logo', 
+				filename,
+				"*.jpg, *.gif, *.png|*.jpg;*.gif;*.png", fileDialogStyle.OPEN);
+			if fileDialog:ShowModal() == idButton.OK then
+				matrice.texteImageStatCourses = string.gsub(fileDialog:GetPath(), '\\', '/');
+			else
+				matrice.texteImageStatCourses = '';
+			end
+				dlgTexte:GetWindowName('texteImageStatCourses'):SetValue(matrice.texteImageStatCourses);
+		end, 
+		dlgTexte:GetWindowName('pathimagestat'));
 	dlgTexte:Bind(eventType.COMBOBOX, 
 		function(evt) 
 			dlgTexte:GetWindowName('texteLigne2Texte'):Enable(dlgTexte:GetWindowName('texteImprimerStatCourses'):GetValue() == 'Oui');
@@ -5623,7 +5648,7 @@ function BuildTableRanking()
 	if matrice.comboSexe then
 		cmd = cmd.." And Sexe = '"..matrice.comboSexe.."'";
 	end
-	cmd = cmd..' Group By Code_coureur';
+	cmd = cmd..' Group By Sexe, Code_coureur';
 	tMatrice_Ranking = base:TableLoad(cmd);
 	ReplaceTableEnvironnement(tMatrice_Ranking, '_tMatrice_Ranking');
  	tMatrice_Ranking:AddColumn({ name = 'Clt', label = 'Clt', type = sqlType.LONG, style = sqlStyle.NULL});
@@ -7293,6 +7318,8 @@ function OnSavedlgConfiguration()	-- sauvegarde des paramètres de la matrice.
 	AddRowEvenement_Matrice('texteImprimerLayerPage', matrice.texteImprimerLayerPage);
 	AddRowEvenement_Matrice('texteLargeurLarge', matrice.texteLargeurLarge);
 	AddRowEvenement_Matrice('texteLargeurEtroite', matrice.texteLargeurEtroite);
+	AddRowEvenement_Matrice('texteImageStatCourses', matrice.texteImageStatCourses);
+
 	AddRowEvenement_Matrice('texteImprimerDeparts', matrice.texteImprimerDeparts);
 	AddRowEvenement_Matrice('texteImprimerStatCourses', matrice.texteImprimerStatCourses);
 	AddRowEvenement_Matrice('texteNbColPresCourses', matrice.texteNbColPresCourses);
@@ -7528,7 +7555,7 @@ function OnConfiguration(cparams)
 	else
 		return false;
 	end
-	matrice.version_script = '4.5';
+	matrice.version_script = '4.53';
 	matrice.OS = app.GetOsDescription();
 	-- vérification de l'existence d'une version plus récente du script.
 	local url = 'https://live.ffs.fr/maj_pg/challenge/last_version.txt'

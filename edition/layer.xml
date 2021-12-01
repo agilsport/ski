@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layers>
+  <layer id="club_esf">
+    <matrix>
+      <col w="2.5cm,1, 2.5cm"/>
+      <image col_start="2" row="1cm">'./res/clubesf_header.png'</image>
+    </matrix>
+  </layer>
+  <layer id="entry_form">
+    <matrix>
+      <background mode="transparent"/>
+      <row value="1cm, 2.00cm"/>
+      <col value="1cm, 2.00cm"/>
+      <image adjust="best">'./res/logo_fis.jpg' </image>
+    </matrix>
+    <matrix>
+      <row value="1.8cm, 0.2cm, 0.2cm, 0.2cm"/>
+      <col value="3.5cm, 1, 1cm"/>
+      <text col_start="2" row_start="2" col_end="2">
+        <background mode="solid" color="rgb 253 191 46"/>''</text>
+      <text col_start="2" col_end="2">
+        <background mode="solid" color="rgb 28 91 162"/>''</text>
+    </matrix>
+    <matrix>
+      <row value="28.2cm"/>
+      <col value="1cm, 14cm, 0.5cm, 5cm"/>
+      <!-- <font name="Arial Narrow" size="7" weight="bold" /> -->
+      <font name="Calibri" size="7" weight="bold"/>
+      <text row="0.3cm">'FEDERATION INTERNATIONALE DE SKI'</text>
+      <text col_start="2" col_end="2">
+        <background mode="solid" color="rgb 253 191 46"/>' '</text>
+      <text row="0.3cm">'INTERNATIONAL SKI FEDERATION'</text>
+      <text row="0.3cm">'INTERNATIONALER SKI VERBAND'</text>
+      <text col_start="2" col_end="2">
+        <background mode="solid" color="rgb 28 91 162"/>' '</text>
+    </matrix>
+  </layer>
+  <layer id="MST">
+    <matrix>
+      <row value="0.05cm, 3.21cm"/>
+      <col value="2.47cm, 16.02cm"/>
+      <image adjust="best">'./logo/Bandeau_FFS/MARATHON-SKI-TOUR-2020.jpg'
+        
+        <background mode="transparent"/>
+      </image>
+    </matrix>
+  </layer>
+  <layer id="FFS">
+    <matrix>
+      <row value="0.13cm, 2.97cm"/>
+      <col value="0.30cm, 2.97cm"/>
+      <image adjust="best">'./res/logo_ffs.jpg'
+        <background mode="transparent"/>
+      </image>
+    </matrix>
+  </layer>
+</layers>

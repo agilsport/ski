@@ -19,6 +19,14 @@ function main(params_c)
 	ReplaceTableEnvironnement(tEvenement2, '_tEvenement2');
 	tEpreuve = base:GetTable('Epreuve');
 	base:TableLoad(tEpreuve, 'Select * From Epreuve Where Code_evenement = '..params.code_evenement);
+	local saison = tEpreuve:GetCell('Code_saison', 0);
+	tRegroupement = base:GetTable('Regroupement');
+	local cmd = "SELECT * FROM Regroupement WHERE Code_activite='ALP' AND Code_entite = 'FIS' AND Code_saison = '"..saison.."' AND Code = 'POOL'"
+	base:TableLoad(tRegroupement, cmd);
+	if tRegroupement:GetNbRows() == 0 then
+		local cmd = "REPLACE INTO Regroupement VALUES ('ALP', 'FIS', "..saison..", '-', 'POOL', 100, NULL, 'Course POOL', 'Course POOL', 'N')";
+		base:Query(cmd);
+	end
 	params.datex = tEpreuve:GetCell('Date_epreuve', 0);
 	tEvenement_Officiel = base:GetTable('Evenement_Officiel');
 	base:TableLoad(tEvenement_Officiel, 'Select * From Evenement_Officiel Where Code_evenement = '..params.code_evenement..' Order By Ordre DESC');

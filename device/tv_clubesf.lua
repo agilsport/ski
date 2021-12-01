@@ -4,7 +4,7 @@ dofile('./interface/device.lua');
 
 -- Information : Numéro de Version, Nom, Interface
 function device.GetInformation()
-	return { version = 4.4, name = 'TV Club ESF', class = 'display', interface = {} };
+	return { version = 4.5, name = 'TV Club ESF', class = 'display', interface = {} };
 end	
 
 -- Ouverture
@@ -32,6 +32,7 @@ function device.OnInit(params)
 		end
 	end
 	device.dbTV:Load();
+	device.dbTV:Query("Replace Into Running (ID) Values (1)");
 	
 	-- Tableau de Bord
 	tbNavigation = wnd.CreateAuiToolBar({ style = auiToolBarStyle.HORIZONTAL });
@@ -631,9 +632,9 @@ end
 function GetTitle()
 	if device.raceInfo.tables ~= nil then
 		local tEvenement = device.raceInfo.tables.Evenement;
-		local tEpreuve = device.raceInfo.tables.Epreuve;
-		if tEvenement ~= nil and tEpreuve ~= nil then
-			local title = tEvenement:GetCell('Commentaire', 0)..'|Flèche';
+		local tDiscipline = device.raceInfo.tables.Discipline;
+		if tEvenement ~= nil and tDiscipline ~= nil then
+			local title = tEvenement:GetCell('Commentaire', 0)..'|'..tDiscipline:GetCell("Libelle", 0);
 			return string.gsub(title,"'", "''");
 		end
 	end
