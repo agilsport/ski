@@ -6,7 +6,7 @@ function main(params_c)
 		return false;
 	end
 	params = params_c;
-	params.version = '1.5';
+	params.version = '1.6';
 	params.pluscode = 0;
 	params.closeDlg = false;
 	params.impression = tonumber(params.impression) or 1;
@@ -490,43 +490,49 @@ function OnEdition(evt)
 	-- local pts = base:GetClassementCoureur('FIS194965', 'IAGS', 1719):GetCell('Pts', 0)
 	-- adv.Alert('pts = '..pts);
 	for i=0, body:GetNbRows()-1 do
+		tCritere = {};
 		local code_coureur = body:GetCell('Code_coureur',i);
-		local plus_moins = body:GetCell('Critere',i):sub(1,1);
-		local critere = body:GetCell('Critere',i);
-		for j = 1, #t do
-			local discipline = t[j]:sub(3);
-			local pts = base:GetClassementCoureur(code_coureur, t[j]):GetCell('Pts', 0);
-			if plus_moins ~= '+' and plus_moins ~= '-' then
-				if pts ~= '' then
-					body:SetCell(t[j], i, pts)
+		if code_coureur:len() > 0 then
+			local plus_moins = body:GetCell('Critere',i):sub(1,1);
+			if plus_moins == '+' or plus_moins == '-' then
+				tCritere.plus_moins = plus_moins;
+				tCritere.discipline = body:GetCell('Critere',i):sub(2);
+			end
+			for j = 1, #t do
+				local pts = '';
+				local discipline = t[j]:sub(3);
+				if not tCritere.discipline then
+					pts = base:GetClassementCoureur(code_coureur, t[j]):GetCell('Pts', 0);
+					if pts:len() == 0 then
+						pts = 'X';
+					end
 				else
-					body:SetCell(t[j], i, 'X')
-				end
-			else
-				if pts ~= '' then
-					if plus_moins == '+' then	-- = GS only
-						if string.find(critere, discipline) then
-							body:SetCell(t[j], i, pts)
+					if plus_moins == '+' then
+						if discipline == tCritere.discipline then	-- +GS : plus_moins = +
+							pts = base:GetClassementCoureur(code_coureur, t[j]):GetCell('Pts', 0);
 						else
-							body:SetCell(t[j], i, '');
 							params.no_entry = params.no_entry + 1;
 						end
-					else						-- = except GS
-						if not string.find(critere, discipline) then
-							body:SetCell(t[j], i, pts)
+					elseif plus_moins == '-' then
+						if discipline ~= tCritere.discipline then	-- -GS : plus_moins = -
+							pts = base:GetClassementCoureur(code_coureur, t[j]):GetCell('Pts', 0);
 						else
-							body:SetCell(t[j], i, '')
 							params.no_entry = params.no_entry + 1;
 						end
 					end
+				end			
+				if pts:len() > 0 then
+					body:SetCell(t[j], i, pts)
+				else
+					body:SetCell(t[j], i, '');
 				end
 			end
-		end
-		body:SetCell('Info', i, body_date_arrivee);
-		if body:GetCell('Critere', i):len() == 0 then
-			body:SetCell('Niveau', i, body_date_depart);
-		else
-			body:SetCell('Niveau', i, body:GetCell('Critere', i));
+			body:SetCell('Info', i, body_date_arrivee);
+			if body:GetCell('Critere', i):len() == 0 then
+				body:SetCell('Niveau', i, body_date_depart);
+			else
+				body:SetCell('Niveau', i, body:GetCell('Critere', i));
+			end
 		end
 	end
 
