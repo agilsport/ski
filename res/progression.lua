@@ -1,5 +1,5 @@
 -- Synthaxe Progression :
--- Version 3.3
+-- Version 3.7
 -- clt/duel/tour/ordre/tri : clt (obligatoire ...), duel, tour, ordre (non obligatoires ...)
 -- exemple 1 : 12 => 12ième du tour précédent (et de tous les duels)
 -- exemple 2 : 2/3 => 2ème du duel 3 du tour précédent
@@ -170,7 +170,6 @@ duel_progression = {
 	{
 		dimension = 12,
 		label = { 'Demi Finale', 'Finale' },
-		acitivite = 'FS',
 		progression = {
 			{ 
 				-- tour 1 : 2 duels de 6 couloirs
@@ -188,7 +187,6 @@ duel_progression = {
 	std16 =
 	{
 		dimension = 16,
-		activite = 'FS',
 		progression = {
 			{ 
 				-- tour 1 : 4 duels de 4 couloirs
@@ -213,7 +211,6 @@ duel_progression = {
 	std24 =
 	{
 		dimension = 24,
-		activite = 'FS',
 		GetLabelTour = GetLabel3Tours,
 		progression = {
 			{ 
@@ -298,8 +295,6 @@ duel_progression = {
 			}
 		}
 	},
-	
-
 
 	std48 =
 	{
@@ -338,9 +333,23 @@ duel_progression = {
 	
 -- Tableau type FreeStyle   ------------------------------------------------->>
 
+	FS_4 = 
+	{
+		dimension = 4,
+		dimension_min = 2,
+		activite = 'FS',
+		progression = {
+			{ 
+				-- tour unique: 1 duel de 4 couloirs
+				{ '1', '2', '3', '4'}
+			},
+		}
+	},
+
 	FS_8 =
 	{
 		dimension = 8,
+		dimension_min = 7,
 		activite = 'FS',
 		label = { 'Demi Finale', 'Finale' },
 		progression = {
@@ -351,8 +360,8 @@ duel_progression = {
 			},
 			{
 				-- tour 2 : Finale A et Finale B
-				{ '1-2/1-2/2/1', '1-2/1-2/2/2', '1-2/1-2/2/3', '1-2/1-2/2/4'}, 
-				{ '3-4/1-2/2/1', '3-4/1-2/2/2', '3-4/1-2/2/3', '3-4/1-2/2/4'}
+				{ '1-2/1-2/1/1', '1-2/1-2/1/2', '1-2/1-2/1/3', '1-2/1-2/1/4'}, 
+				{ '3-4/1-2/1/1', '3-4/1-2/1/2', '3-4/1-2/1/3', '3-4/1-2/1/4'}
 			}
 		}
 	},
@@ -360,9 +369,10 @@ duel_progression = {
 	FS_12 =
 	{
 		dimension = 12,
+		dimension_min = 10,
 		activite = 'FS',
+		niveau = 'Duel_6',
 		label = { 'Demi Finale', 'Finale' },
-		acitivite = 'FS',
 		progression = {
 			{ 
 				-- tour 1 : 2 duels de 6 couloirs
@@ -381,6 +391,7 @@ duel_progression = {
 	FS_16 =
 	{
 		dimension = 16,
+		dimension_min = 12,
 		activite = 'FS',
 		GetLabelTour = GetLabel3Tours,
 		progression = {
@@ -393,8 +404,8 @@ duel_progression = {
 			},
 			{ 
 				-- tour 2 : 2 duels de 4
-				{ '1-2/1-2/1/1', '1-2/1-2/1/2', '3-4/1-2/1/1', '3-4/1-2/1/2'}, 
-				{ '1-2/3-4/1/1', '1-2/3-4/1/2', '3-4/3-4/1/1', '3-4/3-4/1/2'}
+				{ '1-2/1-2/1/1', '1-2/1-2/1/2',  '1-2/1-2/1/3', '1-2/1-2/1/4' }, 
+				{ '1-2/3-4/1/1', '1-2/3-4/1/2',  '1-2/3-4/1/3', '1-2/3-4/1/4' }
 			},
 			{ 
 				-- tour 3 : Finale A et Finale B
@@ -407,7 +418,9 @@ duel_progression = {
 	FS_24 =
 	{
 		dimension = 24,
+		dimension_min = 20,
 		activite = 'FS',
+		niveau = 'Duel_6',
 		GetLabelTour = GetLabel3Tours,
 		progression = {
 			{ 
@@ -433,6 +446,7 @@ duel_progression = {
 	FS_32 =
 	{
 		dimension = 32,
+		dimension_min = 25,
 		activite = 'FS',
 		label = { '8ième de finale', 'Quart de Finale', 'Demi Finale', 'Finale' },
 		progression = {
@@ -470,7 +484,9 @@ duel_progression = {
 	FS_48 =
 	{
 		dimension = 48,
+		dimension_min = 46,
 		activite = 'FS',
+		niveau = 'Duel_6',
 		label = { '8ième de finale', 'Quart de Finale', 'Demi Finale', 'Finale' },
 		progression = {
 			{ 
@@ -507,6 +523,7 @@ duel_progression = {
 		FS_64 =
 	{
 		dimension = 64,
+		dimension_min = 50,
 		activite = 'FS',
 		label = { '8ième de finale', 'Quart de Finale', 'Demi Finale', 'Finale' },
 		progression = {
@@ -544,7 +561,9 @@ duel_progression = {
 		FS_96 =
 	{
 		dimension = 96,
+		dimension_min = 66,
 		activite = 'FS',
+		Niveau = 'Duel_6',
 		label = { '8ième de finale', 'Quart de Finale', 'Demi Finale', 'Finale' },
 		progression = {
 			{ 
