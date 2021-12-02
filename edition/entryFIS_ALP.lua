@@ -6,6 +6,7 @@ function main(params_c)
 		return false;
 	end
 	params = params_c;
+	params.version = '1.5';
 	params.pluscode = 0;
 	params.closeDlg = false;
 	params.impression = tonumber(params.impression) or 1;
@@ -479,6 +480,8 @@ function OnEdition(evt)
 	else
 		params.sexe = "F";
 	end
+	params.no_entry = 0;
+
 	
 	-- base:GetClassementCoureur($(Code_coureur)):GetCell('Pts',0)
 	-- base:GetClassementCoureur($(Code_coureur), 'FAU'):GetCell('Pts',0)
@@ -488,19 +491,42 @@ function OnEdition(evt)
 	-- adv.Alert('pts = '..pts);
 	for i=0, body:GetNbRows()-1 do
 		local code_coureur = body:GetCell('Code_coureur',i);
+		local plus_moins = body:GetCell('Critere',i):sub(1,1);
+		local critere = body:GetCell('Critere',i);
 		for j = 1, #t do
+			local discipline = t[j]:sub(3);
 			local pts = base:GetClassementCoureur(code_coureur, t[j]):GetCell('Pts', 0);
-			if pts ~= '' then
-				body:SetCell(t[j], i, pts)
+			if plus_moins ~= '+' and plus_moins ~= '-' then
+				if pts ~= '' then
+					body:SetCell(t[j], i, pts)
+				else
+					body:SetCell(t[j], i, 'X')
+				end
 			else
-				body:SetCell(t[j], i, 'X')
+				if pts ~= '' then
+					if plus_moins == '+' then	-- = GS only
+						if string.find(critere, discipline) then
+							body:SetCell(t[j], i, pts)
+						else
+							body:SetCell(t[j], i, '');
+							params.no_entry = params.no_entry + 1;
+						end
+					else						-- = except GS
+						if not string.find(critere, discipline) then
+							body:SetCell(t[j], i, pts)
+						else
+							body:SetCell(t[j], i, '')
+							params.no_entry = params.no_entry + 1;
+						end
+					end
+				end
 			end
 		end
 		body:SetCell('Info', i, body_date_arrivee);
 		if body:GetCell('Critere', i):len() == 0 then
 			body:SetCell('Niveau', i, body_date_depart);
 		else
-			body:SetCell('Niveau', i, 'X'..body:GetCell('Critere', i));
+			body:SetCell('Niveau', i, body:GetCell('Critere', i));
 		end
 	end
 
