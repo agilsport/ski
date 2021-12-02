@@ -468,7 +468,10 @@ function OnEdition(evt)
 		local sexe = tEpreuve:GetCell('Sexe', i);
 		arEpreuve[sexe] = sexe;
 	end
-	params.code_regroupement = tEpreuve:GetCell('Code_regroupement', 0)
+	params.code_regroupement = "'-1'";
+	for i = 0, tEpreuve:GetNbRows() -1 do
+		params.code_regroupement = params.code_regroupement..",'"..tEpreuve:GetCell('Code_regroupement', i).."'";
+	end
 	if arEpreuve.M and arEpreuve.F then
 		params.sexe = "T";
 	elseif arEpreuve.M then
@@ -494,7 +497,11 @@ function OnEdition(evt)
 			end
 		end
 		body:SetCell('Info', i, body_date_arrivee);
-		body:SetCell('Niveau', i, body_date_depart);
+		if body:GetCell('Critere', i):len() == 0 then
+			body:SetCell('Niveau', i, body_date_depart);
+		else
+			body:SetCell('Niveau', i, 'X'..body:GetCell('Critere', i));
+		end
 	end
 
 	

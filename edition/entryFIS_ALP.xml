@@ -71,6 +71,8 @@
 			dofile('./interface/adv.lua');
 			dofile('./interface/interface.lua');
 			dofile('./edition/functionPG.lua');
+			tCodesRegroupement = params.code_regroupement:Split(',');
+			params.other = 1;
 		</lua>
 		<layers>
 			<layer id="entry_form">
@@ -181,9 +183,14 @@
 						<row value="(val_row)" />
 						<text align="right" row_start="2" col_start="1"><pen border="none"/>'COC'</text>
 						<line row_start="2" align="left" col_start="2" border="left|top|bottom|right" />
-						<lua>if params.code_regroupement:In('COC', 'EC', 'CE') then</lua>
-							<pen color="red" size="5" />
-							<line row_start="2" align="left" col_start="2" border="diag_up|diag_down" />
+						<lua>for i = 1, #tCodesRegroupement do
+								code_regroupement = tCodesRegroupement[i];
+								if code_regroupement:In("'COC'", "'EC'", "'CE'") then
+									params.other = 0;
+									</lua>
+									<pen color="red" size="5" />
+									<line row_start="2" align="left" col_start="2" border="diag_up|diag_down" />
+								<lua>end</lua>
 						<lua>end</lua>
 					</matrix>
 					
@@ -192,9 +199,14 @@
 						<row value="(val_row)" />
 						<text align="right" row_start="2" col_start="1"><pen border="none"/>'CIT'</text>
 						<line row_start="2" align="left" col_start="2" border="left|top|bottom|right" />
-						<lua>if params.code_regroupement:In('CIT','CITWC') then</lua>
-							<pen color="red" size="5" />
-							<line row_start="2" align="left" col_start="2" border="diag_up|diag_down" />
+						<lua>for i = 1, #tCodesRegroupement do
+								code_regroupement = tCodesRegroupement[i];
+								if code_regroupement:In("'CIT'","'CITWC'") then
+									params.other = 0;
+									</lua>
+									<pen color="red" size="5" />
+									<line row_start="2" align="left" col_start="2" border="diag_up|diag_down" />
+								<lua>end</lua>
 						<lua>end</lua>
 					</matrix>
 
@@ -203,9 +215,14 @@
 						<row value="(val_row)" />
 						<text align="right" row_start="2" col_start="1"><pen border="none"/>'NJR'</text>
 						<line row_start="2" align="left" col_start="2" border="left|top|bottom|right" />
-						<lua>if params.code_regroupement:In('JUN', 'EL-PJ', 'NJR', 'FJ') then</lua>
-							<pen color="red" size="5" />
-							<line row_start="2" align="left" col_start="2" border="diag_up|diag_down" />
+						<lua>for i = 1, #tCodesRegroupement do
+								code_regroupement = tCodesRegroupement[i];
+								if code_regroupement:In("'JUN'", "'EL-PJ'", "'NJR'", "'FJ'") then
+									params.other = 0;
+									</lua>
+									<pen color="red" size="5" />
+									<line row_start="2" align="left" col_start="2" border="diag_up|diag_down" />
+								<lua>end</lua>
 						<lua>end</lua>
 					</matrix>
 
@@ -214,9 +231,14 @@
 						<row value="(val_row)" />
 						<text align="right" row_start="2" col_start="1"><pen border="none"/>'FIS'</text>
 						<line row_start="2" align="left" col_start="2" border="left|top|bottom|right" />
-						<lua>if params.code_regroupement:In('FIS','ELIT','FIS-B','ENL') then</lua>
-							<pen color="red" size="5" />
-							<line row_start="2" align="left" col_start="2" border="diag_up|diag_down" />
+						<lua>for i = 1, #tCodesRegroupement do
+								code_regroupement = tCodesRegroupement[i];
+								if code_regroupement:In("'FIS'","'ELIT'","'FIS-B'") then
+									params.other = 0;
+									</lua>
+									<pen color="red" size="5" />
+									<line row_start="2" align="left" col_start="2" border="diag_up|diag_down" />
+								<lua>end</lua>
 						<lua>end</lua>
 					</matrix>
 					
@@ -225,9 +247,14 @@
 						<row value="(val_row)" />
 						<text align="right" row_start="2" col_start="1"><pen border="none"/>'UNI'</text>
 						<line row_start="2" align="left" col_start="2" border="left|top|bottom|right" />
-						<lua>if params.code_regroupement:In('UNI') then</lua>
-							<pen color="red" size="5" />
-							<line row_start="2" align="left" col_start="2" border="diag_up|diag_down" />
+						<lua>for i = 1, #tCodesRegroupement do
+								code_regroupement = tCodesRegroupement[i];
+								if code_regroupement:In("'UNI'") then
+									params.other = 0;
+									</lua>
+									<pen color="red" size="5" />
+									<line row_start="2" align="left" col_start="2" border="diag_up|diag_down" />
+								<lua>end</lua>
 						<lua>end</lua>
 					</matrix>
 
@@ -236,9 +263,14 @@
 						<row value="(val_row)" />
 						<text align="right" row_start="2" col_start="1"><pen border="none"/>'CHI'</text>
 						<line row_start="2" align="left" col_start="2" border="left|top|bottom|right" />
-						<lua>if params.code_regroupement:In('CHI') then</lua>
-							<pen color="red" size="5" />
-							<line row_start="2" align="left" col_start="2" border="diag_up|diag_down" />
+						<lua>for i = 1, #tCodesRegroupement do
+								code_regroupement = tCodesRegroupement[i];
+								if code_regroupement:In("'CHI'") then
+									params.other = 0;
+									</lua>
+									<pen color="red" size="5" />
+									<line row_start="2" align="left" col_start="2" border="diag_up|diag_down" />
+								<lua>end</lua>
 						<lua>end</lua>
 					</matrix>
 
@@ -247,9 +279,14 @@
 						<row value="(val_row)" />
 						<text align="right" row_start="2" col_start="1"><pen border="none"/>'NC'</text>
 						<line row_start="2" align="left" col_start="2" border="left|top|bottom|right" />
-						<lua>if params.code_regroupement:In('F','FC','FCJ','NC') then</lua>
-							<pen color="red" size="5" />
-							<line row_start="2" align="left" col_start="2" border="diag_up|diag_down" />
+						<lua>for i = 1, #tCodesRegroupement do
+								code_regroupement = tCodesRegroupement[i];
+								if code_regroupement:In("'F'","'FC'","'FCJ'","'NC'") then
+									params.other = 0;
+									</lua>
+									<pen color="red" size="5" />
+									<line row_start="2" align="left" col_start="2" border="diag_up|diag_down" />
+								<lua>end</lua>
 						<lua>end</lua>
 					</matrix>
 
@@ -258,9 +295,14 @@
 						<row value="(val_row)" />
 						<text align="right" row_start="2" col_start="1"><pen border="none"/>'ENL'</text>
 						<line row_start="2" align="left" col_start="2" border="left|top|bottom|right" />
-						<lua>if params.code_regroupement:In('ENL') then</lua>
-							<pen color="red" size="5" />
-							<line row_start="2" align="left" col_start="2" border="diag_up|diag_down" />
+						<lua>for i = 1, #tCodesRegroupement do
+								code_regroupement = tCodesRegroupement[i];
+								if code_regroupement:In("'ENL'") then
+									params.other = 0;
+									</lua>
+									<pen color="red" size="5" />
+									<line row_start="2" align="left" col_start="2" border="diag_up|diag_down" />
+								<lua>end</lua>
 						<lua>end</lua>
 					</matrix>
 
@@ -269,7 +311,7 @@
 						<row value="(val_row)" />
 						<text align="right" row_start="2" col_start="1"><pen border="none"/>'Other'</text>
 						<line row_start="2" align="left" col_start="2" border="left|top|bottom|right" />
-						<lua>if not params.code_regroupement:In('COC','EC','CE','CIT','CITWC','JUN', 'EL-PJ', 'NJR', 'FJ','FIS','ELIT','FIS-B','ENL','UNI','CHI','F','FC','FCJ','NC','ENL') then</lua>
+						<lua>if params.other == 1 then</lua>
 							<pen color="red" size="5" />
 							<line row_start="2" align="left" col_start="2" border="diag_up|diag_down" />
 						<lua>end</lua>
@@ -388,7 +430,11 @@
 			<text col_start="8" align="center">$(IASC)</text>
 			<text col_start="9" align="center">$(NTE)</text>
 			<text col_start="10" align="center">$(Info)</text>
-			<text col_start="11" align="center">$(Niveau)</text>
+			<lua>if string.sub(body:GetCell('Niveau', row), 1, 1) == 'X' then </lua>
+				<text col_start="11" align="center" font_weight="bold" font_size_step="2"><background mode="solid" color="yellow" />string.sub($(Niveau), 2)</text>
+			<lua>else</lua>
+				<text col_start="11" align="center">$(Niveau)</text>
+			<lua>end</lua>
 		</body>
 		<end>
 			<lua>if editor:GetPageCurrent() &gt;= math.floor(body:GetNbRows() / 15) then</lua>
