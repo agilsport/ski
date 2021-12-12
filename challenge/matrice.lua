@@ -823,7 +823,6 @@ function SetPtsTotalMatrice(idxcoureur, courseData);	-- calcul des points totaux
 	-- 4 = critere avec bloc : Idem 3 mais on va chercher les manches indépendemment des blocs.
 	local prise = 0;
 	local ptsMatrice = 0;
-	local ajouter = 0;
 	local ptsBloc1 = -1;
 	local tbolCritere = {};
 		
@@ -888,9 +887,6 @@ function SetPtsTotalMatrice(idxcoureur, courseData);	-- calcul des points totaux
 				tMatrice_Ranking:SetCell('Selection'..idxcourse, idxcoureur, selection);
 			end
 			local bloc = courseData[idxcourseData].Bloc;
-			if courseData[idxcourseData].BestPts >= 0 then
-				ajouter = 1;
-			end
 			ptsMatrice = ptsMatrice + courseData[idxcourseData].PtsTotal;
 			if bloc == 1 then 
 				ptsBloc1 = ptsMatrice;
@@ -899,8 +895,6 @@ function SetPtsTotalMatrice(idxcoureur, courseData);	-- calcul des points totaux
 		if tMatrice_Ranking:GetCell('Code_coureur', idxcoureur) == code_coureur_pour_debug then
 			adv.Alert('ptsMatrice = '..ptsMatrice);
 		end
-		ptsBloc1 = ptsBloc1 + ajouter;
-		ptsMatrice = ptsMatrice + ajouter;
 		return ptsBloc1, ptsMatrice;
 	elseif matrice.numTypeCritere == 1 then				-- on trie par discipline. On avait forcé les blocs à 1.
 		-- matrice.table_critere, {Critere = critere, TypeCritere = matrice.numTypeCritere, Item = item, Bloc = bloc, Discipline = discipline, Prendre = prendre, Combien = combien, NbCombien = nbcombien, Sur = sur}
@@ -1023,8 +1017,6 @@ function SetPtsTotalMatrice(idxcoureur, courseData);	-- calcul des points totaux
 		if tMatrice_Ranking:GetCell('Code_coureur', idxcoureur) == code_coureur_pour_debug then
 			adv.Alert(code_coureur_pour_debug..', ptsMatrice = '..tostring(ptsMatrice)..', ptsBloc1 = '..ptsBloc1);
 		end
-		ptsBloc1 = ptsBloc1 + ajouter;
-		ptsMatrice = ptsMatrice + ajouter;
 		return ptsBloc1, ptsMatrice;
 		
 	elseif matrice.numTypeCritere == 2 then				-- on trie par bloc et discipline. 
@@ -1084,9 +1076,6 @@ function SetPtsTotalMatrice(idxcoureur, courseData);	-- calcul des points totaux
 				-- BestClt = raceData.Bestclt, BestPts = raceData.Bestpts, PtsTotal = raceData.PtsTotal, NbManches = matrice.course[idxcourse].Nombre_de_manche});
 			for idxcourse = 1, #courseData do
 				local ordre = courseData[idxcourse].Ordre;
-				if courseData[idxcourse].BestPts >= 0 then
-					ajouter = 1;
-				end
 				courseData[idxcourse][item] = 0;
 				local prendre =  matrice.course[ordre].Prendre;
 				local prendrecourse = false;
@@ -1187,8 +1176,6 @@ function SetPtsTotalMatrice(idxcoureur, courseData);	-- calcul des points totaux
 				return matrice.defaut_point, matrice.defaut_point;
 			end
 		end
-		ptsBloc1 = ptsBloc1 + ajouter;
-		ptsMatrice = ptsMatrice + ajouter;
 		if stop == code_coureur_pour_debug then
 			adv.Alert('en fin de fonction SetPtsTotalMatrice, ptsBloc1 = '..ptsBloc1..', ptsMatrice = '..ptsMatrice);
 		end
@@ -1248,9 +1235,6 @@ function SetPtsTotalMatrice(idxcoureur, courseData);	-- calcul des points totaux
 			end
 			for idxcourse = 1, #courseData do
 				local ordre = courseData[idxcourse].Ordre;
-				if courseData[idxcourse].BestPts >= 0 then
-					ajouter = 1;
-				end
 				courseData[idxcourse][item] = 0;
 				local prendre =  matrice.course[ordre].Prendre;
 				local prendrecourse = false;
@@ -1351,8 +1335,6 @@ function SetPtsTotalMatrice(idxcoureur, courseData);	-- calcul des points totaux
 				return matrice.defaut_point, matrice.defaut_point;
 			end
 		end
-		ptsBloc1 = ptsBloc1 + ajouter;
-		ptsMatrice = ptsMatrice + ajouter;
 		if stop == code_coureur_pour_debug then
 			adv.Alert('en fin de fonction SetPtsTotalMatrice, ptsBloc1 = '..ptsBloc1..', ptsMatrice = '..ptsMatrice);
 		end
@@ -7555,7 +7537,7 @@ function OnConfiguration(cparams)
 	else
 		return false;
 	end
-	matrice.version_script = '4.53';
+	matrice.version_script = '4.6';
 	matrice.OS = app.GetOsDescription();
 	-- vérification de l'existence d'une version plus récente du script.
 	local url = 'https://live.ffs.fr/maj_pg/challenge/last_version.txt'
