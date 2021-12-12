@@ -2874,7 +2874,6 @@ function LitMatrice()	-- lecture des variables et affectation des valeurs dans l
 	CreateTableListe();
 	CreateTypeClassement();
 	ChargeDisciplines();  	-- on charge toutes les disciplines de la matrice
-	adv.Alert('prndre bloc 1 = '..matrice['comboPrendreBloc'..1]);
 end
 
 function GetCritere()	-- lecture de toutes les variables des critères de calculs s'ils existent
@@ -7476,7 +7475,6 @@ function SetDatadlgConfiguration()
 	
 	dlgConfiguration:GetWindowName('numPtsPresence'):SetValue(matrice.numPtsPresence);
 	for i = 1, 2 do
-		adv.Alert('prendre bloc '..i..' = '..matrice['comboPrendreBloc'..i]);
 		dlgConfiguration:GetWindowName('comboPrendreBloc'..i):SetValue(matrice['comboPrendreBloc'..i]);
 		dlgConfiguration:GetWindowName('coefPourcentageMaxiBloc'..i):SetValue(matrice['coefPourcentageMaxiBloc'..i]);
 		dlgConfiguration:GetWindowName('coefDefautCourseBloc'..i):SetValue(matrice['coefDefautCourseBloc'..i]);
