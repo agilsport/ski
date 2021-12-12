@@ -2800,8 +2800,8 @@ function LitMatrice()	-- lecture des variables et affectation des valeurs dans l
 	matrice.comboListe2Classement = matrice.comboListe2Classement or GetValue('comboListe2Classement', nil);
 	matrice.comboListePrimaute = matrice.comboListePrimaute or GetValue('comboListePrimaute', 'au classement');
 	matrice.comboOrientation = matrice.comboOrientation or GetValue("comboOrientation", 'Portrait');
-	matrice.comboPrendreBloc1 = matrice.comboPrendreBloc1 or GetValue("comboPrendreBloc1", "Classement général");
-	matrice.comboPrendreBloc2 = matrice.comboPrendreBloc2 or GetValue("comboPrendreBloc2", "Classement général");
+	matrice.comboPrendreBloc1 = matrice.comboPrendreBloc1 or GetValue("comboPrendreBloc1", "1.Classement général");
+	matrice.comboPrendreBloc2 = matrice.comboPrendreBloc2 or GetValue("comboPrendreBloc2", "1.Classement général");
 	matrice.comboPresentationCourses = matrice.comboPresentationCourses or GetValue("comboPresentationCourses", "Présentation horizontale type Ski Chrono Tour (par défaut)");
 	matrice.comboRegroupement = matrice.comboRegroupement or GetValue("comboRegroupement", '');
 	matrice.comboSexe = matrice.comboSexe or GetValue("comboSexe", '');
@@ -2828,6 +2828,7 @@ function LitMatrice()	-- lecture des variables et affectation des valeurs dans l
 	matrice.texteImprimerClubLong = matrice.texteImprimerClubLong or 'Oui';
 	matrice.texteFiltreSupplementaire = matrice.texteFiltreSupplementaire or GetValue("texteFiltreSupplementaire", 'Non');
 	matrice.texteImprimerDeparts = matrice.texteImprimerDeparts or GetValue ("texteImprimerDeparts", 'Oui');
+	matrice.texteImprimerStatCourses = matrice.texteImprimerStatCourses or GetValue ("texteImprimerStatCourses", 'Non');
 	matrice.texteImprimerHeader = matrice.texteImprimerHeader or GetValue ("texteImprimerHeader", 'Oui');
 	matrice.texteImprimerLayer = matrice.texteImprimerLayer or '';
 	matrice.texteImprimerLayerPage = matrice.texteImprimerLayerPage or 'Toutes les pages';
@@ -2873,6 +2874,7 @@ function LitMatrice()	-- lecture des variables et affectation des valeurs dans l
 	CreateTableListe();
 	CreateTypeClassement();
 	ChargeDisciplines();  	-- on charge toutes les disciplines de la matrice
+	adv.Alert('prndre bloc 1 = '..matrice['comboPrendreBloc'..1]);
 end
 
 function GetCritere()	-- lecture de toutes les variables des critères de calculs s'ils existent
@@ -7474,6 +7476,7 @@ function SetDatadlgConfiguration()
 	
 	dlgConfiguration:GetWindowName('numPtsPresence'):SetValue(matrice.numPtsPresence);
 	for i = 1, 2 do
+		adv.Alert('prendre bloc '..i..' = '..matrice['comboPrendreBloc'..i]);
 		dlgConfiguration:GetWindowName('comboPrendreBloc'..i):SetValue(matrice['comboPrendreBloc'..i]);
 		dlgConfiguration:GetWindowName('coefPourcentageMaxiBloc'..i):SetValue(matrice['coefPourcentageMaxiBloc'..i]);
 		dlgConfiguration:GetWindowName('coefDefautCourseBloc'..i):SetValue(matrice['coefDefautCourseBloc'..i]);
@@ -7537,7 +7540,7 @@ function OnConfiguration(cparams)
 	else
 		return false;
 	end
-	matrice.version_script = '4.6';
+	matrice.version_script = '4.61';
 	matrice.OS = app.GetOsDescription();
 	-- vérification de l'existence d'une version plus récente du script.
 	local url = 'https://live.ffs.fr/maj_pg/challenge/last_version.txt'

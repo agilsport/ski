@@ -14,8 +14,8 @@
 		<comboTpsDuDernier>Non</comboTpsDuDernier>
 		<numPtsPresence>0</numPtsPresence>
 		<comboPresentationCourses>Présentation horizontale type Ski Chrono Tour (par défaut)</comboPresentationCourses>
-		<comboPrendreBloc1>Classement général</comboPrendreBloc1>
-		<comboPrendreBloc2>Classement général</comboPrendreBloc2>
+		<comboPrendreBloc1>1.Classement général</comboPrendreBloc1>
+		<comboPrendreBloc2>1.Classement général</comboPrendreBloc2>
 		<coefDefautCourseBloc1>100</coefDefautCourseBloc1>
 		<coefDefautCourseBloc2>100</coefDefautCourseBloc2>
 		<coefDefautMancheBloc1>100</coefDefautMancheBloc1>
@@ -27,7 +27,8 @@
 		<texteImprimerDeparts>Non</texteImprimerDeparts>
 		<texteFontSize>8</texteFontSize>
 		<texteLigne2Texte>Nombre de courses :</texteLigne2Texte>
-		<texteImprimerHeader>Non</texteImprimerHeader>
+		<texteImprimerHeader>Oui</texteImprimerHeader>
+		<texteImprimerStatCourses>Non</texteImprimerStatCourses>
 		<texteCodeComplet>Non</texteCodeComplet>
 		<texteImprimerClubLong>Non</texteImprimerClubLong>
 		<texteFiltreSupplementaire>Non</texteFiltreSupplementaire>
