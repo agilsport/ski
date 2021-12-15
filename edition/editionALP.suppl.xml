@@ -14,6 +14,7 @@
 		</menu>
 		<menu title="Outils - Scripts LUA spécifiques" image="./res/32x32_options.png">
 			<menu title="Double Tirage au sort des dossards (RIS)" origine="edition" image="./res/32x32_ranking.png" lua="./process/dossard_DoubleTirage.lua" />
+			<menu title="Regroupement de coureurs" image="./res/32x32_official.png" lua="./process/regroupementALP.lua" />
 		</menu>
 		<menu title="Coupes d'Europe et FIS" image="./res/32x32_juges.png">
 			<menu title="Tirage en ligne des dossards sur le site de la FIS" origine="edition" image="./res/16x16_ranking.png" lua="./process/dossard_LiveDraw.lua"/>
