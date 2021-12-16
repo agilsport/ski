@@ -2,7 +2,7 @@
 <!-- Regroupement de coureurs -->
 <!-- <background mode="gradient_line_vert" color_start="white" color_end="ltgray" /> -->
 <root title="Regroupement de coureurs">
-  <config  titre="Regroupement de coureurs" comboColEquipe="4" comboPrendre="0" comboPtsTps="0" comboAbdDsq="0" coefManche="100"  comboGarderEquipe="0"/>
+  <config titre="Regroupement de coureurs" comboColEquipe="4" comboPrendre="0" comboPtsTps="0" comboAbdDsq="0" coefManche="100" nb_filles="2" nb_garcons="2" comboGarderEquipe="1"/>
   <panel name="config">
     <lua>dofile('./interface/adv.lua');
 		dofile('./edition/functionPG.lua');
@@ -89,7 +89,8 @@
 	elseif params.PtsTps == 2 then
 		pts_tps = 'Temps';
 	end
-	tMatrice_Courses = base:GetTable('_Matrice_Courses');
+	row_height = '0.4cm';
+	tRegroupement_Courses = base:GetTable('_Regroupement_Courses');
 	maxligne = math.max(params.NbFilles, params.NbGarcons);
     function GetDetail(chaine);
 			tDetail = chaine:Split('|');
@@ -132,9 +133,9 @@
       <padding all="0"/>
       <pen border="none"/>
       <font name="Calibri" size="10" adjust="width" weight="bold"/>
-      <lua>for i = 0, tMatrice_Courses:GetNbRows() -1 do</lua>
-      <text row="auto" col_start="2">'C.'..tMatrice_Courses:GetCell('Ordre_xml', i)..'. ('..tMatrice_Courses:GetCell('Sexe', i)..') '..tMatrice_Courses:GetCell('Nom', i)</text>
-      <text col_start="3">tMatrice_Courses:GetCell('Code_discipline', i)</text>
+      <lua>for i = 0, tRegroupement_Courses:GetNbRows() -1 do</lua>
+      <text row="auto" col_start="2" adjust="ellipsize">'Course '..tRegroupement_Courses:GetCell('Ordre_xml', i)..'  du '..tRegroupement_Courses:GetCell('Date', i)..'  ('..tRegroupement_Courses:GetCell('Sexe', i)..')  '..tRegroupement_Courses:GetCell('Nom', i)</text>
+      <text col_start="3">tRegroupement_Courses:GetCell('Code_discipline', i)</text>
       <lua>end</lua>
       <text row="0.3cm">''</text>
     </first_header>
@@ -181,34 +182,11 @@
 			else
 				tGarconsEquipe = {};
 			end
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        <!-- maxligne = math.max(#tFillesEquipe, #tGarconsEquipe); -->
       </lua>
       <matrix>
         <col value="3cm, 8cm, 8cm"/>
         <pen border="all"/>
-        <row value="0.5cm" count="(maxligne)"/>
+        <row value="0.9cm" count="(maxligne)"/>
         <matrix row_start="1" row_end="0" col_start="1">
           <col value="1"/>
           <text col_start="1" align="center" label="Clt - Equipe : Points totaux" row_start="1" row_end="0" cond="params.PtsTps &lt; 2">(row+1)..'\n'..body:GetCell(0,row)..'\n'..$(Pts_total)</text>
@@ -216,12 +194,12 @@
         </matrix>
         <matrix row_start="1" row_end="0" col_start="2">
           <col value="1"/>
-          <row value="1" count="(params.NbCoursesFilles)"/>
+          <row value="1cm" count="(params.NbCoursesFilles)"/>
           <lua>for course = 1, params.NbCoursesFilles do</lua>
           <matrix row_start="(course)">
             <padding left="0.1cm" right="0.1cm"/>
             <col value="1"/>
-            <row value="1" count="(params.NbFilles)"/>
+            <row value="auto" count="(params.NbFilles)"/>
             <lua>for i = 1, params.NbFilles do</lua>
             <text row_start="(i)">
               <background mode="solid" color="ltgray" cond="course % 2 ~= 0 "/>''</text>
@@ -249,11 +227,11 @@
         </matrix>
         <matrix row_start="1" row_end="0" col_start="3">
           <col value="1"/>
-          <row value="1" count="(params.NbCoursesGarcons)"/>
+          <row value="1cm" count="(params.NbCoursesGarcons)"/>
           <lua>for course = 1, params.NbCoursesGarcons do</lua>
           <matrix row_start="(course)">
             <col value="1"/>
-            <row value="1" count="(params.NbGarcons)"/>
+            <row value="auto" count="(params.NbGarcons)"/>
             <lua>for i = 1, params.NbGarcons do</lua>
             <text row_start="(i)">
               <background mode="solid" color="ltgray" cond="course % 2 ~= 0 "/>''</text>

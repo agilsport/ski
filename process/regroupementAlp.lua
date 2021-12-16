@@ -86,7 +86,7 @@ function LitRegroupementCourses();	-- lecture des courses figurant dans la valeu
 	tRegroupement_Courses:AddColumn({ name = 'Code', label = 'Code', type = sqlType.LONG });
 	tRegroupement_Courses:AddColumn({ name = 'Sexe', label = 'Sexe', type = sqlType.CHAR, size = 1 });
 	tRegroupement_Courses:AddColumn({ name = 'Ordre_xml', label = 'Ordre_xml', type = sqlType.LONG, style = sqlStyle.NULL });
-	tRegroupement_Courses:AddColumn({ name = 'Date', label = 'Date', type = sqlType.DATE, style = sqlStyle.NULL });
+	tRegroupement_Courses:AddColumn({ name = 'Date', label = 'Date', type = sqlType.CHAR, size = 10 });
 	tRegroupement_Courses:AddColumn({ name = 'Ordre', label = 'Ordre', type = sqlType.LONG, style = sqlStyle.NULL });
 	tRegroupement_Courses:AddColumn({ name = 'Nom', label = 'Nom', type = sqlType.CHAR, size = 150, style = sqlStyle.NULL });
 	tRegroupement_Courses:AddColumn({ name = 'Code_entite', label = 'Code_entite', type = sqlType.CHAR, size = 6, style = sqlStyle.NULL });
@@ -143,9 +143,9 @@ function LitRegroupementCourses();	-- lecture des courses figurant dans la valeu
 			if filtre:len() > 0 then
 				rRegroupement_Courses:Set('Filtre', filtre);
 			end
-			rRegroupement_Courses:Set('Date', tEpreuve:GetCell('Date_epreuve', 0, '%4Y-%2M-%2D'));
+			rRegroupement_Courses:Set('Date', tEpreuve:GetCell('Date_epreuve', 0, '%2D-%2M-%4Y'));
 			rRegroupement_Courses:Set('Code_discipline', tEpreuve:GetCell('Code_discipline', 0));
-			rRegroupement_Courses:Set('Facteur_f', tEpreuve:GetCellInt('Facteur_f', 0));
+			rRegroupement_Courses:Set('Facteur_f', tEpreuve:GetCell('Facteur_f', 0));
 			rRegroupement_Courses:Set('Nombre_de_manche', tEpreuve:GetCellInt('Nombre_de_manche', 0));
 			rRegroupement_Courses:Set('Coef_manche', tEpreuve:GetCellInt('Coef_manche', 0));
 			tRegroupement_Courses:AddRow();
@@ -181,7 +181,7 @@ function LitRegroupementCourses();	-- lecture des courses figurant dans la valeu
 			if filtre:len() > 0 then
 				rRegroupement_Courses:Set('Filtre', filtre);
 			end
-			rRegroupement_Courses:Set('Date', tEpreuve:GetCell('Date_epreuve', 0, '%4Y-%2M-%2D'));
+			rRegroupement_Courses:Set('Date', tEpreuve:GetCell('Date_epreuve', 0, '%2D-%2M-%4Y'));
 			rRegroupement_Courses:Set('Code_discipline', tEpreuve:GetCell('Code_discipline', 0));
 			rRegroupement_Courses:Set('Facteur_f', tEpreuve:GetCellInt('Facteur_f', 0));
 			rRegroupement_Courses:Set('Nombre_de_manche', tEpreuve:GetCellInt('Nombre_de_manche', 0));
@@ -672,7 +672,7 @@ function main(params_c)
 	params.x = (display:GetSize().width - params.width) / 2;
 	params.y = 50;
 	params.debug = false;
-	params.version = "1.1";
+	params.version = "1.2";
 	base = base or sqlBase.Clone();
 	tPlace_Valeur = base:GetTable('Place_Valeur');
 	tEvenement = base:GetTable('Evenement');
