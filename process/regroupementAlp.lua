@@ -66,28 +66,20 @@ function GetPointPlace(clt)
 end
 
 function LitRegroupementCourses();	-- lecture des courses figurant dans la valeur params.courses_in
+	if params.debug then
+		adv.Alert("entrée de LitRegroupementCourses, base:GetTable('_Regroupement_Courses') = "..tostring(base:GetTable('_Regroupement_Courses'))..', type(tRegroupement_Courses) = '..type(tRegroupement_Courses)..', app.GetNameSpace(tRegroupement_Courses) = '..tostring(app.GetNameSpace(tRegroupement_Courses)));
+	end
 	local cmd = 'Select * from Epreuve Where Code_evenement In('..params.courses_in..') Order By Nombre_de_manche DESC';
 	tEpreuve = base:TableLoad(cmd);
 	local nb_manche_max = tEpreuve:GetCellInt('Nombre_de_manche', 0);
 	params.saison = tEpreuve:GetCell('Code_saison', 0);
-	if params.debug then
-		adv.Alert("entrée de LitRegroupementCourses, base:GetTable('_Regroupement_Courses') = "..tostring(base:GetTable('_Regroupement_Courses'))..', type(tRegroupement_Courses) = '..type(tRegroupement_Courses)..', app.GetNameSpace(tRegroupement_Courses) = '..tostring(app.GetNameSpace(tRegroupement_Courses)));
-	end
-	if base:GetTable('_Regroupement_Courses') ~= nil then
-		base:RemoveTable('_Regroupement_Courses');
-		tRegroupement_Courses:Delete();
-		tRegroupement_Courses = nil;
-	end
-
-	if params.debug then
-		adv.Alert('passage dans la création de la table tRegroupement_Courses');
-	end
+	
 	tRegroupement_Courses = sqlTable:Create('Regroupement_Courses');
 	tRegroupement_Courses:AddColumn({ name = 'Code', label = 'Code', type = sqlType.LONG });
-	tRegroupement_Courses:AddColumn({ name = 'Sexe', label = 'Sexe', type = sqlType.CHAR, size = 1 });
-	tRegroupement_Courses:AddColumn({ name = 'Ordre_xml', label = 'Ordre_xml', type = sqlType.LONG, style = sqlStyle.NULL });
-	tRegroupement_Courses:AddColumn({ name = 'Date', label = 'Date', type = sqlType.CHAR, size = 10 });
 	tRegroupement_Courses:AddColumn({ name = 'Ordre', label = 'Ordre', type = sqlType.LONG, style = sqlStyle.NULL });
+	tRegroupement_Courses:AddColumn({ name = 'Ordre_xml', label = 'Ordre_xml', type = sqlType.LONG, style = sqlStyle.NULL });
+	tRegroupement_Courses:AddColumn({ name = 'Sexe', label = 'Sexe', type = sqlType.CHAR, size = 1 });
+	tRegroupement_Courses:AddColumn({ name = 'Date', label = 'Date', type = sqlType.CHAR, size = 10 , style = sqlStyle.NULL });
 	tRegroupement_Courses:AddColumn({ name = 'Nom', label = 'Nom', type = sqlType.CHAR, size = 150, style = sqlStyle.NULL });
 	tRegroupement_Courses:AddColumn({ name = 'Code_entite', label = 'Code_entite', type = sqlType.CHAR, size = 6, style = sqlStyle.NULL });
 	tRegroupement_Courses:AddColumn({ name = 'Code_activite', label = 'Code_activite', type = sqlType.CHAR, size = 8, style = sqlStyle.NULL });
@@ -109,22 +101,25 @@ function LitRegroupementCourses();	-- lecture des courses figurant dans la valeu
 		end
 	end
 	tRegroupement_Courses:SetPrimary('Code, Ordre');
+	tRegroupement_Courses:RemoveAllRows();
 	ReplaceTableEnvironnement(tRegroupement_Courses, '_Regroupement_Courses');
 	if params.debug then
 		adv.Alert('après création éventuelle de LitRegroupementCourses, type(tRegroupement_Courses) = '..type(tRegroupement_Courses)..', app.GetNameSpace(tRegroupement_Courses) = '..tostring(app.GetNameSpace(tRegroupement_Courses)));
 	end
 	local ordre = 0;
+	tEvenement = base:GetTable('Evenement');
 	for i = 1, 3 do
 		if params['coursef'..i] > 0 then
 			ordre =  ordre + 1;
 			ordre_xml = i;
 			code_evenement = params['coursef'..i];
 			filtre = params['coursef'..i..'_filtre'] or '';
-			if params.debug then
-				adv.Alert('avant add row chez les filles');
-			end
 			cmd = 'Select * From Evenement Where Code = '..code_evenement;
 			base:TableLoad(tEvenement, cmd);
+			local nom = tEvenement:GetCell('Nom', 0);
+			local code_entite = tEvenement:GetCell('Code_entite', 0);
+			local code_activite = tEvenement:GetCell('Code_activite', 0);
+			local code_saison = tEvenement:GetCell('Code_saison', 0);
 			cmd = 'Select * From Epreuve Where Code_evenement = '..code_evenement.." And Code_epreuve = 1";
 			base:TableLoad(tEpreuve, cmd);
 
@@ -135,11 +130,10 @@ function LitRegroupementCourses();	-- lecture des courses figurant dans la valeu
 			rRegroupement_Courses:Set('Ordre', ordre);
 			rRegroupement_Courses:Set('Sexe', 'F');
 			rRegroupement_Courses:Set('Ordre_xml', ordre_xml);
-			rRegroupement_Courses:Set('Nom', tEvenement:GetCell('Nom', 0));
-			rRegroupement_Courses:Set('Code_entite', tEvenement:GetCell('Code_entite', 0));
-			rRegroupement_Courses:Set('Code_activite', tEvenement:GetCell('Code_activite', 0));
-			rRegroupement_Courses:Set('Code_saison', tEvenement:GetCell('Code_saison', 0));
-			rRegroupement_Courses:Set('Code_entite', tEvenement:GetCell('Code_entite', 0));
+			rRegroupement_Courses:Set('Nom', nom);
+			rRegroupement_Courses:Set('Code_entite', code_entite);
+			rRegroupement_Courses:Set('Code_activite', code_activite);
+			rRegroupement_Courses:Set('Code_saison', code_saison);
 			if filtre:len() > 0 then
 				rRegroupement_Courses:Set('Filtre', filtre);
 			end
@@ -149,18 +143,12 @@ function LitRegroupementCourses();	-- lecture des courses figurant dans la valeu
 			rRegroupement_Courses:Set('Nombre_de_manche', tEpreuve:GetCellInt('Nombre_de_manche', 0));
 			rRegroupement_Courses:Set('Coef_manche', tEpreuve:GetCellInt('Coef_manche', 0));
 			tRegroupement_Courses:AddRow();
-			if params.debug then
-				adv.Alert('LitRegroupementCourses : ajout de la course fille n° '..i);
-			end
 		end
 		if params['courseg'..i] > 0 then
 			ordre =  ordre + 1;
 			ordre_xml = i;
 			code_evenement = params['courseg'..i];
 			filtre = params['courseg'..i..'_filtre'] or '';
-			if params.debug then
-				adv.Alert('avant add row chez les garçons');
-			end
 			cmd = 'Select * From Evenement Where Code = '..code_evenement;
 			base:TableLoad(tEvenement, cmd);
 			cmd = 'Select * From Epreuve Where Code_evenement = '..code_evenement.." And Code_epreuve = 1";
@@ -177,7 +165,6 @@ function LitRegroupementCourses();	-- lecture des courses figurant dans la valeu
 			rRegroupement_Courses:Set('Code_entite', tEvenement:GetCell('Code_entite', 0));
 			rRegroupement_Courses:Set('Code_activite', tEvenement:GetCell('Code_activite', 0));
 			rRegroupement_Courses:Set('Code_saison', tEvenement:GetCell('Code_saison', 0));
-			rRegroupement_Courses:Set('Code_entite', tEvenement:GetCell('Code_entite', 0));
 			if filtre:len() > 0 then
 				rRegroupement_Courses:Set('Filtre', filtre);
 			end
@@ -187,9 +174,6 @@ function LitRegroupementCourses();	-- lecture des courses figurant dans la valeu
 			rRegroupement_Courses:Set('Nombre_de_manche', tEpreuve:GetCellInt('Nombre_de_manche', 0));
 			rRegroupement_Courses:Set('Coef_manche', tEpreuve:GetCellInt('Coef_manche', 0));
 			tRegroupement_Courses:AddRow();
-			if params.debug then
-				adv.Alert('LitRegroupementCourses : ajout de la course garçons n° '..i);
-			end
 		end
 	end
 	tCourses = {};
@@ -672,7 +656,7 @@ function main(params_c)
 	params.x = (display:GetSize().width - params.width) / 2;
 	params.y = 50;
 	params.debug = false;
-	params.version = "1.2";
+	params.version = "1.4";
 	base = base or sqlBase.Clone();
 	tPlace_Valeur = base:GetTable('Place_Valeur');
 	tEvenement = base:GetTable('Evenement');
@@ -959,6 +943,7 @@ function main(params_c)
 	dlgConfig:Fit();
 	if dlgConfig:ShowModal() == idButton.OK then
 		OnPrint();
+		base:Delete();
 	end
 	return true;
 end

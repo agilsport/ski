@@ -2,7 +2,7 @@
 <!-- Regroupement de coureurs -->
 <!-- <background mode="gradient_line_vert" color_start="white" color_end="ltgray" /> -->
 <root title="Regroupement de coureurs">
-  <config titre="Regroupement de coureurs" comboColEquipe="4" comboPrendre="0" comboPtsTps="0" comboAbdDsq="0" coefManche="100" nb_filles="2" nb_garcons="2" comboGarderEquipe="1"/>
+  <config  titre="Regroupement de coureurs" comboColEquipe="4" comboPrendre="0" comboPtsTps="0" comboAbdDsq="0" coefManche="100" nb_filles="2" nb_garcons="2" comboGarderEquipe="0"/>
   <panel name="config">
     <lua>dofile('./interface/adv.lua');
 		dofile('./edition/functionPG.lua');
@@ -83,6 +83,7 @@
     dofile('./edition/functionPG.lua');
 	nb_courses = params.NbCourses;
 	nb_ligne_course = math.max(params.NbFilles, params.NbGarcons);
+	maxlignes = nb_ligne_course * nb_courses / 2;
 	pts_tps = 'Points place';
 	if params.PtsTps == 1 then
 		pts_tps = 'Points course';
@@ -91,7 +92,6 @@
 	end
 	row_height = '0.4cm';
 	tRegroupement_Courses = base:GetTable('_Regroupement_Courses');
-	maxligne = math.max(params.NbFilles, params.NbGarcons);
     function GetDetail(chaine);
 			tDetail = chaine:Split('|');
 			tTableDetail = {};
@@ -133,11 +133,20 @@
       <padding all="0"/>
       <pen border="none"/>
       <font name="Calibri" size="10" adjust="width" weight="bold"/>
-      <lua>for i = 0, tRegroupement_Courses:GetNbRows() -1 do</lua>
-      <text row="auto" col_start="2" adjust="ellipsize">'Course '..tRegroupement_Courses:GetCell('Ordre_xml', i)..'  du '..tRegroupement_Courses:GetCell('Date', i)..'  ('..tRegroupement_Courses:GetCell('Sexe', i)..')  '..tRegroupement_Courses:GetCell('Nom', i)</text>
-      <text col_start="3">tRegroupement_Courses:GetCell('Code_discipline', i)</text>
-      <lua>end</lua>
-      <text row="0.3cm">''</text>
+      <lua>ordre_xml_en_cours = tRegroupement_Courses:GetCellInt('Ordre_xml', 0);
+	  for i = 0, tRegroupement_Courses:GetNbRows() -1 do
+		ordre_xml_lu = tRegroupement_Courses:GetCellInt('Ordre_xml', i);
+		</lua>
+      <row value="0.2cm" cond="ordre_xml_en_cours ~= ordre_xml_lu">''</row>
+      <line col_start="1" col_end="0" pen_size="1" border="bottom" cond="ordre_xml_en_cours ~= ordre_xml_lu"/>
+      <row value="0.2cm" cond="ordre_xml_en_cours ~= ordre_xml_lu">''</row>
+      <text row="auto" col_start="2" adjust="ellipsize">
+        <background mode="solid" color="ltgray" cond="tRegroupement_Courses:GetCellInt('Ordre_xml', i) % 2 ~= 0 "/>'Course '..tRegroupement_Courses:GetCell('Ordre_xml', i)..'  du '..tRegroupement_Courses:GetCell('Date', i)..'  ('..tRegroupement_Courses:GetCell('Sexe', i)..')  '..tRegroupement_Courses:GetCell('Nom', i)</text>
+      <text col_start="3">
+        <background mode="solid" color="ltgray" cond="tRegroupement_Courses:GetCellInt('Ordre_xml', i) % 2 ~= 0 "/>tRegroupement_Courses:GetCell('Code_discipline', i)</text>
+      <lua>if ordre_xml_en_cours ~= ordre_xml_lu then ordre_xml_en_cours = ordre_xml_lu; end
+	  end</lua>
+      <row value="0.3cm">''</row>
     </first_header>
     <footer>
       <background mode="transparent"/>
@@ -186,7 +195,7 @@
       <matrix>
         <col value="3cm, 8cm, 8cm"/>
         <pen border="all"/>
-        <row value="0.9cm" count="(maxligne)"/>
+        <row value="0.47cm" count="(maxlignes)"/>
         <matrix row_start="1" row_end="0" col_start="1">
           <col value="1"/>
           <text col_start="1" align="center" label="Clt - Equipe : Points totaux" row_start="1" row_end="0" cond="params.PtsTps &lt; 2">(row+1)..'\n'..body:GetCell(0,row)..'\n'..$(Pts_total)</text>
