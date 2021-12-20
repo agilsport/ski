@@ -8,6 +8,7 @@
 		</menu>
 		<menu title="Listes de Départ" image="./res/32x32_bib.png">
 			<menu title="Liste de Départ" image="./res/16x16_bib.png" id="lst_officiel" choix_manche="1"/>
+			<menu title="Liste de Départ Ordre Alpha" image="./res/16x16_bib.png" id="lst_officiel_alpha" choix_manche="1"/>
 		</menu>
 		<menu title="Résultats" image="./res/32x32_ranking.png">
 			<menu title="Résultats Médailles (Flèche, Chamois, ...)" image="./res/16x16_official.png" id="res_medaille" choix_manche="1" />
@@ -190,6 +191,26 @@
 			<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
 		</body>
 	</report>
+
+	<report id="lst_officiel_alpha" title="Liste de Départ Ordre Alphabétique" first_header="0" >
+		<order key="Identite" />
+		
+		<body>
+			<call option="couleur_alternee" file="./edition/options.xml"/>
+	
+			<row value="auto"/>
+			<text col="4" align="right" label="Dos" font_weight="bold" font_size_step="1">$(Dossard)</text>
+			<text col="12" align="center" label="Code">$(Code_coureur)</text>
+			<text col="24" align="left" label="Nom - Prénom" font_weight="bold" font_size_step="1">$(Identite)</text> 
+			<text col="2" align="center" label="S.">$(Sexe)</text>
+			<text col="4" align="center" label="An">$(An)</text>
+			<text col="6" align="center" label="Cat.">$(Categ)</text>
+			<text col="6" align="right" label="Point">$(Point)</text>
+	
+			<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
+		</body>
+	</report>
+
 
 	<!-- Résultats Médaille : Flèche, Chamois, ... -->
 	<report id="res_medaille" title="Résultats Officiels" >
