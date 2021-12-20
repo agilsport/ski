@@ -6,7 +6,7 @@ dofile('./interface/adv.lua');
 -- Information : Numéro de Version, Nom, Interface
 function device.GetInformation()
 	return { 
-		version = 5.9, 
+		version = 6.3, 
 		code = 'matrix_board', 
 		name = 'Tableau Matrice', 
 		class = 'display', 
@@ -167,6 +167,7 @@ function device.OnInit(params, node)
 	app.BindNotify("<bib_insert>", OnNotifyBibChange);
 
 	app.BindNotify("<bib_time>", OnNotifyBibTime);
+	app.BindNotify("<forerunner_time>", OnNotifyForerunnerTimeBibTime);
 	
 	app.BindNotify("<offset_time>", OnNotifyOffsetTime);
 	app.BindNotify("<run_erase>", OnNotifyRunErase);
@@ -446,12 +447,12 @@ function InitTemplateFieldsESF_Fleche()
 	templateFields.rank_finish = { 
 		condition = function(txt) 
 			if type(txt) == 'number' then txt = tostring(txt) end
-			if txt:len() <= 2 then return true else return false end 
+			if txt:len() <= 3 then return true else return false end 
 		end,
 		color = color.Create(255, 0, 0), 
 		row = 1,
-		col = columnCount-2,
-		lg = 2,
+		col = columnCount-3,
+		lg = 3,
 		align = 'right',
 		
 		agil_pi_display_fmt = function(field) 
@@ -1053,6 +1054,7 @@ end
 
 function OnNotifyBibTime(key, params)
 	local idPassage = tonumber(params.passage) or -99;
+	
 	if idPassage == -1 then
 		-- Arrivée ...
 		tickcount_finish = app.GetTickCount(); 
@@ -1097,6 +1099,36 @@ function OnNotifyBibTime(key, params)
 				Board_InterTime(params.bib, idPassage, params.total_time, params.total_rank, params.total_diff);
 			end
 		end
+	end
+end
+
+function OnNotifyForerunnerTimeBibTime(key, params)
+	local idPassage = tonumber(params.passage) or -99;
+	finish_time = params.time or 0;
+
+	if idPassage == -1 and device.entite == 'ESF' and finish_time > 0 then
+	
+		-- Arrivée Ouvreur ...
+		tickcount_finish = app.GetTickCount(); 
+		state = stateBib.FINISH;
+		
+		ResetArrayField(templateFields);
+		
+		local bib = params.bib or '';
+		local nom = params.nom or '';
+		local prenom = params.prenom or '';
+			
+		AddField(templateFields, 'bib_finish', params.bib or '');
+		AddField(templateFields, 'identity_finish', nom..' '..prenom);
+		
+		if finish_time > 0 and finish_time < 10000 then
+			AddFieldClientData(templateFields, 'time_finish', app.TimeToString(finish_time, "%xs.%2f"), finish_time);
+		else
+			AddFieldClientData(templateFields, 'time_finish', app.TimeToString(finish_time, "%-1h%-1m%2s.%2f"), finish_time);
+		end
+		AddField(templateFields, 'rank_finish', 'OUV');
+		
+		RefreshFields(templateFields);
 	end
 end
 
@@ -1217,16 +1249,18 @@ end
 
 function Board_FinishTime(bib, finish_time, rk, diff)
 	if boardIsFullList(displayBoard:MatrixGetMode()) then return end 
-
-	bib = tonumber(bib) or 0;
-	if bib <= 0 then return end
-
+	
 	finish_time = finish_time or 0;
 	if finish_time <= 0 and finish_time ~= chrono.DNF and finish_time ~= chrono.DSQ then
 		return 
 	end
 
 	rk = tonumber(rk) or 0;
+	bib = tonumber(bib) or 0;
+	
+	if bib <= 0 then 
+			return
+	end	
 	
 	local bibRanking = device.BibLoad(bib);
 	if bibRanking == nil then return end
