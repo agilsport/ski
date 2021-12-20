@@ -1,5 +1,5 @@
 dofile('./xml/xmlTools.lua');
--- Version 1.4 le 17-12-2021
+-- Version 1.5 le 20-12-2021
 -- Envoi 'KO' à la FIS  Ok
 -- Envoi FOND FS à la FIS Ok
 
@@ -57,7 +57,7 @@ xmlProtocol = {
 		import = {
 			name = 'Fisresults', 
 			children = { {name = 'RaceHeader', attributes = {{name = 'Sector', value = 'CC'}, {name = 'Sex', type_value = 'string'}} }},
-			Message('Import vola');
+			-- Message('Import vola');
 		}
 		-- export =  function()
 			-- if base:GetRecord('Evenement'):GetString('Code_activite') == 'FOND' then 
@@ -73,7 +73,7 @@ xmlProtocol = {
 			children = {{name = 'RaceHeader', attributes = {{name = 'Sector', value = 'CC'}},
 							children = {{name = 'Discipline', value = 'KO'}}
 			}},
-			Message('Import skiFFS');
+			-- Message('Import skiFFS');
 		},
 		export =  function()
 			if base:GetRecord('Evenement'):GetString('Code_activite') == 'FOND' and base:GetRecord('Epreuve'):GetString('Code_discipline') == 'KO' then return true else return false end
@@ -88,9 +88,9 @@ xmlProtocol = {
 		},
 		export =  function()
 			if base:GetRecord('Evenement'):GetString('Code_activite') == 'FOND' then 
-				Message('Code_discipline:'..base:GetRecord('Epreuve'):GetString('Code_discipline'));
-			return true else return false end
-		end
+				-- Message('Code_discipline:'..base:GetRecord('Epreuve'):GetString('Code_discipline'));
+				return true else return false end
+			end
 	},
 	
 	-- Protocol Data Exchange JP (FIS)
