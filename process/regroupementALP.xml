@@ -2,7 +2,7 @@
 <!-- Regroupement de coureurs -->
 <!-- <background mode="gradient_line_vert" color_start="white" color_end="ltgray" /> -->
 <root title="Regroupement de coureurs">
-  <config titre="Regroupement de coureurs" comboColEquipe="4" comboPrendre="0" comboPtsTps="0" comboAbdDsq="0" coefManche="100" nb_filles="2" nb_garcons="2" comboGarderEquipe="1"/>
+  <config coursef2_filtre="$(Sexe):In('F') and $(Categ):In('U16')" courseg2_filtre="$(Sexe):In('M') and $(Categ):In('U16')" coursef1="481" courseg1="461" coursef2="478" courseg2="478" titre="Regroupement de coureurs" comboColEquipe="4" comboPrendre="0" comboPtsTps="0" comboAbdDsq="1" coefManche="50" nb_filles="2" nb_garcons="2" comboGarderEquipe="1"/>
   <panel name="config">
     <lua>dofile('./interface/adv.lua');
 		dofile('./edition/functionPG.lua');
@@ -62,7 +62,8 @@
         <combobox col_start="2" name="comboAbdDsq" style="CB_READONLY"/>
         <statictext row="auto" col_start="1" style="ALIGN_RIGHT" label="Classements par addition des "/>
         <combobox col_start="2" name="comboPtsTps" style="CB_READONLY"/>
-        <statictext row="auto" col_start="1" style="ALIGN_RIGHT" label="Coef sur les manches "/>
+        <statictext row="auto" col_start="1" style="ALIGN_RIGHT" label="Coef sur les manches en pourcentage "/>
+        <statictext col_start="3" style="ALIGN_LEFT" label=" %"/>
         <textctrl col_start="2" name="coefManche"/>
         <statictext row="auto" col_start="1" style="ALIGN_RIGHT" label="Nombre de filles à prendre "/>
         <textctrl col_start="2" name="nb_filles"/>
@@ -78,11 +79,68 @@
     </matrix>
     <row value="1"/>
   </panel>
+  <panel name="configscratch">
+    <lua>dofile('./interface/adv.lua');
+		dofile('./edition/functionPG.lua');
+		</lua>
+    <padding all="5px"/>
+    <col value="1"/>
+    <row value="10px"/>
+    <textctrl row="80px" style="ALIGN_CENTER|TE_MULTILINE|" font_size_step="2" name="titre"/>
+    <row value="5px"/>
+    <matrix row="auto">
+      <col value="1,4,6,1"/>
+      <row value="20px"/>
+      <row value="10px"/>
+      <matrix row="auto" col_start="2" col_end="3">
+        <col value="1,1,3,100px"/>
+        <statictext row="auto" col_start="1" style="ALIGN_RIGHT" label="Course n° 1"/>
+        <textctrl col_start="2" name="coursef1"/>
+        <textctrl col_start="3" name="coursef1_nom"/>
+        <statictext row="auto" col_start="1" style="ALIGN_RIGHT" label="Course n° 2 "/>
+        <textctrl col_start="2" name="coursef2"/>
+        <textctrl col_start="3" name="coursef2_nom"/>
+        <statictext row="auto" col_start="1" style="ALIGN_RIGHT" label="Course n° 3 "/>
+        <textctrl col_start="2" name="coursef3"/>
+        <textctrl col_start="3" name="coursef3_nom"/>
+        <lua>for i = 1, 3 do</lua>
+        <button row_start="(i)" col_start="4" align="left" name="('filtragef'..i)" label="Filtrage"/>
+        <lua>end</lua>
+      </matrix>
+      <row value="20px"/>
+      <staticbox row_start="-3" row_end="0" col_start="2" col_end="3" label="Courses du regroupement"/>
+      <row value="20px"/>
+      <matrix row="auto" col_start="2" col_end="3">
+        <col value="1,1,1"/>
+        <statictext row="auto" col_start="1" style="ALIGN_RIGHT" label="Colonne cloisie pour l\'équipe"/>
+        <combobox col_start="2" name="comboColEquipe" style="CB_READONLY"/>
+        <statictext row="auto" col_start="1" style="ALIGN_RIGHT" label="Calcul des points sur "/>
+        <combobox col_start="2" name="comboPrendre" style="CB_READONLY"/>
+        <statictext row="auto" col_start="1" style="ALIGN_RIGHT" label="Les Abd Dsq prènent le temps du dernier "/>
+        <combobox col_start="2" name="comboAbdDsq" style="CB_READONLY"/>
+        <statictext row="auto" col_start="1" style="ALIGN_RIGHT" label="Classements par addition des "/>
+        <combobox col_start="2" name="comboPtsTps" style="CB_READONLY"/>
+        <statictext row="auto" col_start="1" style="ALIGN_RIGHT" label="Coef sur les manches en pourcentage"/>
+        <textctrl col_start="2" name="coefManche"/>
+        <statictext col_start="3" style="ALIGN_LEFT" label=" %"/>
+        <statictext row="auto" col_start="1" style="ALIGN_RIGHT" label="Nombre de coureurs à prendre "/>
+        <textctrl col_start="2" name="nb_filles"/>
+        <statictext row="auto" col_start="1" style="ALIGN_RIGHT" label="Conserver les équipes incomplètes "/>
+        <combobox col_start="2" name="comboGarderEquipe" style="CB_READONLY"/>
+      </matrix>
+      <row value="10px"/>
+      <staticbox row_start="-3" row_end="0" col_start="2" col_end="3" label="Paramétrage des calculs"/>
+      <toolbar row="auto" col_start="1" col_end="0" name="tbconfig" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
+      <row value="1"/>
+    </matrix>
+    <row value="1"/>
+  </panel>
   <panel id="print">
     <lua>dofile('./interface/adv.lua');
     dofile('./edition/functionPG.lua');
 	nb_courses = params.NbCourses;
 	nb_ligne_course = math.max(params.NbFilles, params.NbGarcons);
+	maxlignes = nb_ligne_course * math.max(params.NbCoursesFilles, params.NbCoursesGarcons);
 	pts_tps = 'Points place';
 	if params.PtsTps == 1 then
 		pts_tps = 'Points course';
@@ -91,7 +149,6 @@
 	end
 	row_height = '0.4cm';
 	tRegroupement_Courses = base:GetTable('_Regroupement_Courses');
-	maxligne = math.max(params.NbFilles, params.NbGarcons);
     function GetDetail(chaine);
 			tDetail = chaine:Split('|');
 			tTableDetail = {};
@@ -125,7 +182,7 @@
       <pen border="none"/>
       <font name="Calibri" size="13" adjust="width" weight="bold"/>
       <text row="1cm" col_start="1" align="center">params.Titre..'\nEdition des résultats'</text>
-      <text row="1cm" col_start="1" align="center">'Résultats par équipe en '..pts_tps</text>
+      <text row="1cm" col_start="1" align="center">'Résultats par équipe en '..pts_tps..' ('..params.Prendre..')'</text>
     </header>
     <first_header>
       <col value="1,17cm,1cm,1"/>
@@ -133,11 +190,20 @@
       <padding all="0"/>
       <pen border="none"/>
       <font name="Calibri" size="10" adjust="width" weight="bold"/>
-      <lua>for i = 0, tRegroupement_Courses:GetNbRows() -1 do</lua>
-      <text row="auto" col_start="2" adjust="ellipsize">'Course '..tRegroupement_Courses:GetCell('Ordre_xml', i)..'  du '..tRegroupement_Courses:GetCell('Date', i)..'  ('..tRegroupement_Courses:GetCell('Sexe', i)..')  '..tRegroupement_Courses:GetCell('Nom', i)</text>
-      <text col_start="3">tRegroupement_Courses:GetCell('Code_discipline', i)</text>
-      <lua>end</lua>
-      <text row="0.3cm">''</text>
+      <lua>ordre_xml_en_cours = tRegroupement_Courses:GetCellInt('Ordre_xml', 0);
+	  for i = 0, tRegroupement_Courses:GetNbRows() -1 do
+		ordre_xml_lu = tRegroupement_Courses:GetCellInt('Ordre_xml', i);
+		</lua>
+      <row value="0.2cm" cond="ordre_xml_en_cours ~= ordre_xml_lu">''</row>
+      <line col_start="1" col_end="0" pen_size="1" border="bottom" cond="ordre_xml_en_cours ~= ordre_xml_lu"/>
+      <row value="0.2cm" cond="ordre_xml_en_cours ~= ordre_xml_lu">''</row>
+      <text row="auto" col_start="2" adjust="ellipsize">
+        <background mode="solid" color="ltgray" cond="tRegroupement_Courses:GetCellInt('Ordre_xml', i) % 2 ~= 0 "/>'Course '..tRegroupement_Courses:GetCell('Ordre_xml', i)..'  du '..tRegroupement_Courses:GetCell('Date', i)..'  ('..tRegroupement_Courses:GetCell('Sexe', i)..')  '..tRegroupement_Courses:GetCell('Nom', i)</text>
+      <text col_start="3">
+        <background mode="solid" color="ltgray" cond="tRegroupement_Courses:GetCellInt('Ordre_xml', i) % 2 ~= 0 "/>tRegroupement_Courses:GetCell('Code_discipline', i)</text>
+      <lua>if ordre_xml_en_cours ~= ordre_xml_lu then ordre_xml_en_cours = ordre_xml_lu; end
+	  end</lua>
+      <row value="0.3cm">''</row>
     </first_header>
     <footer>
       <background mode="transparent"/>
@@ -156,43 +222,59 @@
       </matrix>
     </footer>
     <label>
-      <matrix>
+      <matrix cond="params.TypeRegroupement == 'Sexe'">
         <font name="Calibri" size="9" adjust="width" weight="bold"/>
         <pen border="all"/>
         <col value="3cm,8cm,8cm"/>
         <row value="1.5cm"/>
         <text col_start="1" align="center">'Clt\nEquipe\n'..pts_tps</text>
-        <text col_start="2">'Dossard     Nom'</text>
+        <text col_start="2">'Dossard - Clt : Nom'</text>
         <text col_start="2" align="center" font_size_step="4">'Filles'</text>
         <text col_start="2" align="right">pts_tps</text>
-        <text col_start="3">'Dossard     Nom'</text>
+        <text col_start="3">'Dossard - Clt : Nom'</text>
         <text col_start="3" align="center" font_size_step="4">'Garçons'</text>
         <text col_start="3" align="right">pts_tps</text>
+      </matrix>
+      <matrix cond="params.TypeRegroupement == 'Scratch'">
+        <font name="Calibri" size="9" adjust="width" weight="bold"/>
+        <pen border="all"/>
+        <col value="3cm,10cm"/>
+        <row value="1.5cm"/>
+        <text col_start="1" align="center">'Clt\nEquipe\n'..pts_tps</text>
+        <text col_start="2">'Dossard - Clt : Nom'</text>
+        <text col_start="2" align="center" font_size_step="4">'Mixte'</text>
+        <text col_start="2" align="right">pts_tps</text>
       </matrix>
     </label>
     <body>
       <font name="Calibri" size="8" adjust="width" weight="bold"/>
       <lua>if body:GetCell('Detail_filles', row):len() &gt; 0 then
-				tFillesEquipe = GetDetail(body:GetCell('Detail_filles', row));
-			else
-				tFillesEquipe = {};
-			end
-			if body:GetCell('Detail_garcons', row):len() &gt; 0 then
-				tGarconsEquipe = GetDetail(body:GetCell('Detail_garcons', row));
-			else
-				tGarconsEquipe = {};
-			end
-      </lua>
+					tFillesEquipe = GetDetail(body:GetCell('Detail_filles', row));
+				else
+					tFillesEquipe = {};
+				end
+				if body:GetCell('Detail_garcons', row):len() &gt; 0 then
+					tGarconsEquipe = GetDetail(body:GetCell('Detail_garcons', row));
+				else
+					tGarconsEquipe = {};
+				end
+		  </lua>
+      <lua>if params.TypeRegroupement == 'Sexe' then</lua>
       <matrix>
         <col value="3cm, 8cm, 8cm"/>
         <pen border="all"/>
-        <row value="0.9cm" count="(maxligne)"/>
+        <row value="0.47cm" count="(maxlignes)"/>
         <matrix row_start="1" row_end="0" col_start="1">
           <col value="1"/>
           <text col_start="1" align="center" label="Clt - Equipe : Points totaux" row_start="1" row_end="0" cond="params.PtsTps &lt; 2">(row+1)..'\n'..body:GetCell(0,row)..'\n'..$(Pts_total)</text>
           <text col_start="1" align="center" label="Clt - Equipe : Temps total" row_start="1" row_end="0" cond="params.PtsTps == 2">(row+1)..'\n'..body:GetCell(0,row)..'\n'..body:GetCell('Tps_total', row, '%-1h%-1m%2s.%2f')</text>
         </matrix>
         <matrix row_start="1" row_end="0" col_start="2">
+          <col value="1"/>
+          <text row_start="1" row_end="0">''</text>
+        </matrix>
+        <matrix row_start="1" row_end="0" col_start="2">
+          <padding all="0.03cm"/>
           <col value="1"/>
           <row value="1cm" count="(params.NbCoursesFilles)"/>
           <lua>for course = 1, params.NbCoursesFilles do</lua>
@@ -205,10 +287,10 @@
               <background mode="solid" color="ltgray" cond="course % 2 ~= 0 "/>''</text>
             <lua>end</lua>
             <lua>row_start = 1;
-						for i = 1, #tFillesEquipe do
-							if tFillesEquipe[i].Course == course then</lua>
+							for i = 1, #tFillesEquipe do
+								if tFillesEquipe[i].Course == course then</lua>
             <text row_start="(row_start)">
-              <background mode="transparent"/>'C.'..tFillesEquipe[i].Course..' - '..tFillesEquipe[i].Dossard..' . '..tFillesEquipe[i].Nom</text>
+              <background mode="transparent"/>tFillesEquipe[i].Dossard..' - '..tFillesEquipe[i].Clt..' : '..tFillesEquipe[i].Nom</text>
             <lua>if params.PtsTps == 0 then</lua>
             <text row_start="(row_start)" align="right">
               <background mode="transparent"/>tFillesEquipe[i].PtsTotal</text>
@@ -226,6 +308,7 @@
           <lua>end</lua>
         </matrix>
         <matrix row_start="1" row_end="0" col_start="3">
+          <padding all="0.03cm"/>
           <col value="1"/>
           <row value="1cm" count="(params.NbCoursesGarcons)"/>
           <lua>for course = 1, params.NbCoursesGarcons do</lua>
@@ -237,10 +320,10 @@
               <background mode="solid" color="ltgray" cond="course % 2 ~= 0 "/>''</text>
             <lua>end</lua>
             <lua>row_start = 1;
-						for i = 1, #tGarconsEquipe do
-							if tGarconsEquipe[i].Course == course then</lua>
+							for i = 1, #tGarconsEquipe do
+								if tGarconsEquipe[i].Course == course then</lua>
             <text row_start="(row_start)">
-              <background mode="transparent"/>'C.'..tGarconsEquipe[i].Course..' - '..tGarconsEquipe[i].Dossard..' . '..tGarconsEquipe[i].Nom</text>
+              <background mode="transparent"/>tGarconsEquipe[i].Dossard..' - '..tGarconsEquipe[i].Clt..' : '..tGarconsEquipe[i].Nom</text>
             <lua>if params.PtsTps == 0 then</lua>
             <text row_start="(row_start)" align="right">
               <background mode="transparent"/>tGarconsEquipe[i].PtsTotal</text>
@@ -258,6 +341,56 @@
           <lua>end</lua>
         </matrix>
       </matrix>
+      <lua>else</lua>
+      <matrix>
+        <col value="3cm, 10cm"/>
+        <pen border="all"/>
+        <row value="0.47cm" count="(maxlignes)"/>
+        <matrix row_start="1" row_end="0" col_start="1">
+          <col value="1"/>
+          <text col_start="1" align="center" label="Clt - Equipe : Points totaux" row_start="1" row_end="0" cond="params.PtsTps &lt; 2">(row+1)..'\n'..body:GetCell(0,row)..'\n'..$(Pts_total)</text>
+          <text col_start="1" align="center" label="Clt - Equipe : Temps total" row_start="1" row_end="0" cond="params.PtsTps == 2">(row+1)..'\n'..body:GetCell(0,row)..'\n'..body:GetCell('Tps_total', row, '%-1h%-1m%2s.%2f')</text>
+        </matrix>
+        <matrix row_start="1" row_end="0" col_start="2">
+          <col value="1"/>
+          <text row_start="1" row_end="0">''</text>
+        </matrix>
+        <matrix row_start="1" row_end="0" col_start="2">
+          <padding all="0.03cm"/>
+          <col value="1"/>
+          <row value="1cm" count="(params.NbCoursesFilles)"/>
+          <lua>for course = 1, params.NbCoursesFilles do</lua>
+          <matrix row_start="(course)">
+            <padding left="0.1cm" right="0.1cm"/>
+            <col value="1"/>
+            <row value="auto" count="(params.NbFilles)"/>
+            <lua>for i = 1, params.NbFilles do</lua>
+            <text row_start="(i)">
+              <background mode="solid" color="ltgray" cond="course % 2 ~= 0 "/>''</text>
+            <lua>end</lua>
+            <lua>row_start = 1;
+							for i = 1, #tFillesEquipe do
+								if tFillesEquipe[i].Course == course then</lua>
+            <text row_start="(row_start)">
+              <background mode="transparent"/>tFillesEquipe[i].Dossard..' - '..tFillesEquipe[i].Clt..' : '..tFillesEquipe[i].Nom</text>
+            <lua>if params.PtsTps == 0 then</lua>
+            <text row_start="(row_start)" align="right">
+              <background mode="transparent"/>tFillesEquipe[i].PtsTotal</text>
+            <lua>elseif params.PtsTps == 1 then</lua>
+            <text row_start="(row_start)" align="right">
+              <background mode="transparent"/>tFillesEquipe[i].PtsCourse</text>
+            <lua>elseif params.PtsTps == 2 then</lua>
+            <text row_start="(row_start)" align="right">
+              <background mode="transparent"/>app.TimeToString(tFillesEquipe[i].TpsTotal, '%-1h%-1m%2s.%2f')</text>
+            <lua>end</lua>
+            <lua>row_start = row_start + 1</lua>
+            <lua>end</lua>
+            <lua>end</lua>
+          </matrix>
+          <lua>end</lua>
+        </matrix>
+      </matrix>
+      <lua>end</lua>
       <row value="0.2cm"/>
     </body>
   </panel>
