@@ -73,7 +73,7 @@
 		<lua>color_alternate.bk_color1 = color_alternate.bk_color1 or 'ltgray'</lua>
 		<lua>color_alternate.bk_color_label = color_alternate.bk_label or 'white'</lua>
 		
-		<pen color="(color_alternate.pen_color)" border="color_alternate.pen_border" />
+		<pen color="(color_alternate.pen_color)" border="(color_alternate.pen_border)" />
 
 		<lua>if group == 'body' then</lua>
 			<!-- body -->
@@ -89,10 +89,32 @@
 	
 	
 	<option id="identite">
-	<lua>Prenom_NOM = $(Prenom):sub(1,1):upper()..$(Prenom):sub(2):lower()..'  '..$(Nom):upper()</lua>
-	<lua>NOM_Prenom = $(Nom):upper()..' '..$(Prenom):sub(1,1):upper()..$(Prenom):sub(2):lower()$(Nom):upper()</lua>
-	<lua>NOM_PRENOM = $(Identite):upper()</lua>
-	<lua>nom_prenom = $(Identite):lower()</lua>
+		<lua>Prenom_NOM = $(Prenom):sub(1,1):upper()..$(Prenom):sub(2):lower()..'  '..$(Nom):upper()</lua>
+		<lua>NOM_Prenom = $(Nom):upper()..' '..$(Prenom):sub(1,1):upper()..$(Prenom):sub(2):lower()..$(Nom):upper()</lua>
+		<lua>NOM_PRENOM = $(Identite):upper()</lua>
+		<lua>nom_prenom = $(Identite):lower()</lua>
+	</option>
+	
+	<option id="identiteCoureur">
+		<lua>
+			function GetIdentiteCoureur(officiel,speaker)
+				officiel = officiel or 0;
+				if officiel == 0 and speaker == 1 then
+					return $(Prenom):sub(1,1):upper()..$(Prenom):sub(2):lower()..'  '..$(Nom):upper();
+				elseif officiel == 0 then
+					return $(Nom):upper()..' '..$(Prenom):sub(1,1):upper()..$(Prenom):sub(2):lower();
+				else
+					local origineCoureur = $(Code_coureur):sub(1,3);
+					if origineCoureur == 'FFS' or origineCoureur == 'IFS' or origineCoureur == 'ISB' or origineCoureur == 'LCN' then 
+						return $(Identite):upper();
+					elseif origineCoureur == 'TIC' then
+						return $(Nom):upper()..' '..$(Prenom):sub(1,1):upper()..$(Prenom):sub(2):lower()..$(Nom):upper();
+					else
+						return $(Identite):lower();
+					end
+				end	
+			end
+		</lua>
 	</option>
 	
 	<option id="identiteOfficiel">
@@ -115,7 +137,7 @@
 		<row value="auto" />
 		<line col_start="1" col_end="0" pen_color="dkgray" border="top" />
 		<matrix row="0.4cm" col_start="1" col_end="0" >
-			<text col_start="1" col_end="0" align="center" cond="type_edition=='lst_' and discipline:In('MASS','POURS-D', 'FP')">'H. Théorique de Depart de l\'épreuve : '..$(Epreuve.Heure_depart)</text>
+			<text col_start="1" col_end="0" align="center" cond="type_edition=='lst_' and discipline:In('MASS','POURS-D', 'FP')">'H. Théorique de Depart de l\'épreuve N°'..$(Epreuve.Code_epreuve)..' : '..$(Epreuve.Heure_depart)</text>
 		<!-- <row h="0.5cm" cond="type_edition=='lst_' and discipline:In('MASS','POURS-D', 'FP')"/> -->
 		</matrix>
 		<row value="auto" />
@@ -123,17 +145,23 @@
 		<row value="0.2cm" />
 	</option>
 	
-	<!-- Signature DT -->
 	<option id="signature_dt">
-		<lua>dt_code = base:GetOfficiel('TECHNICALDELEGATE', 'Code_coureur'):sub(4)</lua>
+		<lua>
+			dt_code = base:GetOfficiel('TECHNICALDELEGATE', 'Code_coureur'):sub(4)
+			TableEpreuveTransfert = base:GetTable('Epreuve_Transfert');
+				cmd3 = "Select * From Epreuve_Transfert Where Code_evenement = "..$(Evenement.Code)
+				commentaire =  base:TableLoad(TableEpreuveTransfert, cmd3):GetCell('Commentaire', 0);
+		</lua>
 		<lua cond="dt_code:len() ~= 0">dt = GetIdentiteOfficiels('TechnicalDelegate')..' - '..dt_code</lua>
-	
 		<row value="0.8cm" />
 		<row value="auto" />
 		<matrix col_start="1" col_end="0"> 
-			<col value="8cm" />"
-			<text row="auto" col="1" align="left"><font size="14"/>'Le délégué technique'</text>
-			<text row="auto" col_start="2" align="left"><font size="15"/>dt</text>
+			<col w="1,0.3cm,1"/>
+			<text row="auto" col_start="1" col_end="0" align="Left" cond="commentaire:len() ~= 0" >'Commentaire éventuels:'</text>
+			<text row="auto" col_start="1" col_end="0" style="TE_LEFT|TE_MULTILINE" border="all" cond="commentaire:len() ~= 0" >commentaire</text>
+			<!-- <col value="8cm" /> -->
+			<text row="auto" col_start="3" col_end="0" align="left"><font size="14"/>'Le délégué technique'</text>
+			<text row="auto" col_start="3" col_end="0" align="left"><font size="15"/>dt</text>
 		</matrix>
 	</option>
 	
@@ -141,7 +169,7 @@
 	<option id="stat_ranking">
 		<spacing all="0"/>
 		<background mode="transparent"/>
-		<font name="Calibri" size="10" adjust="max" weight="bold"/>
+		<font name="Calibri" size="10" adjust="max" weight="bold">
 	
 		<row value="auto" />
 		<line col_start="1" col_end="0" pen_color="dkgray" border="top" />
@@ -151,25 +179,27 @@
 		<matrix row="auto" col_start="1" col_end="0" >
 		
 			<row value="auto" />
-			<lua>if $(Evenement.Code_entite) == 'FIS' then</lua>
-			<text col="1" align="center">'Inscrits: '..body:GetNbRows()</text>
-			<text col="1" align="center">'Classés: '..body:GetCounterValue('Tps_status', 'ok')</text>
-			<text col="1" align="center">'DNS: '..body:GetCounterValue('Tps_status', 'dns')</text>
-			<text col="1" align="center">'DNF: '..body:GetCounterValue('Tps_status', 'dnf')</text>
-			<text col="1" align="center">'DSQ: '..body:GetCounterValue('Tps_status', 'dsq')</text>
-			<text col="1" align="center">'Non traités: '..body:GetCounterValue('Tps_status', 'ko')</text>
-			<lua>else</lua>
+			<lua>if $(Evenement.Code_entite) == 'FFS' and $(Evenement.Code_activite) ~= 'FS' then</lua>
 			<text col="1" align="center">'Inscrits: '..body:GetNbRows()</text>
 			<text col="1" align="center">'Classés: '..body:GetCounterValue('Tps_status', 'ok')</text>
 			<text col="1" align="center">'Absents: '..body:GetCounterValue('Tps_status', 'dns')</text>
 			<text col="1" align="center">'Abandons: '..body:GetCounterValue('Tps_status', 'dnf')</text>
 			<text col="1" align="center">'Disqualifiés: '..body:GetCounterValue('Tps_status', 'dsq')</text>
 			<text col="1" align="center">'Non traités: '..body:GetCounterValue('Tps_status', 'ko')</text>
+			<lua>else</lua>
+			<text col="1" align="center">'Registered: '..body:GetNbRows()</text>
+			<text col="1" align="center">'Classified: '..body:GetCounterValue('Tps_status', 'ok')</text>
+			<text col="1" align="center">'DNS: '..body:GetCounterValue('Tps_status', 'dns')</text>
+			<text col="1" align="center">'DNF: '..body:GetCounterValue('Tps_status', 'dnf')</text>
+			<text col="1" align="center">'DSQ: '..body:GetCounterValue('Tps_status', 'dsq')</text>
+			<text col="1" align="center">'Not-Classified: '..body:GetCounterValue('Tps_status', 'ko')</text>
+			
 			<lua>end</lua>
 			<row value="0.2cm"/>
 		</matrix>
 		<row value="auto" />
 		<line col_start="1" col_end="0" pen_color="dkgray" border="top" />
+		</font>
 		
 		<row value="0.2cm" />
 	</option>	
@@ -229,14 +259,18 @@
 						tTraduction.en['Dos'] = 'Bib';
 						tTraduction.en['Categ'] = 'Categ';
 						tTraduction.en['Code'] = 'FIS Number';
+						tTraduction.en['Juge'] = 'Judge';
+						tTraduction.en['Juges'] = 'Judges';
 						tTraduction.en['Identité'] = 'Identity';
 						tTraduction.en['Nat'] = 'NSA';
 						tTraduction.en['Nation'] = 'NSA';
 						tTraduction.en['Nom'] = 'Name';
-						tTraduction.en['Points'] = 'Points';
+						tTraduction.en['Points'] = 'Race Points';
 						tTraduction.en['Prénom'] = 'First Name';
 						tTraduction.en['Sexe'] = 'Gender';
 						tTraduction.en['S.'] = 'G.';
+						tTraduction.en['Ecart.'] = 'Diff.';
+						tTraduction.en['Note'] = 'Race Points';
 						
 						
 						tTraduction.it = {};
@@ -254,8 +288,22 @@
 			end
 		</lua>
 	</option>
-	
 
+	<option id="Signature_FS">	
+		<background mode="transparent"/>
+			<row h="auto"/>
+			<matrix  col_start="1" col_end="0">
+				<col w="0.2cm,2,2,0.2cm,2,2,0.2cm" />
+				<row h="0.7cm"/>
+				<line col_start="1" col_end="0" pen_size="4" border="top" />
+				
+				<text col_start="1" col_end="0" align="left">'Signatures: '</text>
+				<row h="1.5cm"/>
+				<text col_start="2" col_end="3" align="Left" border="all" >'Technical Delegate: '..GetIdentiteOfficiels('TechnicalDelegate')</text>
+				<text col_start="5" col_end="6" align="Left" border="all" ><spacing left="10" right="10" top="2" bottom="2" />'Chief of Results: '..GetIdentiteOfficiels('Chiefofresult')</text>
+				<row h="0.5cm"/>
+			</matrix >
+	</option>
 	
 </edition>
 
