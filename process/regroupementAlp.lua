@@ -43,6 +43,12 @@ function AfficheDialogScratch()
 		params.comboPtsTps = 0;
 	end
 
+	if params.nodeConfig:HasAttribute('comboEquipeBis') then
+		params.comboEquipeBis = tonumber(params.nodeConfig:GetAttribute('comboEquipeBis')) or 0;
+	else
+		params.comboEquipeBis = 0;
+	end
+
 	if params.nodeConfig:HasAttribute('coefManche') then
 		params.coefManche = tonumber(params.nodeConfig:GetAttribute('coefManche')) or 50;
 	else
@@ -126,11 +132,23 @@ function AfficheDialogScratch()
 	dlgConfigScratch:GetWindowName('comboPrendre'):Append('Classement général OU meilleure manche');
 	dlgConfigScratch:GetWindowName('comboPrendre'):SetSelection(params.comboPrendre);
 	
+	params.comboprendre = {};
+	table.insert(params.comboprendre, 'Classement général');
+	table.insert(params.comboprendre, 'Classement général PLUS meilleure manche');
+	table.insert(params.comboprendre, 'Classement général OU meilleure manche');
+	
 	dlgConfigScratch:GetWindowName('comboPtsTps'):Clear();
 	dlgConfigScratch:GetWindowName('comboPtsTps'):Append('Points Coupe du Monde');
 	dlgConfigScratch:GetWindowName('comboPtsTps'):Append('Points Course');
 	dlgConfigScratch:GetWindowName('comboPtsTps'):Append('Temps');
 	dlgConfigScratch:GetWindowName('comboPtsTps'):SetSelection(params.comboPtsTps);
+
+
+	dlgConfigScratch:GetWindowName('comboEquipeBis'):Clear();
+	dlgConfigScratch:GetWindowName('comboEquipeBis'):Append('Non');
+	dlgConfigScratch:GetWindowName('comboEquipeBis'):Append('Oui');
+	dlgConfigScratch:GetWindowName('comboEquipeBis'):SetSelection(params.comboEquipeBis);
+
 	if params.comboPtsTps > 0 then
 		dlgConfigScratch:GetWindowName('coefManche'):Enable(false);
 	end
@@ -147,12 +165,12 @@ function AfficheDialogScratch()
 				dlgConfigScratch:GetWindowName('comboAbdDsq'):SetSelection(1);
 				dlgConfigScratch:GetWindowName('coefManche'):SetValue(100);
 				dlgConfigScratch:GetWindowName('coefManche'):Enable(false);
-				if params.comboPtsTps == 2 then
-					dlgConfigScratch:GetWindowName('comboAbdDsq'):Enable(false);
-				end
+				dlgConfigScratch:GetWindowName('comboGarderEquipe'):SetSelection(0);
+				dlgConfigScratch:GetWindowName('comboGarderEquipe'):Enable(false);
 			else
 				dlgConfigScratch:GetWindowName('coefManche'):Enable(true);
 				dlgConfigScratch:GetWindowName('comboAbdDsq'):Enable(true);
+				dlgConfigScratch:GetWindowName('comboGarderEquipe'):Enable(false);
 			end
 		end, dlgConfigScratch:GetWindowName('comboPtsTps')); 
 
@@ -221,6 +239,7 @@ function AfficheDialogScratch()
 			params.comboPrendre = dlgConfigScratch:GetWindowName('comboPrendre'):GetSelection();
 			params.comboPtsTps = dlgConfigScratch:GetWindowName('comboPtsTps'):GetSelection();
 			params.comboGarderEquipe = dlgConfigScratch:GetWindowName('comboGarderEquipe'):GetSelection();
+			params.comboEquipeBis = dlgConfigScratch:GetWindowName('comboEquipeBis'):GetSelection();
 			if params.comboPtsTps == 0 then
 				params.default_pts = 0;
 			else
@@ -228,6 +247,7 @@ function AfficheDialogScratch()
 			end
 			params.coefManche = tonumber(dlgConfigScratch:GetWindowName('coefManche'):GetValue()) or 50;
 			params.nb_filles = tonumber(dlgConfigScratch:GetWindowName('nb_filles'):GetValue()) or 0;
+			params.nb_filles_bis = params.nb_filles;
 			params.nodeConfig:ChangeAttribute('titre', params.titre);
 			params.nodeConfig:ChangeAttribute('comboColEquipe', params.comboColEquipe);
 			params.nodeConfig:ChangeAttribute('comboPrendre', params.comboPrendre);
@@ -236,6 +256,7 @@ function AfficheDialogScratch()
 			params.nodeConfig:ChangeAttribute('coefManche', params.coefManche);
 			params.nodeConfig:ChangeAttribute('nb_filles', params.nb_filles);
 			params.nodeConfig:ChangeAttribute('comboGarderEquipe', params.comboGarderEquipe);
+			params.nodeConfig:ChangeAttribute('comboEquipeBis', params.comboEquipeBis);
 			params.doc:SaveFile();
 			BuildRanking();
 			BuildEquipes(); 		-- tEquipe ne contient que celles qui participent au classement (nombre suffisant de coureurs)
@@ -298,6 +319,12 @@ function AfficheDialogSexe()
 		params.comboPtsTps = tonumber(params.nodeConfig:GetAttribute('comboPtsTps')) or 0;
 	else
 		params.comboPtsTps = 0;
+	end
+
+	if params.nodeConfig:HasAttribute('comboEquipeBis') then
+		params.comboEquipeBis = tonumber(params.nodeConfig:GetAttribute('comboEquipeBis')) or 0;
+	else
+		params.comboEquipeBis = 0;
 	end
 
 	if params.nodeConfig:HasAttribute('coefManche') then
@@ -393,6 +420,7 @@ function AfficheDialogSexe()
 	dlgConfig:GetWindowName('comboPrendre'):Append('Classement général PLUS meilleure manche');
 	dlgConfig:GetWindowName('comboPrendre'):Append('Classement général OU meilleure manche');
 	dlgConfig:GetWindowName('comboPrendre'):SetSelection(params.comboPrendre);
+
 	params.comboprendre = {};
 	table.insert(params.comboprendre, 'Classement général');
 	table.insert(params.comboprendre, 'Classement général PLUS meilleure manche');
@@ -407,6 +435,11 @@ function AfficheDialogSexe()
 		dlgConfig:GetWindowName('coefManche'):Enable(false);
 	end
 	
+	dlgConfig:GetWindowName('comboEquipeBis'):Clear();
+	dlgConfig:GetWindowName('comboEquipeBis'):Append('Non');
+	dlgConfig:GetWindowName('comboEquipeBis'):Append('Oui');
+	dlgConfig:GetWindowName('comboEquipeBis'):SetSelection(params.comboEquipeBis);
+
 	dlgConfig:GetWindowName('titre'):SetValue(params.titre);
 	dlgConfig:GetWindowName('coefManche'):SetValue(params.coefManche);
 	dlgConfig:GetWindowName('nb_filles'):SetValue(params.nb_filles);
@@ -420,12 +453,12 @@ function AfficheDialogSexe()
 				dlgConfig:GetWindowName('comboAbdDsq'):SetSelection(1);
 				dlgConfig:GetWindowName('coefManche'):SetValue(100);
 				dlgConfig:GetWindowName('coefManche'):Enable(false);
-				if params.comboPtsTps == 2 then
-					dlgConfig:GetWindowName('comboAbdDsq'):Enable(false);
-				end
+				dlgConfig:GetWindowName('comboGarderEquipe'):SetSelection(0);
+				dlgConfig:GetWindowName('comboGarderEquipe'):Enable(false);
 			else
 				dlgConfig:GetWindowName('coefManche'):Enable(true);
 				dlgConfig:GetWindowName('comboAbdDsq'):Enable(true);
+				dlgConfig:GetWindowName('comboGarderEquipe'):Enable(false);
 			end
 		end, dlgConfig:GetWindowName('comboPtsTps')); 
 
@@ -520,6 +553,7 @@ function AfficheDialogSexe()
 			params.comboPrendre = dlgConfig:GetWindowName('comboPrendre'):GetSelection();
 			params.comboPtsTps = dlgConfig:GetWindowName('comboPtsTps'):GetSelection();
 			params.comboGarderEquipe = dlgConfig:GetWindowName('comboGarderEquipe'):GetSelection();
+			params.comboEquipeBis = dlgConfig:GetWindowName('comboEquipeBis'):GetSelection();
 			if params.comboPtsTps == 0 then
 				params.default_pts = 0;
 			else
@@ -527,8 +561,9 @@ function AfficheDialogSexe()
 			end
 			params.coefManche = tonumber(dlgConfig:GetWindowName('coefManche'):GetValue()) or 50;
 			params.nb_filles = tonumber(dlgConfig:GetWindowName('nb_filles'):GetValue()) or 0;
+			params.nb_filles_bis = params.nb_filles;
 			params.nb_garcons = tonumber(dlgConfig:GetWindowName('nb_garcons'):GetValue()) or 0;
-
+			params.nb_garcons_bis = params.nb_garcons;
 			params.nodeConfig:ChangeAttribute('titre', params.titre);
 			params.nodeConfig:ChangeAttribute('comboColEquipe', params.comboColEquipe);
 			params.nodeConfig:ChangeAttribute('comboPrendre', params.comboPrendre);
@@ -538,6 +573,7 @@ function AfficheDialogSexe()
 			params.nodeConfig:ChangeAttribute('nb_filles', params.nb_filles);
 			params.nodeConfig:ChangeAttribute('nb_garcons', params.nb_garcons);
 			params.nodeConfig:ChangeAttribute('comboGarderEquipe', params.comboGarderEquipe);
+			params.nodeConfig:ChangeAttribute('comboEquipeBis', params.comboEquipeBis);
 			params.doc:SaveFile();
 			BuildRanking();
 			BuildEquipes(); 		-- tEquipe ne contient que celles qui participent au classement (nombre suffisant de coureurs)
@@ -829,21 +865,31 @@ function BuildEquipes()
 			tEquipe:ChangeColumn(tEquipe:GetColumnName(i), 'chrono');
 		end
 	end
+
  	tEquipe:OrderBy(col_equipe);
 	tEquipe:SetPrimary(col_equipe);
 	ReplaceTableEnvironnement(tEquipe, '_Equipe');
+	tEquipe_Bis = tEquipe:Copy();
+	ReplaceTableEnvironnement(tEquipe_Bis, '_Equipe_Bis');
 	
 	for i = 0, tEquipe:GetNbRows() -1 do
 		local OK = 1;
+		local OK_BIS = 0;
 		local equipe = tEquipe:GetCell(0, i);
 		local pts_total = 0;
 		local tps_total = 0;
+		local pts_total_bis = 0;
+		local tps_total_bis = 0;
 		local strGarcons = '';
 		local separateur_filles = '';
 		local separateur_garcons = '';
+		local separateur_filles_bis = '';
+		local separateur_garcons_bis = '';
 		for idxcourse = 1, #tCourses do
 			local nb_filles_pris = 0;
 			local nb_garcons_pris = 0;
+			local nb_filles_pris_bis = 0;
+			local nb_garcons_pris_bis = 0;
 			local ordre_xml = tCourses[idxcourse].Ordre_xml;
 			local sexe_course = tCourses[idxcourse].Sexe;
 			local code_evenement = tCourses[idxcourse].Code_evenement;
@@ -861,60 +907,9 @@ function BuildEquipes()
 			end
 			-- les filles ou les mixtes
 			for row = 0, tMatrice_Ranking_Copy:GetNbRows() -1 do
-				local pts_total_course = nil;
-				if params.comboPtsTps == 0 then			-- pts place
-					pts_total_course = tMatrice_Ranking_Copy:GetCellDouble('Pts'..idxcourse..'_total', row, 10000);
-				else
-					pts_total_course = tMatrice_Ranking_Copy:GetCellDouble('Pts'..idxcourse..'_total', row, 0);
-				end
-				if pts_total_course < 10000 then
-					local tps_total_course = tMatrice_Ranking_Copy:GetCellInt('Tps'..idxcourse..'_total', row, -1);
-					if tMatrice_Ranking_Copy:GetCell('Sexe', row) == 'F' or params.type_regroupement == 'Scratch' then
-						local dossard = tMatrice_Ranking_Copy:GetCellInt('Dossard'..idxcourse, row);
-						if dossard > 0 and nb_filles_pris < params.nb_filles then
-							local tDetailFilles = {};
-							nb_filles_pris = nb_filles_pris + 1;
-							local code_coureur = tMatrice_Ranking_Copy:GetCell('Code_coureur', row);
-							local nom = tMatrice_Ranking_Copy:GetCell('Identite', row);
-							local pts_course = tMatrice_Ranking_Copy:GetCellDouble('Pts'..idxcourse..'_total', row);
-							local clt = tMatrice_Ranking_Copy:GetCellInt('Clt'..idxcourse, row);
-							local tps = tMatrice_Ranking_Copy:GetCellInt('Tps'..idxcourse, row);
-							local clt_best = tMatrice_Ranking_Copy:GetCellInt('Clt'..idxcourse..'_best', row);
-							local run_best = tMatrice_Ranking_Copy:GetCellInt('Run'..idxcourse..'_best', row);
-							local tps_best = tMatrice_Ranking_Copy:GetCellInt('Tps'..idxcourse..'_Run'..run_best, row);
-							local pts_best = tMatrice_Ranking_Copy:GetCellDouble('Pts'..idxcourse..'_best', row);
-							pts_total = pts_total + pts_total_course;
-							tps_total = tps_total + tps_total_course;
-							table.insert(tDetailFilles, 
-								{Course = ordre_xml, 
-								CodeEvenement = code_evenement, 
-								CodeCoureur = code_coureur, 
-								Dossard = dossard, 
-								Nom = nom, 
-								Sexe = 'F', 
-								Clt = clt, 
-								PtsCourse = pts_course, 
-								TpsCourse = tps_course, 
-								BestClt = clt_best, 
-								BestRun = run_best, 
-								BestTps = tps_best, 
-								BestPts = pts_best, 
-								BestTps = tps_best,
-								PtsTotal = pts_total_course,
-								TpsTotal = tps_total_course});
-							local xDetailFilles = {Detail = tDetailFilles};
-							local jsontxt = table.ToStringJSON(xDetailFilles, false);
-							jsontxt = separateur_filles..jsontxt;
-							tEquipe:SetCell('Detail_filles', i, tEquipe:GetCell('Detail_filles', i)..jsontxt);
-							separateur_filles = '|';
-						end
-					end
-				end
-			end
-			-- les garçons
-			if params.type_regroupement == 'Sexe' then
-				for row = 0, tMatrice_Ranking_Copy:GetNbRows() -1 do
+				if params.type_regroupement == 'Scratch' or (tMatrice_Ranking_Copy:GetCell('Sexe', row) == 'F' and tMatrice_Ranking_Copy:GetCellInt('Tps'..idxcourse, row) ~= -600) then
 					local pts_total_course = nil;
+					local pts_total_course_bis = nil;
 					if params.comboPtsTps == 0 then			-- pts place
 						pts_total_course = tMatrice_Ranking_Copy:GetCellDouble('Pts'..idxcourse..'_total', row, 10000);
 					else
@@ -922,11 +917,9 @@ function BuildEquipes()
 					end
 					if pts_total_course < 10000 then
 						local tps_total_course = tMatrice_Ranking_Copy:GetCellInt('Tps'..idxcourse..'_total', row, -1);
-						if tMatrice_Ranking_Copy:GetCell('Sexe', row) == 'M' then
+						if tMatrice_Ranking_Copy:GetCell('Sexe', row) == 'F' or params.type_regroupement == 'Scratch' then
 							local dossard = tMatrice_Ranking_Copy:GetCellInt('Dossard'..idxcourse, row);
-							if dossard > 0 and nb_garcons_pris < params.nb_garcons then
-								local tDetailGarcons = {};
-								nb_garcons_pris = nb_garcons_pris + 1;
+							if dossard > 0 and tMatrice_Ranking_Copy:GetCellInt('Course'..idxcourse..'_prise', row) == 0 then
 								local code_coureur = tMatrice_Ranking_Copy:GetCell('Code_coureur', row);
 								local nom = tMatrice_Ranking_Copy:GetCell('Identite', row);
 								local pts_course = tMatrice_Ranking_Copy:GetCellDouble('Pts'..idxcourse..'_total', row);
@@ -936,30 +929,151 @@ function BuildEquipes()
 								local run_best = tMatrice_Ranking_Copy:GetCellInt('Run'..idxcourse..'_best', row);
 								local tps_best = tMatrice_Ranking_Copy:GetCellInt('Tps'..idxcourse..'_Run'..run_best, row);
 								local pts_best = tMatrice_Ranking_Copy:GetCellDouble('Pts'..idxcourse..'_best', row);
-								pts_total = pts_total + pts_total_course;
-								tps_total = tps_total + tps_total_course;
-								table.insert(tDetailGarcons, 
-									{Course = ordre_xml, 
-									CodeEvenement = code_evenement, 
-									CodeCoureur = code_coureur, 
-									Dossard = dossard, 
-									Nom = nom, 
-									Sexe = 'M', 
-									Clt = clt, 
-									PtsCourse = pts_course, 
-									TpsCourse = tps_course, 
-									BestClt = clt_best, 
-									BestRun = run_best, 
-									BestTps = tps_best, 
-									BestPts = pts_best, 
-									BestTps = tps_best,
-									PtsTotal = pts_total_course,
-									TpsTotal = tps_total_course});
-								local xDetailGarcons = {Detail = tDetailGarcons};
-								local jsontxt = table.ToStringJSON(xDetailGarcons, false);
-								jsontxt = separateur_garcons..jsontxt;
-								tEquipe:SetCell('Detail_garcons', i, tEquipe:GetCell('Detail_garcons', i)..jsontxt);
-								separateur_garcons = '|';
+								local tDetailFilles = {};
+								local tDetailFillesBis = {};
+								local ajouter_fille = false;
+								local ajouter_fille_bis = false;
+								if nb_filles_pris < params.nb_filles then
+									nb_filles_pris = nb_filles_pris + 1;
+									tMatrice_Ranking_Copy:SetCell('Course'..idxcourse..'_prise', row, 1);
+									table.insert(tDetailFilles, 
+										{Course = ordre_xml, 
+										CodeEvenement = code_evenement, 
+										CodeCoureur = code_coureur, 
+										Dossard = dossard, 
+										Nom = nom, 
+										Sexe = 'F', 
+										Clt = clt, 
+										PtsCourse = pts_course, 
+										TpsCourse = tps_course, 
+										BestClt = clt_best, 
+										BestRun = run_best, 
+										BestPts = pts_best, 
+										BestTps = tps_best,
+										PtsTotal = pts_total_course,
+										TpsTotal = tps_total_course});
+									local xDetailFilles = {Detail = tDetailFilles};
+									local jsontxt = table.ToStringJSON(xDetailFilles, false);
+									pts_total = pts_total + pts_total_course;
+									tps_total = tps_total + tps_total_course;
+									jsontxt = separateur_filles..jsontxt;
+									tEquipe:SetCell('Detail_filles', i, tEquipe:GetCell('Detail_filles', i)..jsontxt);
+									separateur_filles = '|';
+								else
+									if nb_filles_pris_bis < params.nb_filles and tMatrice_Ranking_Copy:GetCellInt('Course'..idxcourse..'_prise', row) == 0 then
+										nb_filles_pris_bis = nb_filles_pris_bis + 1;
+										table.insert(tDetailFillesBis, 
+											{Course = ordre_xml, 
+											CodeEvenement = code_evenement, 
+											CodeCoureur = code_coureur, 
+											Dossard = dossard, 
+											Nom = nom, 
+											Sexe = 'F', 
+											Clt = clt, 
+											PtsCourse = pts_course, 
+											TpsCourse = tps_course, 
+											BestClt = clt_best, 
+											BestRun = run_best, 
+											BestPts = pts_best, 
+											BestTps = tps_best,
+											PtsTotal = pts_total_course,
+											TpsTotal = tps_total_course});
+										local xDetailFilles = {Detail = tDetailFillesBis};
+										local jsontxt = table.ToStringJSON(xDetailFilles, false);
+										pts_total_bis = pts_total_bis + pts_total_course;
+										tps_total_bis = tps_total_bis + tps_total_course;
+										jsontxt = separateur_filles_bis..jsontxt;
+										tEquipe_Bis:SetCell('Detail_filles', i, tEquipe_Bis:GetCell('Detail_filles', i)..jsontxt);
+										separateur_filles_bis = '|';
+									end
+								end
+							end
+						end
+					end
+				end
+			end
+			-- les garçons
+			if params.type_regroupement == 'Sexe' then
+				for row = 0, tMatrice_Ranking_Copy:GetNbRows() -1 do
+					if tMatrice_Ranking_Copy:GetCell('Sexe', row) == 'M'   and tMatrice_Ranking_Copy:GetCellInt('Tps'..idxcourse, row) ~= -600 then
+						local pts_total_course = nil;
+						local pts_total_course_bis = nil;
+						if params.comboPtsTps == 0 then			-- pts place
+							pts_total_course = tMatrice_Ranking_Copy:GetCellDouble('Pts'..idxcourse..'_total', row, 10000);
+						else
+							pts_total_course = tMatrice_Ranking_Copy:GetCellDouble('Pts'..idxcourse..'_total', row, 0);
+						end
+						if pts_total_course < 10000 then
+							local tps_total_course = tMatrice_Ranking_Copy:GetCellInt('Tps'..idxcourse..'_total', row, -1);
+							local dossard = tMatrice_Ranking_Copy:GetCellInt('Dossard'..idxcourse, row);
+							if dossard > 0 and tMatrice_Ranking_Copy:GetCellInt('Course'..idxcourse..'_prise', row) == 0 then
+								local code_coureur = tMatrice_Ranking_Copy:GetCell('Code_coureur', row);
+								local nom = tMatrice_Ranking_Copy:GetCell('Identite', row);
+								local pts_course = tMatrice_Ranking_Copy:GetCellDouble('Pts'..idxcourse..'_total', row);
+								local clt = tMatrice_Ranking_Copy:GetCellInt('Clt'..idxcourse, row);
+								local tps = tMatrice_Ranking_Copy:GetCellInt('Tps'..idxcourse, row);
+								local clt_best = tMatrice_Ranking_Copy:GetCellInt('Clt'..idxcourse..'_best', row);
+								local run_best = tMatrice_Ranking_Copy:GetCellInt('Run'..idxcourse..'_best', row);
+								local tps_best = tMatrice_Ranking_Copy:GetCellInt('Tps'..idxcourse..'_Run'..run_best, row);
+								local pts_best = tMatrice_Ranking_Copy:GetCellDouble('Pts'..idxcourse..'_best', row);
+								local tDetailGarcons = {};
+								local tDetailGarconsBis = {};
+								local ajouter_garcon = false;
+								local ajouter_garcon_bis = false;
+								if nb_garcons_pris < params.nb_garcons then
+									nb_garcons_pris = nb_garcons_pris + 1;
+									tMatrice_Ranking_Copy:SetCell('Course'..idxcourse..'_prise', row, 1);
+									table.insert(tDetailGarcons, 
+										{Course = ordre_xml, 
+										CodeEvenement = code_evenement, 
+										CodeCoureur = code_coureur, 
+										Dossard = dossard, 
+										Nom = nom, 
+										Sexe = 'M', 
+										Clt = clt, 
+										PtsCourse = pts_course, 
+										TpsCourse = tps_course, 
+										BestClt = clt_best, 
+										BestRun = run_best, 
+										BestPts = pts_best, 
+										BestTps = tps_best,
+										PtsTotal = pts_total_course,
+										TpsTotal = tps_total_course});
+									local xDetailGarcons = {Detail = tDetailGarcons};
+									local jsontxt = table.ToStringJSON(xDetailGarcons, false);
+									pts_total = pts_total + pts_total_course;
+									tps_total = tps_total + tps_total_course;
+									jsontxt = separateur_garcons..jsontxt;
+									tEquipe:SetCell('Detail_garcons', i, tEquipe:GetCell('Detail_garcons', i)..jsontxt);
+									separateur_garcons = '|';
+								else
+									if nb_garcons_pris_bis < params.nb_garcons and tMatrice_Ranking_Copy:GetCellInt('Course'..idxcourse..'_prise', row) == 0 then
+										nb_garcons_pris_bis = nb_garcons_pris_bis + 1;
+										table.insert(tDetailGarconsBis, 
+											{Course = ordre_xml, 
+											CodeEvenement = code_evenement, 
+											CodeCoureur = code_coureur, 
+											Dossard = dossard, 
+											Nom = nom, 
+											Sexe = 'M', 
+											Clt = clt, 
+											PtsCourse = pts_course, 
+											TpsCourse = tps_course, 
+											BestClt = clt_best, 
+											BestRun = run_best, 
+											BestPts = pts_best, 
+											BestTps = tps_best,
+											PtsTotal = pts_total_course,
+											TpsTotal = tps_total_course});
+										local xDetailGarcons = {Detail = tDetailGarconsBis};
+										local jsontxt = table.ToStringJSON(xDetailGarcons, false);
+										pts_total_bis = pts_total_bis + pts_total_course;
+										tps_total_bis = tps_total_bis + tps_total_course;
+										jsontxt = separateur_garcons_bis..jsontxt;
+										tEquipe_Bis:SetCell('Detail_garcons', i, tEquipe_Bis:GetCell('Detail_garcons', i)..jsontxt);
+										separateur_garcons_bis = '|';
+									end
+								end
 							end
 						end
 					end
@@ -969,7 +1083,6 @@ function BuildEquipes()
 
 		local tdetailfille = tEquipe:GetCell('Detail_filles', i):Split('|');
 		nb_filles = #tdetailfille;
-			
 		local tdetailgarcons = tEquipe:GetCell('Detail_garcons', i):Split('|');
 		nb_garcons = #tdetailgarcons;
 		if params.nb_filles > 0 and nb_filles < (params.nb_filles * params.nb_courses_filles) then
@@ -981,8 +1094,41 @@ function BuildEquipes()
 		tEquipe:SetCell('OK',i, OK);
 		tEquipe:SetCell('Pts_total',i, pts_total);
 		tEquipe:SetCell('Tps_total',i, tps_total);
+		
+		tdetailfille = tEquipe_Bis:GetCell('Detail_filles', i):Split('|');
+		nb_filles = #tdetailfille;
+		tdetailgarcons = tEquipe_Bis:GetCell('Detail_garcons', i):Split('|');
+		nb_garcons = #tdetailgarcons;
+		if params.nb_filles > 0 and nb_filles < (params.nb_filles * params.nb_courses_filles) then
+			OK = 0;
+		end
+		if params.nb_garcons > 0 and nb_garcons < (params.nb_garcons * params.nb_courses_garcons) then
+			OK_BIS = 0;
+		end
+		tEquipe_Bis:SetCell('OK',i, OK_BIS);
+		tEquipe_Bis:SetCell('Pts_total',i, pts_total_bis);
+		tEquipe_Bis:SetCell('Tps_total',i, tps_total_bis);
 	end
+	if params.comboEquipeBis == 1 then
+		for i = 0, tEquipe_Bis:GetNbRows() -1 do
+			if tEquipe_Bis:GetCell('Detail_filles', i):len() > 0 or tEquipe_Bis:GetCell('Detail_garcons', i):len() > 0 then		-- il faut créer un nouveau record avec l'équipe bis
+			local rEquipe = tEquipe:GetRecord();
+				rEquipe:SetNull(); 
+				rEquipe:Set(col_equipe, tEquipe_Bis:GetCell(col_equipe, i)..' BIS');
+				rEquipe:Set('OK', tEquipe_Bis:GetCell('OK', i));
+				rEquipe:Set('Detail_filles', tEquipe_Bis:GetCell('Detail_filles', i));
+				rEquipe:Set('Detail_garcons', tEquipe_Bis:GetCell('Detail_garcons', i));
+				rEquipe:Set('Pts_total', tEquipe_Bis:GetCell('Pts_total', i));
+				rEquipe:Set('Tps_total', tEquipe_Bis:GetCell('Tps_total', i));
+				tEquipe:AddRow();
+			end
+		end
+	end
+	-- le cas échéant, les équipes BIS ont été ajoutées dans la table tEquipe
 	local filter = '$(OK):In(1)';
+	if params.debug then
+		tEquipe:Snapshot('tEquipe.db3');
+	end
 	if params.comboGarderEquipe == 0 then
 		tEquipe:Filter(filter, true);
 	end
@@ -1023,6 +1169,7 @@ function BuildRanking();
 		local discipline = tCourses[idxcourse].Discipline;
 		tMatrice_Ranking:AddColumn({ name = 'Code_evenement'..idxcourse, label = 'Code_evenement'..idxcourse, type = sqlType.LONG, style = sqlStyle.NULL});
 		tMatrice_Ranking:AddColumn({ name = 'Ordre_xml'..idxcourse, label = 'Ordre_xml'..idxcourse, type = sqlType.LONG, style = sqlStyle.NULL});
+		tMatrice_Ranking:AddColumn({ name = 'Course'..idxcourse..'_prise', label = 'Course'..idxcourse..'_prise', type = sqlType.LONG, style = sqlStyle.NULL});
 		tMatrice_Ranking:AddColumn({ name = 'Dossard'..idxcourse, label = 'Dossard'..idxcourse, type = sqlType.LONG, style = sqlStyle.NULL});
 		tMatrice_Ranking:AddColumn({ name = 'Clt'..idxcourse, label = 'Clt'..idxcourse, type = sqlType.LONG, style = sqlStyle.NULL});
 		tMatrice_Ranking:AddColumn({ name = 'Tps'..idxcourse, label = 'Tps'..idxcourse, type = sqlType.LONG, style = sqlStyle.NULL});
@@ -1168,6 +1315,7 @@ function BuildRanking();
 							best_tps = tps_run
 						end
 					else
+						pts_run = pts_run or params.default_pts;
 						if params.comboPtsTps == 0 then		-- points place
 							if pts_run > best_pts then
 								best_run = idxrun;
@@ -1238,9 +1386,9 @@ function main(params_c)
 	params.width = (display:GetSize().width * 2) / 3;
 	params.height = display:GetSize().height / 2;
 	params.x = (display:GetSize().width - params.width) / 2;
-	params.y = 50;
+	params.y = 0;
 	params.debug = false;
-	params.version = "1.5";
+	params.version = "1.6";
 	base = base or sqlBase.Clone();
 	tPlace_Valeur = base:GetTable('Place_Valeur');
 	tEvenement = base:GetTable('Evenement');
