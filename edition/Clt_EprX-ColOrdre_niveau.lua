@@ -1,8 +1,7 @@
 dofile('./interface/adv.lua');
 dofile('./interface/interface.lua');
 
--- version 1.0
-
+-- version 1.2
 
 function alert(txt)
 	app.GetAuiMessage():AddLine(txt);
@@ -22,8 +21,8 @@ function main(params)
 	dlg = wnd.CreateDialog({
 		x = x,
 		y = y,
-		width=730, -- widthControl, 
-		height=300, -- heightControl, 
+		width=780, -- widthControl, 
+		height=500, -- heightControl, 
 		label='transfert Clt dans Pts_Best', 
 		icon='./res/32x32_agil.png'
 	});
@@ -78,19 +77,18 @@ function LectureDonnees(evt)
 	Place = tResultat:GetCell('CltG', i);
 	Critere = 'Course'..Evt_source;
 	-- alert('Place = '..Place);
-		if place ~= '' then
-			if tonumber(Place) == 0 then 
-				Place = 999; 
-				Critere = 'Non Classer';
-			end
-			cmd = "Update Resultat SET Ordre_niveau = '"..Place.."', Critere = '"..Critere.."' Where Code_evenement = "..tonumber(code_evenement).." and Code_coureur = '"..tResultat:GetCell('Code_coureur', i).."'";
-			base:Query(cmd);
-			-- alert("cmd = "..cmd)
-			bodyliste:AddRow();
-			sqlTable.CopyRow(bodyliste, bodyliste:GetNbRows()-1, tResultat, i);
+		if tonumber(Place) == 0 or Place == '' then 
+			Place = 9999; 
+			Critere = 'Non Classer';
 		end
+		cmd = "Update Resultat SET Ordre_niveau = '"..Place.."', Niveau = '"..Critere.."' Where Code_evenement = "..tonumber(code_evenement).." and Code_coureur = '"..tResultat:GetCell('Code_coureur', i).."'";
+		base:Query(cmd);
+		-- alert("cmd = "..cmd)
 	end
-	--$(Point)
+	for i=0, Nbparticipant-1 do
+		bodyliste:AddRow();
+		sqlTable.CopyRow(bodyliste, bodyliste:GetNbRows()-1, tResultat, i);
+	end
 	
 	editionliste(evt, params, base, bodyliste);
 	
@@ -105,7 +103,7 @@ function editionliste(evt, params, base, bodyliste)
 		
 	-- Creation du Report
 	report = wnd.LoadTemplateReportXML({
-		xml = './edition/Clt_EprX-ColPtsBest.xml',
+		xml = './edition/Clt_EprX-ColOrdre_niveau.xml',
 		node_name = 'root/report',
 		node_attr = 'id',
 		node_value = 'ListeClt' ,

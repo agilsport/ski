@@ -1,6 +1,7 @@
 dofile('./interface/adv.lua');
 dofile('./interface/interface.lua');
--- version 2.2
+
+-- version 1.2
 
 
 function alert(txt)
@@ -8,10 +9,7 @@ function alert(txt)
 end
 
 function main(params)
-	params = params or {};
-	Dlg = {};
-	-- local verif = params.Colum_Label or 'BOF';
-	-- alert('Verif='..verif);
+	theParams = params;
 
 	local widthMax = display:GetSize().width;
 	local widthControl = math.floor((widthMax*3)/4);
@@ -26,26 +24,23 @@ function main(params)
 		y = y,
 		width=780, -- widthControl, 
 		height=500, -- heightControl, 
-		label='transfert Points dans Pts_Best', 
+		label='Transfert Pts_Clt dans PtsClt & Clt dans Clt_best', 
 		icon='./res/32x32_agil.png'
 	});
 	
 	-- Creation des Controles et Placement des controles par le Template XML ...
 	dlg:LoadTemplateXML({ 
-		xml = './edition/PtsFFS_ColPtsBest.xml', 		-- Obligatoire
+		xml = './edition/ColPtsClt_ColPtsBest.xml', 		-- Obligatoire
 		node_name = 'root/panel', 			-- Obligatoire
 		node_attr = 'name', 				-- Facultatif si le node_name est unique ...
-		node_value = 'PtsFFS_ColPts_best',			-- Facultatif si le node_name est unique ...	
-	});
+		node_value = 'ColPtsClt_ColPtsBest',			-- Facultatif si le node_name est unique ...	
+	});	
 
 	base = sqlBase.Clone();
-	code_evenement = params.code_evenement;
-	colum_Pts = params.colum_Pts;	 	--="Pts_best" 
-	LabelNc = params.LabelNc;            -- "NC_FFS"
-	Colum_Label = params.Colum_Label;
-	LabelPts = params.LabelPts;
-	Dlg.LabelPts = params.LabelPts;
+	code_evenement = tonumber(theParams.code_evenement);
+	
 	-- Initialisation des controles ...
+	local comboNbCouloir = dlg:GetWindowName('N_Course');
 	
 	local tb = dlg:GetWindowName('tb');
 	if tb then
@@ -65,35 +60,43 @@ end
 
 function LectureDonnees(evt)
 	-- alert("code_evenement = "..code_evenement);
-	alert("colum_Pts = "..colum_Pts);
-	-- alert("LabelNc = "..LabelNc);
-	-- alert("Colum_Label = "..Colum_Label);
-	Lab_NC = LabelNc;
+	Evt_source = tonumber(dlg:GetWindowName('N_Course'):GetValue());
+	alert("Evt_source = "..Evt_source);
 	tResultat = base:GetTable('Resultat');
-	cmd = "Select * From Resultat WHERE Code_evenement = "..code_evenement.." Order by Code_coureur"
+	tResultat:AddColumn('CltG');
+	tResultat:AddColumn('PtsClt_G');
+	cmd = "Select  b.*, a.Clt CltG, a.PtsClt PtsClt_G"..
+			" From Resultat a, Resultat b "..
+			" Where a.Code_evenement = "..Evt_source..
+			" And b.Code_evenement = "..tonumber(code_evenement)..
+			" And a.Code_coureur = b.Code_coureur";
 	base:TableLoad(tResultat, cmd);
-	alert("base:TableLoad(Resultat, cmd) = "..tResultat:GetNbRows()..' / '..cmd);
 	bodyliste = tResultat:Copy(false);
+	
+	-- alert("base:TableLoad(Resultat, cmd) = "..cmd)
 	Nbparticipant = tResultat:GetNbRows();
 	for i=0, Nbparticipant-1 do
-		--resultatPts = tResultat:GetCell('Point', i)
-		--alert("resultatPts "..resultatPts);
-		if tResultat:GetCellDouble('Point', i) == 0.0 then 
-			resultatPts = 9999;
-			LabelNc = Lab_NC;
-		else
-			resultatPts = tResultat:GetCell('Point', i);
-			LabelNc = '';
+		Points_Ch = tResultat:GetCell('PtsClt_G', i) or 0;
+		Place = tResultat:GetCell('CltG', i) or 0;
+		Groupe = 'Cha'..Evt_source;
+		Critere = '';
+		-- alert('Place = '..Place);
+		if tonumber(Place) == 0 or Place == '' then 
+			Critere = 'Non Classer';
+			Points_Ch = 9999;
+			Place = 9999;
 		end
-		cmd = "Update Resultat SET "..colum_Pts.." = "..resultatPts..", "..Colum_Label.." = '"..LabelNc.."' Where Code_evenement = "..tonumber(code_evenement).." and Code_coureur = '"..tResultat:GetCell('Code_coureur', i).."'";
+		cmd = "Update Resultat SET Pts_best = '"..Points_Ch.."', Ordre_niveau = '"..Place.."', Niveau = '"..Critere.."', Moniteur = '"..Groupe.."' Where Code_evenement = "..tonumber(code_evenement).." and Code_coureur = '"..tResultat:GetCell('Code_coureur', i).."'";
 		base:Query(cmd);
 		alert("cmd = "..cmd)
 	end
+-- rechargement du body pour edition liste	
 	for i=0, Nbparticipant-1 do
 		bodyliste:AddRow();
 		sqlTable.CopyRow(bodyliste, bodyliste:GetNbRows()-1, tResultat, i);
 	end
-	editionliste(evt, base, bodyliste);
+	
+	editionliste(evt, params, base, bodyliste);
 	
 	-- Fermeture
 	bodyliste:Delete();
@@ -101,24 +104,21 @@ function LectureDonnees(evt)
 
 end
 
-function editionliste(evt, base, bodyliste)
-	theParams = {}
-	theParams.Colum_Label = Colum_Label;
-	theParams.LabelNc = LabelNc;
-	theParams.colum_Pts = colum_Pts;
-	theParams.LabelPts = LabelPts;
-	bodyliste:OrderBy('Point Asc' );
+function editionliste(evt, params, base, bodyliste)
+	
+		
 	-- Creation du Report
 	report = wnd.LoadTemplateReportXML({
-		xml = './edition/PtsFFS_ColPtsBest.xml',
+		xml = './edition/ColPtsClt_ColPtsBest.xml',
 		node_name = 'root/report',
 		node_attr = 'id',
-		node_value = 'ListePoints' ,
+		node_value = 'ListeClt' ,
 		
 		-- parent = dlg,
 			
 		base = base,
 		body = bodyliste,
+		
 		params = theParams
 	});
 	dlg:EndModal();

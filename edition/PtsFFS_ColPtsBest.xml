@@ -3,37 +3,45 @@
 
 <!-- Fenètre de configuration de l'éditions des couloir de poursuite -->
 <panel name="PtsFFS_ColPts_best">
-	<padding all="2px"/>
-	<col value="5,5,5,5,5" />
-	<row value="0.2cm" />
-	<row value="auto" />
-		<statictext col_start="1" col_end="0"  align="left" label="Cet utilitaire permet de copier Les Points FFS " />
-
-	<row value="auto" />
-		<statictext col_start="1" col_end="3"  align="left" label="Dans la colonne Pts_best ou meilleur points"/>
-		
-	<row value="auto" />
-		<statictext col_start="1" col_end="0"  align="left" label="Il fo que la course soit en FFS avec la liste corespondante et une maj des points FFS faite" />
-
-	<row value="auto" />
-		<statictext col_start="1" col_end="0"  align="left" label="après le transfert déclarer la course en FIS"/>
-		
-	<row value="auto" />
-		<statictext col_start="1" col_end="0"  align="left" label="Bien faire un changement de code FFS en code FIS puis une mise a jour des points avec la bonne liste FIS"/>
-		
-	<row value="auto" />
-		<statictext col_start="1" col_end="0"  align="left" label="ceci permet de classer par FIS puis FFS pour les Dossards"/>
-
-	<row value="0.2cm" />
-		
+	<font name="Calibri" size="16" adjust="best" >
+		<padding all="2px"/>
+		<col w="5,5,5,5,5" />
+		<row h="0.1cm" />
+		<row h="1" />
+			<wndtext col_start="1" col_end="0" align="left" >'Cet utilitaire permet de copier Les Points: '</wndtext>
+		<row h="1" />
+			<wndtext col_start="1" col_end="0" align="left" >'           => Fis Distance dans la colonne Pts_best'</wndtext>
+		<row h="1" />
+			<wndtext col_start="1" col_end="0" align="left" >'           => Fis Sprint dans la colonne Pts'</wndtext>
+		<row h="1" />
+			<wndtext col_start="1" col_end="0" align="left" >'           => FFS (meilleur¨FOND, ROL,BIATH) dans la colonne Pts_Clt'</wndtext>
+		<row h="1" />
+			<wndtext col_start="1" col_end="0" align="left" >'Bien mettre la course dans la bonne Entité et la bonne Discipline (surtout pour les FIS)'</wndtext>
+		<row h="1" />
+			<wndtext col_start="1" col_end="0" align="left" >'Bien mettre la bonne liste FIS ou FFS selon ce que l\'on souhaite transférer'</wndtext>
+		<row h="1" />
+			<wndtext col_start="1" col_end="0" align="left" >'Faire une mise a jour des points et lancer l\'edition'</wndtext>
+		<row h="1" />
+			<wndtext col_start="1" col_end="0" align="left" >'Penser à réorganiser les colonnes pour faire aparaitre:'</wndtext>
+		<row h="1" />
+			<wndtext col_start="1" col_end="0" align="left" >'          => Pts_best, Pts_Clt'</wndtext>
+		<row h="1" />
+			<wndtext col_start="1" col_end="0" align="left" >'          => Ainsi que Moniteur, Niveau, Info'</wndtext>
+		<row h="1" />
+			<wndtext col_start="1" col_end="0" align="left" >'Pour avoir les Non Classés de la Discipline'</wndtext>
+	</font>
 	<row value="auto" />
 	<toolbar name="tb" col_start="1" col_end="0" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
 </panel>
 
-<!-- édition des couloirs de poursuite -->
-	<report id="ListePoints" title="('liste des participants et points')" >
-		
-		<order key="Rang2 Asc" />
+<!-- édition d une liste par points -->
+	<report id="ListePoints" >
+		<lua>
+			Colum_Label = params.Colum_Label or '';
+			colum_Pts = params.colum_Pts or '';
+			LabelNc = params.LabelNc or '';
+			LabelPts = params.LabelPts or '';
+		</lua>	
 		
 		<first_header />
 	
@@ -45,8 +53,9 @@
 			<text row="0.5cm" align="center" ></text>
 			<text row="auto" align="center" >title</text>
 			<text row="1cm" align="center" ></text>
-			<font name="Calibri" size="26" adjust="max" weight="bold"/>
-			<text row="auto" align="center" >'liste points FIS point FFS'</text>
+			<font name="Calibri" size="14" adjust="max" weight="bold"/>
+			<text row="auto" align="center" >'Passage des Points '..LabelPts..' Dans la colonne: '..colum_Pts</text>
+			<text row="auto" align="center" >'mise en place de la valeur '..LabelNc..' Dans la colonne: '..Colum_Label</text>
 			<row value="0.5cm"/>
 		</header>
 	
@@ -56,8 +65,9 @@
 			<row value="auto"/>
 			<spacing left="5" right="10" top="2" bottom="2" />
 			<text col="2" align="left" label="Dos.">$(Nom)..' '..$(Prenom) </text>
-			<text col="1" align="center" label="Point" >$(Point)</text>
-			<text col="1" align="center" label="Col.Pts_best" >$(Pts_best)</text>
+			<text col="1" align="center" label="('Point '..LabelPts)" >$(Point)</text>
+			<text col="1" align="center" label="(colum_Pts)" >body:GetCell(colum_Pts, row)</text>
+			<text col="1" align="center" label="(Colum_Label)" >body:GetCell(Colum_Label, row)</text>
 		</body>
 	</report>
 

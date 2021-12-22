@@ -1,0 +1,76 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<root>
+
+<!-- Fenètre de configuration de l'éditions des couloir de poursuite -->
+<panel name="ColPtsClt_ColPtsBest">
+	<row value="0.2cm" />
+	<font name="Calibri" size="16" adjust="best" >
+		<padding all="2px"/>
+		<col w="5,5,5,5,5" />
+		<row h="0.1cm" />
+		<row h="1" />
+			<wndtext col_start="1" col_end="0" align="left" >'Cet utilitaire permet de copier Le Clt d\'un Challenge Source xx'</wndtext>
+		<row h="1" />
+			<wndtext col_start="1" col_end="0" align="left" >'Le Clt du challenge => Dans la colonne Ordre_niveau '</wndtext>
+		<row h="1" />
+			<wndtext col_start="1" col_end="0" align="left" >'Les points du Callenge => dans la colonne Pts_best '</wndtext>
+		<row h="1" />
+			<wndtext col_start="1" col_end="0" align="left" >'Les Not Classified => dans la colonne Niveau '</wndtext>
+		<row h="1" />
+			<wndtext col_start="1" col_end="0" align="left" >'PS: Il faut bien avoir fait un Résultat Officiel Du Challenge'</wndtext>
+		<row h="1" />
+			<wndtext col_start="1" col_end="0" align="left" >'après le transfert pour faire l\'atribution des dossard par rapport au Clt de l\'evt Source'</wndtext>
+		<row h="1" />
+			<wndtext col_start="1" col_end="0" align="left" >'faire filtrage ligne puis selectionner tous les concurents ayant Cha N°xx dans le champ Moniteur.'</wndtext>
+		<row h="1" />
+			<wndtext col_start="1" col_end="0" align="left" >'Ceci permet de sélectionner que les concurents qui sont classés dans le Challenge'</wndtext>
+		<row h="1" />
+			<wndtext col_start="1" col_end="0" align="left" >'de les trier ds ordre voulu et faire le tirage des Dos suivant l\'ordre de la liste'</wndtext>
+		<row h="0.1cm" />
+	</font>
+	<row value="auto" />
+	<statictext col_start="1" col_end="3"  align="right" label="N° de la course Source"/>
+	<textctrl col_start="4"  col_end="4" name="N_Course" ></textctrl>
+
+	<row value="0.5cm" />
+		
+	<row value="auto" />
+	<toolbar name="tb" col_start="1" col_end="0" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
+</panel>
+
+<!-- édition -->
+	<report id="ListeClt" title="('liste des participants et Clt Evt1')" >
+		
+		<order key="Distance, Ordre_niveau" />
+		
+		<first_header />
+	
+		<header>
+			<spacing all="0"/>
+			<background mode="transparent"/>		
+			<font name="Calibri" size="14" adjust="max" weight="bold"/>
+			<text row="auto" col="1" col_end="0" align="center">'Vérification'</text>
+			<text row="0.5cm" align="center" ></text>
+			<text row="auto" align="center" >title</text>
+			<text row="1cm" align="center" ></text>
+			<font name="Calibri" size="26" adjust="max" weight="bold"/>
+			<text row="auto" align="center" >'liste Clt'</text>
+			<row value="0.5cm"/>
+		</header>
+	
+		<body>
+			<call option="couleur_alternee" file="./edition/options.xml" />
+			<font size="15" adjust="ellipsize"/>
+			<row value="auto"/>
+			<spacing left="5" right="10" top="2" bottom="2" />
+			<text col="5" align="left" label="Dos.">$(Nom)..' '..$(Prenom) </text>
+			<text col="2" align="center" label="Distance" >$(Distance)..'Km'</text>
+			<text col="2" align="center" label="Chal. Origine" >$(Moniteur)</text>
+			<text col="2" align="center" label="Pts Challenge" >$(Pts_best)</text>
+			<text col="2" align="center" label="Clt Challenge" >$(Ordre_niveau)</text>
+			<text col="2" align="center" label="N.Cl." >$(Niveau)</text>
+		</body>
+	</report>
+
+
+</root>
