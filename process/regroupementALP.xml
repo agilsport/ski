@@ -2,7 +2,7 @@
 <!-- Regroupement de coureurs -->
 <!-- <background mode="gradient_line_vert" color_start="white" color_end="ltgray" /> -->
 <root title="Regroupement de coureurs">
-  <config coursef2_filtre="$(Sexe):In('F') and $(Categ):In('U16')" courseg2_filtre="$(Sexe):In('M') and $(Categ):In('U16')" coursef1="481" courseg1="461" coursef2="478" courseg2="478" titre="Regroupement de coureurs" comboColEquipe="4" comboPrendre="0" comboPtsTps="0" comboAbdDsq="1" coefManche="50" nb_filles="2" nb_garcons="2" comboGarderEquipe="1"/>
+  <config nb_garcons="2" titre="Regroupement de coureurs" comboColEquipe="4" comboPrendre="0" comboPtsTps="0" comboAbdDsq="0" coefManche="100" nb_filles="2" comboGarderEquipe="0" comboEquipeBis="0"/>
   <panel name="config">
     <lua>dofile('./interface/adv.lua');
 		dofile('./edition/functionPG.lua');
@@ -71,6 +71,8 @@
         <textctrl col_start="2" name="nb_garcons"/>
         <statictext row="auto" col_start="1" style="ALIGN_RIGHT" label="Conserver les équipes incomplètes "/>
         <combobox col_start="2" name="comboGarderEquipe" style="CB_READONLY"/>
+        <statictext row="auto" col_start="1" style="ALIGN_RIGHT" label="Création d\'équipes BIS automatique "/>
+        <combobox col_start="2" name="comboEquipeBis" style="CB_READONLY"/>
       </matrix>
       <row value="10px"/>
       <staticbox row_start="-3" row_end="0" col_start="2" col_end="3" label="Paramétrage des calculs"/>
@@ -127,6 +129,8 @@
         <textctrl col_start="2" name="nb_filles"/>
         <statictext row="auto" col_start="1" style="ALIGN_RIGHT" label="Conserver les équipes incomplètes "/>
         <combobox col_start="2" name="comboGarderEquipe" style="CB_READONLY"/>
+        <statictext row="auto" col_start="1" style="ALIGN_RIGHT" label="Création d\'équipes BIS automatique "/>
+        <combobox col_start="2" name="comboEquipeBis" style="CB_READONLY"/>
       </matrix>
       <row value="10px"/>
       <staticbox row_start="-3" row_end="0" col_start="2" col_end="3" label="Paramétrage des calculs"/>
@@ -157,20 +161,22 @@
 				local xDetail = table.FromStringJSON(jsontxt);
 				table.insert(tTableDetail,
 								{CodeEvenement = xDetail.Detail[1].CodeEvenement, 
-								CodeCoureur = xDetail.Detail[1].CodeCoureur, 
-								Clt = xDetail.Detail[1].Clt, 
-								TpsTotal = xDetail.Detail[1].TpsTotal, 
-								BestTps = xDetail.Detail[1].BestTps, 
-								BestPts = xDetail.Detail[1].BestPts, 
-								Dossard = xDetail.Detail[1].Dossard, 
-								PtsTotal = xDetail.Detail[1].PtsTotal,
 								Course = xDetail.Detail[1].Course,
+								CodeCoureur = xDetail.Detail[1].CodeCoureur, 
+								Dossard = xDetail.Detail[1].Dossard, 
+								Nom = xDetail.Detail[1].Nom,
+								Sexe = xDetail.Detail[1].Sexe, 
+								Clt = xDetail.Detail[1].Clt, 
+								PtsCourse = xDetail.Detail[1].PtsCourse, 
+								TpsCourse = xDetail.Detail[1].TpsCourse, 
 								BestClt = xDetail.Detail[1].BestClt, 
 								BestRun = xDetail.Detail[1].BestRun, 
-								PtsCourse = xDetail.Detail[1].PtsCourse, 
-								Sexe = xDetail.Detail[1].Sexe, 
-								Nom = xDetail.Detail[1].Nom 
+								BestTps = xDetail.Detail[1].BestTps, 
+								BestPts = xDetail.Detail[1].BestPts, 
+								PtsTotal = xDetail.Detail[1].PtsTotal,
+								TpsTotal = xDetail.Detail[1].TpsTotal
 								});
+				pts_total = pts_total + xDetail.Detail[1].PtsCourse;
 			end
 			return tTableDetail;
 		end
@@ -193,12 +199,14 @@
       <lua>ordre_xml_en_cours = tRegroupement_Courses:GetCellInt('Ordre_xml', 0);
 	  for i = 0, tRegroupement_Courses:GetNbRows() -1 do
 		ordre_xml_lu = tRegroupement_Courses:GetCellInt('Ordre_xml', i);
-		</lua>
+			</lua>
       <row value="0.2cm" cond="ordre_xml_en_cours ~= ordre_xml_lu">''</row>
       <line col_start="1" col_end="0" pen_size="1" border="bottom" cond="ordre_xml_en_cours ~= ordre_xml_lu"/>
       <row value="0.2cm" cond="ordre_xml_en_cours ~= ordre_xml_lu">''</row>
-      <text row="auto" col_start="2" adjust="ellipsize">
+      <text row="auto" col_start="2" adjust="ellipsize" cond="params.TypeRegroupement == 'Sexe'">
         <background mode="solid" color="ltgray" cond="tRegroupement_Courses:GetCellInt('Ordre_xml', i) % 2 ~= 0 "/>'Course '..tRegroupement_Courses:GetCell('Ordre_xml', i)..'  du '..tRegroupement_Courses:GetCell('Date', i)..'  ('..tRegroupement_Courses:GetCell('Sexe', i)..')  '..tRegroupement_Courses:GetCell('Nom', i)</text>
+      <text row="auto" col_start="2" adjust="ellipsize" cond="params.TypeRegroupement ~= 'Sexe'">
+        <background mode="solid" color="ltgray" cond="tRegroupement_Courses:GetCellInt('Ordre_xml', i) % 2 ~= 0 "/>'Course '..tRegroupement_Courses:GetCell('Ordre_xml', i)..'  du '..tRegroupement_Courses:GetCell('Date', i)..' : '..tRegroupement_Courses:GetCell('Nom', i)</text>
       <text col_start="3">
         <background mode="solid" color="ltgray" cond="tRegroupement_Courses:GetCellInt('Ordre_xml', i) % 2 ~= 0 "/>tRegroupement_Courses:GetCell('Code_discipline', i)</text>
       <lua>if ordre_xml_en_cours ~= ordre_xml_lu then ordre_xml_en_cours = ordre_xml_lu; end
@@ -222,54 +230,52 @@
       </matrix>
     </footer>
     <label>
-      <matrix cond="params.TypeRegroupement == 'Sexe'">
+      <matrix>
         <font name="Calibri" size="9" adjust="width" weight="bold"/>
         <pen border="all"/>
-        <col value="3cm,8cm,8cm"/>
+        <col value="3cm,8cm,8cm" cond="params.TypeRegroupement == 'Sexe'"/>
+        <col value="3cm,10cm" cond="params.TypeRegroupement ~= 'Sexe'"/>
         <row value="1.5cm"/>
         <text col_start="1" align="center">'Clt\nEquipe\n'..pts_tps</text>
         <text col_start="2">'Dossard - Clt : Nom'</text>
-        <text col_start="2" align="center" font_size_step="4">'Filles'</text>
+        <text col_start="2" align="center" font_size_step="4" cond="params.TypeRegroupement == 'Sexe'">'Filles'</text>
+        <text col_start="2" align="center" font_size_step="4" cond="params.TypeRegroupement ~= 'Sexe'">'Mixte'</text>
         <text col_start="2" align="right">pts_tps</text>
-        <text col_start="3">'Dossard - Clt : Nom'</text>
-        <text col_start="3" align="center" font_size_step="4">'Garçons'</text>
-        <text col_start="3" align="right">pts_tps</text>
-      </matrix>
-      <matrix cond="params.TypeRegroupement == 'Scratch'">
-        <font name="Calibri" size="9" adjust="width" weight="bold"/>
-        <pen border="all"/>
-        <col value="3cm,10cm"/>
-        <row value="1.5cm"/>
-        <text col_start="1" align="center">'Clt\nEquipe\n'..pts_tps</text>
-        <text col_start="2">'Dossard - Clt : Nom'</text>
-        <text col_start="2" align="center" font_size_step="4">'Mixte'</text>
-        <text col_start="2" align="right">pts_tps</text>
+        <text col_start="3" cond="params.TypeRegroupement == 'Sexe'">'Dossard - Clt : Nom'</text>
+        <text col_start="3" cond="params.TypeRegroupement == 'Sexe'" align="center" font_size_step="4">'Garçons'</text>
+        <text col_start="3" cond="params.TypeRegroupement == 'Sexe'" align="right">pts_tps</text>
       </matrix>
     </label>
     <body>
       <font name="Calibri" size="8" adjust="width" weight="bold"/>
-      <lua>if body:GetCell('Detail_filles', row):len() &gt; 0 then
-					tFillesEquipe = GetDetail(body:GetCell('Detail_filles', row));
-				else
-					tFillesEquipe = {};
-				end
-				if body:GetCell('Detail_garcons', row):len() &gt; 0 then
-					tGarconsEquipe = GetDetail(body:GetCell('Detail_garcons', row));
-				else
-					tGarconsEquipe = {};
-				end
-		  </lua>
-      <lua>if params.TypeRegroupement == 'Sexe' then</lua>
+      <lua>pts_total = 0;
+			if body:GetCell('Detail_filles', row):len() &gt; 0 then
+				tFillesEquipe = GetDetail(body:GetCell('Detail_filles', row));
+			else
+				tFillesEquipe = {};
+			end
+			if body:GetCell('Detail_garcons', row):len() &gt; 0 then
+				tGarconsEquipe = GetDetail(body:GetCell('Detail_garcons', row));
+			else
+				tGarconsEquipe = {};
+			end
+				</lua>
       <matrix>
-        <col value="3cm, 8cm, 8cm"/>
+        <col value="3cm, 8cm, 8cm" cond="params.TypeRegroupement == 'Sexe'"/>
+        <col value="3cm, 10cm" cond="params.TypeRegroupement ~= 'Sexe'"/>
         <pen border="all"/>
         <row value="0.47cm" count="(maxlignes)"/>
         <matrix row_start="1" row_end="0" col_start="1">
           <col value="1"/>
-          <text col_start="1" align="center" label="Clt - Equipe : Points totaux" row_start="1" row_end="0" cond="params.PtsTps &lt; 2">(row+1)..'\n'..body:GetCell(0,row)..'\n'..$(Pts_total)</text>
+          <text col_start="1" align="center" label="Clt - Equipe : Points totaux" row_start="1" row_end="0" cond="params.PtsTps ~= 2">(row+1)..'\n'..body:GetCell(0,row)..'\n'..$(Pts_total)</text>
+          <!-- <text col_start="1" align="center" label="Clt - Equipe : Points totaux" row_start="1" row_end="0" cond="params.PtsTps ~= 2">(row+1)..'\n'..body:GetCell(0,row)..'\n'..pts_total</text> -->
           <text col_start="1" align="center" label="Clt - Equipe : Temps total" row_start="1" row_end="0" cond="params.PtsTps == 2">(row+1)..'\n'..body:GetCell(0,row)..'\n'..body:GetCell('Tps_total', row, '%-1h%-1m%2s.%2f')</text>
         </matrix>
         <matrix row_start="1" row_end="0" col_start="2">
+          <col value="1"/>
+          <text row_start="1" row_end="0">''</text>
+        </matrix>
+        <matrix row_start="1" row_end="0" col_start="3" cond="params.TypeRegroupement == 'Sexe'">
           <col value="1"/>
           <text row_start="1" row_end="0">''</text>
         </matrix>
@@ -287,8 +293,8 @@
               <background mode="solid" color="ltgray" cond="course % 2 ~= 0 "/>''</text>
             <lua>end</lua>
             <lua>row_start = 1;
-							for i = 1, #tFillesEquipe do
-								if tFillesEquipe[i].Course == course then</lua>
+				for i = 1, #tFillesEquipe do
+					if tFillesEquipe[i].Course == course then</lua>
             <text row_start="(row_start)">
               <background mode="transparent"/>tFillesEquipe[i].Dossard..' - '..tFillesEquipe[i].Clt..' : '..tFillesEquipe[i].Nom</text>
             <lua>if params.PtsTps == 0 then</lua>
@@ -307,7 +313,7 @@
           </matrix>
           <lua>end</lua>
         </matrix>
-        <matrix row_start="1" row_end="0" col_start="3">
+        <matrix row_start="1" row_end="0" col_start="3" cond="params.TypeRegroupement == 'Sexe'">
           <padding all="0.03cm"/>
           <col value="1"/>
           <row value="1cm" count="(params.NbCoursesGarcons)"/>
@@ -341,56 +347,6 @@
           <lua>end</lua>
         </matrix>
       </matrix>
-      <lua>else</lua>
-      <matrix>
-        <col value="3cm, 10cm"/>
-        <pen border="all"/>
-        <row value="0.47cm" count="(maxlignes)"/>
-        <matrix row_start="1" row_end="0" col_start="1">
-          <col value="1"/>
-          <text col_start="1" align="center" label="Clt - Equipe : Points totaux" row_start="1" row_end="0" cond="params.PtsTps &lt; 2">(row+1)..'\n'..body:GetCell(0,row)..'\n'..$(Pts_total)</text>
-          <text col_start="1" align="center" label="Clt - Equipe : Temps total" row_start="1" row_end="0" cond="params.PtsTps == 2">(row+1)..'\n'..body:GetCell(0,row)..'\n'..body:GetCell('Tps_total', row, '%-1h%-1m%2s.%2f')</text>
-        </matrix>
-        <matrix row_start="1" row_end="0" col_start="2">
-          <col value="1"/>
-          <text row_start="1" row_end="0">''</text>
-        </matrix>
-        <matrix row_start="1" row_end="0" col_start="2">
-          <padding all="0.03cm"/>
-          <col value="1"/>
-          <row value="1cm" count="(params.NbCoursesFilles)"/>
-          <lua>for course = 1, params.NbCoursesFilles do</lua>
-          <matrix row_start="(course)">
-            <padding left="0.1cm" right="0.1cm"/>
-            <col value="1"/>
-            <row value="auto" count="(params.NbFilles)"/>
-            <lua>for i = 1, params.NbFilles do</lua>
-            <text row_start="(i)">
-              <background mode="solid" color="ltgray" cond="course % 2 ~= 0 "/>''</text>
-            <lua>end</lua>
-            <lua>row_start = 1;
-							for i = 1, #tFillesEquipe do
-								if tFillesEquipe[i].Course == course then</lua>
-            <text row_start="(row_start)">
-              <background mode="transparent"/>tFillesEquipe[i].Dossard..' - '..tFillesEquipe[i].Clt..' : '..tFillesEquipe[i].Nom</text>
-            <lua>if params.PtsTps == 0 then</lua>
-            <text row_start="(row_start)" align="right">
-              <background mode="transparent"/>tFillesEquipe[i].PtsTotal</text>
-            <lua>elseif params.PtsTps == 1 then</lua>
-            <text row_start="(row_start)" align="right">
-              <background mode="transparent"/>tFillesEquipe[i].PtsCourse</text>
-            <lua>elseif params.PtsTps == 2 then</lua>
-            <text row_start="(row_start)" align="right">
-              <background mode="transparent"/>app.TimeToString(tFillesEquipe[i].TpsTotal, '%-1h%-1m%2s.%2f')</text>
-            <lua>end</lua>
-            <lua>row_start = row_start + 1</lua>
-            <lua>end</lua>
-            <lua>end</lua>
-          </matrix>
-          <lua>end</lua>
-        </matrix>
-      </matrix>
-      <lua>end</lua>
       <row value="0.2cm"/>
     </body>
   </panel>
