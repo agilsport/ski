@@ -1,0 +1,181 @@
+#block_running
+{
+	position: absolute;
+
+	left:305px;
+	top:840px;
+	width:;
+	height:100px;
+}	
+
+#block_running .bib
+{
+	position: absolute;
+
+	left:0px;
+	top:80px;
+	width:50px;
+	height:60px;
+
+	background-image: url("../img/60_50_Gray.jpg");
+	background-repeat: no-repeat;
+	
+	font-family: Calibri;
+	font-size:38px;
+	font-weight:bold;
+	color:black;
+	text-align:center;
+	padding-top:4px;
+}
+ 
+#block_running .identity
+{
+	position: absolute;
+
+	left:50px;
+	top:80px;
+	width:1030px;
+	height:60px;
+
+	background-image: url("../img/60_1030_B_Bar_right_left.jpg");
+	background-repeat: no-repeat;
+	
+	font-family: Calibri;
+	font-size:38px;
+	font-weight:bold;
+	color:white;
+	text-align:left;
+	padding-left:20px;
+	padding-top:4px;
+}
+
+#block_running .team
+{
+	position: absolute;
+
+	top:80px;
+	left:50px;
+	width:1030px;
+	height:60px;
+
+	font-size:18px;
+	color:white;
+	font-weight:bold;
+	text-align:right;
+	padding-top:16px;
+	padding-right:30px;
+}
+
+#block_running .rank
+{
+	position: absolute;
+
+	left:1080px;
+	top:80px;
+	width:170px;
+	height:60px;
+
+	font-size:40px;
+	color:black;
+	font-weight:bold;
+	text-align:center;
+	padding-top:2px;
+
+	background-image: url("../img/60_170_Y.jpg");
+	background-repeat: no-repeat;
+}
+
+#block_running .time
+{
+	position: absolute;
+
+	left:1250px;
+	top:80px;
+	width:170px;
+	height:60px;
+
+	font-size:40px;
+	color:white;
+	font-weight:bold;
+	text-align:center;
+	padding-top:2px;
+
+	background-image: url("../img/60_170_B.jpg");
+	background-repeat: no-repeat;
+}
+
+#block_running .diff.green
+{
+	position: absolute;
+
+	left:1420px;
+	top:80px;
+	width:170px;
+	height:60px;
+
+	font-size:40px;
+	color:white;
+	font-weight:bold;
+	text-align:center;
+	padding-top:2px;
+
+	background-image: url("../img/60_170_G.jpg");
+	background-repeat: no-repeat;
+}
+
+#block_running .diff.red
+{
+	position: absolute;
+
+	left:1420px;
+	top:80px;
+	width:170px;
+	height:60px;
+
+	font-size:40px;
+	color:white;
+	font-weight:bold;
+	text-align:center;
+	padding-top:2px;
+
+	background-image: url("../img/60_170_R.jpg");
+	background-repeat: no-repeat;
+}
+
+#block_running .best_identity
+{
+	position: absolute;
+
+	top:0px;
+	left:1250px;
+	width:170px;
+	height:40px;
+	
+	font-size:16px;
+	color:black;
+	font-weight:bold;
+	text-align:center;
+	padding-top:8px;
+
+	background-image: url("../img/45_170_Y.jpg");
+	background-repeat: repeat;
+}
+
+#block_running .best_time
+{
+	position: absolute;
+
+	top:40px;
+	left:1250px;
+	width:170px;
+	height:40px;
+	
+	font-size:22px;
+	color:black;
+	font-weight:bold;
+	text-align:center;
+	padding-top:8px;
+
+	background-image: url("../img/60_170_Gray.jpg");
+	background-repeat: repeat;
+}

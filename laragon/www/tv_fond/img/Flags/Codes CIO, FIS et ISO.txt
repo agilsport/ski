@@ -1,0 +1,49 @@
+- Philippines :
+code CIO : PHI
+code ISO : PHL
+code FIS : PHI
+PHY.bmp pour l'automobile (FIA, FIK) ?
+
+- Macao :
+ancien code CIO : MAC (rattaché à la chine depuis 1999)
+MACAU.bmp pour l'automobile (FIA, FIK) ?
+
+- Taiwan, Chinese/Taipei :
+Taiwan.bmp : drapeau de la "République de Chine (Taiwan)"
+code CIO : "" (aucun)
+code ISO : TWN
+TPE.bmp : drapeau olympique de Taiwan (nommé "Taipei chinois" dans les organisations internationales)
+code FIS : TPE
+
+- Denmark :
+code CIO : DEN
+code ISO : DNK
+code FIS : DAN
+
+- Iran :
+code CIO : IRI
+code ISO : IRN
+code FIS : IRA
+
+- Ireland :
+code CIO : IRL
+code ISO : IRL
+code FIS : IRE
+
+- Republic of San Marino :
+code CIO : SMR
+code ISO : SMR
+code FIS : RSM
+
+- TRINIDAD AND TOBAGO :
+code CIO : TRI
+code ISO : TTO
+code FIS : TTO
+
+- Singapour :
+code CIO : SIN
+code ISO et FEI : SGP
+
+- Lebanon :
+code CIO : LIB
+code ISO et FEI : LBN

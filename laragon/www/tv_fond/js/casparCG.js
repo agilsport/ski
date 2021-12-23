@@ -1,0 +1,5 @@
+/* CasparGC Simulator */
+
+function toto()
+{
+}

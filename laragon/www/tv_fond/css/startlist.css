@@ -1,0 +1,554 @@
+#block_start_list
+{
+	position: absolute;
+
+	left:0px;
+	top:160px;
+	width:100%;
+	height:660px;
+}	
+
+#block_start_list .row_label
+{
+	position: absolute;
+
+	left:0px;
+	top:0px;
+	width:1920px;
+	height:60px;
+
+	background-image: url("../img/60_170_Gray.jpg");
+	background-repeat: repeat;
+}
+
+#block_start_list .label_bib
+{
+	position: absolute;
+
+	left:0px;
+	width:170px;
+	height:60px;
+	top:0px;
+	
+	font-size:32px;
+	color:black;
+	font-weight:bold;
+	text-align:center;
+	padding-top:6px;
+}
+
+#block_start_list .label_identity
+{
+	position: absolute;
+
+	left:170px;
+	width:1750px;
+	height:60px;
+	top:0px;
+	
+	font-size:32px;
+	color:black;
+	font-weight:bold;
+	text-align:left;
+	padding-top:6px;
+	padding-left:20px;
+}
+
+#block_start_list .label_categ
+{
+	position: absolute;
+
+	left:1000px;
+	width:100px;
+	height:60px;
+	top:0px;
+	
+	font-size:32px;
+	color:black;
+	font-weight:bold;
+	text-align:center;
+	padding-top:6px;
+}
+
+#block_start_list .label_sex
+{
+	position: absolute;
+
+	left:1100px;
+	width:50px;
+	height:60px;
+	top:0px;
+	
+	font-size:32px;
+	color:black;
+	font-weight:bold;
+	text-align:center;
+	padding-top:6px;
+}
+
+#block_start_list .label_distance
+{
+	position: absolute;
+
+	left:1150px;
+	width:100px;
+	height:60px;
+	top:0px;
+	
+	font-size:32px;
+	color:black;
+	font-weight:bold;
+	text-align:center;
+	padding-top:6px;
+}
+
+#block_start_list .label_team
+{
+	position: absolute;
+
+	left:170px;
+	width:1750px;
+	height:60px;
+	top:0px;
+	
+	font-size:32px;
+	color:black;
+	font-weight:bold;
+	text-align:right;
+	padding-top:6px;
+	padding-right:30px;
+}
+
+#block_start_list .row1
+{
+	position: absolute;
+
+	left:0px;
+	top:60px;
+	width:100%;
+	height:60px;
+}
+
+#block_start_list .row2
+{
+	position: absolute;
+
+	left:0px;
+	top:120px;
+	width:100%;
+	height:60px;
+}
+
+#block_start_list .row3
+{
+	position: absolute;
+
+	left:0px;
+	top:180px;
+	width:100%;
+	height:60px;
+}
+
+#block_start_list .row4
+{
+	position: absolute;
+
+	left:0px;
+	top:240px;
+	width:100%;
+	height:60px;
+}
+
+#block_start_list .row5
+{
+	position: absolute;
+
+	left:0px;
+	top:300px;
+	width:100%;
+	height:60px;
+}
+
+#block_start_list .row6
+{
+	position: absolute;
+
+	left:0px;
+	top:360px;
+	width:100%;
+	height:60px;
+}
+
+#block_start_list .row7
+{
+	position: absolute;
+
+	left:0px;
+	top:420px;
+	width:100%;
+	height:60px;
+}
+
+#block_start_list .row8
+{
+	position: absolute;
+
+	left:0px;
+	top:480px;
+	width:100%;
+	height:60px;
+}
+
+#block_start_list .row9
+{
+	position: absolute;
+
+	left:0px;
+	top:540px;
+	width:100%;
+	height:60px;
+}
+
+#block_start_list .row10
+{
+	position: absolute;
+
+	left:0px;
+	top:600px;
+	width:100%;
+	height:60px;
+}
+
+#block_start_list .row11
+{
+	position: absolute;
+
+	left:0px;
+	top:660px;
+	width:100%;
+	height:60px;
+}
+
+#block_start_list .row12
+{
+	position: absolute;
+
+	left:0px;
+	top:720px;
+	width:100%;
+	height:60px;
+}
+
+#block_start_list .row13
+{
+	position: absolute;
+
+	left:0px;
+	top:780px;
+	width:100%;
+	height:60px;
+}
+
+#block_start_list .row14
+{
+	position: absolute;
+
+	left:0px;
+	top:840px;
+	width:100%;
+	height:60px;
+}
+
+#block_start_list .row15
+{
+	position: absolute;
+
+	left:0px;
+	top:900px;
+	width:100%;
+	height:60px;
+}
+
+#block_start_list .row16
+{
+	position: absolute;
+
+	left:0px;
+	top:60px;
+	width:100%;
+	height:60px;
+}
+
+#block_start_list .row17
+{
+	position: absolute;
+
+	left:0px;
+	top:120px;
+	width:100%;
+	height:60px;
+}
+
+#block_start_list .row18
+{
+	position: absolute;
+
+	left:0px;
+	top:180px;
+	width:100%;
+	height:60px;
+}
+
+#block_start_list .row19
+{
+	position: absolute;
+
+	left:0px;
+	top:240px;
+	width:100%;
+	height:60px;
+}
+
+#block_start_list .row20
+{
+	position: absolute;
+
+	left:0px;
+	top:300px;
+	width:100%;
+	height:60px;
+}
+
+#block_start_list .row21
+{
+	position: absolute;
+
+	left:0px;
+	top:360px;
+	width:100%;
+	height:60px;
+}
+
+#block_start_list .row22
+{
+	position: absolute;
+
+	left:0px;
+	top:420px;
+	width:100%;
+	height:60px;
+}
+
+#block_start_list .row23
+{
+	position: absolute;
+
+	left:0px;
+	top:480px;
+	width:100%;
+	height:60px;
+}
+
+#block_start_list .row24
+{
+	position: absolute;
+
+	left:0px;
+	top:540px;
+	width:100%;
+	height:60px;
+}
+
+#block_start_list .row25
+{
+	position: absolute;
+
+	left:0px;
+	top:600px;
+	width:100%;
+	height:60px;
+}
+
+#block_start_list .row26
+{
+	position: absolute;
+
+	left:0px;
+	top:660px;
+	width:100%;
+	height:60px;
+}
+
+#block_start_list .row27
+{
+	position: absolute;
+
+	left:0px;
+	top:720px;
+	width:100%;
+	height:60px;
+}
+
+#block_start_list .row28
+{
+	position: absolute;
+
+	left:0px;
+	top:780px;
+	width:100%;
+	height:60px;
+}
+
+#block_start_list .row29
+{
+	position: absolute;
+
+	left:0px;
+	top:840px;
+	width:100%;
+	height:60px;
+}
+
+#block_start_list .row30
+{
+	position: absolute;
+
+	left:0px;
+	top:900px;
+	width:100%;
+	height:60px;
+}
+
+
+
+
+
+#block_start_list .bib
+{
+	position: absolute;
+
+	left:0px;
+	width:170px;
+	height:60px;
+	top:0px;
+	
+	font-size:40px;
+	color:black;
+	font-weight:bold;
+	text-align:center;
+	padding-top:4px;
+	
+	background-image: url("../img/60_170_Y.jpg");
+	background-repeat: no-repeat;
+}
+
+#block_start_list .identity
+{
+	position: absolute;
+
+	left:170px;
+	width:1750px;
+	height:60px;
+	top:0px;
+
+	font-size:36px;
+	font-weight:bold;
+
+	color:white;
+	text-align:left;
+	padding-left:32px;
+	padding-top:6px;
+	
+	background-image: url("../img/60_1750_B_Bar_right_left.jpg");
+	background-repeat: no-repeat;
+}
+
+#block_start_list .team
+{
+	position: absolute;
+
+	left:170px;
+	width:1750px;
+	height:60px;
+	top:0px;
+
+	font-size:28px;
+	font-weight:bold;
+
+	color:white;
+	text-align:right;
+	padding-right:32px;
+	padding-top:10px;
+}
+
+#block_start_list .categ
+{
+	position: absolute;
+
+	left:1000px;
+	width:100px;
+	height:60px;
+	top:0px;
+
+	font-size:28px;
+	font-weight:bold;
+
+	color:white;
+	text-align:center;
+	padding-top:10px;
+}
+
+#block_start_list .sex
+{
+	position: absolute;
+
+	left:1100px;
+	width:50px;
+	height:60px;
+	top:0px;
+
+	font-size:28px;
+	font-weight:bold;
+
+	color:white;
+	text-align:center;
+	padding-top:10px;
+}
+
+#block_start_list .distance
+{
+	position: absolute;
+
+	left:1150px;
+	width:100px;
+	height:60px;
+	top:0px;
+
+	font-size:28px;
+	font-weight:bold;
+
+	color:white;
+	text-align:center;
+	padding-top:10px;
+}
+
+#block_start_list .rank
+{
+	position: absolute;
+
+	left:170px;
+	width:1750px;
+	height:60px;
+	top:0px;
+
+	font-size:36px;
+	font-weight:bold;
+
+	color:white;
+	text-align:left;
+	padding-left:32px;
+	padding-top:4px;
+	
+	background-image: url("../img/60_1750_B_Bar_right_left.jpg");
+	background-repeat: no-repeat;
+}
