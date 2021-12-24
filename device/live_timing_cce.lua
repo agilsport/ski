@@ -1,10 +1,11 @@
 -- LIVE Timing 
--- version 9.4
+-- version 9.5
 -- gestion du biathlon
 -- envoi de l'heure de départ de la manche en fond rol et biathlon pour les indiv
 -- gestion de l'envoi de l'heure de départ de l'épreuve pour les tps tournants epreuves en nordique
 -- gestion des messages en nordique
 -- GESTION DES balise style a la place de align
+-- xml diff alpin pour avoir acces à la gestions des params point inter
 
 dofile('./interface/interface.lua');
 dofile('./interface/adv.lua');
@@ -19,7 +20,7 @@ end
 -- Information : Numéro de Version, Nom, Interface
 function device.GetInformation()
 	return { 
-		version = 9.3;
+		version = 9.5;
 		name = 'Live Timing Async.', 
 		class = 'network'
 	};
@@ -374,7 +375,7 @@ function device.OnInit(params, node)
 	
 	-- Ouverture Document XML 
 	live.doc = xmlDocument.Create();
-	if live.doc:LoadFile('./device/live_timing.xml') == false then
+	if live.doc:LoadFile('./device/live_timing_cce.xml') == false then
 		live.doc:Delete();
 		live.doc = nil;
 	end
@@ -384,7 +385,7 @@ function device.OnInit(params, node)
 	-- Creation Panel 
 	local panel = wnd.CreatePanel({ parent = app.GetAuiFrame() });
 	panel:LoadTemplateXML({ 
-		xml = './device/live_timing.xml',
+		xml = './device/live_timing_cce.xml',
 		node_name = 'root/panel',
 		node_attr = 'name',
 		node_value = 'live'
@@ -510,7 +511,7 @@ function OnSaisieMeteo()
 	});
 	
 	dlg:LoadTemplateXML({ 
-		xml = './device/live_timing.xml',
+		xml = './device/live_timing_cce.xml',
 		node_name = 'root/panel',
 		node_attr = 'name',
 		node_value = 'meteo'
@@ -587,7 +588,7 @@ function OnSaisieInter()
 	});
 	
 	dlg:LoadTemplateXML({ 
-		xml = './device/live_timing.xml',
+		xml = './device/live_timing_cce.xml',
 		node_name = 'root/panel',
 		node_attr = 'name',
 		node_value = 'Gestion_Inter'
@@ -607,7 +608,7 @@ function OnSaisieInter()
 	cmd = "Select * From Epreuve_Passage Where Code_evenement = '"..live.Code_evenement.."' Order by Code_Passage";
 	live_Gestion_Inter.dbSki:TableLoad(Table_Epreuve_Passage, cmd)
 	
-	Table_Epreuve_Passage:SetColumn('Code', { label = 'Code-Evt.', width = 9 });
+	-- Table_Epreuve_Passage:SetColumn('Code_evenement', { label = 'Code-Evt.', width = 9 });
 	Table_Epreuve_Passage:SetColumn('Code_epreuve', { label = 'N° épreuve', width = 12 });
 	Table_Epreuve_Passage:SetColumn('Code_manche', { label = 'Manche', width = 9 });
 	Table_Epreuve_Passage:SetColumn('Code_Passage', { label = 'N° de passage.', width = 12 });
@@ -622,7 +623,7 @@ function OnSaisieInter()
 	grid = dlg:GetWindowName('grid_Inter');
 	grid:Set({
 		table_base = Table_Epreuve_Passage,
-		columns = 'Code, Code_epreuve, Code_manche, Code_Passage, Distance, Distance_Cumulee, Num_Portes, Libelle, Altitude, Lieu, Info ',
+		columns = 'Code_epreuve, Code_manche, Code_Passage, Distance, Distance_Cumulee, Num_Portes, Libelle, Altitude, Lieu, Info ',
 		selection_mode = gridSelectionModes.CELLS,
 		sortable = false,
 		enable_editing = true
@@ -681,7 +682,6 @@ end
 -- fonction de sauvegarde des Points Inter	
 -- live_Gestion_Inter.dbSki:TableLoad(Table_Epreuve_Passage, cmd)
 function OnSaveInter(evt)
-
 	cmd = "Delete From Epreuve_Passage Where Code_evenement = "..live.Code_evenement;
 	live_Gestion_Inter.dbSki:Query(cmd);
 	local grid_Ligne = dlg:GetWindowName('grid_Inter');
@@ -702,7 +702,6 @@ function OnSaveInter(evt)
 		Table_Epreuve_Passage:SetCell("Lieu", r, Grid_Ligne:GetCell('Lieu', i));
 		Table_Epreuve_Passage:SetCell("Info", r, Grid_Ligne:GetCell('Info', i));
 		live_Gestion_Inter.dbSki:TableFlush(Table_Epreuve_Passage, r);
-		
 	end
 		adv.Alert("Sauvegarde des lignes ds Epreuve_Passage éffectuer correctement");
 end
@@ -1134,7 +1133,7 @@ function OnSendMessage()
 	});
 	
 	dlg:LoadTemplateXML({ 
-		xml = './device/live_timing.xml',
+		xml = './device/live_timing_cce.xml',
 		node_name = 'root/panel',
 		node_attr = 'name',
 		node_value = 'message'
