@@ -1,0 +1,50 @@
+body
+{
+	background:black;
+}
+
+#monitor_id
+{
+	position: absolute;
+
+	top:5px;
+	left:5px;
+	width:64px;
+	text-align:right;
+	
+	color:yellow;
+	font-size:20px;
+	font-weight:bold;
+}
+
+#monitor_state.ok
+{
+	position: absolute;
+
+	top:5px;
+	left:80px;
+	
+	width:128px;
+	
+	color:white;
+	background-color:green;
+	font-size:20px;
+	font-weight:bold;
+	text-align:center;
+}
+
+#monitor_state.ko
+{
+	position: absolute;
+
+	top:5px;
+	left:80px;
+	
+	width:128px;
+	
+	color:white;
+	background-color:red;
+	font-size:20px;
+	font-weight:bold;
+	text-align:center;
+}

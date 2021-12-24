@@ -1,0 +1,101 @@
+body
+{
+	background:green;
+}
+
+#head
+{
+	position:absolute;
+
+	top:20px;
+	left:305px;
+	width:1310px;
+	height:160px;
+	
+	background-image: url("../img/head_1310.png");
+	background-repeat:no-repeat;
+}
+
+#head_logo_left
+{
+	position:absolute;
+	top:0px;
+	left:10px;
+	width:170px;
+	height:120px;
+	
+	background-image: url("../img/logo_esf.png");
+	background-repeat: no-repeat;
+}
+
+#head_logo_right
+{
+	position:absolute;
+	top:50px;
+	left:1145px;
+	width:140px;
+	height:130px;
+
+	background-image: url("../img/logo_morzine_avoriaz.png");
+	background-repeat: no-repeat;
+}
+
+#name
+{
+	position: absolute;
+
+	top:0px;
+	left:0px;
+	width:100%;
+		
+	font-family:Calibri;
+	font-size:32px;
+	font-weight:bold;
+	color:white;
+	text-align:center;
+}
+
+#place
+{
+	position:absolute;
+
+	top:40px;
+	left:0px;
+	width:100%;
+		
+	font-family:Calibri;
+	font-size:32px;
+	font-weight:bold;
+	color:white;
+	text-align:center;
+}
+
+#title
+{
+	position:absolute;
+
+	top:80px;
+	left:0px;
+	width:100%;
+		
+	font-family:Calibri;
+	font-size:30px;
+	font-weight:bold;
+	color:white;
+	text-align:center;
+}
+
+#mode
+{
+	position:absolute;
+
+	top:118px;
+	left:0px;
+	width:100%;
+		
+	font-family:Calibri;
+	font-size:30px;
+	font-weight:bold;
+	color:black;
+	text-align:center;
+}

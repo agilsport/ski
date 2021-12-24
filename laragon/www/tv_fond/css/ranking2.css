@@ -1,0 +1,496 @@
+#block_ranking2
+{
+	position: absolute;
+
+	left:0px;
+	top:160px;
+	width:100%;
+}	
+
+#block_ranking2 .row_label
+{
+	position: absolute;
+
+	left:0px;
+	top:0px;
+	width:1920px;
+	height:60px;
+
+	background-image: url("../img/60_170_Gray.jpg");
+	background-repeat: repeat;
+}
+
+#block_ranking2 .label_rank
+{
+	position: absolute;
+
+	left:0px;
+	width:170px;
+	height:60px;
+	top:0px;
+	
+	font-size:32px;
+	color:black;
+	font-weight:bold;
+	text-align:center;
+	padding-top:6px;
+}
+
+#block_ranking2 .label_bib
+{
+	position: absolute;
+
+	left:170px;
+	width:150px;
+	height:60px;
+	top:0px;
+	
+	font-size:32px;
+	color:black;
+	font-weight:bold;
+	text-align:center;
+	padding-top:6px;
+}
+
+#block_ranking2 .label_identity
+{
+	position: absolute;
+
+	left:300px;
+	width:830px;
+	height:60px;
+	top:0px;
+	
+	font-size:32px;
+	color:black;
+	font-weight:bold;
+	text-align:center;
+	padding-top:6px;
+	padding-left:30px;
+}
+
+#block_ranking2 .label_equipe
+{
+	position: absolute;
+
+	left:300px;
+	width:830px;
+	height:60px;
+	top:0px;
+	
+	font-size:18px;
+	color:black;
+	font-weight:bold;
+	text-align:right;
+	padding-top:16px;
+	padding-right:30px;
+}
+
+#block_ranking2 .label_time1
+{
+	position: absolute;
+
+	left:1130px;
+	width:170px;
+	height:60px;
+	top:0px;
+	
+	font-size:32px;
+	color:black;
+	font-weight:bold;
+	text-align:right;
+	padding-top:6px;
+	padding-right:30px;
+}
+
+#block_ranking2 .label_rank1
+{
+	position: absolute;
+
+	left:1275px;
+	width:170px;
+	height:60px;
+	top:0px;
+	
+	font-size:32px;
+	color:black;
+	font-weight:bold;
+	text-align:right;
+	padding-top:6px;
+	padding-right:30px;
+}
+
+#block_ranking2 .label_time2
+{
+	position: absolute;
+
+	left:1440px;
+	width:170px;
+	height:60px;
+	top:0px;
+	
+	font-size:32px;
+	color:black;
+	font-weight:bold;
+	text-align:right;
+	padding-top:6px;
+	padding-right:30px;
+}
+
+#block_ranking2 .label_rank2
+{
+	position: absolute;
+
+	left:1585px;
+	width:170px;
+	height:60px;
+	top:0px;
+	
+	font-size:32px;
+	color:black;
+	font-weight:bold;
+	text-align:right;
+	padding-top:6px;
+	padding-right:30px;
+}
+
+#block_ranking2 .label_time
+{
+	position: absolute;
+
+	left:1750px;
+	width:170px;
+	height:60px;
+	top:0px;
+	
+	font-size:32px;
+	color:black;
+	font-weight:bold;
+	text-align:right;
+	padding-top:6px;
+	padding-right:30px;
+}
+
+#block_ranking2 .row1
+{
+	position: absolute;
+
+	left:0px;
+	top:60px;
+	width:100%;
+	height:60px;
+}
+
+#block_ranking2 .row2
+{
+	position: absolute;
+
+	left:0px;
+	top:120px;
+	width:100%;
+	height:60px;
+}
+
+#block_ranking2 .row3
+{
+	position: absolute;
+
+	left:0px;
+	top:180px;
+	width:100%;
+	height:60px;
+}
+
+#block_ranking2 .row4
+{
+	position: absolute;
+
+	left:0px;
+	top:240px;
+	width:100%;
+	height:60px;
+}
+
+#block_ranking2 .row5
+{
+	position: absolute;
+
+	left:0px;
+	top:300px;
+	width:100%;
+	height:60px;
+}
+
+#block_ranking2 .row6
+{
+	position: absolute;
+
+	left:0px;
+	top:360px;
+	width:100%;
+	height:60px;
+}
+
+#block_ranking2 .row7
+{
+	position: absolute;
+
+	left:0px;
+	top:420px;
+	width:100%;
+	height:60px;
+}
+
+#block_ranking2 .row8
+{
+	position: absolute;
+
+	left:0px;
+	top:480px;
+	width:100%;
+	height:60px;
+}
+
+#block_ranking2 .row9
+{
+	position: absolute;
+
+	left:0px;
+	top:540px;
+	width:100%;
+	height:60px;
+}
+
+#block_ranking2 .row10
+{
+	position: absolute;
+
+	left:0px;
+	top:600px;
+	width:100%;
+	height:60px;
+}
+
+#block_ranking2 .row11
+{
+	position: absolute;
+
+	left:0px;
+	top:660px;
+	width:100%;
+	height:60px;
+}
+
+#block_ranking2 .row12
+{
+	position: absolute;
+
+	left:0px;
+	top:720px;
+	width:100%;
+	height:60px;
+}
+
+#block_ranking2 .row13
+{
+	position: absolute;
+
+	left:0px;
+	top:780px;
+	width:100%;
+	height:60px;
+}
+
+#block_ranking2 .row14
+{
+	position: absolute;
+
+	left:0px;
+	top:840px;
+	width:100%;
+	height:60px;
+}
+
+#block_ranking2 .row15
+{
+	position: absolute;
+
+	left:0px;
+	top:900px;
+	width:100%;
+	height:60px;
+}
+
+#block_ranking2 .rank
+{
+	position: absolute;
+
+	left:0px;
+	width:170px;
+	height:60px;
+	top:0px;
+	
+	font-size:40px;
+	color:black;
+	font-weight:bold;
+	text-align:center;
+	padding-top:2px;
+	
+	background-image: url("../img/60_170_Y.jpg");
+	background-repeat: no-repeat;
+}
+
+#block_ranking2 .bib
+{
+	position: absolute;
+
+	left:170px;
+	width:130px;
+	height:60px;
+	top:0px;
+	
+	font-size:40px;
+	color:black;
+	font-weight:bold;
+	text-align:center;
+	padding-top:2px;
+	
+	background-image: url("../img/60_50_Gray.jpg");
+	background-repeat: repeat;
+}
+
+#block_ranking2 .identity
+{
+	position: absolute;
+
+	left:300px;
+	width:1000px;
+	height:60px;
+	top:0px;
+
+	font-size:28px;
+	font-weight:bold;
+
+	color:white;
+	text-align:left;
+	padding-left:32px;
+	padding-top:8px;
+	
+	background-image: url("../img/60_1750_B_Bar_right_left.jpg");
+	background-repeat: no-repeat;
+}
+
+#block_ranking2 .team
+{
+	position: absolute;
+
+	left:300px;
+	width:830px;
+	height:60px;
+	top:0px;
+
+	font-size:18px;
+	font-weight:bold;
+
+	color:white;
+	text-align:right;
+	padding-right:32px;
+	padding-top:16px;
+}
+
+#block_ranking2 .time1
+{
+	position: absolute;
+
+	left:1130px;
+	width:170px;
+	height:60px;
+	top:0px;
+	
+	font-size:40px;
+	color:black;
+	font-weight:bold;
+	text-align:center;
+	padding-top:2px;
+	
+	background-image: url("../img/60_170_Y.jpg");
+	background-repeat: no-repeat;
+}
+
+#block_ranking2 .rank1
+{
+	position: absolute;
+
+	left:1300px;
+	width:140px;
+	height:60px;
+	top:0px;
+	
+	font-size:40px;
+	color:black;
+	font-weight:bold;
+	text-align:center;
+	padding-top:2px;
+	
+	background-image: url("../img/60_140_Y.jpg");
+	background-repeat: no-repeat;
+}
+
+#block_ranking2 .time2
+{
+	position: absolute;
+
+	left:1440px;
+	width:170px;
+	height:60px;
+	top:0px;
+	
+	font-size:40px;
+	color:black;
+	font-weight:bold;
+	text-align:center;
+	padding-top:2px;
+	
+	background-image: url("../img/60_170_Y.jpg");
+	background-repeat: no-repeat;
+}
+
+#block_ranking2 .rank2
+{
+	position: absolute;
+
+	left:1610px;
+	width:140px;
+	height:60px;
+	top:0px;
+	
+	font-size:40px;
+	color:black;
+	font-weight:bold;
+	text-align:center;
+	padding-top:2px;
+	
+	background-image: url("../img/60_140_Y.jpg");
+	background-repeat: no-repeat;
+}
+
+#block_ranking2 .time
+{
+	position: absolute;
+
+	left:1750px;
+	width:170px;
+	height:60px;
+	top:0px;
+	
+	font-size:40px;
+	color:black;
+	font-weight:bold;
+	text-align:center;
+	padding-top:2px;
+	
+	background-image: url("../img/60_170_Y.jpg");
+	background-repeat: no-repeat;
+}
+
+

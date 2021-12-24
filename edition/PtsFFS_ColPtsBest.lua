@@ -1,6 +1,6 @@
 dofile('./interface/adv.lua');
 dofile('./interface/interface.lua');
--- version 2.1
+-- version 2.2
 
 
 function alert(txt)
@@ -8,7 +8,10 @@ function alert(txt)
 end
 
 function main(params)
-	theParams = params;
+	params = params or {};
+	Dlg = {};
+	-- local verif = params.Colum_Label or 'BOF';
+	-- alert('Verif='..verif);
 
 	local widthMax = display:GetSize().width;
 	local widthControl = math.floor((widthMax*3)/4);
@@ -21,8 +24,8 @@ function main(params)
 	dlg = wnd.CreateDialog({
 		x = x,
 		y = y,
-		width=730, -- widthControl, 
-		height=300, -- heightControl, 
+		width=780, -- widthControl, 
+		height=500, -- heightControl, 
 		label='transfert Points dans Pts_Best', 
 		icon='./res/32x32_agil.png'
 	});
@@ -36,8 +39,12 @@ function main(params)
 	});
 
 	base = sqlBase.Clone();
-	code_evenement = theParams.code_evenement;
-	
+	code_evenement = params.code_evenement;
+	colum_Pts = params.colum_Pts;	 	--="Pts_best" 
+	LabelNc = params.LabelNc;            -- "NC_FFS"
+	Colum_Label = params.Colum_Label;
+	LabelPts = params.LabelPts;
+	Dlg.LabelPts = params.LabelPts;
 	-- Initialisation des controles ...
 	
 	local tb = dlg:GetWindowName('tb');
@@ -57,28 +64,36 @@ function main(params)
 end
 
 function LectureDonnees(evt)
-	alert("code_evenement = "..code_evenement);
-
+	-- alert("code_evenement = "..code_evenement);
+	alert("colum_Pts = "..colum_Pts);
+	-- alert("LabelNc = "..LabelNc);
+	-- alert("Colum_Label = "..Colum_Label);
+	Lab_NC = LabelNc;
 	tResultat = base:GetTable('Resultat');
-	cmd = "select * from Resultat where Code_evenement = "..code_evenement.." Order by Dossard"
-	base:TableLoad(Resultat, cmd);
+	cmd = "Select * From Resultat WHERE Code_evenement = "..code_evenement.." Order by Code_coureur"
+	base:TableLoad(tResultat, cmd);
+	alert("base:TableLoad(Resultat, cmd) = "..tResultat:GetNbRows()..' / '..cmd);
 	bodyliste = tResultat:Copy(false);
-	
-	alert("base:TableLoad(Resultat, cmd) = "..tResultat:GetNbRows())
 	Nbparticipant = tResultat:GetNbRows();
 	for i=0, Nbparticipant-1 do
-		resultatPts = tResultat:GetCell('Point', i)
-		if resultatPts ~= '' then
-			cmd = "Update Resultat SET Pts_best = '"..resultatPts.."' Where Code_evenement = "..tonumber(code_evenement).." and Code_coureur = '"..tResultat:GetCell('Code_coureur', i).."'";
-			base:Query(cmd);
-			alert("cmd = "..cmd)
-			bodyliste:AddRow();
-			sqlTable.CopyRow(bodyliste, bodyliste:GetNbRows()-1, tResultat, i);
+		--resultatPts = tResultat:GetCell('Point', i)
+		--alert("resultatPts "..resultatPts);
+		if tResultat:GetCellDouble('Point', i) == 0.0 then 
+			resultatPts = 9999;
+			LabelNc = Lab_NC;
+		else
+			resultatPts = tResultat:GetCell('Point', i);
+			LabelNc = '';
 		end
+		cmd = "Update Resultat SET "..colum_Pts.." = "..resultatPts..", "..Colum_Label.." = '"..LabelNc.."' Where Code_evenement = "..tonumber(code_evenement).." and Code_coureur = '"..tResultat:GetCell('Code_coureur', i).."'";
+		base:Query(cmd);
+		alert("cmd = "..cmd)
 	end
-	--$(Point)
-	
-	editionliste(evt, params, base, bodyliste);
+	for i=0, Nbparticipant-1 do
+		bodyliste:AddRow();
+		sqlTable.CopyRow(bodyliste, bodyliste:GetNbRows()-1, tResultat, i);
+	end
+	editionliste(evt, base, bodyliste);
 	
 	-- Fermeture
 	bodyliste:Delete();
@@ -86,7 +101,13 @@ function LectureDonnees(evt)
 
 end
 
-function editionliste(evt, params, base, bodyliste)
+function editionliste(evt, base, bodyliste)
+	theParams = {}
+	theParams.Colum_Label = Colum_Label;
+	theParams.LabelNc = LabelNc;
+	theParams.colum_Pts = colum_Pts;
+	theParams.LabelPts = LabelPts;
+	bodyliste:OrderBy('Point Asc' );
 	-- Creation du Report
 	report = wnd.LoadTemplateReportXML({
 		xml = './edition/PtsFFS_ColPtsBest.xml',
@@ -98,7 +119,6 @@ function editionliste(evt, params, base, bodyliste)
 			
 		base = base,
 		body = bodyliste,
-		
 		params = theParams
 	});
 	dlg:EndModal();

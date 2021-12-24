@@ -1,0 +1,129 @@
+body
+{
+	background:black;
+}
+
+.img_center {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 10px;
+}
+
+#head
+{
+	position:absolute;
+
+	top:0px;
+	left:0px;
+	width:1920px;
+	height:160px;
+	
+	background-image: url("../img/head_1920.png");
+	background-repeat: no-repeat;
+}
+
+#head_logo_left
+{
+	position:absolute;
+	top:7px;
+	left:2px;
+	width:220px;
+	height:300px;
+	
+	/*background-image: url("../img/logo_esf.png"); gauche*/
+	/*background-image: url("../img/Logo-CCE-T.png");*/
+	background-image: url("../img/logo_ffs.png");
+	background-repeat: no-repeat;
+}
+
+#head_logo_right
+{
+	position:absolute;
+	top:7px;
+	left:1750px;
+	width:186px;
+	height:133px;
+
+	/*background-image: url("../img/logo_valcenis2.png"); droite*/
+	/*background-image: url("../img/Logo-CCE-T.png");*/
+	background-image: url("../img/logo_ffs.png");
+	background-repeat: no-repeat;
+}
+
+#name
+{
+	position: absolute;
+
+	top:0px;
+	left:0px;
+	width:100%;
+		
+	font-family:Calibri;
+	font-size:32px;
+	font-weight:bold;
+	color:white;
+	text-align:center;
+}
+
+#place
+{
+	position:absolute;
+
+	top:40px;
+	left:0px;
+	width:100%;
+		
+	font-family:Calibri;
+	font-size:32px;
+	font-weight:bold;
+	color:white;
+	text-align:center;
+}
+
+#title
+{
+	position:absolute;
+
+	top:80px;
+	left:0px;
+	width:100%;
+		
+	font-family:Calibri;
+	font-size:30px;
+	font-weight:bold;
+	color:white;
+	text-align:center;
+}
+
+#mode
+{
+	position:absolute;
+
+	top:118px;
+	left:0px;
+	width:100%;
+		
+	font-family:Calibri;
+	font-size:30px;
+	font-weight:bold;
+	color:black;
+	text-align:center;
+}
+
+#block_clear
+{
+	position:absolute;
+	top:30px;
+	left:30px;
+	width:150%;
+	height:150%;
+	
+	background-image: url("../img/skiFFS.png");
+	/*background-image: url("../img/clip_fin.jpg");*/
+	/* background-image: url("../img/Saramagbelle-affiche-2019.png"); */
+	/*background-image: url("../img/Affiche-Aquaterra-2019.jpg");*/
+	/*background-image: url("../img/Affiche-trail-de-carlat.jpg");*/
+	background-repeat: no-repeat;
+}
+
