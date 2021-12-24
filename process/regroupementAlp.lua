@@ -12,7 +12,7 @@ function AfficheDialogScratch()
 	params.type_regroupement = 'Scratch';
 	params.nodeConfig = params.doc:FindFirst('root/config');
 	assert(params.nodeConfig ~= nil);
-	for i =1, 3 do
+	for i =1, 4 do
 		params['coursef'..i] = tonumber(params.nodeConfig:GetAttribute('coursef'..i)) or 0;
 		params['coursef'..i..'_filtre'] = params.nodeConfig:GetAttribute('coursef'..i..'_filtre');
 		params['courseg'..i] = 0;
@@ -99,7 +99,7 @@ function AfficheDialogScratch()
 	tbconfig:Realize();
 	local message = app.GetAuiMessage();
 	
-	for i = 1, 3 do
+	for i = 1, 4 do
 		if params['coursef'..i] > 0 then
 			tEvenement = base:TableLoad('Select * From Evenement Where Code = '..params['coursef'..i]);
 			dlgConfigScratch:GetWindowName('coursef'..i):SetValue(params['coursef'..i]);
@@ -174,7 +174,7 @@ function AfficheDialogScratch()
 			end
 		end, dlgConfigScratch:GetWindowName('comboPtsTps')); 
 
-	for i = 1, 3 do
+	for i = 1, 4 do
 		dlgConfigScratch:Bind(eventType.TEXT, 
 			function(evt) 
 				params['coursef'..i] = tonumber(dlgConfigScratch:GetWindowName('coursef'..i):GetValue()) or -1;
@@ -220,7 +220,7 @@ function AfficheDialogScratch()
 			params.nb_courses_filles = 0;
 			params.courses_in  = "-1";
 			params.titre = dlgConfigScratch:GetWindowName('titre'):GetValue();
-			for i = 1, 3 do
+			for i = 1, 4 do
 				params['coursef'..i] = tonumber(dlgConfigScratch:GetWindowName('coursef'..i):GetValue()) or 0;
 				if params['coursef'..i] > 0 then
 					params.nb_courses_filles = params.nb_courses_filles + 1;
@@ -290,7 +290,7 @@ function AfficheDialogSexe()
 	params.type_regroupement = 'Sexe';
 	params.nodeConfig = params.doc:FindFirst('root/config');
 	assert(params.nodeConfig ~= nil);
-	for i =1, 3 do
+	for i =1, 4 do
 		params['coursef'..i] = tonumber(params.nodeConfig:GetAttribute('coursef'..i)) or 0;
 		params['courseg'..i] = tonumber(params.nodeConfig:GetAttribute('courseg'..i)) or 0;
 		params['coursef'..i..'_filtre'] = params.nodeConfig:GetAttribute('coursef'..i..'_filtre');
@@ -383,7 +383,7 @@ function AfficheDialogSexe()
 	tbconfig:Realize();
 	local message = app.GetAuiMessage();
 	
-	for i = 1, 3 do
+	for i = 1, 4 do
 		if params['coursef'..i] > 0 then
 			tEvenement = base:TableLoad('Select * From Evenement Where Code = '..params['coursef'..i]);
 			dlgConfig:GetWindowName('coursef'..i):SetValue(params['coursef'..i]);
@@ -462,7 +462,7 @@ function AfficheDialogSexe()
 			end
 		end, dlgConfig:GetWindowName('comboPtsTps')); 
 
-	for i = 1, 3 do
+	for i = 1, 4 do
 		dlgConfig:Bind(eventType.TEXT, 
 			function(evt) 
 				params['coursef'..i] = tonumber(dlgConfig:GetWindowName('coursef'..i):GetValue()) or -1;
@@ -520,7 +520,7 @@ function AfficheDialogSexe()
 			params.courses_in  = "-1";
 			params.prendre = params.comboprendre[params.comboPrendre + 1];
 			params.titre = dlgConfig:GetWindowName('titre'):GetValue();
-			for i = 1, 3 do
+			for i = 1, 4 do
 				params['coursef'..i] = tonumber(dlgConfig:GetWindowName('coursef'..i):GetValue()) or 0;
 				if params['coursef'..i] > 0 then
 					params.nb_courses_filles = params.nb_courses_filles + 1;
@@ -698,7 +698,7 @@ function LitRegroupementCourses();	-- lecture des courses figurant dans la valeu
 	ReplaceTableEnvironnement(tRegroupement_Courses, '_Regroupement_Courses');
 	local ordre = 0;
 	tEvenement = base:GetTable('Evenement');
-	for i = 1, 3 do
+	for i = 1, 4 do
 		if params['coursef'..i] > 0 then
 			ordre =  ordre + 1;
 			ordre_xml = i;
@@ -922,6 +922,7 @@ function BuildEquipes()
 							if dossard > 0 and tMatrice_Ranking_Copy:GetCellInt('Course'..idxcourse..'_prise', row) == 0 then
 								local code_coureur = tMatrice_Ranking_Copy:GetCell('Code_coureur', row);
 								local nom = tMatrice_Ranking_Copy:GetCell('Identite', row);
+								local categ = tMatrice_Ranking_Copy:GetCell('Categ', row);
 								local pts_course = tMatrice_Ranking_Copy:GetCellDouble('Pts'..idxcourse..'_total', row);
 								local clt = tMatrice_Ranking_Copy:GetCellInt('Clt'..idxcourse, row);
 								local tps = tMatrice_Ranking_Copy:GetCellInt('Tps'..idxcourse, row);
@@ -942,6 +943,7 @@ function BuildEquipes()
 										CodeCoureur = code_coureur, 
 										Dossard = dossard, 
 										Nom = nom, 
+										Categ = categ,
 										Sexe = 'F', 
 										Clt = clt, 
 										PtsCourse = pts_course, 
@@ -968,6 +970,7 @@ function BuildEquipes()
 											CodeCoureur = code_coureur, 
 											Dossard = dossard, 
 											Nom = nom, 
+											Categ = categ, 
 											Sexe = 'F', 
 											Clt = clt, 
 											PtsCourse = pts_course, 
@@ -1009,6 +1012,7 @@ function BuildEquipes()
 							if dossard > 0 and tMatrice_Ranking_Copy:GetCellInt('Course'..idxcourse..'_prise', row) == 0 then
 								local code_coureur = tMatrice_Ranking_Copy:GetCell('Code_coureur', row);
 								local nom = tMatrice_Ranking_Copy:GetCell('Identite', row);
+								local categ = tMatrice_Ranking_Copy:GetCell('Categ', row);
 								local pts_course = tMatrice_Ranking_Copy:GetCellDouble('Pts'..idxcourse..'_total', row);
 								local clt = tMatrice_Ranking_Copy:GetCellInt('Clt'..idxcourse, row);
 								local tps = tMatrice_Ranking_Copy:GetCellInt('Tps'..idxcourse, row);
@@ -1029,6 +1033,7 @@ function BuildEquipes()
 										CodeCoureur = code_coureur, 
 										Dossard = dossard, 
 										Nom = nom, 
+										Categ = categ, 
 										Sexe = 'M', 
 										Clt = clt, 
 										PtsCourse = pts_course, 
@@ -1055,6 +1060,7 @@ function BuildEquipes()
 											CodeCoureur = code_coureur, 
 											Dossard = dossard, 
 											Nom = nom, 
+											Categ = categ,
 											Sexe = 'M', 
 											Clt = clt, 
 											PtsCourse = pts_course, 
@@ -1388,7 +1394,7 @@ function main(params_c)
 	params.x = (display:GetSize().width - params.width) / 2;
 	params.y = 0;
 	params.debug = false;
-	params.version = "1.6";
+	params.version = "1.7";
 	base = base or sqlBase.Clone();
 	tPlace_Valeur = base:GetTable('Place_Valeur');
 	tEvenement = base:GetTable('Evenement');
