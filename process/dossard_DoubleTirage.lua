@@ -112,7 +112,6 @@ function GetBibo()
 			params.nb_non_classes = params.nb_non_classes + 1;
 		end
 	end	
-	adv.Alert('params.pts_15 = '..params.pts_15..', params.nb_bibo = '..params.nb_bibo..', params.nb_classes = '..params.nb_classes..', params.nb_non_classes = '..params.nb_non_classes);
 end
 
 function CheckExaequo();
