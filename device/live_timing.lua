@@ -12,7 +12,7 @@ end
 -- Information : Numéro de Version, Nom, Interface
 function device.GetInformation()
 	return { 
-		version = 6.3;
+		version = 6.4;
 		name = 'Live Timing Async.', 
 		class = 'network'
 	};
@@ -419,6 +419,11 @@ function device.OnInit(params, node)
 	btn_saisie_meteo = menuSend:Append({label = "Saisie des infos météo", image = "./res/32x32_cloud_blue.png"});
 	btn_envoi_meteo = menuSend:Append({label = "Envoi des infos météo", image = "./res/32x32_cloud_blue.png"});
 	tb:SetDropdownMenu(btn_send:GetId(), menuSend);
+	local btn_reset_socket = tb:AddTool('Reset de la connexion FIS', './res/32x32_satellite.png');
+	tb:AddSeparator();
+	if live.method ~= 'socket' then
+		tb:EnableTool(btn_reset_socket:GetId(), false);
+	end
 
 	-- tb:AddStretchableSpace();
 	live.counterSequence = wnd.CreateStaticText({parent = tb, label = "Trame 0/0", style = wndStyle.ALIGN_LEFT});
@@ -451,6 +456,8 @@ function device.OnInit(params, node)
 	panel:Bind(eventType.MENU, OnSendMeteo, btn_envoi_meteo);
 	panel:Bind(eventType.MENU, OnSaisieMeteo, btn_saisie_meteo);
 	
+	panel:Bind(eventType.MENU, OnResetSocket, btn_reset_socket);
+
 	panel:Bind(eventType.MENU, OnSendMessage, btn_message);
 	panel:Bind(eventType.MENU, OnSendRunChrono, btn_send_run);
 	panel:Bind(eventType.MENU, OnSendAll, btn_send_all);
@@ -467,6 +474,7 @@ function device.OnInit(params, node)
 		live.socket = socketClient.Open(parentFrame, live.hostname, live.port);
 		live.socket_state = false;
 		parentFrame:Bind(eventType.SOCKET, OnSocketLive, live.socket);
+		-- parentFrame:Bind(eventType.SOCKET, OnSocketLive);
 		
 	elseif live.method == 'post' then
 		-- Method : POST Asynchrone
@@ -492,7 +500,7 @@ function device.OnInit(params, node)
 
 		float = true, 
 		floating_position = {600, 120},
-		floating_size = {450, 250},
+		floating_size = {500, 250},
 		dockable = false
 	});
 	mgr:Update();
@@ -653,7 +661,6 @@ end
 
 -- Envoi Packet 
 function SendNextPacket()
-
 	if live.sequence_ack == live.sequence_send then
 		return; -- Tout est Acquitté ...
 	end
@@ -709,6 +716,10 @@ function OnSocketLive(evt)
 	elseif evt.GetSocketEvent() == socketNotify.LOST then
 		-- LOST
 		Warning("CONNEXION FIS PERDUE ...");
+		live.socket_state = false;
+	else
+		Warning("CONNEXION INTERNET PERDUE !!!");
+		Warning("REINITIALISEZ LA CONNEXION A LA FIS !!!");
 		live.socket_state = false;
 	end
 end
@@ -766,6 +777,31 @@ function OnReset(evt)
 	gridmessage:Clear();
 	
 	CommandClear();
+end
+
+function OnResetSocket(evt)
+	local msg = "Confirmation de la réinitialisation de la connexion :\n\n"..
+		"La connexion avec la FIS sera interronpue puis réinitialisée.\n"..
+		"Vous devrez éventuellent renvoyer les informations manquantes à la FIS.";
+	if live.panel:MessageBox(
+		msg, 
+		"Reset de la connexion avec la FIS", 
+		msgBoxStyle.YES_NO+msgBoxStyle.ICON_INFORMATION
+	) ~= msgBoxStyle.YES then
+		return;
+	end
+	-- on ferme le socket
+	if live.socket ~= nil then
+		live.socket:Close();
+	end
+	live.socket_state = false;
+	live.sequence_last_send = nil;
+	parentFrame = wnd.GetParentFrame();
+	live.socket = socketClient.Open(parentFrame, live.hostname, live.port);
+	Info('Demande de réinitialisation ....');
+	if live.socket ~= nil then
+		parentFrame:Bind(eventType.SOCKET, OnSocketLive, live.socket);
+	end
 end
 
 function OnWebLive(evt)
