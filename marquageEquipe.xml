@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Regroupement de coureurs -->
+<!-- <background mode="gradient_line_vert" color_start="white" color_end="ltgray" /> -->
+<root title="Marquage des équipes">
+  <panel name="config">
+    <lua>dofile('./interface/adv.lua');
+		dofile('./edition/functionPG.lua');
+	</lua>
+    <padding all="5px"/>
+    <row value="20px"/>
+	<col value="10px,1,10px"/>
+	<wnd name="statictext" style="ALIGN_RIGHT" />
+    <matrix row="auto" col_start="2">
+      <col value="1,2,1,6,100px,1"/>
+       <wndtext row="200px" col_start="2" col_end = "5" name="texte" align="center" style="TE_MULTILINE" ><background mode="solid" color="ltgray" /></wndtext>
+       <statictext row="auto" col_start="2" label="Codes disponibles "/>
+        <combobox col_start="3" name="comboTypeEquipe" style="CB_READONLY"/>
+        <statictext row="auto" col_start="2" label="Colonne à marquer "/>
+        <combobox col_start="3" name="comboColEquipe" style="CB_READONLY"/>
+        <statictext row="auto" col_start="2" label="Course à prendre "/>
+        <textctrl col_start="3" name="coursex" />
+        <textctrl col_start="4" name="evenementx" />
+        <button col_start="5" name="btnAjouter" label="Ajouter"/>
+        <statictext row="auto" col_start="2" label="Courses prises "/>
+        <combobox col_start="3" col_end="4" name="comboCoursesPrises" style="CB_READONLY"/>
+        <statictext row="auto" col_start="2" col_end="3" label="N° des courses séparés par une virgule "/>
+        <textctrl col_start="4" name="courses" />
+      <row value="10px"/>
+      <toolbar row="auto" col_start="1" col_end="0" name="tbconfig" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
+      <row value="20px"/>
+    </matrix>
+    <row value="1"/>
+  </panel>
+ </root>

@@ -3,7 +3,6 @@
 <edition>
 	<menu>
 		<menu title="Editions Supplémentaires" image="./res/32x32_options.png">
-			<menu title="Regroupement de coureurs" image="./res/16x16_compute.png" lua="./edition/editionRegroupement.lua" />
 			<menu title="Edition du Timing Report FIS" image="./res/16x16_fis.png" id="timing_report" lua="./edition/editionTR_FIS.lua" />
 			<menu title="Calcul d'un temps manuel" image="./res/16x16_calc.png" id="temps_manuel" lua="./edition/tempsManuel.lua" />
 			<menu title="formulaire d'inscription FIS" image="./res/16x16_fis.png">

@@ -125,7 +125,7 @@ function CheckExaequo();
 	params.tExaequo = {};
 	for i = 0, tResultat:GetNbRows() -1 do
 		local point = tResultat:GetCellDouble('Point', i, -1);
-		if point >= 0 then
+		if point >= 0 and point > params.pts_15 then
 			if nb_exeaquo == 0 then
 				rang_tirage = rang_tirage + 1 + exaequo_ajoute;
 				tResultat:SetCell('Rang', i, rang_tirage);
@@ -236,7 +236,7 @@ function main(params_c)
 		return false;
 	end
 	params = params_c;
-	params.version = '2.91';
+	params.version = '3.0';
 	params.code_evenement = params.code_evenement or -1;
 	if params.code_evenement < 0 then
 		return;
