@@ -823,6 +823,7 @@ function SetPtsTotalMatrice(idxcoureur, courseData);	-- calcul des points totaux
 	-- 4 = critere avec bloc : Idem 3 mais on va chercher les manches indépendemment des blocs.
 	local prise = 0;
 	local ptsMatrice = 0;
+	local ajouter = 0;
 	local ptsBloc1 = -1;
 	local tbolCritere = {};
 		
@@ -887,6 +888,9 @@ function SetPtsTotalMatrice(idxcoureur, courseData);	-- calcul des points totaux
 				tMatrice_Ranking:SetCell('Selection'..idxcourse, idxcoureur, selection);
 			end
 			local bloc = courseData[idxcourseData].Bloc;
+			if courseData[idxcourseData].BestPts >= 0 then
+				ajouter = 0;
+			end
 			ptsMatrice = ptsMatrice + courseData[idxcourseData].PtsTotal;
 			if bloc == 1 then 
 				ptsBloc1 = ptsMatrice;
@@ -895,6 +899,8 @@ function SetPtsTotalMatrice(idxcoureur, courseData);	-- calcul des points totaux
 		if tMatrice_Ranking:GetCell('Code_coureur', idxcoureur) == code_coureur_pour_debug then
 			adv.Alert('ptsMatrice = '..ptsMatrice);
 		end
+		ptsBloc1 = ptsBloc1 + ajouter;
+		ptsMatrice = ptsMatrice + ajouter;
 		return ptsBloc1, ptsMatrice;
 	elseif matrice.numTypeCritere == 1 then				-- on trie par discipline. On avait forcé les blocs à 1.
 		-- matrice.table_critere, {Critere = critere, TypeCritere = matrice.numTypeCritere, Item = item, Bloc = bloc, Discipline = discipline, Prendre = prendre, Combien = combien, NbCombien = nbcombien, Sur = sur}
@@ -936,7 +942,7 @@ function SetPtsTotalMatrice(idxcoureur, courseData);	-- calcul des points totaux
 				end
 				if tMatrice_Ranking:GetCell('Code_coureur', idxcoureur) == code_coureur_pour_debug then
 					adv.Alert('--------------------------------------------');
-					adv.Alert('passage 1');
+					adv.Alert('Le coureur correspond : passage 1');
 				end
 				if string.find(courseData[idxcourseData].Discipline, matrice.table_critere[idxcritere].Discipline) then	-- la course est dans la discipline du critère
 					if tMatrice_Ranking:GetCell('Code_coureur', idxcoureur) == code_coureur_pour_debug then
@@ -967,7 +973,7 @@ function SetPtsTotalMatrice(idxcoureur, courseData);	-- calcul des points totaux
 								else
 									selection = selection..'Pts'.. idxcourse..'_run'..courseData[idxcourseData].Run..','
 								end
-								ptsMatrice = ptsMatrice + courseData[idxcourseData].Pts;
+								ptsMatrice = ptsMatrice + courseData[idxcourseData].PtsTotal;
 								if tMatrice_Ranking:GetCell('Code_coureur', idxcoureur) == code_coureur_pour_debug then
 									adv.Alert('--------------------------------------------');
 									adv.Alert('Type critère = 1, on prend la course '..idxcourseData.." du tableau d'idxcourse "..idxcourse..' = '..courseData[idxcourseData].Discipline..', nb_courses_prises = '..nb_courses_prises..' / '..tostring(nbcombienx)..' avec '..courseData[idxcourseData].Pts..' Pts, on enregistre la selection = '..selection);
@@ -1017,6 +1023,8 @@ function SetPtsTotalMatrice(idxcoureur, courseData);	-- calcul des points totaux
 		if tMatrice_Ranking:GetCell('Code_coureur', idxcoureur) == code_coureur_pour_debug then
 			adv.Alert(code_coureur_pour_debug..', ptsMatrice = '..tostring(ptsMatrice)..', ptsBloc1 = '..ptsBloc1);
 		end
+		ptsBloc1 = ptsBloc1 + ajouter;
+		ptsMatrice = ptsMatrice + ajouter;
 		return ptsBloc1, ptsMatrice;
 		
 	elseif matrice.numTypeCritere == 2 then				-- on trie par bloc et discipline. 
@@ -1076,6 +1084,9 @@ function SetPtsTotalMatrice(idxcoureur, courseData);	-- calcul des points totaux
 				-- BestClt = raceData.Bestclt, BestPts = raceData.Bestpts, PtsTotal = raceData.PtsTotal, NbManches = matrice.course[idxcourse].Nombre_de_manche});
 			for idxcourse = 1, #courseData do
 				local ordre = courseData[idxcourse].Ordre;
+				if courseData[idxcourse].BestPts >= 0 then
+					ajouter = 0;
+				end
 				courseData[idxcourse][item] = 0;
 				local prendre =  matrice.course[ordre].Prendre;
 				local prendrecourse = false;
@@ -1176,6 +1187,8 @@ function SetPtsTotalMatrice(idxcoureur, courseData);	-- calcul des points totaux
 				return matrice.defaut_point, matrice.defaut_point;
 			end
 		end
+		ptsBloc1 = ptsBloc1 + ajouter;
+		ptsMatrice = ptsMatrice + ajouter;
 		if stop == code_coureur_pour_debug then
 			adv.Alert('en fin de fonction SetPtsTotalMatrice, ptsBloc1 = '..ptsBloc1..', ptsMatrice = '..ptsMatrice);
 		end
@@ -1235,6 +1248,9 @@ function SetPtsTotalMatrice(idxcoureur, courseData);	-- calcul des points totaux
 			end
 			for idxcourse = 1, #courseData do
 				local ordre = courseData[idxcourse].Ordre;
+				if courseData[idxcourse].BestPts >= 0 then
+					ajouter = 0;
+				end
 				courseData[idxcourse][item] = 0;
 				local prendre =  matrice.course[ordre].Prendre;
 				local prendrecourse = false;
@@ -1335,6 +1351,8 @@ function SetPtsTotalMatrice(idxcoureur, courseData);	-- calcul des points totaux
 				return matrice.defaut_point, matrice.defaut_point;
 			end
 		end
+		ptsBloc1 = ptsBloc1 + ajouter;
+		ptsMatrice = ptsMatrice + ajouter;
 		if stop == code_coureur_pour_debug then
 			adv.Alert('en fin de fonction SetPtsTotalMatrice, ptsBloc1 = '..ptsBloc1..', ptsMatrice = '..ptsMatrice);
 		end
@@ -2029,6 +2047,11 @@ function Calculer(panel_name)		-- fonction de calcul du résultat du Challenge/Co
 						tMatrice_Ranking:SetCell('Tps'..idxcourse, idxcoureur, raceData.Tps);
 					end
 				end
+	-- 1.Classement général"
+	-- 2.Classement à la manche"
+	-- 3.Idem plus le classement général"
+	-- 4.Général PLUS meilleure manche"
+	-- 5.Général OU meilleure manche"
 				if raceData.Tps > 0 then
 					if type(ajouter[idxcourse][code_coureur]) == 'nil' then	-- on peut calculer les points
 						local diff = raceData.Tps - matrice.course[idxcourse].Best_time;
@@ -2800,8 +2823,8 @@ function LitMatrice()	-- lecture des variables et affectation des valeurs dans l
 	matrice.comboListe2Classement = matrice.comboListe2Classement or GetValue('comboListe2Classement', nil);
 	matrice.comboListePrimaute = matrice.comboListePrimaute or GetValue('comboListePrimaute', 'au classement');
 	matrice.comboOrientation = matrice.comboOrientation or GetValue("comboOrientation", 'Portrait');
-	matrice.comboPrendreBloc1 = matrice.comboPrendreBloc1 or GetValue("comboPrendreBloc1", "1.Classement général");
-	matrice.comboPrendreBloc2 = matrice.comboPrendreBloc2 or GetValue("comboPrendreBloc2", "1.Classement général");
+	matrice.comboPrendreBloc1 = matrice.comboPrendreBloc1 or GetValue("comboPrendreBloc1", "Classement général");
+	matrice.comboPrendreBloc2 = matrice.comboPrendreBloc2 or GetValue("comboPrendreBloc2", "Classement général");
 	matrice.comboPresentationCourses = matrice.comboPresentationCourses or GetValue("comboPresentationCourses", "Présentation horizontale type Ski Chrono Tour (par défaut)");
 	matrice.comboRegroupement = matrice.comboRegroupement or GetValue("comboRegroupement", '');
 	matrice.comboSexe = matrice.comboSexe or GetValue("comboSexe", '');
@@ -2828,7 +2851,6 @@ function LitMatrice()	-- lecture des variables et affectation des valeurs dans l
 	matrice.texteImprimerClubLong = matrice.texteImprimerClubLong or 'Oui';
 	matrice.texteFiltreSupplementaire = matrice.texteFiltreSupplementaire or GetValue("texteFiltreSupplementaire", 'Non');
 	matrice.texteImprimerDeparts = matrice.texteImprimerDeparts or GetValue ("texteImprimerDeparts", 'Oui');
-	matrice.texteImprimerStatCourses = matrice.texteImprimerStatCourses or GetValue ("texteImprimerStatCourses", 'Non');
 	matrice.texteImprimerHeader = matrice.texteImprimerHeader or GetValue ("texteImprimerHeader", 'Oui');
 	matrice.texteImprimerLayer = matrice.texteImprimerLayer or '';
 	matrice.texteImprimerLayerPage = matrice.texteImprimerLayerPage or 'Toutes les pages';
@@ -7538,7 +7560,7 @@ function OnConfiguration(cparams)
 	else
 		return false;
 	end
-	matrice.version_script = '4.61';
+	matrice.version_script = '4.7';
 	matrice.OS = app.GetOsDescription();
 	-- vérification de l'existence d'une version plus récente du script.
 	local url = 'https://live.ffs.fr/maj_pg/challenge/last_version.txt'
@@ -7549,7 +7571,7 @@ function OnConfiguration(cparams)
 	matrice.dlgPosit.x = 1;
 	matrice.dlgPosit.y = 1;
 	base = base or sqlBase.Clone();
-	code_coureur_pour_debug = "FFS2674462";		-- provoque tous les affichages pour débug propres à ce Code_coureur
+	code_coureur_pour_debug = "FFS2662170";		-- provoque tous les affichages pour débug propres à ce Code_coureur
 	matrice.debug = false;
 	if matrice.debug == false then
 		code_coureur_pour_debug = '';
