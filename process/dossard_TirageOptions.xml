@@ -2,7 +2,7 @@
 <!-- Matrice Individuelle PG -->
 <!-- <background mode="gradient_line_vert" color_start="white" color_end="ltgray" /> -->
 <root title="Tirage des dossards avec options">
-  <config course1="424" clef1="3" option1="4" option2="4"/>
+  <config clef1="3" option1="4" option2="4"/>
   <panel name="bibo">
     <padding all="10px"/>
     <col value="1"/>
@@ -40,7 +40,6 @@
       <row value="20px"/>
       <staticbox row_start="1" row_end="0" col_start="2" col_end="3" label="Configuration du tirage au sort"/>
       <row value="20px"/>
-      <lua>if params.niveau:In('N_U14', 'N_U16', 'ARG_U14', 'ARG_U16') then</lua>
       <matrix row="auto" col_start="2" col_end="3">
         <col value="1,1,3"/>
         <statictext row="auto" col_start="1" col_end="0" style="ALIGN_CENTER" label="Courses concernées pour le tirage"/>
@@ -55,7 +54,6 @@
       <row value="10px"/>
       <staticbox row_start="-3" row_end="0" col_start="2" col_end="3" label="Courses Nationales ou Coupes d\'Argent U14/U16"/>
       <row value="10px"/>
-      <lua>end</lua>
       <row value="20px"/>
       <toolbar row="auto" col_start="1" col_end="0" name="tbconfig" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
     </matrix>

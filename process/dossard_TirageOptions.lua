@@ -415,6 +415,179 @@ function SetDossard(course)
 	return true;
 end
 
+
+
+function SetDossardMixte()
+	-- adv.Alert('clef1 = '..clef1..', option1 = '..option1..', option2 = '..option2);
+	base:TableLoad(tResultat, 'Select * From Resultat Where Code_evenement = '..params.course1..' And Dossard > 0');
+	if tResultat:GetNbRows() > 0 and not tCoureur then
+		local msg = "Les dossards ont déjà été tirés.\nVoulez-vous les remplacer ?";
+		if app.GetAuiFrame():MessageBox(msg, "Vérification !!!"
+			, msgBoxStyle.YES_NO+msgBoxStyle.NO_DEFAULT+msgBoxStyle.ICON_WARNING) == msgBoxStyle.NO then
+			return false;
+		end
+	end
+	if string.find(option2, '3%.') and not params.bibo then
+		params.bibo, params.dossard = GetBibo(0);
+	end
+	params.bibo = params.bibo or 30;
+	if not tCoureur then
+		local cmd = 'Update Resultat Set Dossard = Null, Rang = null Where Code_evenement IN('..params.course1..','..params.course2..')';
+		base:Query(cmd);
+		cmd = 'Delete From Resultat_Manche Where Code_evenement IN('..params.course1..','..params.course2..')'.."And (Tps_chrono =  Null or Tps_Chrono = -1)" ;
+		base:Query(cmd);
+		cmd = 'Update Resultat_Manche Set Rang = Null Where Code_evenement IN('..params.course1..','..params.course2..')';
+		base:Query(cmd);
+	end
+	if params.course2 > 0 then
+		local cmd = 'Select * From Resultat Where Code_evenement = '..params.course2;
+		base:TableLoad(tResultat, cmd);
+		tResultat2 = tResultat:Copy();
+	end
+	local cmd = 'Select * From Resultat Where Code_evenement = '..params.course1;
+	base:TableLoad(tResultat, cmd);
+	tResultat_Filles = tResultat:Copy();
+	local filtre = "$(Sexe):In('F')";
+	tResultat_Filles:Filter(filtre, true);
+	tResultat_Filles:OrderRandom();
+	tResultat_Filles:OrderRandom();
+	tResultat_Garcons = tResultat:Copy();
+	local filtre = "$(Sexe):In('M')";
+	tResultat_Garcons:Filter(filtre, true);
+	tResultat_Garcons:OrderRandom();
+	tResultat_Garcons:OrderRandom();
+		
+	tCoureur = tCoureur or {};
+	
+	params.decaler_garcons = tResultat_Filles:GetNbRows();
+
+	params.nb_groupe1_filles = math.ceil(tResultat_Filles:GetNbRows() / 2); 	-- 55 filles, params.nb_groupe1_filles = 28 -> row 27
+	params.nb_groupe1_garcons = math.ceil(tResultat_Garcons:GetNbRows() / 2);
+	
+	-- manche 1 de la course 1 : toujours un tirage à la mêlée.
+	for i = 0, tResultat_Filles:GetNbRows() -1 do
+		local code_coureur = tResultat_Filles:GetCell('Code_coureur', i);
+		local dossard = i + 1;
+		local rang = i+1;
+		tResultat_Filles:SetCell('Dossard', i, i+1);
+		tResultat_Filles:SetCellNull('Rang', i);
+		tResultat_Filles:SetCellNull('Reserve', i);
+		tCoureur[code_coureur] = {};
+		tCoureur[code_coureur].Dossard = dossard;
+	end
+
+	base:TableBulkUpdate(tResultat_Filles, 'Dossard, Rang, Reserve', 'Resultat');
+
+	for i = 0, tResultat_Garcons:GetNbRows() -1 do
+		local code_coureur = tResultat_Garcons:GetCell('Code_coureur', i);
+		tResultat_Garcons:SetCell('Dossard', i, params.decaler_garcons+i+1);
+		tResultat_Garcons:SetCellNull('Rang', i);
+		tResultat_Garcons:SetCellNull('Reserve', i);
+		tCoureur[code_coureur] = {};
+		tCoureur[code_coureur].Dossard = params.decaler_garcons+i+1;
+	end
+
+	base:TableBulkUpdate(tResultat_Garcons, 'Dossard, Rang, Reserve', 'Resultat');
+
+	if params.course2 > 0 then
+		for i = 0, tResultat2:GetNbRows() -1 do
+			local code_coureur = tResultat2:GetCell('Code_coureur', i);
+			if tCoureur[code_coureur] then
+				tResultat2:SetCell('Dossard', i, tCoureur[code_coureur].Dossard);
+			end
+		end
+	end
+	base:TableBulkUpdate(tResultat2, 'Dossard', 'Resultat');
+	-- adv.Alert('params.decaler_garcons = '..params.decaler_garcons..', params.nb_groupe1_filles = '..params.nb_groupe1_filles..', params.nb_groupe1_garcons = '..params.nb_groupe1_garcons);
+	return true;
+end
+
+function OnTirage2x2Mixte(course, code_evenement)
+	-- 6. Tirage pour 2 courses de 2 manches
+	
+	-- cas de 2 courses de 2 manches
+	-- course 1
+	-- manche 1 : à la mêlée
+	-- manche 2 : ordre inverse
+	-- course 2
+	-- manche 1 milieu -> fin puis début -> milieu ex de 51 à 100 puis de 1 à 50
+	-- manche 2 milieu -> début puis fin -> milieu ex de 50 à 1 puis de 100 à 51
+
+	local debut = 0;
+	local fin = 0;
+	step = 0;
+	base:TableLoad(tResultat, 'Select * From Resultat Where Code_evenement = '..code_evenement);
+	tResultat:OrderBy('Dossard');
+	if course == 1 then
+		params.rang_depart = 1;
+		row_debut = params.decaler_garcons - 1;
+		row_fin = 0;
+		step = -1;
+		OnTirageManchex(code_evenement, 2, row_debut, row_fin, step);
+		row_debut = tResultat:GetNbRows()-1;
+		row_fin = params.decaler_garcons;
+		step = -1;
+		OnTirageManchex(code_evenement, 2, row_debut, row_fin, step);
+	else
+		for manche = 1, 2 do
+			params.rang_depart = 1;
+			if manche == 1 then
+				-- manche 1 ex de 51 à 100   row de 50 à 99
+				-- les filles
+				row_debut = params.nb_groupe1_filles;
+				row_fin = params.decaler_garcons -1;
+				step = 1;
+				-- adv.Alert('Filles course 2 manche 1 milieu - fin');
+				OnTirageManchex(code_evenement, manche, row_debut, row_fin, step);
+				-- manche 1 ex de 1 à 50  row de 0 à 49
+				row_debut = 0;
+				row_fin = params.nb_groupe1_filles -1;
+				step = 1;
+				-- adv.Alert('Filles course 2 manche 1 début - milieu ');
+				OnTirageManchex(code_evenement, manche, row_debut, row_fin, step);
+				
+				-- les garcons
+				row_debut = params.decaler_garcons + params.nb_groupe1_garcons +1;
+				row_fin = tResultat:GetNbRows() -1;
+				step = 1;
+				-- adv.Alert('Garcons course 2 manche 1 milieu - fin');
+				OnTirageManchex(code_evenement, manche, row_debut, row_fin, step);
+				-- manche 1 ex de 1 à 50  row de 0 à 49
+				row_debut = params.decaler_garcons ;
+				row_fin = params.decaler_garcons + params.nb_groupe1_garcons;
+				step = 1;
+				-- adv.Alert('Garcons course 2 manche 1 début - milieu');
+				OnTirageManchex(code_evenement, manche, row_debut, row_fin, step);
+				
+			else	-- milieu -> début puis fin -> milieu
+				-- les filles
+				row_debut = params.nb_groupe1_filles -1;
+				row_fin = 0 ;
+				step = -1;
+				-- adv.Alert('Filles course 2 manche 2 milieu - début');
+				OnTirageManchex(code_evenement, manche, row_debut, row_fin, step);
+				row_debut = params.decaler_garcons - 1;
+				row_fin = params.nb_groupe1_filles;
+				step = -1;
+				-- adv.Alert('Filles course 2 manche 2 fin - milieu');
+				OnTirageManchex(code_evenement, manche, row_debut, row_fin, step);
+
+				-- les garcons
+				row_debut = params.decaler_garcons + params.nb_groupe1_garcons;
+				row_fin = params.decaler_garcons;
+				step = -1;
+				-- adv.Alert('garcons course 2 manche 2 milieu - début');
+				OnTirageManchex(code_evenement, manche, row_debut, row_fin, step);
+				row_debut = tResultat:GetNbRows() -1;
+				row_fin = params.decaler_garcons + params.nb_groupe1_garcons +1 ;
+				step = -1;
+				-- adv.Alert('garcons course 2 manche 2 fin - milieu');
+				OnTirageManchex(code_evenement, manche, row_debut, row_fin, step);
+			end
+		end
+	end
+end
+
 function OnTirageNationales(course, code_evenement)
 	-- 5. Coupes d'Argent et Nationales jeunes : Tirage pour des courses de 4 manches
 	-- 6. Coupes d'Argent et Nationales jeunes : Tirage pour des courses de 2 manches
@@ -533,6 +706,8 @@ function OnTirageNationales(course, code_evenement)
 end
 
 function OnTirageManchex(code_evenement, manche, debut, fin, step)
+
+	-- adv.Alert('OnTirageManchex('..code_evenement..', '..manche..', '..debut..', '..fin..', '..step..')');
 	for i = debut, fin, step do
 		local code_coureur = tResultat:GetCell('Code_coureur', i);
 		base:TableLoad(tResultat_Manche, 'Select * From Resultat_Manche Where Code_evenement = '..code_evenement.." And Code_manche = "..manche.." And Code_coureur = '"..code_coureur.."'");
@@ -760,21 +935,14 @@ function main(params_c)
 	dlgConfig:GetWindowName('clef1'):Append('2. Par Sexe et par Catégorie');
 	dlgConfig:GetWindowName('clef1'):Append('3. Par Sexe et par Année');
 	dlgConfig:GetWindowName('clef1'):Append('4. Sans objet');
-	if params.code_niveau:In('N_U14', 'N_U16', 'ARG_U14', 'ARG_U16') then
-		dlgConfig:GetWindowName('clef1'):SetSelection(3);
-	else
-		dlgConfig:GetWindowName('clef1'):SetSelection(0);
-	end
 		
 	dlgConfig:GetWindowName('option1'):Clear();
 	dlgConfig:GetWindowName('option1'):Append('1. Tirage pour la manche 1 avec BIBO particulier');
 	dlgConfig:GetWindowName('option1'):Append('2. Tirage pour les manches 1 et 2');
 	dlgConfig:GetWindowName('option1'):Append('3. Tirage pour la manche 2 (ABD DSQ ordre inverse)');
 	dlgConfig:GetWindowName('option1'):Append('4. Tirage des 3 manches par tiers tournants');
-	if params.code_niveau:In('N_U14', 'N_U16', 'ARG_U14', 'ARG_U16') then
-		dlgConfig:GetWindowName('option1'):Append("5. Coupes d'Argent et Nationales jeunes : Tirage pour des courses de 4 manches");
-		dlgConfig:GetWindowName('option1'):Append("6. Coupes d'Argent et Nationales jeunes : Tirage pour des courses de 2 manches");
-	end
+	dlgConfig:GetWindowName('option1'):Append("5. Tirage pour des courses de 4 manches");
+	dlgConfig:GetWindowName('option1'):Append("6. Tirage pour 2 courses de 2 manches");
 	
 	dlgConfig:GetWindowName('option2'):Clear();
 	dlgConfig:GetWindowName('option2'):Append("1. Pas d'inversion des dossards dans les groupes de tirage");
@@ -792,12 +960,10 @@ function main(params_c)
 		dlgConfig:GetWindowName('option1'):SetSelection(1);
 		dlgConfig:GetWindowName('option2'):SetSelection(1);
 	end
-	if params.code_niveau:In('N_U14', 'N_U16', 'ARG_U14', 'ARG_U16') then
-		dlgConfig:GetWindowName('option2'):SetSelection(4);
-		dlgConfig:GetWindowName('course1'):SetValue(params.code_evenement);
-		dlgConfig:GetWindowName('course1_nom'):SetValue(tEvenement:GetCell('Nom', 0));
-	end
-
+	dlgConfig:GetWindowName('option2'):SetSelection(4);
+	dlgConfig:GetWindowName('course1'):SetValue(params.code_evenement);
+	dlgConfig:GetWindowName('course1_nom'):SetValue(tEvenement:GetCell('Nom', 0));
+	
 	dlgConfig:Bind(eventType.TEXT, 
 		function(evt) 
 			local code_evenement1 = tonumber(dlgConfig:GetWindowName('course1'):GetValue()) or -1;
@@ -850,6 +1016,7 @@ function main(params_c)
 				params.course2 = -1;
 			end
 			params.nodeConfig:ChangeAttribute('course1', params.course1);
+			params.nodeConfig:ChangeAttribute('course2', params.course2);
 			params.nodeConfig:ChangeAttribute('clef1', dlgConfig:GetWindowName('clef1'):GetSelection());
 			params.nodeConfig:ChangeAttribute('option1', dlgConfig:GetWindowName('option1'):GetSelection());
 			params.nodeConfig:ChangeAttribute('option2', dlgConfig:GetWindowName('option2'):GetSelection());
@@ -862,6 +1029,7 @@ function main(params_c)
 		 end,  btnClose);
 
 	dlgConfig:Fit();
+	
 	if dlgConfig:ShowModal() == idButton.OK then
 		local intKO = 0;
 		if string.find(option1, '5%.') then
@@ -911,23 +1079,37 @@ function main(params_c)
 		elseif string.find(option1, '4%.') then
 			OnTirageParTiers();
 		elseif string.find(option1, '5%.') or string.find(option1, '6%.') then
-			if params.course1 > 0 then
-				local bolOK = SetDossard(1);
-				if bolOK then
-					OnTirageNationales(1, params.course1);
+			params.decaler_garcons = 0;
+			if string.find(clef1, '1%.') then		--par sexe
+				if string.find(option1, '6%.') then
+					if params.course1 > 0 then
+						local bolOK = SetDossardMixte();
+						if bolOK == false then return false; end
+						OnTirage2x2Mixte(1, params.course1);
+					end
+					if params.course2 > 0 then
+						OnTirage2x2Mixte(2, params.course2);
+					end
+				end
+			else
+				if params.course1 > 0 then
+					local bolOK = SetDossard(1);
+					if bolOK then
+						OnTirageNationales(1, params.course1);
+					end
+				end
+				if params.course2 > 0 then
+					local bolOK = SetDossard(2);
+					if bolOK then
+						OnTirageNationales(2, params.course2);
+					end
+				end
+				if string.find(option1, '6%.') then
+					local cmd = 'Delete From Resultat_Manche Where Code_evenement IN('..params.course1..','..params.course2..') And Code_manche > 2';
+					base:Query(cmd);
 				end
 			end
-			if params.course2 > 0 then
-				local bolOK = SetDossard(2);
-				if bolOK then
-					OnTirageNationales(2, params.course2);
-				end
-			end
-			if string.find(option1, '6%.') then
-				local cmd = 'Delete From Resultat_Manche Where Code_evenement IN('..params.course1..','..params.course2..') And Code_manche > 2';
-				base:Query(cmd);
-			end
-		end
+		end			
 		local cmd = 'Update Resultat Set Rang = NULL Where Code_evenement IN('..params.course1..','..params.course2..')';
 		base:Query(cmd);
 	end
