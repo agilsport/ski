@@ -12,7 +12,7 @@ end
 -- Information : Numéro de Version, Nom, Interface
 function device.GetInformation()
 	return { 
-		version = 6.4;
+		version = 6.5;
 		name = 'Live Timing Async.', 
 		class = 'network'
 	};
@@ -713,13 +713,13 @@ function OnSocketLive(evt)
 		Success("CONNEXION SERVEUR FIS OK ...");
 		live.socket_state = true;
 		InitLive();
-	elseif evt.GetSocketEvent() == socketNotify.LOST then
+	elseif evt:GetSocketEvent() == socketNotify.LOST then
 		-- LOST
-		Warning("CONNEXION FIS PERDUE ...");
+		Warning("CONNEXION INTERNET / FIS PERDUE ...");
+		Warning("REINITIALISEZ LES CONNEXIONS !!!");
 		live.socket_state = false;
-	else
-		Warning("CONNEXION INTERNET PERDUE !!!");
-		Warning("REINITIALISEZ LA CONNEXION A LA FIS !!!");
+	else 
+		Warning("REINITIALISEZ TOUTES LES CONNEXIONS !!!");
 		live.socket_state = false;
 	end
 end
