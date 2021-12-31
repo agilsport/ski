@@ -12,6 +12,7 @@
 		</menu>
 		<menu title="Résultats" image="./res/32x32_ranking.png">
 			<menu title="Résultats Médailles (Flèche, Chamois, ...)" image="./res/16x16_official.png" id="res_medaille" choix_manche="1" />
+			<menu title="Résultats Médailles Par Moniteurs" image="./res/16x16_official.png" id="res_medaille_mon" choix_manche="1" />
 			<menu title="Résultats Mémorial (Total des Manches)" image="./res/16x16_ranking.png" id="res_total" />
 			<menu title="Résultats Meilleure Manche" image="./res/16x16_ranking.png" id="res_best" />
 			<menu title="Résultats Trace" image="./res/16x16_official.png" id="res_trace" choix_manche="1" />
@@ -214,10 +215,7 @@
 
 	<!-- Résultats Médaille : Flèche, Chamois, ... -->
 	<report id="res_medaille" title="Résultats Officiels" >
-		<layers>
-			<layer id="club_esf"/>
-		</layers>
-		
+	
 		<column name="Tps_status">chrono.Status(body:GetCellInt('Tps'..manche, row))</column>
 		<lua>body:SetCounter('Tps_status')</lua>
 		<order key="('Tps'..manche..', Dossard')" />
@@ -249,12 +247,42 @@
 		</body>
 	</report>
 	
+	<!-- Résultats Médaille Par Moniteurs  -->
+	<report id="res_medaille_mon" title="Résultats Officiels" >
+		<column name="Tps_status">chrono.Status(body:GetCellInt('Tps'..manche, row))</column>
+		<lua>body:SetCounter('Tps_status')</lua>
+		<order key="('Moniteur, Tps'..manche..', Dossard')" />
+
+		<rupture key="Moniteur">
+			<before>
+				<need h="2cm" />
+				<font size="14"/>
+				<row value="0.4cm"/>
+				<text row="auto" col="1" >$(Moniteur)</text>
+			</before>
+		</rupture>
+
+		<body>
+			<call option="couleur_alternee" file="./edition/options.xml"/>
+
+			<row value="auto"/>
+			<text col="4" align="right" label="Clt" font_weight="bold" font_size_step="1">body:GetCell('Clt'..manche, row)</text>
+			<text col="4" align="right" label="Dos">$(Dossard)</text>
+			<text col="10" align="center" label="Code" font_size_step="-1">$(Code_coureur)</text>
+			<text col="24" align="left" label="Nom - Prénom"><font weight="bold"/>$(Identite)</text>
+			<text col="4" align="center" label="An">$(An)</text>
+			<text col="2" align="center" label="S.">$(Sexe)</text>
+			<text col="6" align="center" label="Cat.">$(Categ)</text>
+			<text col="8" align="right" label="Temps" font_weight="bold" font_size_step="1">body:GetCell('Tps'..manche, row)</text>
+			<text col="7" align="right" label="Pt.Open">body:GetCell('PtsClt'..manche, row)</text>
+			<text col="12" align="center" label="Medaille"><font weight="bold"/>body:GetCell('Medaille'..manche, row)</text>
+			<image col_start="0" align="right" cond="group =='body'" adjust="width"><background mode="transparent"/><pen border="0" />app.ImageMedailleESF(body:GetCell('Medaille'..manche, row))</image>
+		</body>
+	</report>
+	
 	<!-- Résultats Trace ... -->
 	<report id="res_trace" title="Résultats Officiels" >
-		<layers>
-			<layer id="club_esf"/>
-		</layers>
-		
+	
 		<first_header>
 			<font name="Calibri" size="10" adjust="max" weight="bold"/>
 			<pen border="1" size="1"/>
@@ -325,9 +353,6 @@
 	
 	<!-- Résultats Vitesse : (Record ou Vitesse) ... -->
 	<report id="res_vitesse" title="Résultats Officiels" first_header="0" >
-		<layers>
-			<layer id="club_esf"/>
-		</layers>
 		
 		<column name="Tps_status">chrono.Status(body:GetCellInt('Tps'..manche, row))</column>
 		<lua>body:SetCounter('Tps_status')</lua>
