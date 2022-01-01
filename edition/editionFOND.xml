@@ -293,10 +293,12 @@
 	<!-- Liste Par Ordre Alpha -->
 	<report id="part_officiel" title="(params.title or '')" header="1" first_header="0" rupture="0">
 		<call option="identiteCoureur" file="./edition/options.xml"/>
+		
 		<order key="Identite Asc" />
 		<body>
 			<call option="color_alternate" file="./edition/options.xml" />
 			<font size="9" adjust="ellipsize"/>
+			<pen border="none" />
 			<row h="auto"/>
 			<spacing left="5" right="10" top="2" bottom="2" />
 			<text col="4" align="right" label="Dos">$(Dossard) </text>
@@ -321,6 +323,7 @@
 		<body>
 			<call option="color_alternate" file="./edition/options.xml" />
 			<font size="9" adjust="ellipsize"/>
+			<pen border="none" />
 			<row h="auto"/>
 			<spacing left="5" right="10" top="2" bottom="2" />
 			<text col="4" align="right" label="Dos">$(Dossard) </text>
@@ -370,6 +373,7 @@
 		<body>
 			<call option="color_alternate" file="./edition/options.xml" />
 			<font size="9" adjust="ellipsize"/>
+			<pen border="none" />
 			<row h="auto"/>
 			<spacing left="5" right="10" top="2" bottom="2" />
 			<text col="4" align="right" label="Dos">$(Dossard) </text>
@@ -415,6 +419,7 @@
 		<body>
 			<call option="color_alternate" file="./edition/options.xml" />
 			<font size="9" adjust="ellipsize"/>
+			<pen border="none" />
 			<spacing left="5" right="10" top="2" bottom="2" />
 			<row h="auto"/>
 			<text col="4" align="right" label="Dos">$(Dossard) </text>
@@ -453,6 +458,7 @@
 		<body>
 			<call option="color_alternate" file="./edition/options.xml" />
 			<font size="9" adjust="ellipsize"/>
+			<pen border="none" />
 			<spacing left="5" right="10" top="2" bottom="2" />
 			<lua>
 				LabelCode = $(Code_coureur):sub(1,3)
@@ -504,6 +510,7 @@
 		<body>
 			<call option="color_alternate" file="./edition/options.xml" />
 			<font size="9" adjust="ellipsize"/>
+			<pen border="none" />
 			<spacing left="5" right="10" top="2" bottom="2" />
 			<row h="auto"/>
 			<text col="4" align="right" label="Rg.">body:GetCell(rang,row)</text>
@@ -563,6 +570,7 @@
 		<body>
 			<call option="color_alternate" file="./edition/options.xml" />
 			<font size="9" adjust="ellipsize"/>
+			<pen border="none" />
 			<spacing left="5" right="10" top="2" bottom="2" />
 			<row h="auto"/>
 			<text col="0.5cm" font_size="6" align="center" label="Pb">$(Modif_manuel) </text>
@@ -612,6 +620,7 @@
 		<body>
 			<call option="color_alternate" file="./edition/options.xml" />
 			<font size="9" adjust="ellipsize"/>
+			<pen border="none" />
 			<spacing left="5" right="10" top="2" bottom="2" />
 			<row h="auto"/>
 			<text col="4" align="right" label="Dos">$(Dossard) </text>
@@ -657,6 +666,7 @@
 		<body>
 			<call option="color_alternate" file="./edition/options.xml" />
 			<font name="calibri" size="9" adjust="ellipsize" />
+			<pen border="none" />
 			<spacing all="2" />
 			<spacing left="7" right="10" top="2" bottom="2" />
 			<lua>LabelCode = $(Code_coureur):sub(1,3)</lua>
@@ -712,6 +722,7 @@
 		<body>
 			<call option="color_alternate" file="./edition/options.xml" />
 			<font name="calibri" size="9" adjust="ellipsize" />
+			<pen border="none" />
 			<spacing all="2" />
 			<spacing left="7" right="10" top="2" bottom="2" />
 			<lua>LabelCode = $(Code_coureur):sub(1,3)</lua>
@@ -795,6 +806,7 @@
 				<call option="color_alternate" file="./edition/options.xml"/>
 				<font size="8" adjust="ellipsize"/>
 				<spacing left="5" right="10" top="2" bottom="2" />
+				<pen border="none" />
 				<row h="auto" />
 				<text col="5" align="right" label="C.Cat" font_weight="bold" font_size_step="1">$(Cltc)</text>
 				<text col="5" align="right" label="C.Tot" font_weight="bold" font_size_step="1">$(Clte)</text>
@@ -884,6 +896,7 @@
 			<call option="color_alternate" file="./edition/options.xml" />
 			<font size="9" adjust="ellipsize"/>
 			<spacing left="5" right="15" top="2" bottom="2" />
+			<pen border="none" />
 			<row h="auto"/>
 			<row h="auto"/>
 			
