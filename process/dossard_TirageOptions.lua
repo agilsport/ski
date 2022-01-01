@@ -51,6 +51,27 @@ function GetBibo(bibo)
 	return bibo, dossard;
 end
 
+function ValideOption1(clef1, option1, option2)
+	if string.find(option1, '1%.') or string.find(option1, '4%.') or string.find(option1, '5%.') or string.find(option1, '6%.') then
+		dlgConfig:GetWindowName('clef1'):SetSelection(3);
+		clef1 = dlgConfig:GetWindowName('clef1'):GetValue();
+		if string.find(option1, '4%.') then
+			dlgConfig:GetWindowName('course2'):SetValue('');
+			dlgConfig:GetWindowName('course2_nom'):SetValue('');
+			if not string.find(option2, '4%.') and not string.find(option2, '5%.')then
+				dlgConfig:GetWindowName('option2'):SetSelection(3);
+				option2 = dlgConfig:GetWindowName('option2'):GetValue();
+			end
+		end
+	end
+	if string.find(option1, '1%.') or string.find(option1, '3%.') then
+		dlgConfig:GetWindowName('clef1'):SetSelection(3);
+		dlgConfig:GetWindowName('clef1'):SetSelection(3);
+		dlgConfig:GetWindowName('option2'):SetSelection(2);
+		option2 = dlgConfig:GetWindowName('option2'):GetValue();
+	end
+end
+
 	-- dlgConfig:GetWindowName('clef1'):Append('1. Par Sexe');
 	-- dlgConfig:GetWindowName('clef1'):Append('2. Par Sexe et par Catégorie');
 	-- dlgConfig:GetWindowName('clef1'):Append('3. Par Sexe et par Année');
@@ -68,36 +89,15 @@ end
 	-- dlgConfig:GetWindowName('option2'):Append('3. Gestion du BIBO');
 	-- dlgConfig:GetWindowName('option2'):Append('4. Tirage au sort dans les tiers tournants');
 	-- dlgConfig:GetWindowName('option2'):Append('5. Sans objet');
-
-function ValideOption1(clef1, option1, option2)
-	if string.find(option1, '1%.') or string.find(option1, '4%.') or string.find(option1, '5%.') or string.find(option1, '6%.') then
-		dlgConfig:GetWindowName('clef1'):SetSelection(3);
-		clef1 = dlgConfig:GetWindowName('clef1'):GetValue();
-		if string.find(option1, '4%.') then
-			if not string.find(option2, '4%.') and not string.find(option2, '5%.')then
-				dlgConfig:GetWindowName('option2'):SetSelection(3);
-				option2 = dlgConfig:GetWindowName('option2'):GetValue();
-			end
-		end
-	end
-	if string.find(option1, '1%.') or string.find(option1, '3%.') then
-		dlgConfig:GetWindowName('clef1'):SetSelection(3);
-		dlgConfig:GetWindowName('clef1'):SetSelection(3);
-		dlgConfig:GetWindowName('option2'):SetSelection(2);
-		option2 = dlgConfig:GetWindowName('option2'):GetValue();
-	end
-end
-
 function ValideOption2(clef1, option1, option2)
-	if string.find(clef1, '1%.') or string.find(clef1, '2%.') or string.find(clef1, '3%.') then
-		if not string.find(option2, '1%.') and not string.find(option2, '2%.') then 
-			dlgConfig:GetWindowName('option2'):SetSelection(1);
-			option2 = dlgConfig:GetWindowName('option2'):GetValue();
+	if string.find(option1, '4%.') then
+		if string.find(option2, '4%.') or string.find(option2, '5%.') then 
+			return;
 		end
 	end
-	if string.find(option1, '4%.') then
-		if not string.find(option2, '1%.') and not string.find(option2, '4%.') and not string.find(option2, '5%.') then 
-			dlgConfig:GetWindowName('option2'):SetSelection(4);
+	if string.find(clef1, '1%.') or string.find(clef1, '2%.') or string.find(clef1, '3%.') then
+		if string.find(option2, '3%.') or string.find(option2, '4%.') then 
+			dlgConfig:GetWindowName('option2'):SetSelection(1);
 			option2 = dlgConfig:GetWindowName('option2'):GetValue();
 		end
 	end
@@ -260,19 +260,126 @@ function OnTirageManche2Special()
 	cmd = 'Update Resultat_Manche Set Reserve = Null  Where Code_evenement = '..params.code_evenement..' And Code_manche = 1';
 	base:Query(cmd);
 end
-function OnTirageParTiers();
-	-- Ordre des groupes = manche 1 : 1, 2, 3,  manche 2 : 2, 3, 1,  manche 3 : 3, 1, 2
+
+
+function OnTirageParTiersMixte();
+	-- on fixe les dossards
+	-- Ordre des groupes = manche 1 : 1, 2, 3,  manche 2 : 2, 3, 1,  manche 3 : 3, 1, 2 par sexe le cas échéant.
 	if tEpreuve:GetCellInt('Nombre_de_manche', 0) ~= 3 then
 		local msg = "Cette course n'est pas paramétrée pour 3 manches";
 		app.GetAuiFrame():MessageBox(msg, "Attention aux erreurs !!!", msgBoxStyle.OK+msgBoxStyle.ICON_ERROR);
 		return;
 	end
+	SetDossardMixte();
+	local tables_sexe = {};
+	if tResultat_Filles:GetNbRows() > 0 then
+		tResultat_Filles:OrderBy('Dossard')
+		table.insert(tables_sexe, {Sexe = 'F', Table = tResultat_Filles});
+	end
+	if tResultat_Garcons:GetNbRows() > 0 then
+		tResultat_Garcons:OrderBy('Dossard')
+		table.insert(tables_sexe, {Sexe = 'M', Table = tResultat_Garcons});
+	end
+	local max_row_g1_filles = math.ceil(tResultat_Filles:GetNbRows() / 3);
+	local max_row_g2_filles = tResultat_Filles:GetNbRows() - max_row_g1_filles;
+	local max_row_g1_garcons = math.ceil(tResultat_Garcons:GetNbRows() / 3);
+	local max_row_g2_garcons = tResultat_Garcons:GetNbRows() - max_row_g1_garcons;
+	for i = tResultat_Filles:GetNbRows() - 1, 0, -1 do
+		if i >= max_row_g2_filles then
+			tResultat_Filles:SetCell('Reserve', i, 3);
+		elseif i >= max_row_g1_filles then
+			tResultat_Filles:SetCell('Reserve', i, 2);
+		else
+			tResultat_Filles:SetCell('Reserve', i, 1);
+		end
+	end
+	base:TableBulkUpdate(tResultat_Filles,'Reserve', 'Resultat');
+	for i = tResultat_Garcons:GetNbRows() - 1, 0, -1 do
+		if i >= max_row_g2_garcons then
+			tResultat_Garcons:SetCell('Reserve', i, 3);
+		elseif i >= max_row_g1_garcons then
+			tResultat_Garcons:SetCell('Reserve', i, 2);
+		else
+			tResultat_Garcons:SetCell('Reserve', i, 1);
+		end
+	end
+	base:TableBulkUpdate(tResultat_Garcons,'Reserve', 'Resultat');
+	
+	for idx = 1, #tables_sexe do
+		local table_resultat = tables_sexe[idx].Table;
+		local sexe = tables_sexe[idx].Sexe;
+		local Counter_Reserve = table_resultat:SetCounter('Reserve');
+		local tCounter_Reserve = table_resultat:GetCounter('Reserve');
+		NbG1 = tCounter_Reserve:GetCellInt('_count_', 0);
+		NbG2 = tCounter_Reserve:GetCellInt('_count_', 1);
+		NbG3 = tCounter_Reserve:GetCellInt('_count_', 2);
+		local tReserve = {};
+		table.insert(tReserve, {Manche = 1, Ordre = {1,2,3}});
+		table.insert(tReserve, {Manche = 2, Ordre = {3,1,2}});
+		table.insert(tReserve, {Manche = 3, Ordre = {2,3,1}});
+		
+		for manche = 2, 3 do
+			local tOrdre = tReserve[manche].Ordre;	-- si manche = 2, tOrdre = {3,1,2}, tOrdre[2] = 1
+			rang = 0;
+			if sexe == 'M' then
+				rang = tResultat_Filles:GetNbRows();
+			end
+			for ordre = 1, 3 do
+				local reserve = tOrdre[ordre];
+				local filtre = '$(Reserve):In('..reserve..')';
+				table_resultat_copy = table_resultat:Copy();
+				table_resultat_copy:Filter(filtre, true);
+				if string.find(option2, '4%.') then
+					table_resultat_copy:OrderRandom();
+				else
+					table_resultat_copy:OrderBy('Dossard');
+				end	
+				local row = nil;
+				local addrow = false;
+				for i = 0, table_resultat_copy:GetNbRows() -1 do
+					rang = rang + 1;
+					local code_coureur = table_resultat_copy:GetCell('Code_coureur', i);
+					local reserve = table_resultat_copy:GetCellInt('Reserve', i);
+					local cmd = 'Select * From Resultat_Manche Where Code_evenement = '..params.code_evenement.." And Code_manche = "..manche.." And Code_coureur = '"..code_coureur.."'";
+					base:TableLoad(tResultat_Manche, cmd);
+					if tResultat_Manche:GetNbRows() == 0 then
+						addrow = true;
+						row = tResultat_Manche:AddRow();
+					else
+						row = 0;
+					end
+					tResultat_Manche:SetCell('Code_evenement', row, params.code_evenement);
+					tResultat_Manche:SetCell('Code_manche', row, manche);
+					tResultat_Manche:SetCell('Code_coureur', row, code_coureur);
+					tResultat_Manche:SetCell('Rang', row, rang);
+					tResultat_Manche:SetCell('Reserve', row, reserve);
+					if addrow == true then
+						base:TableInsert(tResultat_Manche, row);
+					else
+						base:TableUpdate(tResultat_Manche, row);
+					end
+				end
+			end
+		end
+	end
+end
+
+function OnTirageParTiers();
+	-- on fixe les dossards
+	-- Ordre des groupes = manche 1 : 1, 2, 3,  manche 2 : 2, 3, 1,  manche 3 : 3, 1, 2 par sexe le cas échéant.
+	if tEpreuve:GetCellInt('Nombre_de_manche', 0) ~= 3 then
+		local msg = "Cette course n'est pas paramétrée pour 3 manches";
+		app.GetAuiFrame():MessageBox(msg, "Attention aux erreurs !!!", msgBoxStyle.OK+msgBoxStyle.ICON_ERROR);
+		return;
+	end
+	_, params.dossard = GetBibo(0);
+
+	tResultat:OrderBy('Dossard');
 	local max_row_g1 = math.ceil(tResultat:GetNbRows() / 3);
 	local max_row_g2 = tResultat:GetNbRows() - max_row_g1;
 	tResultat:OrderRandom();
-	local dossard = 0;
 	for i = tResultat:GetNbRows() - 1, 0, -1 do
-		tResultat:SetCell('Dossard', i, i + 1);
+		tResultat:SetCell('Dossard', i, params.dossard + i);
 		if i >= max_row_g2 then
 			tResultat:SetCell('Reserve', i, 3);
 		elseif i >= max_row_g1 then
@@ -282,15 +389,17 @@ function OnTirageParTiers();
 		end
 	end
 	base:TableBulkUpdate(tResultat);
-	tGroupes = base:TableLoad('SELECT Reserve, COUNT(*) Nb FROM Resultat WHERE Code_evenement = '..params.code_evenement..' GROUP BY Reserve');
-	NbG1 = tGroupes:GetCellInt('Nb', 0);
-	NbG2 = tGroupes:GetCellInt('Nb', 1);
-	NbG3 = tGroupes:GetCellInt('Nb', 2);
+
+	local Counter_Reserve = tResultat:SetCounter('Reserve');
+	local tCounter_Reserve = tResultat:GetCounter('Reserve');
+	NbG1 = tCounter_Reserve:GetCellInt('_count_', 0);
+	NbG2 = tCounter_Reserve:GetCellInt('_count_', 1);
+	NbG3 = tCounter_Reserve:GetCellInt('_count_', 2);
 	local tReserve = {};
 	table.insert(tReserve, {Manche = 1, Ordre = {1,2,3}});
 	table.insert(tReserve, {Manche = 2, Ordre = {3,1,2}});
 	table.insert(tReserve, {Manche = 3, Ordre = {2,3,1}});
-	for manche = 1, 3 do
+	for manche = 2, 3 do
 		local tOrdre = tReserve[manche].Ordre;	-- si manche = 2, tOrdre = {3,1,2}, tOrdre[2] = 1
 		local rang = 1;
 		for ordre = 1, 3 do
@@ -299,33 +408,32 @@ function OnTirageParTiers();
 			tResultat_Copy = tResultat:Copy();
 			tResultat_Copy:Filter(filtre, true);
 			if string.find(option2, '4%.') then
-				if manche > 1 then
-					tResultat_Copy:OrderRandom();
-				end
+				tResultat_Copy:OrderRandom();
+			else
+				tResultat_Copy:OrderBy('Dossard');
 			end				
+			local row = nil;
+			local addrow = false;
 			for i = 0, tResultat_Copy:GetNbRows() -1 do
 				local code_coureur = tResultat_Copy:GetCell('Code_coureur', i);
-				base:TableLoad(tResultat_Manche, 'Select * From Resultat_Manche Where Code_evenement = '..params.code_evenement.." And Code_manche = "..manche.." And Code_coureur = '"..code_coureur.."'");
-				local row = nil;
-				local addrow = false;
+				local reserve = tResultat_Copy:GetCellInt('Reserve', i);
+				local cmd = 'Select * From Resultat_Manche Where Code_evenement = '..params.code_evenement.." And Code_manche = "..manche.." And Code_coureur = '"..code_coureur.."'";
+				base:TableLoad(tResultat_Manche, cmd);
 				if tResultat_Manche:GetNbRows() == 0 then
-					row = tResultat_Manche:AddRow();
 					addrow = true;
+					row = tResultat_Manche:AddRow();
 				else
 					row = 0;
 				end
 				tResultat_Manche:SetCell('Code_evenement', row, params.code_evenement);
 				tResultat_Manche:SetCell('Code_manche', row, manche);
 				tResultat_Manche:SetCell('Code_coureur', row, code_coureur);
-				if manche > 1 then
-					tResultat_Manche:SetCell('Rang', row, rang);
-				else
-					tResultat_Manche:SetCellNull('Rang', row);
-				end
+				tResultat_Manche:SetCell('Rang', row, rang);
+				tResultat_Manche:SetCell('Reserve', row, reserve);
 				if addrow == true then
 					base:TableInsert(tResultat_Manche, row);
 				else
-					base:TableUpdate(tResultat_Manche, row, 'Rang');
+					base:TableUpdate(tResultat_Manche, row);
 				end
 				rang = rang + 1;
 			end
@@ -418,88 +526,62 @@ end
 
 
 function SetDossardMixte()
-	-- adv.Alert('clef1 = '..clef1..', option1 = '..option1..', option2 = '..option2);
 	base:TableLoad(tResultat, 'Select * From Resultat Where Code_evenement = '..params.course1..' And Dossard > 0');
-	if tResultat:GetNbRows() > 0 and not tCoureur then
+	if tResultat:GetNbRows() > 0 then
 		local msg = "Les dossards ont déjà été tirés.\nVoulez-vous les remplacer ?";
 		if app.GetAuiFrame():MessageBox(msg, "Vérification !!!"
 			, msgBoxStyle.YES_NO+msgBoxStyle.NO_DEFAULT+msgBoxStyle.ICON_WARNING) == msgBoxStyle.NO then
 			return false;
 		end
 	end
-	if string.find(option2, '3%.') and not params.bibo then
-		params.bibo, params.dossard = GetBibo(0);
-	end
-	params.bibo = params.bibo or 30;
-	if not tCoureur then
-		local cmd = 'Update Resultat Set Dossard = Null, Rang = null Where Code_evenement IN('..params.course1..','..params.course2..')';
-		base:Query(cmd);
-		cmd = 'Delete From Resultat_Manche Where Code_evenement IN('..params.course1..','..params.course2..')'.."And (Tps_chrono =  Null or Tps_Chrono = -1)" ;
-		base:Query(cmd);
-		cmd = 'Update Resultat_Manche Set Rang = Null Where Code_evenement IN('..params.course1..','..params.course2..')';
-		base:Query(cmd);
-	end
-	if params.course2 > 0 then
-		local cmd = 'Select * From Resultat Where Code_evenement = '..params.course2;
-		base:TableLoad(tResultat, cmd);
-		tResultat2 = tResultat:Copy();
-	end
+	_, params.dossard = GetBibo(0);
+
+	local cmd = 'Update Resultat Set Dossard = Null, Rang = Null, Reserve = Null Where Code_evenement IN('..params.course1..')';
+	base:Query(cmd);
+	cmd = 'Delete From Resultat_Manche Where Code_evenement IN('..params.course1..')'.."And (Tps_chrono =  Null or Tps_Chrono = -1)" ;
+	base:Query(cmd);
+	cmd = 'Update Resultat_Manche Set Rang = Null Where Code_evenement IN('..params.course1..')';
+	base:Query(cmd);
+
 	local cmd = 'Select * From Resultat Where Code_evenement = '..params.course1;
 	base:TableLoad(tResultat, cmd);
 	tResultat_Filles = tResultat:Copy();
+	tResultat_Garcons = tResultat:Copy();
 	local filtre = "$(Sexe):In('F')";
 	tResultat_Filles:Filter(filtre, true);
 	tResultat_Filles:OrderRandom();
 	tResultat_Filles:OrderRandom();
-	tResultat_Garcons = tResultat:Copy();
 	local filtre = "$(Sexe):In('M')";
 	tResultat_Garcons:Filter(filtre, true);
 	tResultat_Garcons:OrderRandom();
 	tResultat_Garcons:OrderRandom();
 		
 	tCoureur = tCoureur or {};
-	
-	params.decaler_garcons = tResultat_Filles:GetNbRows();
 
 	params.nb_groupe1_filles = math.ceil(tResultat_Filles:GetNbRows() / 2); 	-- 55 filles, params.nb_groupe1_filles = 28 -> row 27
 	params.nb_groupe1_garcons = math.ceil(tResultat_Garcons:GetNbRows() / 2);
 	
 	-- manche 1 de la course 1 : toujours un tirage à la mêlée.
+	local dossard = params.dossard;
 	for i = 0, tResultat_Filles:GetNbRows() -1 do
 		local code_coureur = tResultat_Filles:GetCell('Code_coureur', i);
-		local dossard = i + 1;
-		local rang = i+1;
-		tResultat_Filles:SetCell('Dossard', i, i+1);
-		tResultat_Filles:SetCellNull('Rang', i);
-		tResultat_Filles:SetCellNull('Reserve', i);
+		tResultat_Filles:SetCell('Dossard', i, dossard);
 		tCoureur[code_coureur] = {};
 		tCoureur[code_coureur].Dossard = dossard;
+		dossard = dossard + 1;
 	end
 
-	base:TableBulkUpdate(tResultat_Filles, 'Dossard, Rang, Reserve', 'Resultat');
+	base:TableBulkUpdate(tResultat_Filles, 'Dossard', 'Resultat');
 
 	for i = 0, tResultat_Garcons:GetNbRows() -1 do
 		local code_coureur = tResultat_Garcons:GetCell('Code_coureur', i);
-		tResultat_Garcons:SetCell('Dossard', i, params.decaler_garcons+i+1);
-		tResultat_Garcons:SetCellNull('Rang', i);
-		tResultat_Garcons:SetCellNull('Reserve', i);
+		tResultat_Garcons:SetCell('Dossard', i, dossard);
 		tCoureur[code_coureur] = {};
-		tCoureur[code_coureur].Dossard = params.decaler_garcons+i+1;
+		tCoureur[code_coureur].Dossard = dossard;
+		dossard = dossard + 1;
 	end
 
-	base:TableBulkUpdate(tResultat_Garcons, 'Dossard, Rang, Reserve', 'Resultat');
-
-	if params.course2 > 0 then
-		for i = 0, tResultat2:GetNbRows() -1 do
-			local code_coureur = tResultat2:GetCell('Code_coureur', i);
-			if tCoureur[code_coureur] then
-				tResultat2:SetCell('Dossard', i, tCoureur[code_coureur].Dossard);
-			end
-		end
-	end
-	base:TableBulkUpdate(tResultat2, 'Dossard', 'Resultat');
-	-- adv.Alert('params.decaler_garcons = '..params.decaler_garcons..', params.nb_groupe1_filles = '..params.nb_groupe1_filles..', params.nb_groupe1_garcons = '..params.nb_groupe1_garcons);
-	return true;
+	base:TableBulkUpdate(tResultat_Garcons, 'Dossard', 'Resultat');
 end
 
 function OnTirage2x2Mixte(course, code_evenement)
@@ -857,7 +939,7 @@ function main(params_c)
 	params.height = display:GetSize().height / 2;
 	params.x = (display:GetSize().width - params.width) / 2;
 	params.y = 200;
-	params.version = "2.0";
+	params.version = "2.1";
 	base = base or sqlBase.Clone();
 	tEvenement = base:GetTable('Evenement');
 	base:TableLoad(tEvenement, 'Select * From Evenement Where Code = '..params.code_evenement);
@@ -1077,7 +1159,11 @@ function main(params_c)
 		elseif string.find(option1, '3%.') then
 			OnTirageManche2Special()
 		elseif string.find(option1, '4%.') then
-			OnTirageParTiers();
+			if string.find(clef1, '1%.') then
+				OnTirageParTiersMixte();
+			else
+				OnTirageParTiers();
+			end
 		elseif string.find(option1, '5%.') or string.find(option1, '6%.') then
 			params.decaler_garcons = 0;
 			if string.find(clef1, '1%.') then		--par sexe
