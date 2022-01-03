@@ -1,7 +1,9 @@
 -- Synthaxe Progression :
--- Version 3.8
+-- Version 4.0
 -- Rectif placement en final
 -- rajout de dim_min en tab nordique
+-- rajout du KO_12 en 'FOND,ROL'
+-- Création d'un niveau KO_Spec pour pouvoir faire des ko30 ou autre spécifique en cas de reclamation ou de repeche ou l'on faire un duel a 7 a la place de 6 par exemple 
 -- clt/duel/tour/ordre/tri : clt (obligatoire ...), duel, tour, ordre (non obligatoires ...)
 -- exemple 1 : 12 => 12ième du tour précédent (et de tous les duels)
 -- exemple 2 : 2/3 => 2ème du duel 3 du tour précédent
@@ -39,9 +41,9 @@ function GetLabelDuelTabA_B(progression, tour, duel)
 		end
 	elseif tour == 2 then
 		if duel < 3 then 
-			return 'Tab A \n Duel:'..tostring(duel);
+			return 'Tab A \n Poule:'..tostring(duel);
 		else
-			return 'Tab B \n Duel:'..tostring(duel)-2;
+			return 'Tab B \n Poule:'..tostring(duel)-2;
 		end
 	elseif tour == 3 then
 		if duel == 1 then 
@@ -773,8 +775,8 @@ duel_progression = {
 			},
 			{
 				-- tour 2 : Finale A et Finale B => 2 duel de 6 couloirs
-				{ '1/1-2/2/1', '1/1-2/2/2', '2/1-2/2/1', '2/1-2/2/2', '3/1-2/2/1', '3/1-2/2/2'}, 
-				{ '4/1-2/2/1', '4/1-2/2/2', '5/1-2/2/1', '5/1-2/2/2', '6/1-2/2/1', '6/1-2/2/2'}
+				{ '1/1-2/1/1', '1/1-2/1/2', '2/1-2/1/1', '2/1-2/1/2', '3/1-2/1/1', '3/1-2/1/2'}, 
+				{ '4/1-2/1/1', '4/1-2/1/2', '5/1-2/1/1', '5/1-2/1/2', '6/1-2/1/1', '6/1-2/1/2'}
 			}
 		}
 	},
@@ -868,7 +870,7 @@ duel_progression = {
 	{
 		dimension = 30,
 		dimension_min = 21,
-		niveau = 'KO_30_Q7',
+		niveau = 'KO_Spec',
 		GetLabelTour = GetLabel3Tours,
 		--label = { 'Quart de Finale', 'Demi Finale', 'Finale' },
 		progression = {
