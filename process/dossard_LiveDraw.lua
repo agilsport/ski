@@ -126,6 +126,8 @@ end
 
 
 function RefreshCounterSequence()
+	draw.sequence_ack = draw.sequence_ack or 0;
+	draw.sequence_send = draw.sequence_send or 0;
 	dlgTableau:GetWindowName('sequence'):SetValue('Trame '..draw.sequence_ack..' / '..draw.sequence_send);
 	dlgTableau:Refresh();
 end
@@ -355,7 +357,7 @@ function OnPrintEtiquettes(orderby)
 			end
 			local bolDelete = true;
 			if i > 30 then
-				if tEtiquette:GetCellInt('ECSL_points', i) > 0 then
+				if tEtiquette:GetCellInt('ECSL_points', i) > 0 or tEtiquette:GetCellInt('WCSL_points', i) > 0 then
 					bolDelete = false;
 				end
 				if tEtiquette:GetCell('Winner_CC', i):len() > 0 then
@@ -2707,7 +2709,7 @@ function main(params_c)
 	draw.height = display:GetSize().height - 30;
 	draw.x = 0;
 	draw.y = 0;
-	draw.version = "2.41";
+	draw.version = "2.42";
 	draw.orderbyCE = 'Rang_tirage, Groupe_tirage, ECSL_points DESC, WCSL_points DESC, ECSL_overall_points DESC, Winner_CC DESC, FIS_pts, Nom, Prenom';
 	draw.orderbyFIS = 'Rang_tirage, Groupe_tirage, FIS_pts, Nom, Prenom';
 	draw.hostname = 'live.fisski.com';
@@ -2807,6 +2809,8 @@ function main(params_c)
 		draw.sequence_ack = tonumber(nodelivedraw:GetAttribute('ack', 0)) or 0;
 		draw.sequence_last_send = draw.sequence_send;
 	end
+	draw.sequence_ack = draw.sequence_ack or 0;
+	draw.sequence_send = draw.sequence_send or 0;
 	draw.targetName = draw.hostname..':'..draw.port;
 	draw.web = 'live.fis-ski.com/lv-'..string.lower(string.sub(draw.code_activite,1,2))..draw.codex..'.htm';
 	draw.state = false;
