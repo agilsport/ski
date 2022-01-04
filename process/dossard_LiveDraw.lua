@@ -126,6 +126,8 @@ end
 
 
 function RefreshCounterSequence()
+	draw.sequence_ack = draw.sequence_ack or 0;
+	draw.sequence_send = draw.sequence_send or 0;
 	dlgTableau:GetWindowName('sequence'):SetValue('Trame '..draw.sequence_ack..' / '..draw.sequence_send);
 	dlgTableau:Refresh();
 end
@@ -355,7 +357,7 @@ function OnPrintEtiquettes(orderby)
 			end
 			local bolDelete = true;
 			if i > 30 then
-				if tEtiquette:GetCellInt('ECSL_points', i) > 0 then
+				if tEtiquette:GetCellInt('ECSL_points', i) > 0 or tEtiquette:GetCellInt('WCSL_points', i) > 0 or tEtiquette:GetCellInt('ECSL_overall_points', i) > 0 then
 					bolDelete = false;
 				end
 				if tEtiquette:GetCell('Winner_CC', i):len() > 0 then
@@ -2707,7 +2709,7 @@ function main(params_c)
 	draw.height = display:GetSize().height - 30;
 	draw.x = 0;
 	draw.y = 0;
-	draw.version = "2.41";
+	draw.version = "2.51";
 	draw.orderbyCE = 'Rang_tirage, Groupe_tirage, ECSL_points DESC, WCSL_points DESC, ECSL_overall_points DESC, Winner_CC DESC, FIS_pts, Nom, Prenom';
 	draw.orderbyFIS = 'Rang_tirage, Groupe_tirage, FIS_pts, Nom, Prenom';
 	draw.hostname = 'live.fisski.com';
@@ -2755,11 +2757,12 @@ function main(params_c)
 	draw.code_entite = tEvenement:GetCell("Code_entite",0);
 	draw.code_activite = tEvenement:GetCell("Code_activite",0);
 	draw.code_niveau = tEpreuve:GetCell('Code_niveau', 0);
+	draw.code_regroupement = tEpreuve:GetCell('Code_regroupement', 0);
 	draw.sexe = tEpreuve:GetCell('Sexe', 0);
-	if draw.code_niveau ~= 'EC' then
-		draw.bolEstCE = false;
-	else
+	if draw.code_niveau == 'EC' or draw.code_regroupement == 'CE' then
 		draw.bolEstCE = true;
+	else
+		draw.bolEstCE = false;
 	end
 	draw.code_saison = tEvenement:GetCell("Code_saison", 0);
 	draw.discipline = tEpreuve:GetCell('Code_discipline', 0);
@@ -2807,6 +2810,8 @@ function main(params_c)
 		draw.sequence_ack = tonumber(nodelivedraw:GetAttribute('ack', 0)) or 0;
 		draw.sequence_last_send = draw.sequence_send;
 	end
+	draw.sequence_ack = draw.sequence_ack or 0;
+	draw.sequence_send = draw.sequence_send or 0;
 	draw.targetName = draw.hostname..':'..draw.port;
 	draw.web = 'live.fis-ski.com/lv-'..string.lower(string.sub(draw.code_activite,1,2))..draw.codex..'.htm';
 	draw.state = false;
