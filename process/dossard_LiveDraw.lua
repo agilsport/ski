@@ -64,6 +64,51 @@ function OnClose()
 	end
 end
 
+function ReadECSL()
+	local filename = '';
+	local idxcolPts = nil;
+	local fileDialog = wnd.CreateFileDialog(dlgScriptLua,
+		"Recherche du fichier ECSL ",
+		app.GetPath(), 
+		"",
+		"*.csv|*.csv",
+		fileDialogStyle.OPEN+fileDialogStyle.FD_FILE_MUST_EXIST
+	);
+	if fileDialog:ShowModal() == idButton.OK then
+		filename = string.gsub(fileDialog:GetPath(), app.GetPathSeparator(), "/");
+	end
+	if filename:len() > 0 then
+		-- local f = assert(io.open(filename, "r"))
+		lines = {};
+		for line in io.lines(filename) do 
+			lines[#lines + 1] = line
+		end
+		local cols = lines[1]:Split(',');
+		for i = 1, #cols do
+			if cols[i] == draw.discipline..'points' then
+				idxcolPts = i;
+				break;
+			end
+		end
+		if idxcolPts then
+			for i = 2, #lines do
+				local cols = lines[i]:Split(',');
+				local fiscode = 'FIS'..cols[1];
+				local pts = tonumber(cols[idxcolPts]) or 0;
+				local clt = tonumber(cols[idxcolPts+1]) or 0;
+				if pts > 0 then
+					local r = tDraw:GetIndexRow('Code_coureur', fiscode);
+					if r and r >= 0 then
+						tDraw:SetCell('ECSL_points', r, pts);
+						tDraw:SetCell('ECSL_rank', r, clt);
+					end
+				end
+			end
+			RefreshGrid();
+		end
+	end
+end
+
 -- fonctions des événements concernant les séquences
 function IncrementationSequenceSend()
 	assert(draw.sequence_send ~= nil);
@@ -2116,6 +2161,8 @@ function OnAfficheTableau()
 	menuOutils:AppendSeparator();
 	btnDecalerGroupeHaut = menuOutils:Append({label="Décaler les groupes de tirage vers le haut", image ="./res/32x32_up.png"});
 	menuOutils:AppendSeparator();
+	btnGetECSL = menuOutils:Append({label="Charger un fichier csv ECSL", image ="./res/32x32_startlist.png"});
+	menuOutils:AppendSeparator();
 	btnAideCE = menuOutils:Append({label="Aide / ranking en CE", image ="./res/32x32_ranking.png"});
 	menuOutils:AppendSeparator();
 	tbTableau:SetDropdownMenu(btnOutils:GetId(), menuOutils);
@@ -2636,6 +2683,10 @@ function OnAfficheTableau()
 				OnDecaler(row, false, true);
 			end
 		end, btnDecalerGroupeHaut);
+	dlgTableau:Bind(eventType.MENU, 
+		function(evt)
+			ReadECSL();
+		end, btnGetECSL);
 
 	dlgTableau:Bind(eventType.GRID_FILTER_CHANGED, 
 		function(evt)
@@ -2709,7 +2760,7 @@ function main(params_c)
 	draw.height = display:GetSize().height - 30;
 	draw.x = 0;
 	draw.y = 0;
-	draw.version = "2.51";
+	draw.version = "2.6";
 	draw.orderbyCE = 'Rang_tirage, Groupe_tirage, ECSL_points DESC, WCSL_points DESC, ECSL_overall_points DESC, Winner_CC DESC, FIS_pts, Nom, Prenom';
 	draw.orderbyFIS = 'Rang_tirage, Groupe_tirage, FIS_pts, Nom, Prenom';
 	draw.hostname = 'live.fisski.com';
