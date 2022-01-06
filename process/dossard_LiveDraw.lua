@@ -67,6 +67,7 @@ end
 function ReadECSL()
 	local filename = '';
 	local idxcolPts = nil;
+	local idxcolClt = nil;
 	local fileDialog = wnd.CreateFileDialog(dlgScriptLua,
 		"Recherche du fichier ECSL ",
 		app.GetPath(), 
@@ -87,18 +88,24 @@ function ReadECSL()
 		for i = 1, #cols do
 			if cols[i] == draw.discipline..'points' then
 				idxcolPts = i;
-				break;
+			end
+			if cols[i] == draw.discipline..'pos' then
+				idxcolClt = i;
 			end
 		end
-		if idxcolPts then
+		if idxcolPts and idxcolClt then
+			for i = 0, tDraw:GetNbRows() -1 do
+				tDraw:SetCellNull('ECSL_points', i);
+				tDraw:SetCellNull('ECSL_rank', i);					
+			end
 			for i = 2, #lines do
 				local cols = lines[i]:Split(',');
 				local fiscode = 'FIS'..cols[1];
 				local pts = tonumber(cols[idxcolPts]) or 0;
-				local clt = tonumber(cols[idxcolPts+1]) or 0;
-				if pts > 0 then
-					local r = tDraw:GetIndexRow('Code_coureur', fiscode);
-					if r and r >= 0 then
+				local clt = tonumber(cols[idxcolClt]) or 0;
+				local r = tDraw:GetIndexRow('Code_coureur', fiscode);
+				if r and r >= 0 then
+					if pts > 0 then
 						tDraw:SetCell('ECSL_points', r, pts);
 						tDraw:SetCell('ECSL_rank', r, clt);
 					end
@@ -2760,7 +2767,7 @@ function main(params_c)
 	draw.height = display:GetSize().height - 30;
 	draw.x = 0;
 	draw.y = 0;
-	draw.version = "2.6";
+	draw.version = "2.61";
 	draw.orderbyCE = 'Rang_tirage, Groupe_tirage, ECSL_points DESC, WCSL_points DESC, ECSL_overall_points DESC, Winner_CC DESC, FIS_pts, Nom, Prenom';
 	draw.orderbyFIS = 'Rang_tirage, Groupe_tirage, FIS_pts, Nom, Prenom';
 	draw.hostname = 'live.fisski.com';
