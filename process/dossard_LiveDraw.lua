@@ -708,27 +708,23 @@ function CommandValiderCoureurs(statut)
 end
 
 function ChecktDraw()
-	tDraw:OrderBy('Rang_tirage');
+	tDraw:OrderBy('Dossard');
 	draw.bolExisteDossard = false;
-	draw.tRang_tirageauto = {};
+	draw.tRang_tirageauto = draw.tRang_tirageauto or {};
 	draw.statut = 'CF';
 	draw.tDossardsAvailable = {};
-	if draw.bolVitesse == true then
-		for i = 1, 30 do
-			table.insert(draw.tDossardsAvailable, i);
+	for i = 0, tDraw:GetNbRows() -1 do
+		local dossard = tDraw:GetCellInt('Dossard', i);
+		if dossard == 0 then
+			table.insert(draw.tDossardsAvailable, i+1);
 		end
 	end
+	tDraw:OrderBy('Rang_tirage');
+	local groupe_30 = tDraw:GetCellInt('Groupe_tirage', 29);
 	for i = 0, tDraw:GetNbRows() -1 do
 		local dossard = tDraw:GetCellInt('Dossard', i);
 		if dossard > 0 then
 			draw.bolExisteDossard = true;
-		end
-		if draw.bolVitesse then
-			if i < 30 then
-				if dossard > 0 then
-					draw.tDossardsAvailable[dossard] = draw.tDossardsAvailable[dossard] + 100;
-				end
-			end
 		end
 		local pts, rank, pts_VIT, rank_VIT = GetRank(tDraw:GetCell('Code_coureur', i));
 		if pts and pts >= 0 then
@@ -750,13 +746,6 @@ function ChecktDraw()
 						table.insert(draw.tRang_tirageauto, rang_tirage);
 					end
 				end
-			end
-		end
-	end
-	if draw.bolVitesse then
-		for i = #draw.tDossardsAvailable, 1, -1 do
-			if draw.tDossardsAvailable[i] > 100 then
-				table.remove(draw.tDossardsAvailable, i);
 			end
 		end
 	end
@@ -2475,56 +2464,78 @@ function OnAfficheTableau()
 				end
 			else
 				-- les coureurs ont un rang de tirage > 15
-				tDraw:OrderBy('Rang_tirage')
-				for i = 0, tDraw:GetNbRows() -1 do
-					if tDraw:GetCellDouble('FIS_pts', i) == 0 then
-						break;
+				local groupe_tirage_30 = tDraw:GetCellInt('Groupe_tirage', 29);
+				if draw.bolVitesse then		-- on tire au sort le groupe groupe_tirage_30
+					tDrawG6 = tDraw:Copy();
+					ReplaceTableEnvironnement(tDrawG6, 'DrawG6');
+					local filter = "$(Groupe_tirage):In("..groupe_tirage_30..")";
+					tDrawG6:Filter(filter, true);
+					for row = tDrawG6:GetNbRows() -1, 0, -1 do
+						local dossard = tDrawG6:GetCellInt('Dossard', row);
+						if dossard > 0 then
+							tDrawG6:RemoveRowAt(row);
+						end
 					end
-					if tDraw:GetCellInt('Rang_tirage', i) > 15 then
-						local dossard = tDraw:GetCellInt('Dossard', i);
+					if tDrawG6:GetNbRows() > 0 then
+						tDrawG6:OrderRandom('Groupe_tirage');
+						tDrawG6:OrderRandom('Groupe_tirage');
+						local bib = draw.tDossardsAvailable[1];
+						local tShuffle = {};
+						for i = 0, tDrawG6:GetNbRows() -1 do
+							table.insert(tShuffle, bib);
+							bib = bib + 1;
+						end
+						tShuffle = Shuffle(tShuffle, true);
+						for i = 0, tDrawG6:GetNbRows() -1 do
+							local valeur_shuffle = tShuffle[i+1];
+							local dossard = valeur_shuffle ;
+							local code_coureur = tDrawG6:GetCell('Code_coureur', i)
+							local r = tDraw:GetIndexRow('Code_coureur', code_coureur);
+							tDraw:SetCell('Dossard', r, dossard);
+							table.remove(draw.tDossardsAvailable, 1);
+							local cmd = "Update Resultat Set Dossard = "..dossard..", Critere = '"..string.format('%03d', tDrawG6:GetCellInt('Rang_tirage', i)).."' Where Code_evenement = "..draw.code_evenement.." And Code_coureur = '"..code_coureur.."'";
+							base:Query(cmd);
+						end
+					end
+				end
+				tDraw:OrderBy('Rang_tirage');
+				for i = 0, tDraw:GetNbRows() -1 do
+					if tDraw:GetCellDouble('FIS_pts', i) == 0  then
+						if tDraw:GetCellInt('ECSL_points', i) == 0 and tDraw:GetCellInt('WCSL_points', i) == 0 and tDraw:GetCellInt('ECSL_overall_points', i) == 0 and tDraw:GetCell('Winner_CC', i):len() == 0 then
+							break;
+						end
+					end
+					if tDraw:GetCellInt('Dossard', i) == 0 then
 						local rang_tirage = tDraw:GetCellInt('Rang_tirage', i);
 						local groupe_tirage = tDraw:GetCellInt('Groupe_tirage', i);
-						if draw.bolVitesse then
-							if dossard == 0 and i < 30 then
-								if #draw.tDossardsAvailable > 0 then
-									dossard = draw.tDossardsAvailable[1];
-									table.remove(draw.tDossardsAvailable, 1);
-									tDraw:SetCell('Dossard', i, dossard);
-									local cmd = "Update Resultat Set Dossard = "..dossard..", Critere = '"..string.format('%03d', tDraw:GetCellInt('Rang_tirage', i)).."' Where Code_evenement = "..draw.code_evenement.." And Code_coureur = '"..tDraw:GetCell('Code_coureur', i).."'";
-									base:Query(cmd);
+						if not draw.tRows_nepastirer[rang_tirage] then
+							local dossard = rang_tirage;
+							tDraw:SetCell('Dossard', i, dossard);
+							local cmd = "Update Resultat Set Dossard = "..dossard..", Critere = '"..string.format('%03d', tDraw:GetCellInt('Rang_tirage', i)).."' Where Code_evenement = "..draw.code_evenement.." And Code_coureur = '"..tDraw:GetCell('Code_coureur', i).."'";
+							base:Query(cmd);
+						else
+							tDrawG6 = tDraw:Copy();
+							ReplaceTableEnvironnement(tDrawG6, 'DrawG6');
+							for i = tDrawG6:GetNbRows() -1, 0, -1 do
+								if tDrawG6:GetCellInt('Rang_tirage', i, -1) ~= rang_tirage then
+									tDrawG6:RemoveRowAt(i);
 								end
 							end
-						end
-						if dossard == 0 then
-							if not draw.tRows_nepastirer[rang_tirage] then
-								local dossard = rang_tirage;
-								tDraw:SetCell('Dossard', i, dossard);
-								local cmd = "Update Resultat Set Dossard = "..dossard..", Critere = '"..string.format('%03d', tDraw:GetCellInt('Rang_tirage', i)).."' Where Code_evenement = "..draw.code_evenement.." And Code_coureur = '"..tDraw:GetCell('Code_coureur', i).."'";
-								base:Query(cmd);
-							else
-								tDrawG6 = tDraw:Copy();
-								ReplaceTableEnvironnement(tDrawG6, 'DrawG6');
-								for i = tDrawG6:GetNbRows() -1, 0, -1 do
-									if tDrawG6:GetCellInt('Rang_tirage', i, -1) ~= rang_tirage then
-										tDrawG6:RemoveRowAt(i);
-									end
-								end
-								tDrawG6:OrderRandom('FIS_pts');
-								local tShuffle = {};
-								for i = 0, tDrawG6:GetNbRows() -1 do
-									-- table.insert(tShuffle, i+1);
-									table.insert(tShuffle, rang_tirage + i);
-								end
-								tShuffle = Shuffle(tShuffle, true);
-								for i = 0, tDrawG6:GetNbRows() -1 do
-									local valeur_shuffle = tShuffle[i+1];
-									local dossard = valeur_shuffle ;
-									local code_coureur = tDrawG6:GetCell('Code_coureur', i)
-									local r = tDraw:GetIndexRow('Code_coureur', code_coureur);
-									if r >= 0 then
-										if draw.tirage_auto then
-											tDraw:SetCell('Dossard', r, dossard);
-										end
+							tDrawG6:OrderRandom('FIS_pts');
+							local tShuffle = {};
+							for i = 0, tDrawG6:GetNbRows() -1 do
+								-- table.insert(tShuffle, i+1);
+								table.insert(tShuffle, rang_tirage + i);
+							end
+							tShuffle = Shuffle(tShuffle, true);
+							for i = 0, tDrawG6:GetNbRows() -1 do
+								local valeur_shuffle = tShuffle[i+1];
+								local dossard = valeur_shuffle ;
+								local code_coureur = tDrawG6:GetCell('Code_coureur', i)
+								local r = tDraw:GetIndexRow('Code_coureur', code_coureur);
+								if r >= 0 then
+									if draw.tirage_auto then
+										tDraw:SetCell('Dossard', r, dossard);
 									end
 								end
 							end
@@ -2767,7 +2778,7 @@ function main(params_c)
 	draw.height = display:GetSize().height - 30;
 	draw.x = 0;
 	draw.y = 0;
-	draw.version = "2.61";
+	draw.version = "2.7";
 	draw.orderbyCE = 'Rang_tirage, Groupe_tirage, ECSL_points DESC, WCSL_points DESC, ECSL_overall_points DESC, Winner_CC DESC, FIS_pts, Nom, Prenom';
 	draw.orderbyFIS = 'Rang_tirage, Groupe_tirage, FIS_pts, Nom, Prenom';
 	draw.hostname = 'live.fisski.com';
