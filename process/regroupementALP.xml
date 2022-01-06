@@ -2,7 +2,7 @@
 <!-- Regroupement de coureurs -->
 <!-- <background mode="gradient_line_vert" color_start="white" color_end="ltgray" /> -->
 <root title="Regroupement de coureurs">
-  <config titre="Regroupement de coureurs" comboColEquipe="4" comboPrendre="0" comboPtsTps="1" comboAbdDsq="1" coefManche="100" nb_filles="1" nb_garcons="1" comboGarderEquipe="0" comboEquipeBis="0"/>
+  <config coursef1_filtre="$(Sexe):In('F') and $(Categ):In('U14')" coursef2_filtre="$(Sexe):In('F') and $(Categ):In('U16')" courseg1_filtre="$(Sexe):In('M') and $(Categ):In('U14')" courseg2_filtre="$(Sexe):In('M') and $(Categ):In('U16')" coursef1="478" courseg1="478" coursef2="478" courseg2="478" titre="Regroupement de coureurs" comboColEquipe="4" comboPrendre="0" comboPtsTps="1" comboAbdDsq="1" coefManche="100" nb_filles="1" nb_garcons="1" comboGarderEquipe="0" comboEquipeBis="0"/>
   <panel name="config">
     <lua>dofile('./interface/adv.lua');
 		dofile('./edition/functionPG.lua');
@@ -40,7 +40,7 @@
       <row value="20px"/>
       <matrix row="auto" col_start="2" col_end="3">
         <col value="1,1,1,1,30px"/>
-        <statictext row="auto" col_start="1" style="ALIGN_RIGHT" label="Colonne cloisie pour l\'équipe"/>
+        <statictext row="auto" col_start="1" style="ALIGN_RIGHT" label="Colonne choisie pour l\'équipe"/>
         <combobox col_start="2" name="comboColEquipe" style="CB_READONLY"/>
         <statictext col_start="3" style="ALIGN_RIGHT" label="Nombre de filles à prendre "/>
         <textctrl col_start="4" name="nb_filles"/>
@@ -48,7 +48,7 @@
         <combobox col_start="2" name="comboPtsTps" style="CB_READONLY"/>
         <statictext col_start="3" style="ALIGN_RIGHT" label="Nombre de garçons à prendre "/>
         <textctrl col_start="4" name="nb_garcons"/>
-        <statictext row="auto" col_start="1" style="ALIGN_RIGHT" label="Les Abd Dsq prènent le temps du dernier "/>
+        <statictext row="auto" col_start="1" style="ALIGN_RIGHT" label="Les Abd Dsq prennent le temps du dernier "/>
         <combobox col_start="2" name="comboAbdDsq" style="CB_READONLY"/>
         <statictext col_start="3" style="ALIGN_RIGHT" label="Conserver les équipes incomplètes "/>
         <combobox col_start="4" name="comboGarderEquipe" style="CB_READONLY"/>
