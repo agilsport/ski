@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- Menu Editions Activité "FOND " suplementaire !-->
-<!-- version="6.1" !-->
+<!-- version="6.5" !-->
 <!-- si possible de faire fonctionne des cond dans les menu -->
+<!-- si possible de fermer des Item par default -->
 <edition>
 	<menu>
 		<menu title="Edition Relais" image="./res/32x32_ranking.png" bold="false" cond ="($(Epreuve.Code_discipline)='RELAIS')">
@@ -16,7 +17,12 @@
 		<menu title="Analyse des Performances" image="./res/32x32_options.png">
 			<menu title="Analyse des différences entre chaque temps inter" image="./res/16x16_ranking.png" id="res_DiffInter" header="1" first_header="0" choix_manche="1"/>
 			<menu title="Résultats Skiathlon" image="./res/16x16_ranking.png" id="res_Skiathlon" header="1" first_header="0" choix_manche="1"/>
-			<menu title="Résultats Avec inter Multi passage" image="./res/16x16_ranking.png" id="res_inter_Multi_passage" header="1" first_header="0" choix_manche="1"/>
+		</menu>
+		
+		<menu title="Gestion des Points de Passage et LAP" image="./res/32x32_options.png">
+			<menu title="Configuration des points de passages" image="./res/16x16_text.png" lua="./edition/Config_Passage.lua"  />
+			<menu title="Résultats Avec inter Multi Lap avec Tps et Clt cumulés" image="./res/16x16_ranking.png" id="res_inter_Multi_Lap" Cumul="1" mode_lap="1" header="1" first_header="0" passage="1" choix_manche="1"/>
+			<menu title="Résultats Avec inter Multi Lap avec Tps et Clt au tour" image="./res/16x16_ranking.png" id="res_inter_Multi_Lap" Cumul="0" mode_lap="1" header="1" first_header="0" passage="1" choix_manche="1"/>
 		</menu>
 		
 		<menu title="Outils" image="./res/32x32_options.png">
@@ -1135,6 +1141,122 @@
 			<text col="6" align="right" label="(traduction('Points'))" cond="entite == 'FFS'">$(Point)</text>
 			<text col="6" align="right" label="Pts FIS" cond="entite == 'FFS'">$(Pts_best)</text>
 			<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
+		</body>
+	</report>
+	
+	<!-- Résultats Multi-Passage -->
+	<report id="res_inter_Multi_Lap" title="Résultats Inter Multi-Passages" first_header="0">
+		<column name="Tps_status">chrono.Status(body:GetCellInt('Tps', row))</column>
+		<!-- création des colonne dans le body -->
+		<!-- app.GetAuiMessage():AddLine(ColTpsInterX); -->
+		<column name="Diff_Inter_Lap" type="chrono" />
+		<column name="Rank_Diff_Inter_Lap" type="ranking" />
+		<column name="Diff_Tps_Inter" type="chrono" />
+		<column name="Rank_Diff_Tps_Inter" type="ranking" />
+		<lua>
+			code_epreuve = $(Epreuve.Code_epreuve) or 1
+			code_manche = manche or 1
+			tPassage = base:GetTable('Epreuve_Passage')
+			cmd = "Select * from Epreuve_Passage Where Code_evenement = "..$(Evenement.Code)..
+				" And Code_epreuve = "..code_epreuve..
+				" And Code_manche = "..code_manche
+			base:TableLoad(tPassage, cmd)
+			if tPassage:GetNbRows()~= nil then
+				if tPassage:GetNbRows() == 1 then 
+					code_passage = tPassage:GetCellInt('Code_Passage', 0)
+					nb_lap = tonumber(tPassage:GetCellInt('Nb_Lap', 0))
+				end
+			else
+				code_passage = 1
+				nb_lap = 10
+			end
+			if tonumber(params.Cumul) == 1 then
+				cumul = "_cumul"
+				Label_lap = 'Lap'
+			else
+				cumul = ""
+				Label_lap = 'Tour'
+				ColTpsX = 'Tps'..code_manche
+				ColTpsInterX = 'Tps'..code_manche..'_inter'..code_passage
+				ColdiffTpsinterx = 'Diff_Inter_Lap'
+				ColRankTpsinterx = 'Rank_Diff_Inter_Lap'
+				ColrefOrderX = 'Diff_Inter_Lap, Dossard Desc'
+				ColTpsInterXLapY =  'Tps_cumul'..code_manche..'_inter'..code_passage..'_lap'..nb_lap-1
+				body:ComputeSubtractTime(ColdiffTpsinterx, ColTpsX, ColTpsInterX)
+				body:SetRanking(ColRankTpsinterx, ColrefOrderX)
+				if nb_lap == 1 then
+					ColLapInterY = 'Tps'..code_manche..'_inter'..code_passage
+					Rank_LapInterY = 'Clt'..code_manche..'_inter'..code_passage 
+				else
+					ColLapInterY = 'Diff_Tps_Inter'
+					Rank_LapInterY = 'Rank_Diff_Tps_Inter'
+					ColrefOrderY = 'Diff_Tps_Inter, Dossard Desc'
+					body:ComputeSubtractTime(ColLapInterY, ColTpsInterX, ColTpsInterXLapY)
+					body:SetRanking(Rank_LapInterY, ColrefOrderY)
+				end
+			end
+		</lua>
+		<order key="Tps, Dossard" />
+		<rupture key="Tps_status">
+			<before cond="$(Tps_status) ~= 'ok'">
+				<font size="14"/>
+				<lua>local status = $(Tps_status)</lua>
+				<row h="0.5cm"/>
+				<text row="auto" col="1" >ranking.Code(status)..' - '..ranking.Label(status)..' ('..body:GetCounterValue('Tps_status', status)..')'</text>
+				<row h="0.2cm"/>
+			</before>
+		</rupture>
+		<body>
+			<call option="couleur_alternee" file="./edition/options.xml" />
+			<font size="9" adjust="ellipsize"/>
+	
+			<row value="auto"/>
+			<text col="4" align="right" label="Dos.">$(Dossard)</text>
+			<text col="12" align="left" label="Nom - Prénom" font_weight="bold" font_size_step="1">$(Identite)</text> 
+			<text col="4" align="center" label="Cat.">$(Categ)</text>
+			
+			<lua>
+				if nb_lap > 0 then
+					for l=1,nb_lap-1 do
+			</lua>
+					<text col="8" cond="group=='label'" label="('Inter'..code_passage..' '..Label_lap..'. '..l)"/>
+					<matrix col="8" cond="group=='body'" fit_inside="0" >
+						<row h="1"/>
+						<font size_step="-1" />
+						<!-- <text col="7" align="right">body:GetCell('Tps'..manche..'_inter'..manche..'_lap'..l,row)</text> -->
+						<text col="7" align="right">body:GetCell('Tps'..cumul..''..code_manche..'_inter'..code_passage..'_lap'..l, row, '[P10]%-1h%-1m%2s.%2f')</text>
+						<text col="7" align="right">body:GetCell('Clt'..cumul..''..code_manche..'_inter'..code_passage..'_lap'..l, row)</text>
+					</matrix> 
+				<lua>end</lua>
+					<text col="8" cond="group=='label'" label="('Inter'..code_passage..' '..Label_lap..'. '..nb_lap)"/>
+					<matrix col="8" cond="group=='body'" fit_inside="0" >
+						<row h="1"/>
+						<font size_step="-1" />
+						<lua>if tonumber(params.Cumul) == 1 then</lua>
+							<text col="7" align="right">body:GetCell('Tps'..manche..'_inter'..code_passage, row, '[P10]%-1h%-1m%2s.%2f')</text>
+							<text col="4" align="right">body:GetCell('Clt'..manche..'_inter'..code_passage, row)</text>
+						<lua>else</lua>
+							<text col="7" align="right">body:GetCell(ColLapInterY, row, '[P10]%-1h%-1m%2s.%2f')</text>
+							<text col="4" align="right">body:GetCell(Rank_LapInterY, row)</text>
+						<lua>end</lua>					
+					</matrix>
+				<lua>if tonumber(params.Cumul) == 0 then</lua>
+						<text col="8" cond="group=='label'" label="('Inter'..code_passage..' '..Label_lap..'. '..nb_lap+1)"/>
+						<matrix col="8" cond="group=='body'" fit_inside="0" >
+							<text col="7" align="right">body:GetCell(ColdiffTpsinterx, row, '[P10]%-1h%-1m%2s.%2f')</text>
+							<text col="4" align="right">body:GetCell(ColRankTpsinterx, row)</text>
+							<!-- <text col="4" align="right">body:GetCell(ColTpsX, row)</text> -->
+						</matrix> 
+				<lua>end</lua>
+			<lua>end</lua>
+
+			<text col="10" cond="group=='label'" label="Tps Total"/>
+			<matrix col="10" cond="group=='body'" fit_inside="0" >
+				<row h="1"/>
+				<font size_step="1" weight="bold" />
+				<text col="7" align="right">$(Tps)..$(Clt):Parenthesis()</text>
+				<text col="5" align="right">$(Diff)</text>
+			</matrix>
 		</body>
 	</report>
 </edition>

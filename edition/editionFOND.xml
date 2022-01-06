@@ -174,7 +174,7 @@
 		<text col_start="2" align="left">'Liste : '..$(Evenement.Code_liste)</text>
 		<text col_start="5" col_end="6" align="left" >'Codex Epreuve : '..$(Epreuve.Fichier_transfert) </text>
 		<text col_start="8" col_end="9" align="left" >'Coéficient F : '..$(Discipline.Facteur_f)</text>
-		<text col_start="10" align="left" cond="params.title=='Résultats Officiels'" >'Penalité : '..$(Epreuve.Penalite_appliquee)</text>
+		<text col_start="10" align="left" cond="params.title=='Officiels'" >'Penalité : '..$(Epreuve.Penalite_appliquee)</text>
 
 		<!-- affichage de la ligne d'heure de départ en massstart ou fond pop -->
 		<lua>if type_edition == 'lst_' and discipline:In('MASS','POURS-D', 'FP') and $(Epreuve.Heure_depart):len() &gt; 0 then</lua>
@@ -685,11 +685,11 @@
 			<lua>end</lua>
 			<text col="8" align="right" label="Tps.Tot" font_weight="bold" font_size_step="1">$(Tps)</text> 
 			<text col="8" align="right" label="Ecart." font_weight="bold" font_size_step="1">$(Diff)</text> 
-			<text col="6" align="right" label="Note" cond="params.title=='Résultats Officiels'">$(Note)</text> 
+			<text col="6" align="right" label="Note" cond="params.title=='Officiels'">$(Note)</text> 
 			<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
 		</body>
 		
-		<end cond="params.title=='Résultats Officiels'">
+		<end cond="params.title=='Officiels'">
 			<lua>sqlBase.FixationTableRanking(body)</lua>
 			<call option="signature_dt" file="./edition/options.xml" />
 		</end>
@@ -745,7 +745,7 @@
 			<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
 		</body>
 		
-		<!-- <end cond="params.title=='Résultats Officiels'"> -->
+		<!-- <end cond="params.title=='Officiels'"> -->
 			<!-- <lua>sqlBase.FixationTableRanking(body)</lua> -->
 			<!-- <call option="signature_dt" file="./edition/options.xml" /> -->
 		<!-- </end> -->
