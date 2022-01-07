@@ -1,11 +1,11 @@
 -- AGIL PDA : Interface Vidage du PDA vers le logiciel de Course 
-dofile('./interface/adv.lua');
+dofile('./interface/include.lua');
 dofile('./interface/device.lua');
 
 -- Information : Numéro de Version, Nom, Interface
 function device.GetInformation()
 	return { 
-		version = 1.6, 
+		version = 1.7, 
 		code = 'agil_pda', 
 		name = 'Agil PDA-Chrono', 
 		class = 'chrono', 
@@ -57,41 +57,41 @@ function IsPacketOk(packet)
 	if #arrayPacket == 1 then
 		return true;
 	elseif #arrayPacket == 3 then
-		local bib = tonumber(arrayPacket[2]) or 0;
-		local chrono = tonumber(arrayPacket[3]) or 0;
+		local bib = arrayPacket[2] or '';
+		local millisec = tonumber(arrayPacket[3]) or 0;
 		
 		if arrayPacket[1] == 'TN' then
-			AddTimeNet(chrono, -1, bib);
+			AddTimeNet(millisec, -1, bib);
 			return true;
 		elseif arrayPacket[1] == '0' then
-			AddTimePassage(chrono, 0, bib);
+			AddTimePassage(millisec, 0, bib);
 			return true;
 		elseif  arrayPacket[1] == '-1' then
-			AddTimePassage(chrono, -1, bib);
+			AddTimePassage(millisec, -1, bib);
 			return true;
 		end
 	end
 	return false;
 end
 
-function AddTimePassage(chrono, passage, bib)
+function AddTimePassage(millisec, passage, bib)
 	app.SendNotify("<passage_add>", 
-		{ time = chrono,  passage = passage, bib = bib, device = 'agil_pda' }
+		{ time = millisec,  passage = passage, bib = bib, device = 'agil_pda' }
 	);
 end
 
-function AddTimeNet(chrono, passage, bib)
-	if chrono == 4294966696 then
+function AddTimeNet(millisec, passage, bib)
+	if millisec == 4294966696 then
 		-- DNS, ABS
-		chrono = -600;
-		AddTimePassage(-600, 0, bib);
-	elseif chrono == 4294966796 then
+		millisec = chrono.DNS;
+		AddTimePassage(chrono.DNS, 0, bib);
+	elseif millisec == 4294966796 then
 		-- DNF, ABD
-		chrono = -500;
-		AddTimePassage(-500, -1, bib);
+		millisec = chrono.DNF;
+		AddTimePassage(chrono.DNF, -1, bib);
 	end
 
 	app.SendNotify("<net_time_add>", 
-		{ time = chrono,  passage = passage, bib = bib, device = 'agil_pda' }
+		{ time = millisec,  passage = passage, bib = bib, device = 'agil_pda' }
 	);
 end

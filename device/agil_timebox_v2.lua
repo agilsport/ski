@@ -27,15 +27,15 @@ end
 
 function device.OnSerialPulse(evt)
 	local passage = evt:GetInt();
-	if (passage & 1) ~= 0 then AddTimePassage(evt:GetExtraLong(), 0) end -- Depart
+	if (passage & 8) ~= 0 then AddTimePassage(evt:GetExtraLong(), 0) end -- Depart
 	if (passage & 2) ~= 0 then AddTimePassage(evt:GetExtraLong(), 1) end -- Inter 1
 	if (passage & 4) ~= 0 then AddTimePassage(evt:GetExtraLong(), 2) end -- Inter 2
-	if (passage & 8) ~= 0 then AddTimePassage(evt:GetExtraLong(), -1) end -- Arrivée
+	if (passage & 1) ~= 0 then AddTimePassage(evt:GetExtraLong(), -1) end -- Arrivée
 end
 
 function AddTimePassage(chrono, passage)
 	app.SendNotify("<passage_add>", 
-		{ time = chrono,  passage = passage, device = 'agil_timebox' }
+		{ time = chrono,  passage = passage, device = 'agil_timebox_v2' }
 	);
 end
 

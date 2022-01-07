@@ -3,6 +3,16 @@ dofile('./interface/interface.lua');
 dofile('./interface/adv.lua');
 dofile('./interface/device.lua');
 
+-- Information : Numéro de Version, Nom, Interface
+function device.GetInformation()
+	return { 
+		version = "3.7",
+		name = 'AGIL IMHP Version 3', 
+		class = 'chrono', 
+		interface = { { type='serial', baudrate = '19200' }	} 
+	};
+end	
+
 -- Creation et initialisation table imhp
 imhp = {};
 
@@ -105,16 +115,6 @@ imhp.Send = function(packet)
 		mt_device.obj:WriteByte(asciiCode.CR);	-- Cariage Return : Caractère Fin de Trame
 	end
 end
-
--- Information : Numéro de Version, Nom, Interface
-function device.GetInformation()
-	return { 
-		version = "3.5",
-		name = 'AGIL IMHP Version 3', 
-		class = 'chrono', 
-		interface = { { type='serial', baudrate = '19200' }	} 
-	};
-end	
 
 -- Ouverture
 function device.OnInit(params, node)
@@ -379,6 +379,15 @@ function OnTimer(evt)
 		end
 	end
 	
+	-- ACK - BIB
+	if imhp.bibMode ~= nil and imhp.bibAck ~= nil then
+		if imhp.bibMode == 'N' or imhp.bibMode == 'C' then
+			if imhp.bibAck > 0 then
+				packet = packet..imhp.bibMode..string.format("%3d", imhp.bibAck);
+			end
+		end
+	end
+
 	-- Envoi MBUS
 	imhp.Send(packet);
 	
@@ -1186,7 +1195,8 @@ end
 
 -- <HEADER_ID.BATTERY><ID><PERCENT><TYPE_SYNCHRO>
 function ReadPacketBattery(packet)
-	if #packet < 5 then return end;
+	local lenPacket = #packet;
+	if lenPacket < 5 then return end;
 
 	local idChrono = string.char(packet[2]);
 	local percent = adv.PacketString(packet, 3, 4);
@@ -1201,6 +1211,35 @@ function ReadPacketBattery(packet)
 	
 	if imhp.valueRSSI ~= -1 then
 		infoRSSI = infoRSSI..'rssi='..imhp.valueRSSI;
+	end
+	
+	if lenPacket >= 9 and idChrono == '1' then
+		-- Dossard au départ ...
+		local bibAck = adv.PacketString(packet, 7, 9);
+		bibAck = tonumber(bibAck) or 0;
+		if bibAck > 0 then
+			local bibMode = string.char(packet[6]);
+			imhp.bibAck = imhp.bibAck or 0;
+			imhp.bibMode = imhp.bibMode or ' ';
+
+			if bibMode == 'N' then
+				-- NEXT BIB
+				if imhp.bibAck ~= bibAck or imhp.bibMode ~= bibMode then 
+					imhp.alert("Dossard Suivant="..bibAck);
+					app.SendNotify("<bib_next>", { bib = bibAck,  passage = 0, device = 'agil_imhp', src = 'imhp' });
+					imhp.bibAck = bibAck;
+					imhp.bibMode = bibMode;
+				end
+			elseif bibMode == 'C' then
+				-- CANCEL BIB
+				if imhp.bibAck ~= bibAck or imhp.bibMode ~= bibMode then 
+					imhp.alert("Dossard Annulé="..bibAck);
+					app.SendNotify("<bib_cancel>", { bib = bibAck,  passage = 0, device = 'agil_imhp', src = 'imhp' });
+					imhp.bibAck = bibAck;
+					imhp.bibMode = bibMode;
+				end
+			end
+		end
 	end
 
 	local tGrid = imhp.grid:GetTable();
@@ -1230,8 +1269,38 @@ function ReadPacketPulse(packet)
 	local mstime = base64.ToInteger(time64)
 	
 	local origin = '9';
-	if #packet >= 11 then
+	local lenPacket = #packet;
+	if lenPacket >= 11 then
 		origin = string.char(packet[11]);
+	end
+	
+	if lenPacket >= 15 and idChrono == '1' then
+		-- Dossard au départ ...
+		local bibAck = adv.PacketString(packet, 13, 15);
+		bibAck = tonumber(bibAck) or 0;
+		if bibAck > 0 then
+			local bibMode = string.char(packet[12]);
+			imhp.bibAck = imhp.bibAck or 0;
+			imhp.bibMode = imhp.bibMode or ' ';
+
+			if bibMode == 'N' then
+				-- NEXT BIB
+				if imhp.bibAck ~= bibAck or imhp.bibMode ~= bibMode then 
+					imhp.alert("Dossard Suivant="..bibAck);
+					app.SendNotify("<bib_next>", { bib = bibAck,  passage = 0, device = 'agil_imhp', src = 'imhp' });
+					imhp.bibAck = bibAck;
+					imhp.bibMode = bibMode;
+				end
+			elseif bibMode == 'C' then
+				-- CANCEL BIB
+				if imhp.bibAck ~= bibAck or imhp.bibMode ~= bibMode then 
+					imhp.alert("Dossard Annulé="..bibAck);
+					app.SendNotify("<bib_cancel>", { bib = bibAck,  passage = 0, device = 'agil_imhp', src = 'imhp' });
+					imhp.bibAck = bibAck;
+					imhp.bibMode = bibMode;
+				end
+			end
+		end
 	end
 	
 	local countChrono = #imhp.chrono;
