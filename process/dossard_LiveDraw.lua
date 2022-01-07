@@ -1384,6 +1384,8 @@ function OnCellChanged(evt)
 		if t:GetCell('Statut', row) ~= 'CF' then
 			t:SetCellNull('Dossard', row);
 			grid_tableau:RefreshCell(row, col);
+			local msg = "Le coureur n'est pas confirmé !!";
+			app.GetAuiFrame():MessageBox(msg, "ATTENTION !! ", msgBoxStyle.OK+msgBoxStyle.ICON_WARNING);
 		else
 			local ok = true;
 			draw.double_tirage_bibo = false;
@@ -2824,7 +2826,7 @@ function main(params_c)
 	draw.height = display:GetSize().height - 30;
 	draw.x = 0;
 	draw.y = 0;
-	draw.version = "2.8";
+	draw.version = "2.81";
 	draw.orderbyCE = 'Rang_tirage, Groupe_tirage, ECSL_points DESC, WCSL_points DESC, ECSL_overall_points DESC, Winner_CC DESC, FIS_pts, Nom, Prenom';
 	draw.orderbyFIS = 'Rang_tirage, Groupe_tirage, FIS_pts, Nom, Prenom';
 	draw.hostname = 'live.fisski.com';
