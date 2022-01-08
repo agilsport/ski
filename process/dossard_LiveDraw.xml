@@ -217,21 +217,20 @@
 			<text row_start="2" row_end="3" col_start="2" align="center" font_size_step="-6">$(Nation)</text>
 			<text row_start="2" col_start="3" >$(Nom)</text> 
 			<text row_start="2" col_start="3" align="right" font_size_step="-6">'('..$(Rang_tirage)..')'</text> 
-			<text row_start="3" col_start="3" >$(Prenom)</text> 
+			<text row_start="3" col_start="3" >$(Prenom)</text>
 			<text row_start="2" col_start="4" align="center" font_size_step="-6">$(Categ)..'/'..$(An)</text>
 			<text row_start="2" col_start="5" align="center" font_size_step="-6">$(Point)</text>
 			<lua>if params.EstCE == 1 then</lua>
-				<text row_start="3" col_start="3" col_end="4" align="right"  cond="body:GetCellInt('ECSL_30', row) == 1" font_size_step="-3">'ECSL pts/rank'</text>
-				<text row_start="3" col_start="3" col_end="4" align="right"  cond="body:GetCellInt('Rang_tirage', row) &gt; 30 and body:GetCellInt('ECSL_points', row) &gt; 0 and body:GetCell('Winner_CC', row):len() == 0" font_size_step="-3">'ECSL pts/rank'</text>
-				<text row_start="3" col_start="3" col_end="4" align="right"  cond="body:GetCellInt('ECSL_30', row) == 2 and body:GetCellInt('ECSL_overall_points', row) &gt; 0" font_size_step="-3">'ECSL Overall Pts'</text>
-				<text row_start="3" col_start="3" col_end="4" align="right"  cond="body:GetCellInt('Rang_tirage', row) &gt; 15 and body:GetCellInt('WCSL_points', row) &gt; 0" font_size_step="-3">'WCSL pts/rank'</text>
-				<text row_start="3" col_start="4" col_end="0" align="center" cond="body:GetCellInt('Rang_tirage', row) &gt; 30 and body:GetCell('Winner_CC', row):len() ~= 0" font_size_step="-3">'CC Winner'</text>
+				<text row_start="3" col_start="3" col_end="4" align="right"  cond="body:GetCellInt('ECSL_30', row) == 1 or body:GetCellInt('ECSL_points', row) &gt; 0 and (body:GetCellInt('WCSL_points', row) == 0 and body:GetCellInt('ECSL_overall_points', row) == 0 and body:GetCellInt('ECSL_overall_points', row) == 0 and body:GetCell('Winner_CC', row):len() == 0)" font_size_step="-3">'ECSL pts/rank'</text>
+				<!-- <text row_start="3" col_start="3" col_end="4" align="right"  cond="body:GetCellInt('Rang_tirage', row) &gt; 30 and body:GetCellInt('ECSL_points', row) &gt; 0 and body:GetCell('Winner_CC', row):len() == 0" font_size_step="-3">'ECSL pts/rank'</text> -->
+				<text row_start="3" col_start="3" col_end="4" align="right"  cond="body:GetCellInt('ECSL_30', row) ~= 1 and body:GetCellInt('ECSL_overall_points', row) &gt; 0" font_size_step="-3">'ECSL Overall Pts'</text>
+				<text row_start="3" col_start="3" col_end="4" align="right"  cond="body:GetCellInt('ECSL_30', row) ~= 1 and body:GetCellInt('WCSL_points', row) &gt; 0" font_size_step="-3">'WCSL pts/rank'</text>
+				<text row_start="3" col_start="4" col_end="0" align="center" cond="body:GetCellInt('ECSL_30', row) ~= 1 and body:GetCell('Winner_CC', row):len() ~= 0" font_size_step="-3">'CC Winner'</text>
 
 				<text row_start="3" col_start="5" align="center" cond="body:GetCellInt('ECSL_30', row) == 1" >$(ECSL_points)..' / '..$(ECSL_rank)</text>
 				<text row_start="3" col_start="5" align="center" cond="body:GetCellInt('Rang_tirage', row) &gt; 30 and body:GetCellInt('ECSL_points', row) &gt; 0 and body:GetCell('Winner_CC', row):len() == 0" >$(ECSL_points)..' / '..$(ECSL_rank)</text>
-				<text row_start="3" col_start="3" col_end="4" align="right"  cond="body:GetCellInt('Rang_tirage', row) &gt; 15 and body:GetCell('Winner_CC', row):len() == 0 and body:GetCellInt('ECSL_overall_points', row) == 0 and body:GetCellInt('WCSL_points', row) == 0 and body:GetCellInt('ECSL_30', row) == 1" font_size_step="-3">'ECSL pts/rank'</text>
-				<text row_start="3" col_start="5" align="center" cond="body:GetCellInt('Rang_tirage', row) &gt; 15 and body:GetCellInt('WCSL_points', row) &gt; 0" >$(WCSL_points)..' / '..$(WCSL_rank)</text>
-				<text row_start="3" col_start="5" align="center" cond="body:GetCellInt('ECSL_overall_points', row) &gt; 0 and body:GetCellInt('ECSL_30', row) == 2" font_size_step="-3">$(ECSL_overall_points)</text>
+				<text row_start="3" col_start="5" align="center" cond="body:GetCellInt('WCSL_points', row) &gt; 0" >$(WCSL_points)..' / '..$(WCSL_rank)</text>
+				<text row_start="3" col_start="5" align="center" cond="body:GetCellInt('ECSL_overall_points', row) &gt; 0" font_size_step="-3">$(ECSL_overall_points)..' / '..$(ECSL_overall_rank)</text>
 			<lua>end</lua>
 			<line row_start="4" col_start="1" col_end="0" pen_size="1" border="bottom" cond="row ~= params.RowSeparation and x &lt; 5 and not _context_border"/>
 			<line row_start="4" col_start="1" col_end="0" pen_size="20" border="bottom" cond="row == params.RowSeparation and x &lt; 5 and not _context_border"/>

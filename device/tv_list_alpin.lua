@@ -4,7 +4,7 @@ dofile('./interface/device.lua');
 
 -- Information : Numéro de Version, Nom, Interface
 function device.GetInformation()
-	return { version = 3.4, name = 'TV Liste Alpin', class = 'display', interface = {} };
+	return { version = 3.5, name = 'TV Liste Alpin', class = 'display', interface = {} };
 end	
 
 -- Configuration du Device
@@ -93,6 +93,7 @@ function device.OnInit(params)
 		end
 	end
 	device.dbTV:Load();
+	device.dbTV:Query("Replace Into Running (ID) Values (1)");
 	
 	-- Tableau de Bord
 	tbNavigation = wnd.CreateAuiToolBar({ style = auiToolBarStyle.HORIZONTAL });
