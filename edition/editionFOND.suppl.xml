@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- Menu Editions Activité "FOND " suplementaire !-->
-<!-- version="6.5" !-->
+<!-- version="6.7" !-->
 <!-- si possible de faire fonctionne des cond dans les menu -->
 <!-- si possible de fermer des Item par default -->
 <edition>
-	<menu>
+<menu>
 		<menu title="Edition Relais" image="./res/32x32_ranking.png" bold="false" cond ="($(Epreuve.Code_discipline)='RELAIS')">
 			<menu title="Liste Départ Relais (1-a)" image="./res/16x16_official.png" id="Lst_Relais" DossardRelais="Lettre"/>
 			<menu title="Liste Départ Relais (1/²)" image="./res/16x16_official.png" id="Lst_Relais" DossardRelais="Numeric"/>
@@ -27,7 +27,6 @@
 		
 		<menu title="Outils" image="./res/32x32_options.png">
 			<menu title="Edition des Séquences Chrono" image="./res/16x16_bib.png" id="chrono_seq" choix_manche="1" action="chrono_seq"/>
-			<menu title="Configuration des points de passages" image="./res/16x16_text.png" lua="./edition/Config_Passage.lua"  />
 		</menu>
 		
 		<menu title="Outils Clt Saison Samse" image="./res/32x32_options.png">
@@ -1095,7 +1094,7 @@
 			body:SetCounter('Nation');
 			body:SetCounter('Comite');
 		</lua>
-		<order key="Nation,Comite,Rang,Dossard,Identite" />
+		<order key="Nation,Comite,Identite" />
 		<call option="identiteCoureur" file="./edition/options.xml"/>
 		<call option="traduction" file="./edition/options.xml"/>
 		
@@ -1228,10 +1227,10 @@
 						<font size_step="-1" />
 						<!-- <text col="7" align="right">body:GetCell('Tps'..manche..'_inter'..manche..'_lap'..l,row)</text> -->
 						<text col="7" align="right">body:GetCell('Tps'..cumul..''..code_manche..'_inter'..code_passage..'_lap'..l, row, '[P10]%-1h%-1m%2s.%2f')</text>
-						<text col="7" align="right">body:GetCell('Clt'..cumul..''..code_manche..'_inter'..code_passage..'_lap'..l, row)..' / '..l</text>
+						<text col="7" align="right">body:GetCell('Clt'..cumul..''..code_manche..'_inter'..code_passage..'_lap'..l, row)</text>
 					</matrix> 
 				<lua>end</lua>
-					<text col="8" cond="group=='label'" label="('stInter'..code_passage..' '..Label_lap..'. '..nb_lap)"/>
+					<text col="8" cond="group=='label'" label="('Inter'..code_passage..' '..Label_lap..'. '..nb_lap)"/>
 					<matrix col="8" cond="group=='body'" fit_inside="0" >
 						<row h="1"/>
 						<font size_step="-1" />

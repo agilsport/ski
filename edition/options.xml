@@ -137,7 +137,7 @@
 		<row value="auto" />
 		<line col_start="1" col_end="0" pen_color="dkgray" border="top" />
 		<matrix row="0.4cm" col_start="1" col_end="0" >
-			<text col_start="1" col_end="0" align="center" cond="type_edition=='lst_' and discipline:In('MASS','POURS-D', 'FP')">'H. Théorique de Depart de l\'épreuve N°'..$(Epreuve.Code_epreuve)..' : '..$(Epreuve.Heure_depart)</text>
+			<text col_start="1" col_end="0" align="center" cond="type_edition=='lst_' and discipline:In('MASS', 'POURS', 'POURS-D', 'FP')">'H. Théorique de Depart de l\'épreuve N°'..$(Epreuve.Code_epreuve)..' : '..$(Epreuve.Heure_depart)</text>
 		<!-- <row h="0.5cm" cond="type_edition=='lst_' and discipline:In('MASS','POURS-D', 'FP')"/> -->
 		</matrix>
 		<row value="auto" />

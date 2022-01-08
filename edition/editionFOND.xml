@@ -80,7 +80,7 @@
 			<qrcode adjust="best" col_start="2" cond="tonumber(params.Qrcode)==1 and entite=='FIS' and $(Evenement.Commentaire_live):len() &gt; 0">'live.fis-ski.com/lv-al'..string.sub($(Epreuve.Fichier_transfert),4)..'.htm#/short'</qrcode>
 		</matrix>
 		<!-- affichage de la ligne d'heure de départ en massstart ou fond pop si pas de first header -->
-		<lua>if type_edition == 'lst_' and first_header == '0' and discipline:In('MASS','POURS-D', 'FP') and $(Epreuve.Heure_depart):len() &gt; 0 then</lua>
+		<lua>if type_edition == 'lst_' and first_header == '0' and discipline:In('MASS', 'POURS', 'POURS-D', 'FP') and $(Epreuve.Heure_depart):len() &gt; 0 then</lua>
 		<call option="Ligne_H_depart" cond="editor:GetPageCurrent() == 1" file="./edition/options.xml"/>
 		<lua>end</lua>
 		<!-- affichage du Compteur des classés si c'est un resultat (id commence par 'res_' et si le first header n'est pas actif) -->
@@ -513,7 +513,7 @@
 			<pen border="none" />
 			<spacing left="5" right="10" top="2" bottom="2" />
 			<row h="auto"/>
-			<text col="4" align="right" label="Rg.">body:GetCell(rang,row)</text>
+			<!-- <text col="4" align="right" label="Rg.">body:GetCell(rang,row)</text> -->
 			<text col="4" align="right" label="Dos">$(Dossard)</text>
 			<text col="7" align="center" label="Code"><font size="8" cond="group =='body'"/>$(Code_coureur):sub(4)</text> 
 			<text col="18" align="left" label="Prénom - Nom" >GetIdentiteCoureur(officiel)</text> 
