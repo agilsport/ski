@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- Menu Editions Activité "FOND " suplementaire !-->
-<!-- version="6.5" !-->
+<!-- version="6.7" !-->
 <!-- si possible de faire fonctionne des cond dans les menu -->
 <!-- si possible de fermer des Item par default -->
 <edition>
-	<menu>
+<menu>
 		<menu title="Edition Relais" image="./res/32x32_ranking.png" bold="false" cond ="($(Epreuve.Code_discipline)='RELAIS')">
 			<menu title="Liste Départ Relais (1-a)" image="./res/16x16_official.png" id="Lst_Relais" DossardRelais="Lettre"/>
 			<menu title="Liste Départ Relais (1/²)" image="./res/16x16_official.png" id="Lst_Relais" DossardRelais="Numeric"/>
@@ -27,12 +27,14 @@
 		
 		<menu title="Outils" image="./res/32x32_options.png">
 			<menu title="Edition des Séquences Chrono" image="./res/16x16_bib.png" id="chrono_seq" choix_manche="1" action="chrono_seq"/>
-			<menu title="Configuration des points de passages" image="./res/16x16_text.png" lua="./edition/Config_Passage.lua"  />
-			<menu title="Transfert du Clt d'un Evt X Ds la colonne Ordre_niveau et du Ctrietre Coursexx pour attribution des Dossards suivant le Clt de l'Evt xx" image="./res/16x16_fis.png" lua="./edition/Clt_EprX-ColOrdre_niveau.lua" />
+		</menu>
+		
+		<menu title="Outils Clt Saison Samse" image="./res/32x32_options.png">
+			<menu title="Transfert du Clt d'un Evt X Ds la colonne Ordre_niveau et du Crietre Coursexx pour attribution des Dossards suivant le Clt de l'Evt xx" Colum_Ref="CltG" image="./res/16x16_fis.png" lua="./edition/Clt_EprX-ColOrdre_niveau.lua" />
+			<menu title="Transfert d'une colonne Ordre_niveau d'un Evt X Ds la colonne Ordre_niveau et du Crietre Coursexx pour attribution des Dossards suivant le Clt de l'Evt xx" Colum_Ref="OrdreG" image="./res/16x16_fis.png" lua="./edition/Clt_EprX-ColOrdre_niveau.lua" />
 			<menu title="Transfert du Clt et des ponits d'un Cha. X Ds la colonne Ordre_niveau pour attribution des Dossards suivant le Clt de l'Evt X" image="./res/16x16_fis.png" lua="./edition/ColPtsClt_ColPtsBest.lua" />
 		
 		</menu>
-		
 		<menu title="Outils Dossards FIS" image="./res/32x32_options.png">
 			<menu title="Transfert de la colonne Points (FIS Distance) dans la Colonne Pts_best" image="./res/16x16_fis.png" LabelPts="FIS_Dist" colum_Pts="Pts_best" LabelNc="NC_FIS_Dst" Colum_Label="Moniteur" lua="./edition/PtsFFS_ColPtsBest.lua" />
 			<menu title="Transfert de la colonne Points (FFS) dans la Colonne Pts_Clt" image="./res/16x16_fis.png" LabelPts="FFS" colum_Pts="PtsClt" LabelNc="NC_FFS" Colum_Label="Niveau" lua="./edition/PtsFFS_ColPtsBest.lua" />
@@ -1092,7 +1094,7 @@
 			body:SetCounter('Nation');
 			body:SetCounter('Comite');
 		</lua>
-		<order key="Nation,Comite,Rang,Dossard,Identite" />
+		<order key="Nation,Comite,Identite" />
 		<call option="identiteCoureur" file="./edition/options.xml"/>
 		<call option="traduction" file="./edition/options.xml"/>
 		

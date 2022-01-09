@@ -43,13 +43,14 @@
 		<text row="auto" align="center">$(Discipline.Libelle)</text>
 		<text row="auto" align="center">$(Categorie{$(Epreuve.Code_categorie)}.Libelle)..' - '..$(Sexe{$(Epreuve.Sexe)}.Libelle)</text>
 		<text row="auto" align="center" cond="title" >title</text>
+		<row value="0.5cm" cond="title" />
 		<text row="auto" align="center" cond="title_filter">title_filter</text>
 		<row value="0.5cm"/>
 	</header>
 	
 	<!-- duel_total : utilisation des colonnes Tour_max, Duel_max, Clt_max, Tps_max, et Niveau_max -->
 	<report id="duel_total" title="Résultats Officiels" first_header="0">
-		<!-- <lua>body:SetRanking('Clt', 'Centre, Tour_max Desc, Duel_max asc, Clt_max NULL_OK, Clt_qualif NULL_OK, Dossard')</lua> -->
+		<!-- <lua>body:SetRanking('Clt', 'Centre, Tour_max Desc, Duel_max asc, Clt_max NULL_KO, Clt_qualif NULL_KO, Dossard NULL_KO')</lua> -->
 		<lua>sqlBase.FixationTableRanking(body)</lua>
 		
 		<!-- Copie Clt dans la colonne Critere pour gestion KO en challenge -->
@@ -88,6 +89,7 @@
 			<text col="6" align="right" label="Clt" font_weight="bold" font_size_step="2">$(Clt)</text>
 			<text col="5" align="center" label="Dos.">$(Dossard)</text>
 			<text col="24" align="left" label="Nom - Prénom" font_weight="bold">$(Identite)</text> 
+			<text col="6" align="center" label="Cat." font_size_step="-1">$(An)</text>
 			<text col="6" align="center" label="Cat." font_size_step="-1">$(Categ)</text>
 			<text col="4" align="right" label="C.Cat" font_size_step="-1">$(Cltc)</text>
 			<text col="3" align="center" label="CS">$(Comite)</text>
@@ -95,7 +97,6 @@
 
 			<text col="7" align="right" label="T.Qualif" >$(Tps_qualif)</text>
 			<text col="4" align="right" label="C.Q" >$(Clt_qualif)</text>
-			
 			<!-- <text col="8" align="center" label="Tab">$(Centre)</text> -->
 			<!-- <text col="8" align="center" label="TourM">$(Tour_max)</text> -->
 			<!-- <text col="8" align="center" label="DuelM">$(Duel_max)</text> -->
@@ -200,7 +201,7 @@
 			<lua>end</lua>
 			<row c="height_label_tour" />
 			<text col_start="1" col_end="0" font_size_step="2" align="center" border="0">$(Epreuve.Code_categorie)..' - '..$(Epreuve.Sexe)</text>
-			<row h="1"/>
+			<row c="height_separator_duel"/>
 			
 			<lua>for tour=tour_min,tour_max do</lua>
 			

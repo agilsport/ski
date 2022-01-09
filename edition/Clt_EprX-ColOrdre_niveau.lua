@@ -1,7 +1,7 @@
 dofile('./interface/adv.lua');
 dofile('./interface/interface.lua');
 
--- version 1.2
+-- version 1.5
 
 function alert(txt)
 	app.GetAuiMessage():AddLine(txt);
@@ -37,6 +37,7 @@ function main(params)
 
 	base = sqlBase.Clone();
 	code_evenement = tonumber(theParams.code_evenement);
+	Colum_Ref = theParams.Colum_Ref;
 	
 	-- Initialisation des controles ...
 	local comboNbCouloir = dlg:GetWindowName('N_Course');
@@ -63,28 +64,57 @@ function LectureDonnees(evt)
 	alert("Evt_source = "..Evt_source);
 	tResultat = base:GetTable('Resultat');
 	tResultat:AddColumn('CltG');
-	cmd = "Select  b.*, a.Clt CltG"..
+	tResultat:AddColumn('OrdreG');
+	cmd = "Select  b.*, a.Clt CltG, a.Ordre_niveau OrdreG"..
 			" From Resultat a, Resultat b "..
 			" Where a.Code_evenement = "..Evt_source..
 			" And b.Code_evenement = "..tonumber(code_evenement)..
 			" And a.Code_coureur = b.Code_coureur";
 	base:TableLoad(tResultat, cmd);
-	bodyliste = tResultat:Copy(false);
+	
 	
 	-- alert("base:TableLoad(Resultat, cmd) = "..cmd)
-	Nbparticipant = tResultat:GetNbRows();
+	local Nbparticipant = tResultat:GetNbRows();
 	for i=0, Nbparticipant-1 do
-	Place = tResultat:GetCell('CltG', i);
-	Critere = 'Course'..Evt_source;
+	-- Place = tResultat:GetCell('CltG', i);
+	-- Place = tResultat:GetCell('OrdreG', i);
+	Place = tResultat:GetCell(Colum_Ref, i);
+	--alert("Place: "..Place);
+	Critere = 'Evt_'..Evt_source;
 	-- alert('Place = '..Place);
 		if tonumber(Place) == 0 or Place == '' then 
+			-- alert("Critere: "..Critere);
 			Place = 9999; 
-			Critere = 'Non Classer';
+			Critere = 'NQ_'..Critere;
+			-- alert("Critere2: "..Critere);
 		end
 		cmd = "Update Resultat SET Ordre_niveau = '"..Place.."', Niveau = '"..Critere.."' Where Code_evenement = "..tonumber(code_evenement).." and Code_coureur = '"..tResultat:GetCell('Code_coureur', i).."'";
 		base:Query(cmd);
 		-- alert("cmd = "..cmd)
 	end
+	
+	cmd = "Select DISTINCT * From Resultat"..
+			" Where Code_evenement = "..tonumber(code_evenement)..
+			" And Ordre_niveau IS NULL or Ordre_niveau = ''"
+	base:TableLoad(tResultat, cmd);
+	-- alert("tResultat:GetNbRows(); "..tResultat:GetNbRows());
+	
+	local Nbparticipant = tResultat:GetNbRows();
+	for i=0, Nbparticipant-1 do
+		Place = 9999; 
+		local Critere2 = 'Abs'..Evt_source;
+		cmd = "Update Resultat SET Ordre_niveau = '"..Place.."', Niveau = '"..Critere2.."' Where Code_evenement = "..tonumber(code_evenement).." and Code_coureur = '"..tResultat:GetCell('Code_coureur', i).."'";
+		base:Query(cmd);
+		-- alert("cmd = "..cmd)
+	end
+	
+	cmd = "Select * From Resultat"..
+		" Where Code_evenement = "..tonumber(code_evenement)
+	base:TableLoad(tResultat, cmd);
+	alert("Nbparticipant_Tot; "..tResultat:GetNbRows());
+	
+	bodyliste = tResultat:Copy(false);
+	local Nbparticipant = tResultat:GetNbRows();
 	for i=0, Nbparticipant-1 do
 		bodyliste:AddRow();
 		sqlTable.CopyRow(bodyliste, bodyliste:GetNbRows()-1, tResultat, i);
