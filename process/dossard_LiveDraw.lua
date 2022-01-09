@@ -407,20 +407,6 @@ function OnPrintEtiquettes(orderby)
 			if tEtiquette:GetCellInt('ECSL_30', i) > 0 and not row_separation then
 				row_separation = i;
 			end
-			local bolDelete = true;
-			if i > 30 then
-				if tEtiquette:GetCellInt('ECSL_points', i) > 0 or tEtiquette:GetCellInt('WCSL_points', i) > 0 or tEtiquette:GetCellInt('ECSL_overall_points', i) > 0 then
-					bolDelete = false;
-				end
-				if tEtiquette:GetCell('Winner_CC', i):len() > 0 then
-					bolDelete = false;
-				end
-			else
-				bolDelete = false;
-			end
-			if bolDelete == true then
-				tEtiquette:RemoveRowAt(i);
-			end
 		end
 		estce = 1;
 	end
@@ -2826,7 +2812,7 @@ function main(params_c)
 	draw.height = display:GetSize().height - 30;
 	draw.x = 0;
 	draw.y = 0;
-	draw.version = "2.81";
+	draw.version = "2.9";
 	draw.orderbyCE = 'Rang_tirage, Groupe_tirage, ECSL_points DESC, WCSL_points DESC, ECSL_overall_points DESC, Winner_CC DESC, FIS_pts, Nom, Prenom';
 	draw.orderbyFIS = 'Rang_tirage, Groupe_tirage, FIS_pts, Nom, Prenom';
 	draw.hostname = 'live.fisski.com';
