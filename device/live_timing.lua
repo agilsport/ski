@@ -12,7 +12,7 @@ end
 -- Information : Numéro de Version, Nom, Interface
 function device.GetInformation()
 	return { 
-		version = 6.5;
+		version = 6.6;
 		name = 'Live Timing Async.', 
 		class = 'network'
 	};
@@ -414,7 +414,7 @@ function device.OnInit(params, node)
 	menuSend:AppendSeparator();
 	btn_raceinfo = menuSend:Append({label="Envoi des Informations Course", image ="./res/32x32_tools.png"});
 	menuSend:AppendSeparator();
-	btn_scheduled = menuSend:Append({label="Envoi des Heures de Départ sur le calendrier FIS", image ="./res/32x32_clock.png"});
+	btn_scheduled = menuSend:Append({label="Envoi des Heures de Départ", image ="./res/32x32_clock.png"});
 	menuSend:AppendSeparator();
 	btn_saisie_meteo = menuSend:Append({label = "Saisie des infos météo", image = "./res/32x32_cloud_blue.png"});
 	btn_envoi_meteo = menuSend:Append({label = "Envoi des infos météo", image = "./res/32x32_cloud_blue.png"});
@@ -847,7 +847,7 @@ function OnSendScheduled(evt)
 		Error("Feu au Rouge : Aucune Action possible ...");
 		return;
 	end
-	CommandScheduled()
+	CommandScheduled(live.Code_manche)
 end
 
 
@@ -1450,6 +1450,7 @@ function CommandStartList(activerun)
 		CreateXML(nodeRoot);
 		Info("dossard suivant "..live.rangnext.. " envoyé");
 	end
+	CommandScheduled(activerun);
 end
 
 function CommandRaceInfo(activerun, bolPlusStartList)
@@ -1684,7 +1685,7 @@ function CommandRaceInfo(activerun, bolPlusStartList)
 	end
 end
 
-function CommandScheduled()
+function CommandScheduled(run)
 	local tEpreuve = live.tables.Epreuve;
 
 	if tEpreuve:GetCell('Code_activite', 0) == 'ALP' then
@@ -1692,34 +1693,34 @@ function CommandScheduled()
 		local tEpreuveAlpineManche = live.tables.Epreuve_Alpine_Manche;
 		local heure = ""; local minute = ""; local stringtime = "";
 		if tEpreuveAlpineManche ~= nil then
-			for i = 1, live.Nb_manche do
-				local heure_depart = tEpreuveAlpineManche:GetCell("Heure_depart", i-1);
-				if heure_depart == "" then
-					return
-				end
-				local x, y = string.find(heure_depart, "%D");  -- tout ce qui n'est pas un chiffre
-				if x ~= nil then  -- position du séparateur
-					heure = string.sub(heure_depart, 1, x-1);
-					heure = string.format("%02d", tonumber(heure) or 0);
-					minute = string.sub(heure_depart, x+1);
-					minute = string.format("%02d", tonumber(minute) or 0);
-					stringtime = heure..":"..minute;
-					local nodeCommand = xmlNode.Create(nil, xmlNodeType.ELEMENT_NODE, "command");
-					local nodeScheduled = xmlNode.Create(nodeCommand, xmlNodeType.ELEMENT_NODE, "scheduled");
-					nodeScheduled:AddAttribute("runno", i);
-					-- nodeScheduled Childs ...
-					xmlNode.Create(nodeScheduled, xmlNodeType.ELEMENT_NODE, "year", tEpreuve:GetCell("Date_epreuve", 0, '%4Y'));	
-					xmlNode.Create(nodeScheduled, xmlNodeType.ELEMENT_NODE, "month", tEpreuve:GetCell("Date_epreuve", 0, '%2M'));	
-					xmlNode.Create(nodeScheduled, xmlNodeType.ELEMENT_NODE, "day", tEpreuve:GetCell("Date_epreuve", 0, '%2D'));	
-					xmlNode.Create(nodeScheduled, xmlNodeType.ELEMENT_NODE, "cettime", stringtime);
-					xmlNode.Create(nodeScheduled, xmlNodeType.ELEMENT_NODE, "loctime", stringtime);
-					-- Regroupement <scheduled> et <command>
-					local nodeRoot = xmlNode.Create(nil, xmlNodeType.ELEMENT_NODE, "livetiming");
-					nodeRoot:AddChild(nodeCommand);
-					CreateXML(nodeRoot);
-					Info("Tag scheduled envoyé pour la manche "..i.." = "..stringtime);
-				end
+			local heure_depart = tEpreuveAlpineManche:GetCell("Heure_depart", run-1);
+			if heure_depart == "" then
+				heure_depart = '00:00';
 			end
+			local x, y = string.find(heure_depart, "%D");  -- tout ce qui n'est pas un chiffre
+			if x == nil then  -- position du séparateur
+				return;
+			else
+				heure = string.sub(heure_depart, 1, x-1);
+				heure = string.format("%02d", tonumber(heure) or 0);
+				minute = string.sub(heure_depart, x+1);
+				minute = string.format("%02d", tonumber(minute) or 0);
+				stringtime = heure..":"..minute;
+			end
+			local nodeCommand = xmlNode.Create(nil, xmlNodeType.ELEMENT_NODE, "command");
+			local nodeScheduled = xmlNode.Create(nodeCommand, xmlNodeType.ELEMENT_NODE, "scheduled");
+			nodeScheduled:AddAttribute("runno", run);
+			-- nodeScheduled Childs ...
+			xmlNode.Create(nodeScheduled, xmlNodeType.ELEMENT_NODE, "year", tEpreuve:GetCell("Date_epreuve", 0, '%4Y'));	
+			xmlNode.Create(nodeScheduled, xmlNodeType.ELEMENT_NODE, "month", tEpreuve:GetCell("Date_epreuve", 0, '%2M'));	
+			xmlNode.Create(nodeScheduled, xmlNodeType.ELEMENT_NODE, "day", tEpreuve:GetCell("Date_epreuve", 0, '%2D'));	
+			xmlNode.Create(nodeScheduled, xmlNodeType.ELEMENT_NODE, "cettime", stringtime);
+			xmlNode.Create(nodeScheduled, xmlNodeType.ELEMENT_NODE, "loctime", stringtime);
+			-- Regroupement <scheduled> et <command>
+			local nodeRoot = xmlNode.Create(nil, xmlNodeType.ELEMENT_NODE, "livetiming");
+			nodeRoot:AddChild(nodeCommand);
+			CreateXML(nodeRoot);
+			Info("Tag scheduled envoyé pour la manche "..run.." = "..stringtime);
 		end
 	end
 end
