@@ -1,0 +1,71 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!-- Version 1.2 -->
+<root>
+
+<!-- Fenètre de configuration de l'éditions des couloir de poursuite -->
+<panel name="Couloir">
+	<padding all="2px"/>
+	<col value="5,5,5,5,5" />
+
+	<row value="auto" />
+		<statictext col_start="1" col_end="0"  align="center" label="Edition des Couloirs" />
+	
+	<row value="auto" />
+		<statictext col_start="1" col_end="3"  align="right" label='Nombre de couloir à éditer'/>
+		<spinctrl col_start="4" name="NbCouloir">'1'</spinctrl>
+
+	<row value="auto" />
+		<statictext col_start="1" col_end="0"  align="center" label="Choix de l\'affichage"/>
+
+	<row value="auto" />
+		<statictext col_start="1" col_end="2"  align="right" label='Heure de départ'/>
+		<checkbox col_start="3" col_end="3" name="Affich_HeureDepart"/> 
+		<statictext col_start="4" col_end="4"  align="right" label='Ecart'/>
+		<checkbox col_start="5" col_end="5" name="Affich_Ecart"/> 	
+		
+	<row value="auto" />
+	<toolbar name="tb" col_start="1" col_end="0" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
+</panel>
+
+<!-- édition des couloirs de poursuite -->
+	<report id="Couloir" title="('Edition des couloirs (poursuite)')" >
+		<lua>
+			NbCouloir = params.NbCouloir
+			Affich_heureDepart = params.Affich_heureDepart
+			Affich_Ecart = params.Affich_Ecart
+			NumCouloir = body:GetCell('Dossard', 0);
+			if NumCouloir:len() >= 2 then
+				NumCouloir = NumCouloir:sub(NumCouloir:len())
+			end
+		</lua>
+		
+		<order key="Rang2 Asc" />
+		
+		<first_header />
+	
+		<header>
+			<spacing all="0"/>
+			<background mode="transparent"/>		
+			<font name="Calibri" size="14" adjust="max" weight="bold"/>
+			<text row="auto" col="1" col_end="0" align="center">$(Evenement.Nom)..' NbCouloir '</text>
+			<text row="0.5cm" align="center" ></text>
+			<text row="auto" align="center" >title</text>
+			<text row="1cm" align="center" ></text>
+			<font name="Calibri" size="26" adjust="max" weight="bold"/>
+			<text row="auto" align="center" >'Couloir N°'..NumCouloir</text>
+			<row value="0.5cm"/>
+		</header>
+	
+		<body>
+			<call option="couleur_alternee" file="./edition/options.xml" />
+			<font size="32" adjust="ellipsize"/>
+			<row value="auto"/>
+			<spacing left="5" right="10" top="2" bottom="2" />
+			<text col="6" align="right" label="Dos.">$(Dossard) </text>
+			<text col="25" align="center" label="Heure de Départ" cond="Affich_heureDepart == 1" >$(Heure_depart2)</text>
+			<text col="25" align="center" label="Ecart de départ" cond="Affich_Ecart == 1" >$(Diff_heure_depart2, '%-1m%2s.%1f')</text>
+		</body>
+	</report>
+
+
+</root>
