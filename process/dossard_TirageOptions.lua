@@ -96,7 +96,7 @@ function ValideOption2(clef1, option1, option2)
 		end
 	end
 	if string.find(clef1, '1%.') or string.find(clef1, '2%.') or string.find(clef1, '3%.') then
-		if string.find(option2, '3%.') or string.find(option2, '4%.') then 
+		if string.find(option2, '4%.') then 
 			dlgConfig:GetWindowName('option2'):SetSelection(1);
 			option2 = dlgConfig:GetWindowName('option2'):GetValue();
 		end
@@ -119,44 +119,60 @@ function OnTirageManche1()
 	base:TableLoad(tResultat, 'Select * From Resultat Where Code_evenement = '..params.code_evenement);
 	tResultat:OrderBy('Point');
 	if string.find(option2, '3%.') then
-		params.bibo, params.dossard = GetBibo(0);
+		params.bibo, params.dossard = GetBibo(15);
 	end
-	params.pts_bibo = nil;
-	if params.bibo > 0 then
-		params.pts_bibo = tResultat:GetCellDouble('Point', params.bibo - 1);
+	params.bibo = params.bibo or -1;
+	params.pts_bibo = -1;
+	params.dossard = params.dossard or 1;
+	local tSexe = {'T'};
+	if string.find(clef1, '1%.') then		-- par sexe
+		tSexe = {'F', 'M'};
 	end
-	for i = 0, tResultat:GetNbRows() -1 do
-		tResultat:SetCell('Reserve', i, 1);
-		local pts = tResultat:GetCellDouble('Point', i, -1);
-		if params.pts_bibo then
-			if pts < 0 then
-				tResultat:SetCell('Reserve', i, 3);
-			else
-				if pts <= params.pts_bibo then
-					tResultat:SetCell('Reserve', i, 1);
-				else
-					tResultat:SetCell('Reserve', i, 2);
+	for idx = 1, #tSexe do
+		local sexe_encours = tSexe[idx];
+		local Resultat_Copy = tResultat:Copy();
+		local filtre = "$(Sexe):In('F', 'M', 'T')";
+		if sexe_encours == 'F' then
+			filtre = "$(Sexe):In('F')";
+		elseif sexe_encours == 'M' then
+			filtre = "$(Sexe):In('M')";
+		else
+			filtre = "$(Sexe):In('F', 'M')";
+		end
+		Resultat_Copy:Filter(filtre, true);
+		if params.bibo > 0 then
+			params.pts_bibo = Resultat_Copy:GetCellDouble('Point', params.bibo -1);
+		end
+		for i = 0, Resultat_Copy:GetNbRows() -1 do
+			local reserve = 3;
+			local point = Resultat_Copy:GetCellDouble('Point', i, -1);
+			if point >= 0 then
+				if params.pts_bibo > 0 then
+					if point <= params.pts_bibo then
+						reserve = 1;
+					elseif point > 0 then
+						reserve = 2;
+					end
 				end
 			end
-		end		
-	end
-	base:TableBulkUpdate(tResultat,'Reserve', 'Resultat');
-	params.dossard = tonumber(params.dossard) or 1;
-	for reserve = 1, 3 do
-		tResultat_Copy = tResultat:Copy();
-		local filtre = '$(Reserve):In('..reserve..')';
-		tResultat_Copy:Filter(filtre, true);
-		if reserve == 1 or reserve == 3 then
-			tResultat_Copy:OrderRandom();
-		elseif reserve == 2 then
-			tResultat_Copy:OrderBy('Point');
+			Resultat_Copy:SetCell('Reserve', i, reserve);
 		end
-		for i = 0, tResultat_Copy:GetNbRows() -1 do
-			local code_coureur = tResultat_Copy:GetCell('Code_coureur', i);
-			tResultat_Copy:SetCell('Dossard', i, params.dossard);
-			params.dossard = params.dossard + 1;
+		base:TableBulkUpdate(Resultat_Copy,'Reserve', 'Resultat');
+		for reserve = 1, 3 do
+			tResultat_Filtre = Resultat_Copy:Copy();
+			local filtre = '$(Reserve):In('..reserve..')';
+			tResultat_Filtre:Filter(filtre, true);
+			if reserve == 1 or reserve == 3 then
+				tResultat_Filtre:OrderRandom();
+			elseif reserve == 2 then
+				tResultat_Filtre:OrderBy('Point');
+			end
+			for i = 0, tResultat_Filtre:GetNbRows() -1 do
+				tResultat_Filtre:SetCell('Dossard', i, params.dossard);
+				params.dossard = params.dossard + 1;
+			end
+			base:TableBulkUpdate(tResultat_Filtre, 'Dossard', 'Resultat');
 		end
-		base:TableBulkUpdate(tResultat_Copy, 'Dossard', 'Resultat');
 	end
 	
 end
@@ -939,7 +955,7 @@ function main(params_c)
 	params.height = display:GetSize().height / 2;
 	params.x = (display:GetSize().width - params.width) / 2;
 	params.y = 200;
-	params.version = "2.1";
+	params.version = "2.2";
 	base = base or sqlBase.Clone();
 	tEvenement = base:GetTable('Evenement');
 	base:TableLoad(tEvenement, 'Select * From Evenement Where Code = '..params.code_evenement);
@@ -1019,7 +1035,7 @@ function main(params_c)
 	dlgConfig:GetWindowName('clef1'):Append('4. Sans objet');
 		
 	dlgConfig:GetWindowName('option1'):Clear();
-	dlgConfig:GetWindowName('option1'):Append('1. Tirage pour la manche 1 avec BIBO particulier');
+	dlgConfig:GetWindowName('option1'):Append('1. Tirage pour la manche 1 seulement');
 	dlgConfig:GetWindowName('option1'):Append('2. Tirage pour les manches 1 et 2');
 	dlgConfig:GetWindowName('option1'):Append('3. Tirage pour la manche 2 (ABD DSQ ordre inverse)');
 	dlgConfig:GetWindowName('option1'):Append('4. Tirage des 3 manches par tiers tournants');
@@ -1042,7 +1058,6 @@ function main(params_c)
 		dlgConfig:GetWindowName('option1'):SetSelection(1);
 		dlgConfig:GetWindowName('option2'):SetSelection(1);
 	end
-	dlgConfig:GetWindowName('option2'):SetSelection(4);
 	dlgConfig:GetWindowName('course1'):SetValue(params.code_evenement);
 	dlgConfig:GetWindowName('course1_nom'):SetValue(tEvenement:GetCell('Nom', 0));
 	
