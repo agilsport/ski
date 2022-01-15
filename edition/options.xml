@@ -90,7 +90,7 @@
 	
 	<option id="identite">
 		<lua>Prenom_NOM = $(Prenom):sub(1,1):upper()..$(Prenom):sub(2):lower()..'  '..$(Nom):upper()</lua>
-		<lua>NOM_Prenom = $(Nom):upper()..' '..$(Prenom):sub(1,1):upper()..$(Prenom):sub(2):lower()..$(Nom):upper()</lua>
+		<lua>NOM_Prenom = $(Nom):upper()..' '..$(Prenom):sub(1,1):upper()..$(Prenom):sub(2):lower()</lua>
 		<lua>NOM_PRENOM = $(Identite):upper()</lua>
 		<lua>nom_prenom = $(Identite):lower()</lua>
 	</option>
@@ -108,7 +108,7 @@
 					if origineCoureur == 'FFS' or origineCoureur == 'IFS' or origineCoureur == 'ISB' or origineCoureur == 'LCN' then 
 						return $(Identite):upper();
 					elseif origineCoureur == 'TIC' then
-						return $(Nom):upper()..' '..$(Prenom):sub(1,1):upper()..$(Prenom):sub(2):lower()..$(Nom):upper();
+						return $(Nom):upper()..' '..$(Prenom):sub(1,1):upper()..$(Prenom):sub(2):lower();
 					else
 						return $(Identite):lower();
 					end
