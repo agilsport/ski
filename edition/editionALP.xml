@@ -7,6 +7,7 @@
 			<menu title="Par Club" image="./res/16x16_juges.png" rupture="Club" id="parti_factorise"/>
 			<menu title="Par Comité" image="./res/16x16_juges.png" label="Comité" rupture="Comite" id="parti_factorise"/>
 			<menu title="Par Nation" image="./res/16x16_juges.png" rupture="Nation" id="parti_factorise"/>
+			<menu title="Par Nation sans saut de pages" image="./res/16x16_juges.png" rupture="Nation" page="0" id="parti_factorise"/>
 			<menu title="Par Points" image="./res/16x16_juges.png" id="parti_point"/>
 			<menu title="Edition des tickets courses " image="./res/16x16_text.png" lua="./edition/TicketsCourse.lua"  />
 			<menu title="Etiquettes avec Drapeaux des Pays par ordre de points" ecsl="1" orderby="Point, Identite" image="./res/16x16_juges.png" id="parti_etiquette_factorise"/>
@@ -390,17 +391,23 @@
 		<lua>dofile('./interface/adv.lua');</lua>
 		<lua>entite = $(Evenement.Code_entite);
 			rupture = params.rupture;
+			saut_page = params.page or 1;
+			saut_page = tonumber(saut_page) or 1;
 			label = params.label or params.rupture;
 			title = title..label;
 			body:SetCounter(rupture);
 			if rupture ~= 'Nation' then
 				body:SetCounter('Nation');
 			end
-			orderby = rupture..", Sexe, Nom, Prenom";
+			if saut_page == 1 then
+				orderby = rupture..", Sexe, Nom, Prenom";
+			else
+				orderby = rupture..", Sexe, Point, Nom, Prenom";
+			end
 			somme_rupture = 0;
 			nb_etrangers = 0;
 			comite = {};
-			page_break = 1;
+			page_break = saut_page;
 			bolAjouter = false;
 
 		</lua>
@@ -438,19 +445,21 @@
 						bolAjouter = true;
 					end
 				end
+				clt = base:GetClassementCoureur($(Code_coureur)):GetCell('Clt',0);
 				</lua>
 			<call option="couleur_alternee" file="./edition/options.xml" />
 
 			<row value="auto"/>
 			<text col="7" align="center" label="Code"><font size="8" cond="group =='body'"/>$(Code_coureur):sub(4)</text>
-			<text col="20" align="left" label="Nom - Prénom" font_weight="bold" font_size_step="1">$(Identite)</text> 
+			<text col="20" align="left" label="Identity" font_weight="bold" font_size_step="1">$(Identite)</text> 
 			<text col="2" align="center" label="S.">$(Sexe)</text>
-			<text col="4" align="center" label="An">$(An)</text>
+			<text col="4" align="center" label="YoB">$(An)</text>
 			<text col="5" align="center" label="Cat.">$(Categ)</text>
 			<text col="4" align="center" label="Nat" cond="entite == 'FIS'">$(Nation)</text>
-			<text col="5" align="center" label="CS">GetComiteOrigine($(Code_coureur),$(Comite))</text>
-			<text col="12" align="center" label="Club">$(Club)</text>
-			<text col="7" align="center" label="Point">$(Point)</text>
+			<text col="5" align="center" label="CS" cond="saut_page==1">GetComiteOrigine($(Code_coureur),$(Comite))</text>
+			<text col="12" align="center" label="Club" cond="saut_page==1">$(Club)</text>
+			<text col="7" align="center" label="Rank" cond="saut_page==0">clt</text>
+			<text col="7" align="center" label="Points">$(Point)</text>
 			
 			<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
 		</body>
@@ -543,7 +552,7 @@
 			<font size="9" adjust="ellipsize"/>
 
 			<row h="auto"/>
-			<text col="4" cond="body:GetCellInt('Rang'..manche, row) &gt; 0" align="right" label="Rang" font_weight="bold">body:GetCellInt('Rang'..manche, row) </text>
+			<text col="4" cond="body:GetCellInt('Rang'..manche, row) &gt; 0" align="right" label="Rang" font_weight="bold">body:GetCellInt('Rang'..manche, row)</text>
 			<text col="4" align="center" label="Dos" font_weight="bold" font_size_step="1">$(Dossard)</text>
 			<text col="7" align="center" label="Code"><font size="8" cond="group =='body'"/>$(Code_coureur):sub(4)</text>
 			<text col="20" align="left" label="Nom - Prénom" font_weight="bold" font_size_step="1">$(Identite)</text> 
