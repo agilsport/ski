@@ -4913,6 +4913,18 @@ function AffichedlgTexte()		-- boîte de dialogue pour le choix des textes à impr
 			LectureLayers(root);
 		end
 		doc:Delete();
+	else
+		local utf8 = true;
+		local doc = xmlDocument.Create();
+		local nodeRoot = xmlNode.Create(nil, xmlNodeType.ELEMENT_NODE, "layers");
+		if doc:SetRoot(nodeRoot) == false then
+			adv.Alert('doc:SetRoot(nodeRoot) == false');
+			return;
+		else
+			adv.Alert('doc:SetRoot(nodeRoot) == true');
+		end
+		doc:SaveFile(app.GetPath()..'/edition/layer.perso.xml');
+		doc:Delete();
 	end
 	-- Toolbar 
 	local tbtexte = dlgTexte:GetWindowName('tbtexte');
@@ -7560,7 +7572,7 @@ function OnConfiguration(cparams)
 	else
 		return false;
 	end
-	matrice.version_script = '4.7';
+	matrice.version_script = '4.8';
 	matrice.OS = app.GetOsDescription();
 	-- vérification de l'existence d'une version plus récente du script.
 	local url = 'https://live.ffs.fr/maj_pg/challenge/last_version.txt'
