@@ -1,331 +1,345 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <root>
-	<panel name="config">
-		<padding all="2px"/>
-		<col value="1"/>
-		<row value="50px"/>
-		<matrix row="auto">
-			<col value="1,1,1,1"/>
-			<row value="40px" />
-			<padding all="5px"/>
-			<textctrl row="150px" col_start="2" col_end="3" style="TE_CENTER|TE_READONLY|TE_MULTILINE" name="race_name" ><background mode="solid" color="ltgray" /></textctrl>
-			<statictext row="auto" col_start="2" style="ALIGN_RIGHT" label="Codex : "/>
-			<textctrl col_start="3" style="TE_READONLY" name="codex"/>
-			<statictext row="auto" col_start="2" style="ALIGN_RIGHT" label="Hostname : "/>
-			<textctrl col_start="3" style="TE_READONLY" name="fis_hostname"/>
-			<statictext row="auto" col_start="2" style="ALIGN_RIGHT" label="Port : "/>
-			<textctrl col_start="3" name="fis_port"/>
-			<statictext row="auto" col_start="2" style="ALIGN_RIGHT" label="Mot de Passe : "/>
-			<textctrl col_start="3" name="fis_pwd"/>
-			<row value="20px"/>
-			<textctrl row="auto" col_start="3" cond="discipline=='AC'" name="discipline_vitesse"/>
-			<statictext col_start="2" style="ALIGN_RIGHT" cond="discipline=='AC'" label="Discipline en vitesse : " />
-			<row value="20px"/>
-			<toolbar row="auto" col_start="1" name="tbconfig" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
-		</matrix>
-		<row value="1"/>
-	</panel>
-	<panel name="gridCE">
-		<padding all="2px"/>
-		<col value="50px,1,50px"/>
-		<row value="10px"/>
-		<grid row="1" col_start="2" name="tableau"/>
-		<row value="10px"/>
-		<matrix row="auto" col_start="2">
-			<row value="40px"/>
-			<col value="1+50px,1,4,4,1,1,1,1,1,1,1"/>
-			<wndtext row="30px" col_start="1" align="center"><background mode="solid" color="ltgray" />'Code_FIS' </wndtext>
-			<wndtext col_start="2" align="center"><background mode="solid" color="ltgray" />'Groupe' </wndtext>
-			<wndtext col_start="3" align="center"><background mode="solid" color="ltgray" />'Nom' </wndtext>
-			<wndtext col_start="4" align="center"><background mode="solid" color="ltgray" />'Prenom' </wndtext>
-			<wndtext col_start="5" align="center"><background mode="solid" color="ltgray" />'Sexe' </wndtext>
-			<wndtext col_start="6" align="center"><background mode="solid" color="ltgray" />'Année' </wndtext>
-			<wndtext col_start="7" align="center"><background mode="solid" color="ltgray" />'Nation' </wndtext>
-			<wndtext col_start="8" align="center"><background mode="solid" color="ltgray" />'FIS Pts' </wndtext>
-			<wndtext col_start="9" align="center"><background mode="solid" color="ltgray" />'FIS Clt' </wndtext>
-			<textctrl row="auto" col_start="1" align="left" name="code"/>
-			<textctrl col_start="2" align="left" name="groupe"/>
-			<textctrl col_start="3" align="left" name="nom" />
-			<textctrl col_start="4" align="left" name="prenom" />
-			<textctrl col_start="5" align="left" name="sexe" />
-			<textctrl col_start="6" align="left" name="an" />
-			<textctrl col_start="7" align="left" name="nation" />
-			<textctrl col_start="8" align="left" name="points" />
-			<textctrl col_start="9" align="left" name="classement" />
-			<button col_start="10" align="left" name="ajouter" label="Ajouter"/>
-			<row value="10px"/>
-			<staticbox row_start="1" row_end="0" col_start="1" col_end="0" label="Recherche de coureur"/>
-		</matrix>
-		<row value="10px"/>
-		<matrix row="auto" col_start="2">
-			<row value="40px"/>
-			<col value="20px,1,1,4,4"/>
-			<wndtext row="auto" col_start="2" align="right" ><background mode="solid" color="ltgray" />'Séquences :'</wndtext>
-			<textctrl col_start="3" align="left" name="sequence" style="TE_READONLY"/>
-			<textctrl col_start="4" align="left" name="info" style="TE_READONLY"/>
-			<row value="10px"/>
-			<staticbox row_start="1" row_end="0" col_start="1" col_end="0" label="Informations sur la communication avec la FIS"/>
-		</matrix>
-		<toolbar row="auto" col_start="1" col_end="0" name="tbtableau" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT" />
-		<row value="20px"/>
-	</panel>
-	<panel name="gridFIS">
-		<padding all="2px"/>
-		<col value="50px,1,50px"/>
-		<row value="10px"/>
-		<grid row="1" col_start="2" name="tableau"/>
-		<row value="10px"/>
-		<matrix row="auto" col_start="2">
-			<row value="40px"/>
-			<col value="1+50px,1,4,4,1,1,1,4,1,1,1,1"/>
-			<wndtext row="30px" col_start="1" align="center"><background mode="solid" color="ltgray" />'Code_FIS' </wndtext>
-			<wndtext col_start="2" align="center"><background mode="solid" color="ltgray" />'Groupe' </wndtext>
-			<wndtext col_start="3" align="center"><background mode="solid" color="ltgray" />'Nom' </wndtext>
-			<wndtext col_start="4" align="center"><background mode="solid" color="ltgray" />'Prenom' </wndtext>
-			<wndtext col_start="5" align="center"><background mode="solid" color="ltgray" />'Année' </wndtext>
-			<wndtext col_start="6" align="center"><background mode="solid" color="ltgray" />'Nation' </wndtext>
-			<wndtext col_start="7" align="center"><background mode="solid" color="ltgray" />'Comité' </wndtext>
-			<wndtext col_start="8" align="center"><background mode="solid" color="ltgray" />'Club' </wndtext>
-			<wndtext col_start="9" align="center"><background mode="solid" color="ltgray" />'FIS Pts' </wndtext>
-			<wndtext col_start="10" align="center"><background mode="solid" color="ltgray" />'FIS Clt' </wndtext>
-			<textctrl row="auto" col_start="1" align="left" name="code"/>
-			<textctrl col_start="2" align="left" name="groupe"/>
-			<textctrl col_start="3" align="left" name="nom" />
-			<textctrl col_start="4" align="left" name="prenom" />
-			<textctrl col_start="5" align="left" name="an" />
-			<textctrl col_start="6" align="left" name="nation" />
-			<textctrl col_start="7" align="left" name="comite" />
-			<textctrl col_start="8" align="left" name="club" />
-			<textctrl col_start="9" align="left" name="points" />
-			<textctrl col_start="10" align="left" name="classement" />
-			<button col_start="11" align="left" name="ajouter" label="Ajouter"/>
-			<row value="10px"/>
-			<staticbox row_start="1" row_end="0" col_start="1" col_end="0" label="Recherche de coureur"/>
-		</matrix>
-		<row value="10px"/>
-		<matrix row="auto" col_start="2">
-			<row value="40px"/>
-			<col value="20px,1,1,4,4"/>
-			<wndtext row="auto" col_start="2" align="right" ><background mode="solid" color="ltgray" />'Séquences :'</wndtext>
-			<textctrl col_start="3" align="left" name="sequence" style="TE_READONLY"/>
-			<textctrl col_start="4" align="left" name="info" style="TE_READONLY"/>
-			<row value="10px"/>
-			<staticbox row_start="1" row_end="0" col_start="1" col_end="0" label="Informations sur la communication avec la FIS"/>
-		</matrix>
-		<toolbar row="auto" col_start="1" col_end="0" name="tbtableau" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT" />
-		<row value="20px"/>
-	</panel>
-	<panel name="message">
-		<padding all="2px"/>
-		<col value="1,3"/>
-		<statictext row="auto" col_start="1" style="ALIGN_RIGHT" label="Message :"/>
-		<combobox col_start="2" name="message"/>
-		<toolbar row="auto" col_start="1" col_end="0" name="tb" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
-	</panel>
-	<panel name="discipline">
-		<padding all="2px"/>
-		<col value="5,1,1,5" />
-		<row value="auto" />
-		<statictext col_start="2" align="right" label="Discipline en vitesse : " />
-		<textctrl col_start="3" align="left" name="discipline"/>
-		<toolbar row="auto" col_start="1" col_end="0" name="tb" style="TB_FLAT,TB_HORIZONTAL,TB_TEXT" />
-	</panel>
-
-	<panel id="print">
-		<header>
-			<spacing all="0"/>
-			<padding all="0"/>
-			<col value="1"/>
-			<pen border="none"/>
-			<font name="Calibri" size="13" adjust="width" weight="bold"/>
-			<text row="2cm" align="center">params.Evenement_nom</text>
-		</header>
-		<first_header>
-			<font name="Calibri" size="11" adjust="width" weight="bold"/>
-			<text row="0.5cm" align="center">"Racers' Board for bib drawing"</text>
-		</first_header>
-		<footer>
-			<background mode="transparent"/>
-			<font name="Calibri" size="8" adjust="width" weight="normal"/>
-			<pen border="none"/>
-			<text row="auto" col="1" align="left"/>
-			<line col_start="1" col_end="0" pen_size="2" pen_color="dkgray" border="bottom"/>
-			<row value="auto"/>
-			<matrix col_start="1">
-				<row value="auto"/>
-				<text col="auto" align="left">app.GetName()..' Version '..app.GetVersion()..' / FFS'</text>
-				<image col="0.4cm" adjust="width" align="left">'./res/32x32_ffs.png'</image>
-				<text col="auto" align="left">' / Agil Informatique'</text>
-				<image col="0.4cm" adjust="width" align="left">'./res/32x32_agil.png'</image>
-				<text col="auto" align="left">'/ Ph.Guérindon '..os.date(' / Edition du %d-%m-%Y à %H:%M:%S')</text>
-				<text col="auto" align="left">' / version du script : '..params.Version</text>
-			</matrix>
-		</footer>
-		<label>
-			<font name="Calibri" size="9" adjust="width" weight="bold"/>
-			<pen border="all"/>
-			<row value="0.5cm"/>
-			<col value="1,1,1,1,1,5,1,1,1" />
-			<background mode="transparent"/>
-			<text row="auto" col_start="2" align="center">'Bib'</text>
-			<text col_start="3" align="center">'Rank'</text>
-			<text col_start="4" align="center">'Group'</text>
-			<text col_start="5" align="center">'Code'</text>
-			<text col_start="6" align="center">'Identity'</text>
-			<text col_start="7" align="center">'Nation'</text>
-			<text col_start="8" cond="params.EstCE == 0" align="center">'FIS Pts'</text>
-		</label>
-		<body>
-			<pen border="all"/>
-			<col value="1,1,1,1,1,5,1,1,1" />
-			<call option="couleur_alternee" file="./edition/options.xml"/>
-			<row value="0.5cm"/>
-			<font name="Calibri" size="9" adjust="width" color="black" weight="normal"/>
-			<text col_start="2" align="center" cond="body:GetCellInt('Dossard', row) &gt; 0">$(Dossard)</text>
-			<text col_start="2" align="center" cond="body:GetCellInt('Dossard', row) == 0">''</text>
-			<text col_start="3" align="center">$(Rang_tirage)</text>
-			<text col_start="4" align="center">$(Groupe_tirage)</text>
-			<text col_start="5" align="center">$(Code_coureur):sub(4)</text>
-			<text col_start="6" align="left">$(Nom)..' '..$(Prenom)</text>
-			<text col_start="7" align="center">$(Nation)</text>
-			<text col_start="8" cond="params.EstCE == 0" align="center">$(FIS_pts)</text>
-		</body>
-	</panel>
-	<!-- Edition factorisée des étiquettes -->
-	<report id="parti_etiquette_factorise" title="Liste Alphabétique des Participants par Nation" first_header="0">
-		<header />
-		<first_header />
-		<footer />
-		<label />
-		<layers />
-		<!-- <layer /> -->
-		<!-- <order key="(params.Orderby)" /> -->
-		<paper orientation="landscape" />
-		<margin top="50" bottom="50" />
-		<lua>x = 0;
+  <panel name="config">
+    <padding all="2px"/>
+    <col value="1"/>
+    <row value="50px"/>
+    <matrix row="auto">
+      <col value="1,1,1,1"/>
+      <row value="40px"/>
+      <padding all="5px"/>
+      <textctrl row="150px" col_start="2" col_end="3" style="TE_CENTER|TE_READONLY|TE_MULTILINE" name="race_name">
+        <background mode="solid" color="ltgray"/>
+      </textctrl>
+      <statictext row="auto" col_start="2" style="ALIGN_RIGHT" label="Codex : "/>
+      <textctrl col_start="3" style="TE_READONLY" name="codex"/>
+      <statictext row="auto" col_start="2" style="ALIGN_RIGHT" label="Hostname : "/>
+      <textctrl col_start="3" style="TE_READONLY" name="fis_hostname"/>
+      <statictext row="auto" col_start="2" style="ALIGN_RIGHT" label="Port : "/>
+      <textctrl col_start="3" name="fis_port"/>
+      <statictext row="auto" col_start="2" style="ALIGN_RIGHT" label="Mot de Passe : "/>
+      <textctrl col_start="3" name="fis_pwd"/>
+      <row value="20px"/>
+      <textctrl row="auto" col_start="3" cond="discipline=='AC'" name="discipline_vitesse"/>
+      <statictext col_start="2" style="ALIGN_RIGHT" cond="discipline=='AC'" label="Discipline en vitesse : "/>
+      <row value="20px"/>
+      <toolbar row="auto" col_start="1" name="tbconfig" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
+    </matrix>
+    <row value="1"/>
+  </panel>
+  <panel name="gridCE">
+    <padding all="2px"/>
+    <col value="50px,1,50px"/>
+    <row value="10px"/>
+    <grid row="1" col_start="2" name="tableau"/>
+    <row value="10px"/>
+    <matrix row="auto" col_start="2">
+      <row value="40px"/>
+      <col value="1+50px,1,4,4,1,1,1,1,1,1,1"/>
+      <wndtext row="30px" col_start="1" align="center">
+        <background mode="solid" color="ltgray"/>'Code_FIS' </wndtext>
+      <wndtext col_start="2" align="center">
+        <background mode="solid" color="ltgray"/>'Groupe' </wndtext>
+      <wndtext col_start="3" align="center">
+        <background mode="solid" color="ltgray"/>'Nom' </wndtext>
+      <wndtext col_start="4" align="center">
+        <background mode="solid" color="ltgray"/>'Prenom' </wndtext>
+      <wndtext col_start="5" align="center">
+        <background mode="solid" color="ltgray"/>'Sexe' </wndtext>
+      <wndtext col_start="6" align="center">
+        <background mode="solid" color="ltgray"/>'Année' </wndtext>
+      <wndtext col_start="7" align="center">
+        <background mode="solid" color="ltgray"/>'Nation' </wndtext>
+      <wndtext col_start="8" align="center">
+        <background mode="solid" color="ltgray"/>'FIS Pts' </wndtext>
+      <wndtext col_start="9" align="center">
+        <background mode="solid" color="ltgray"/>'FIS Clt' </wndtext>
+      <textctrl row="auto" col_start="1" align="left" name="code"/>
+      <textctrl col_start="2" align="left" name="groupe"/>
+      <textctrl col_start="3" align="left" name="nom"/>
+      <textctrl col_start="4" align="left" name="prenom"/>
+      <textctrl col_start="5" align="left" name="sexe"/>
+      <textctrl col_start="6" align="left" name="an"/>
+      <textctrl col_start="7" align="left" name="nation"/>
+      <textctrl col_start="8" align="left" name="points"/>
+      <textctrl col_start="9" align="left" name="classement"/>
+      <button col_start="10" align="left" name="ajouter" label="Ajouter"/>
+      <row value="10px"/>
+      <staticbox row_start="1" row_end="0" col_start="1" col_end="0" label="Recherche de coureur"/>
+    </matrix>
+    <row value="10px"/>
+    <matrix row="auto" col_start="2">
+      <row value="40px"/>
+      <col value="20px,1,1,4,4"/>
+      <wndtext row="auto" col_start="2" align="right">
+        <background mode="solid" color="ltgray"/>'Séquences :'</wndtext>
+      <textctrl col_start="3" align="left" name="sequence" style="TE_READONLY"/>
+      <textctrl col_start="4" align="left" name="info" style="TE_READONLY"/>
+      <row value="10px"/>
+      <staticbox row_start="1" row_end="0" col_start="1" col_end="0" label="Informations sur la communication avec la FIS"/>
+    </matrix>
+    <toolbar row="auto" col_start="1" col_end="0" name="tbtableau" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
+    <row value="20px"/>
+  </panel>
+  <panel name="gridFIS">
+    <padding all="2px"/>
+    <col value="50px,1,50px"/>
+    <row value="10px"/>
+    <grid row="1" col_start="2" name="tableau"/>
+    <row value="10px"/>
+    <matrix row="auto" col_start="2">
+      <row value="40px"/>
+      <col value="1+50px,1,4,4,1,1,1,4,1,1,1,1"/>
+      <wndtext row="30px" col_start="1" align="center">
+        <background mode="solid" color="ltgray"/>'Code_FIS' </wndtext>
+      <wndtext col_start="2" align="center">
+        <background mode="solid" color="ltgray"/>'Groupe' </wndtext>
+      <wndtext col_start="3" align="center">
+        <background mode="solid" color="ltgray"/>'Nom' </wndtext>
+      <wndtext col_start="4" align="center">
+        <background mode="solid" color="ltgray"/>'Prenom' </wndtext>
+      <wndtext col_start="5" align="center">
+        <background mode="solid" color="ltgray"/>'Année' </wndtext>
+      <wndtext col_start="6" align="center">
+        <background mode="solid" color="ltgray"/>'Nation' </wndtext>
+      <wndtext col_start="7" align="center">
+        <background mode="solid" color="ltgray"/>'Comité' </wndtext>
+      <wndtext col_start="8" align="center">
+        <background mode="solid" color="ltgray"/>'Club' </wndtext>
+      <wndtext col_start="9" align="center">
+        <background mode="solid" color="ltgray"/>'FIS Pts' </wndtext>
+      <wndtext col_start="10" align="center">
+        <background mode="solid" color="ltgray"/>'FIS Clt' </wndtext>
+      <textctrl row="auto" col_start="1" align="left" name="code"/>
+      <textctrl col_start="2" align="left" name="groupe"/>
+      <textctrl col_start="3" align="left" name="nom"/>
+      <textctrl col_start="4" align="left" name="prenom"/>
+      <textctrl col_start="5" align="left" name="an"/>
+      <textctrl col_start="6" align="left" name="nation"/>
+      <textctrl col_start="7" align="left" name="comite"/>
+      <textctrl col_start="8" align="left" name="club"/>
+      <textctrl col_start="9" align="left" name="points"/>
+      <textctrl col_start="10" align="left" name="classement"/>
+      <button col_start="11" align="left" name="ajouter" label="Ajouter"/>
+      <row value="10px"/>
+      <staticbox row_start="1" row_end="0" col_start="1" col_end="0" label="Recherche de coureur"/>
+    </matrix>
+    <row value="10px"/>
+    <matrix row="auto" col_start="2">
+      <row value="40px"/>
+      <col value="20px,1,1,4,4"/>
+      <wndtext row="auto" col_start="2" align="right">
+        <background mode="solid" color="ltgray"/>'Séquences :'</wndtext>
+      <textctrl col_start="3" align="left" name="sequence" style="TE_READONLY"/>
+      <textctrl col_start="4" align="left" name="info" style="TE_READONLY"/>
+      <row value="10px"/>
+      <staticbox row_start="1" row_end="0" col_start="1" col_end="0" label="Informations sur la communication avec la FIS"/>
+    </matrix>
+    <toolbar row="auto" col_start="1" col_end="0" name="tbtableau" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
+    <row value="20px"/>
+  </panel>
+  <panel name="message">
+    <padding all="2px"/>
+    <col value="1,3"/>
+    <statictext row="auto" col_start="1" style="ALIGN_RIGHT" label="Message :"/>
+    <combobox col_start="2" name="message"/>
+    <toolbar row="auto" col_start="1" col_end="0" name="tb" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
+  </panel>
+  <panel name="discipline">
+    <padding all="2px"/>
+    <col value="5,1,1,5"/>
+    <row value="auto"/>
+    <statictext col_start="2" align="right" label="Discipline en vitesse : "/>
+    <textctrl col_start="3" align="left" name="discipline"/>
+    <toolbar row="auto" col_start="1" col_end="0" name="tb" style="TB_FLAT,TB_HORIZONTAL,TB_TEXT"/>
+  </panel>
+  <panel id="print">
+    <header>
+      <spacing all="0"/>
+      <padding all="0"/>
+      <col value="1"/>
+      <pen border="none"/>
+      <font name="Calibri" size="13" adjust="width" weight="bold"/>
+      <text row="2cm" align="center">params.Evenement_nom</text>
+    </header>
+    <first_header>
+      <font name="Calibri" size="11" adjust="width" weight="bold"/>
+      <text row="0.5cm" align="center">"Racers' Board for bib drawing"</text>
+    </first_header>
+    <footer>
+      <background mode="transparent"/>
+      <font name="Calibri" size="8" adjust="width" weight="normal"/>
+      <pen border="none"/>
+      <text row="auto" col="1" align="left"/>
+      <line col_start="1" col_end="0" pen_size="2" pen_color="dkgray" border="bottom"/>
+      <row value="auto"/>
+      <matrix col_start="1">
+        <row value="auto"/>
+        <text col="auto" align="left">app.GetName()..' Version '..app.GetVersion()..' / FFS'</text>
+        <image col="0.4cm" adjust="width" align="left">'./res/32x32_ffs.png'</image>
+        <text col="auto" align="left">' / Agil Informatique'</text>
+        <image col="0.4cm" adjust="width" align="left">'./res/32x32_agil.png'</image>
+        <text col="auto" align="left">'/ Ph.Guérindon '..os.date(' / Edition du %d-%m-%Y à %H:%M:%S')</text>
+        <text col="auto" align="left">' / version du script : '..params.Version</text>
+      </matrix>
+    </footer>
+    <label>
+      <font name="Calibri" size="9" adjust="width" weight="bold"/>
+      <pen border="all"/>
+      <row value="0.5cm"/>
+      <col value="1,1,1,1,1,5,1,1,1"/>
+      <background mode="transparent"/>
+      <text row="auto" col_start="2" align="center">'Bib'</text>
+      <text col_start="3" align="center">'Rank'</text>
+      <text col_start="4" align="center">'Group'</text>
+      <text col_start="5" align="center">'Code'</text>
+      <text col_start="6" align="center">'Identity'</text>
+      <text col_start="7" align="center">'Nation'</text>
+      <text col_start="8" cond="params.EstCE == 0" align="center">'FIS Pts'</text>
+    </label>
+    <body>
+      <pen border="all"/>
+      <col value="1,1,1,1,1,5,1,1,1"/>
+      <call option="couleur_alternee" file="./edition/options.xml"/>
+      <row value="0.5cm"/>
+      <font name="Calibri" size="9" adjust="width" color="black" weight="normal"/>
+      <text col_start="2" align="center" cond="body:GetCellInt('Dossard', row) &gt; 0">$(Dossard)</text>
+      <text col_start="2" align="center" cond="body:GetCellInt('Dossard', row) == 0">''</text>
+      <text col_start="3" align="center">$(Rang_tirage)</text>
+      <text col_start="4" align="center">$(Groupe_tirage)</text>
+      <text col_start="5" align="center">$(Code_coureur):sub(4)</text>
+      <text col_start="6" align="left">$(Nom)..' '..$(Prenom)</text>
+      <text col_start="7" align="center">$(Nation)</text>
+      <text col_start="8" cond="params.EstCE == 0" align="center">$(FIS_pts)</text>
+    </body>
+  </panel>
+  <!-- Edition factorisée des étiquettes -->
+  <report id="parti_etiquette_factorise" title="Liste Alphabétique des Participants par Nation" first_header="0">
+    <header/>
+    <first_header/>
+    <footer/>
+    <label/>
+    <layers/>
+    <!-- <layer /> -->
+    <!-- <order key="(params.Orderby)" /> -->
+    <paper orientation="landscape"/>
+    <margin top="50" bottom="50"/>
+    <lua>x = 0;
 		</lua>
-		<body>
-			<font size="28" weight="bold" adjust="ellipsize"/>
-			<lua>x = x + 1;</lua>
-			<row value="0.3cm,1.4cm,1.4cm,0.9cm"/>
-			<col value="1, 2cm, 13cm, 5cm, 1" />
-			<image row_start="2" row_end="3" col_start="1" adjust="best" align="center" border="0"><background mode="transparent"/>app.ImageNation($(Nation))</image> 
-			<text row_start="2" row_end="3" col_start="2" align="center" font_size_step="-6">$(Nation)</text>
-			<text row_start="2" col_start="3" >$(Nom)</text> 
-			<text row_start="2" col_start="3" align="right" font_size_step="-6">'('..$(Rang_tirage)..')'</text> 
-			<text row_start="3" col_start="3" >$(Prenom)</text>
-			<text row_start="2" col_start="4" align="center" font_size_step="-6" cond="$(Categ) == 'U18'">$(Categ)..'/'..$(An)</text>
-			<text row_start="2" col_start="4" align="center" font_size_step="-6" cond="$(Categ) ~= 'U18'">$(An)</text>
-			<text row_start="2" col_start="5" align="center" font_size_step="-6">$(Point)</text>
-			<lua>if params.EstCE == 1 then</lua>
-				<lua>if body:GetCellInt('WCSL_points', row) == 0 and body:GetCellInt('ECSL_overall_points', row) == 0 and body:GetCellInt('ECSL_overall_points', row) == 0 and body:GetCell('Winner_CC', row):len() == 0 then</lua>
-					<text row_start="3" col_start="3" col_end="4" align="right" font_size_step="-3">'ECSL pts/rank'</text>
-					<text row_start="3" col_start="5" align="center" font_size_step="-3">$(ECSL_points)..' / '..$(ECSL_rank)</text>
-				<lua>else</lua>
-					<font size="20" />
-					<matrix row_start="3" col_start="1" col_end="0">
-						<col value="17cm,1" />
-						<text row="auto" col_start="2" cond="body:GetCellInt('WCSL_points', row) &gt; 0">'ECSL pts/rank  '..$(ECSL_points)..' / '..$(ECSL_rank)..'\nWCSL pts/rank '..$(WCSL_points)..' / '..$(WCSL_rank)</text>
-						<text row="auto" col_start="2" cond="body:GetCellInt('ECSL_overall_points', row) &gt; 0">'ECSL pts/rank  '..$(ECSL_points)..' / '..$(ECSL_rank)..'\nECSL Overall Pts/rank '..$(ECSL_overall_points)..' / '..$(ECSL_overall_rank)</text>
-						<text row="auto" col_start="2" cond="body:GetCell('Winner_CC', row):len() &gt; 0">'ECSL pts/rank  '..$(ECSL_points)..' / '..$(ECSL_rank)..'\nCC Winner'</text>
-
-						<!-- <text align="right" cond="body:GetCellInt('ECSL_overall_points', row) &gt; 0">'ECSL Overall Pts/rank '..$(ECSL_overall_points)..' / '..$(ECSL_overall_rank)..' - ECSL pts/rank  '..$(ECSL_points)..' / '..$(ECSL_rank)</text> -->
-						<!-- <text align="right" cond="body:GetCell('Winner_CC', row):len() &gt; 0">'CC Winner - ECSL pts/rank  '..$(ECSL_points)..' / '..$(ECSL_rank)</text> -->
-					</matrix>
-				<lua>end</lua>
-			<lua>end</lua>
-			<line row_start="4" col_start="1" col_end="0" pen_size="1" border="bottom" cond="row ~= params.RowSeparation and x &lt; 5 and not _context_border"/>
-			<line row_start="4" col_start="1" col_end="0" pen_size="20" border="bottom" cond="row == params.RowSeparation and x &lt; 5 and not _context_border"/>
-			<lua>if x == 5 then x = 0; end</lua>
-		</body>
-	</report>
-	<report id="print_tableau" title="Racers' Board" first_header="0">
-		<header>
-			<spacing all="0"/>
-			<background mode="transparent"/>
-			<font name="Calibri" size="14" adjust="max" weight="bold"/>
-			<text row="1cm" align="center" >$(Evenement.Nom)</text>
-			<text row="1cm" align="center" cond="title" >title</text>
-
-			<!-- <text row="3cm" align="left"><font orientation="90" origin="left,bottom"/>'HELLO'</text> -->
-			<row value="0.5cm"/>
-		</header>
-		<first_header />
-		<footer>
-			<background mode="transparent"/>
-			<font name="Calibri" size="8" adjust="best" weight="normal"/>
-			<pen border="none" />
-
-			<lua>entite = entite or $(Evenement.Code_entite)</lua>
-			<lua>info = $(Epreuve.Date_epreuve,'%2D/%2M/%4Y')..' / '..$(Evenement.Station)..' ('</lua>
-			<lua cond="entite=='FIS'">info = info..$(Evenement.Code_nation)..'-'</lua>
-			<lua>info = info..$(Evenement.Code_comite).. ') / '..$(Evenement.Organisateur)</lua>
-			<text row="auto" col="1" align="left">info</text>
-			<text align="right" font_weight="bold" cond="entite=='FIS'">$(Epreuve.Fichier_transfert_int)..' (Liste n°'..$(Evenement.Code_liste)..')'</text>
-			<text align="right" font_weight="bold" cond="entite=='FFS'">$(Epreuve.Fichier_transfert)..' (Liste n°'..$(Evenement.Code_liste)..')'</text>
-			<line col_start="1" col_end="0" pen_size="2" pen_color="dkgray" border="bottom"/>
-			<!-- <text row="auto" align="left"><pen border="top" />app.GetName()..' Version '..app.GetVersion()..' (FFS - ESF - Agil Informatique) - '..os.date('Edité le %d-%m-%Y à %H:%M:%S')</text> -->
-			
-			<row value="auto" />
-			<matrix col_start="1">
-				<row value="auto"/>
-				<text col="auto" align="left">app.GetName()..' Version '..app.GetVersion()..' / FFS'</text>
-				<image col="0.4cm" adjust="width" align="left">'./res/32x32_ffs.png'</image>
-				<text col="auto" align="left" adjust="width">' / ESF'</text>
-				<image col="0.4cm" adjust="width" align="left">'./res/32x32_esf.png'</image>
-				<text col="auto" align="left">' / Agil Informatique - Philippe Guérindon'</text>
-				<image col="0.4cm" adjust="width" align="left">'./res/32x32_agil.png'</image>
-				<text col="auto" align="left">os.date(' / Edité le %d-%m-%Y à %H:%M:%S')</text>
-			</matrix>	
-			<text align="right">string.format('Page %d/%s',editor:GetPageCurrent(), editor:GetPageCountLabel())</text>
-			<line col_start="1" col_end="0" border="top" />
-			<text row="auto" align="left" cond="editor:GetPageCurrent() == 1">$(Evenement.Commentaire)</text>
-		</footer>
-		<layers />
-		<!-- <layer /> -->
-		<!-- <order key="(params.Orderby)" /> -->
-		<paper orientation="landscape" />
-		<margin top="50" bottom="50" />
-		<lua>lignedouble = 0;
+    <body>
+      <font size="28" weight="bold" adjust="ellipsize"/>
+      <lua>x = x + 1;</lua>
+      <row value="0.3cm,1.4cm,1.4cm,0.9cm"/>
+      <col value="1, 2cm, 13cm, 5cm, 1"/>
+      <image row_start="2" row_end="3" col_start="1" adjust="best" align="center" border="0">
+        <background mode="transparent"/>app.ImageNation($(Nation))</image>
+      <text row_start="2" row_end="3" col_start="2" align="center" font_size_step="-6">$(Nation)</text>
+      <text row_start="2" col_start="3">$(Nom)</text>
+      <text row_start="2" col_start="3" align="right" font_size_step="-6">'('..$(Rang_tirage)..')'</text>
+      <text row_start="3" col_start="3">$(Prenom)</text>
+      <text row_start="2" col_start="4" align="center" font_size_step="-6" cond="$(Categ) == 'U18'">$(Categ)..'/'..$(An)</text>
+      <text row_start="2" col_start="4" align="center" font_size_step="-6" cond="$(Categ) ~= 'U18'">$(An)</text>
+      <text row_start="2" col_start="5" align="center" font_size_step="-6">$(Point)</text>
+      <lua>if params.EstCE == 1 then</lua>
+      <lua>if body:GetCellInt('WCSL_points', row) == 0 and body:GetCellInt('ECSL_overall_points', row) == 0 and body:GetCellInt('ECSL_overall_points', row) == 0 and body:GetCell('Winner_CC', row):len() == 0 then</lua>
+      <text row_start="3" col_start="3" col_end="4" align="right" font_size_step="-3">'ECSL pts/rank'</text>
+      <text row_start="3" col_start="5" align="center" font_size_step="-3">$(ECSL_points)..' / '..$(ECSL_rank)</text>
+      <lua>else</lua>
+      <font size="20"/>
+      <matrix row_start="3" col_start="1" col_end="0">
+        <col value="17cm,1"/>
+        <text row="auto" col_start="2" cond="body:GetCellInt('WCSL_points', row) &gt; 0">'ECSL pts/rank  '..$(ECSL_points)..' / '..$(ECSL_rank)..'\nWCSL pts/rank '..$(WCSL_points)..' / '..$(WCSL_rank)</text>
+        <text row="auto" col_start="2" cond="body:GetCellInt('ECSL_overall_points', row) &gt; 0">'ECSL pts/rank  '..$(ECSL_points)..' / '..$(ECSL_rank)..'\nECSL Overall Pts/rank '..$(ECSL_overall_points)..' / '..$(ECSL_overall_rank)</text>
+        <text row="auto" col_start="2" cond="body:GetCell('Winner_CC', row):len() &gt; 0">'ECSL pts/rank  '..$(ECSL_points)..' / '..$(ECSL_rank)..'\nCC Winner'</text>
+       </matrix>
+      <lua>end</lua>
+      <lua>end</lua>
+      <line row_start="4" col_start="1" col_end="0" pen_size="1" border="bottom" cond="row ~= params.RowSeparation and x &lt; 5 and not _context_border"/>
+      <line row_start="4" col_start="1" col_end="0" pen_size="20" border="bottom" cond="row == params.RowSeparation and x &lt; 5 and not _context_border"/>
+      <lua>if x == 5 then x = 0; end</lua>
+    </body>
+  </report>
+  <report id="print_tableau" title="Racers' Board" first_header="0">
+    <header>
+      <spacing all="0"/>
+      <background mode="transparent"/>
+      <font name="Calibri" size="14" adjust="max" weight="bold"/>
+      <text row="1cm" align="center">$(Evenement.Nom)</text>
+      <text row="1cm" align="center" cond="title">title</text>
+      <!-- <text row="3cm" align="left"><font orientation="90" origin="left,bottom"/>'HELLO'</text> -->
+      <row value="0.5cm"/>
+    </header>
+    <first_header/>
+    <footer>
+      <background mode="transparent"/>
+      <font name="Calibri" size="8" adjust="best" weight="normal"/>
+      <pen border="none"/>
+      <lua>entite = entite or $(Evenement.Code_entite)</lua>
+      <lua>info = $(Epreuve.Date_epreuve,'%2D/%2M/%4Y')..' / '..$(Evenement.Station)..' ('</lua>
+      <lua cond="entite=='FIS'">info = info..$(Evenement.Code_nation)..'-'</lua>
+      <lua>info = info..$(Evenement.Code_comite).. ') / '..$(Evenement.Organisateur)</lua>
+      <text row="auto" col="1" align="left">info</text>
+      <text align="right" font_weight="bold" cond="entite=='FIS'">$(Epreuve.Fichier_transfert_int)..' (Liste n°'..$(Evenement.Code_liste)..')'</text>
+      <text align="right" font_weight="bold" cond="entite=='FFS'">$(Epreuve.Fichier_transfert)..' (Liste n°'..$(Evenement.Code_liste)..')'</text>
+      <line col_start="1" col_end="0" pen_size="2" pen_color="dkgray" border="bottom"/>
+      <!-- <text row="auto" align="left"><pen border="top" />app.GetName()..' Version '..app.GetVersion()..' (FFS - ESF - Agil Informatique) - '..os.date('Edité le %d-%m-%Y à %H:%M:%S')</text> -->
+      <row value="auto"/>
+      <matrix col_start="1">
+        <row value="auto"/>
+        <text col="auto" align="left">app.GetName()..' Version '..app.GetVersion()..' / FFS'</text>
+        <image col="0.4cm" adjust="width" align="left">'./res/32x32_ffs.png'</image>
+        <text col="auto" align="left" adjust="width">' / ESF'</text>
+        <image col="0.4cm" adjust="width" align="left">'./res/32x32_esf.png'</image>
+        <text col="auto" align="left">' / Agil Informatique - Philippe Guérindon'</text>
+        <image col="0.4cm" adjust="width" align="left">'./res/32x32_agil.png'</image>
+        <text col="auto" align="left">os.date(' / Edité le %d-%m-%Y à %H:%M:%S')</text>
+      </matrix>
+      <text align="right">string.format('Page %d/%s',editor:GetPageCurrent(), editor:GetPageCountLabel())</text>
+      <line col_start="1" col_end="0" border="top"/>
+      <text row="auto" align="left" cond="editor:GetPageCurrent() == 1">$(Evenement.Commentaire)</text>
+    </footer>
+    <layers/>
+    <!-- <layer /> -->
+    <!-- <order key="(params.Orderby)" /> -->
+    <paper orientation="landscape"/>
+    <margin top="50" bottom="50"/>
+    <lua>lignedouble = 0; lastrowECSL_30 = 0;
 		</lua>
-		<body>
-			<font size="10" weight="normal" adjust="ellipsize"/>
-			<call option="couleur_alternee" file="./edition/options.xml" />
-			<lua>if params.EstCE == 1 then</lua>
-				<lua>if row &lt; body:GetNbRows() -1 then</lua>
-					<lua>if body:GetCellInt('ECSL_30', row+1) == 0 and body:GetCellInt('ECSL_30', row+1) then</lua>
-						<lua>if lignedouble == 0 then lignedouble = 1;</lua>
-							<background mode="solid" color="ltyellow" />
-						<lua>end</lua>
-					<lua>end</lua>
-				<lua>end</lua>
-			<lua>end</lua>
-
-			<row value="auto"/>
-			<text col="4" align="center" label="Rank">$(Rang_tirage)</text>
-			<text col="4" align="center" label="Group">$(Groupe_tirage)</text>
-			<text col="5" align="center" label="Code">$(Code_coureur):sub(4)</text>
-			<text col="20" label="Identity" font_weight="bold" font_size_step="1">$(Nom)..'   '..$(Prenom)</text> 
-			<text col="4" align="center" label="Nation">$(Nation)</text> 
-			<lua>if params.EstCE == 1 then</lua>
-				<text col="5" align="center" label="ECSL pts">$(ECSL_points)</text>
-				<text col="5" align="center" label="ECSL rank">$(ECSL_rank)</text>
-				<text col="5" align="center" label="FIS Pts">$(FIS_pts)</text>
-				<text col="5" align="center" label="FIS rank">$(FIS_clt)</text>
-				<lua>if params.EstVitesse == 1 then</lua>
-					<text col="5" align="center" label="FIS SG Pts">$(FIS_SG_pts)</text>
-					<text col="5" align="center" label="FIS SG rank">$(FIS_SG_clt)</text>
-				<lua>end</lua>
-				<text col="5" align="center" label="WCSL pts">$(WCSL_points)</text>
-				<text col="5" align="center" label="WCSL rank">$(WCSL_rank)</text>
-				<text col="5" align="center" label="/ All Pts">$(ECSL_overall_points)</text>
-				<text col="5" align="center" label="/ All rank">$(ECSL_overall_rank)</text>
-				<text col="5" align="center" label="Winner CC">$(Winner_CC)</text>
-			<lua>else</lua>
-				<text col="5" align="center" label="FIS Pts">$(FIS_pts)</text>
-				<text col="5" align="center" label="FIS rank">$(FIS_clt)</text>
-			<lua>end</lua>
-		</body>
-	</report>
-
+    <body>
+      <font size="10" weight="normal" adjust="ellipsize"/>
+      <call option="couleur_alternee" file="./edition/options.xml"/>
+      <lua>if params.EstCE == 1 then
+			if row &lt; body:GetNbRows() -2 then 
+				row_next = row+1; 
+			end
+	  </lua>
+       <background mode="solid" color="ltyellow" cond="body:GetCellInt('ECSL_30', row) == 99"/>
+      <lua>end</lua>
+      <row value="auto"/>
+      <text col="4" align="center" label="Rank">$(Rang_tirage)</text>
+      <text col="4" align="center" label="Group">$(Groupe_tirage)</text>
+      <text col="5" align="center" label="Code">$(Code_coureur):sub(4)</text>
+      <text col="20" label="Identity" font_weight="bold" font_size_step="1">$(Nom)..'   '..$(Prenom)</text>
+      <text col="4" align="center" label="Nation">$(Nation)</text>
+      <lua>if params.EstCE == 1 then</lua>
+      <text col="5" align="center" label="ECSL pts">$(ECSL_points)</text>
+      <text col="5" align="center" label="ECSL rank">$(ECSL_rank)</text>
+      <text col="5" align="center" label="FIS Pts">$(FIS_pts)</text>
+      <text col="5" align="center" label="FIS rank">$(FIS_clt)</text>
+      <lua>if params.EstVitesse == 1 then</lua>
+      <text col="5" align="center" label="FIS SG Pts">$(FIS_SG_pts)</text>
+      <text col="5" align="center" label="FIS SG rank">$(FIS_SG_clt)</text>
+      <lua>end</lua>
+      <text col="5" align="center" label="WCSL pts">$(WCSL_points)</text>
+      <text col="5" align="center" label="WCSL rank">$(WCSL_rank)</text>
+      <text col="5" align="center" label="/ All Pts">$(ECSL_overall_points)</text>
+      <text col="5" align="center" label="/ All rank">$(ECSL_overall_rank)</text>
+      <text col="5" align="center" label="Winner CC">$(Winner_CC)</text>
+      <!-- <text col="5" align="center" label="ECSL_30">$(ECSL_30)</text> -->
+      <lua>else</lua>
+      <text col="5" align="center" label="FIS Pts">$(FIS_pts)</text>
+      <text col="5" align="center" label="FIS rank">$(FIS_clt)</text>
+      <lua>end</lua>
+    </body>
+  </report>
 </root>
