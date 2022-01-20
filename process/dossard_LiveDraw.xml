@@ -321,6 +321,9 @@
 				<text col="5" align="center" label="/ All Pts">$(ECSL_overall_points)</text>
 				<text col="5" align="center" label="/ All rank">$(ECSL_overall_rank)</text>
 				<text col="5" align="center" label="Winner CC">$(Winner_CC)</text>
+			<lua>else</lua>
+				<text col="5" align="center" label="FIS Pts">$(FIS_pts)</text>
+				<text col="5" align="center" label="FIS rank">$(FIS_clt)</text>
 			<lua>end</lua>
 		</body>
 	</report>
