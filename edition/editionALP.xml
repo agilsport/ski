@@ -833,6 +833,24 @@
 		
 	<!-- Analyse des Performances " -->
 	<report id="res_performance" title="Analyse des performances" first_header="0">
+			<lua>dofile('./xml/xmlTools.lua');
+				tResultat_Inter = base:GetTable('Resultat_Inter');
+				nb_inter = nb_inter or 0;
+				best_inter1 = 0;
+				best_inter2 = 0;
+				best_inter3 = 0;
+				for i = 1, nb_inter do
+					cmd = "Select * From Resultat_Inter Where Code_evenement = "..params.code_evenement.." And Not Code_coureur Like 'EXT%' And Code_inter = "..i..' Order By Tps';
+					base:TableLoad(tResultat_Inter, cmd);
+					if i == 1 then best_inter1 = tResultat_Inter:GetCellInt('Tps', 0); end
+					if i == 2 then best_inter2 = tResultat_Inter:GetCellInt('Tps', 0); end
+					if i == 3 then best_inter3 = tResultat_Inter:GetCellInt('Tps', 0); end
+				end
+				best_inter1 = best_inter1 or 0;
+				best_inter2 = best_inter2 or 0;
+				best_inter3 = best_inter3 or 0;
+			</lua>
+
 		<order key="('Clt'..manche..', Dossard Desc')" />
 		<paper orientation="portrait" />
 		
@@ -850,6 +868,18 @@
 		</label>
 		
 		<body>
+			<lua>
+				if row == 0 then best_time = body:GetCellInt('Tps'..manche, row); end
+				diff = body:GetCellInt('Tps'..manche, row) - best_time;
+				diff_inter1 = body:GetCellInt('Tps'..manche..'_inter1', row) - best_inter1;
+				diff_inter2 = body:GetCellInt('Tps'..manche..'_inter2', row) - best_inter2;
+				diff_inter3 = body:GetCellInt('Tps'..manche..'_inter3', row) - best_inter3;
+				if diff_inter1 &gt; 0 then diff_inter1 = ' - (+'..app.TimeToString(diff_inter1, '%xs.%2f')..')' else diff_inter1 = ''; end ;
+				if diff_inter2 &gt; 0 then diff_inter2 = ' - (+'..app.TimeToString(diff_inter2, '%xs.%2f')..')' else diff_inter2 = ''; end ;
+				if diff_inter3 &gt; 0 then diff_inter3 = ' - (+'..app.TimeToString(diff_inter3, '%xs.%2f')..')' else diff_inter3 = ''; end;
+				diff = body:GetCellInt('Tps'..manche, row) - best_time;
+				if diff &gt; 0 then diff = ' - (+'..app.TimeToString(diff, '%xs.%2f')..')' else diff = ''; end ;
+			</lua>
 			<call option="couleur_alternee" file="./edition/options.xml" />
 			<font size="9" adjust="ellipsize"/>
 	
@@ -888,21 +918,22 @@
 			<col value="8" />
 			<text row_start="1" align="center" font_size_step="-2">
 				<background mode="solid" color="yellow" cond="body:GetCell('Clt'..manche..'_inter1', row) == '1'" />
-				body:GetCell('Tps'..manche..'_inter1', row)..' '..body:GetCell('Clt'..manche..'_inter1', row):Parenthesis()
+				body:GetCell('Tps'..manche..'_inter1', row)..' '..body:GetCell('Clt'..manche..'_inter1', row):Parenthesis()..diff_inter1
 			</text> 
+
 			<text row_start="2" align="center" font_size_step="-2">
 				<background mode="solid" color="yellow" cond="body:GetCell('Clt'..manche..'_inter2', row) == '1'" />
-				body:GetCell('Tps'..manche..'_inter2', row)..' '..body:GetCell('Clt'..manche..'_inter2', row):Parenthesis()
+				body:GetCell('Tps'..manche..'_inter2', row)..' '..body:GetCell('Clt'..manche..'_inter2', row):Parenthesis()..diff_inter2
 			</text> 
 			<text row_start="3" align="center" font_size_step="-2">
 				<background mode="solid" color="yellow" cond="body:GetCell('Clt'..manche..'_inter3', row) == '1'" />
-				body:GetCell('Tps'..manche..'_inter3', row)..' '..body:GetCell('Clt'..manche..'_inter3', row):Parenthesis()
+				body:GetCell('Tps'..manche..'_inter3', row)..' '..body:GetCell('Clt'..manche..'_inter3', row):Parenthesis()..diff_inter3
 			</text> 
 
-			<text col="8" row_start="1" row_end="0" align="right" font_weight="bold" font_size_step="1">
+			<text col="8" row_start="1" row_end="0" align="center" font_weight="bold" font_size_step="1">
 				<background mode="solid" color="green" cond="body:GetCell('Clt'..manche, row) == '1'" />
 				<font color="white" cond="body:GetCell('Clt'..manche, row) == '1'"/>
-					body:GetCell('Tps'..manche, row)
+					body:GetCell('Tps'..manche, row)..diff;
 			</text> 
 		</body>
 	</report>
