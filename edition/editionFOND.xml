@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- Menu Editions Activité "FOND" !-->
-<!-- version="6.2" !-->
+<!-- version="6.3" !-->
 <!-- nettoyage du fichier mise en place de la fonction getidentitecoureur -->
 <!-- Activation de la fenetre filtrage epreuves pour une edition gerer par un .lua => Option filter="before" -->
 <!-- calcul de la note poursuite 2éme jour !-->
@@ -22,7 +22,7 @@
 		</menu>
 		
 		<menu title="Listes de Départ" image="./res/32x32_bib.png">
-			<menu title="Sans entête" image="./res/16x16_official.png" header="1" first_header="0" id="Lst_officielle" officiel="0"/>
+			<menu title="Officieuse" image="./res/16x16_official.png" header="1" first_header="0" id="Lst_officielle" officiel="0"/>
 			<menu title="Officielle" image="./res/16x16_official.png" id="Lst_officielle" Qrcode="0" officiel="1"/>
 			<menu title="Par Nation" image="./res/16x16_bib.png" page_break="1" orderby="Nation" id="Lst_officielle_Filtrer"/>
 			<menu title="Par Comite" image="./res/16x16_bib.png" page_break="1" orderby="Comite" id="Lst_officielle_Filtrer"/>
@@ -40,7 +40,7 @@
 			<menu title="Officieux" image="./res/16x16_ranking.png" id="res_officiel" first_header="0" officiel="0" />
 			<menu title="Officiels" image="./res/16x16_official.png" id="res_officiel" officiel="1" />
 			<menu title="Officiels poursuite 2éme Jour" image="./res/16x16_official.png" id="res_off_Pours" officiel="1" />
-			<menu title="par épreuve / catégories et sexe" image="./res/16x16_ranking.png" id="res_categ" header="1" first_header="0" page_break="0" choix_clt_max="1"/>
+			<menu title="par épreuve, catégories et sexe" image="./res/16x16_ranking.png" id="res_categ" header="1" first_header="0" page_break="0" choix_clt_max="1"/>
 			<menu title="Multi épreuve(poursuite)" image="./res/16x16_juges.png"  id="res_epr2"/>
 		</menu>
 	</menu>
@@ -447,13 +447,7 @@
 			officiel = tonumber(params.officiel)
 			Regroupement = $(Epreuve.Code_regroupement)
 		</lua>	
-		<!-- <layers> -->
-			<!-- <layer id="bandeauFFS_nordique"> -->
-		<!-- </layer> -->
-		<!-- </layers> -->
-		<!-- <margin left="80" top="320" right="80" bottom="20" cond="Regroupement:In('F','SKI-TOUR')"/> -->
-		<!-- <call option="Affiche_bandeauFFS" cond="editor:GetPageCurrent() == 1 and type_edition == 'res_' or type_edition == 'lst_' and officiel == 1 and Regroupement:In('F','SKI-TOUR')" file="./edition/options.xml"/> -->
-	
+
 		<order key="Heure_depart1, Dossard, Identite" />
 		<body>
 			<call option="color_alternate" file="./edition/options.xml" />
@@ -741,7 +735,7 @@
 			<!-- <lua>end</lua> -->
 			<text col="8" align="right" label="Tps2" font_weight="bold" font_size_step="1">$(Tps2)</text>
 			<text col="8" align="right" label="Ecart." font_weight="bold" font_size_step="1">$(Diff2)</text>
-			<text col="6" align="right" label="Note">$(Note)</text> 
+			<!-- <text col="6" align="right" label="Note">$(Note)</text>  -->
 			<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
 		</body>
 		
@@ -937,184 +931,6 @@
 			<row h="0.2cm"/>
 		</body>
 	</report>
-	
-<!-- Utilitaires  -->
-	<!-- utilitaire permetant de faire un recap du nombre d'inscrit dans l'evenements -->
-		<report id="uti_recapilatif" title="Nombre de participants" >
-			<!-- header simplifier !-->
-			<header>
-				<spacing all="0"/>
-				<background mode="transparent"/>
-				<font name="Calibri" size="14" adjust="max" weight="bold"/>
-				<text row="auto" col="1" align="center">$(Evenement.Nom)</text>
-				<!-- <text row="auto" align="center">$(Discipline.Libelle)</text> -->
-				<!-- <text row="auto" align="center">$(Categorie{$(Epreuve.Code_categorie)}.Libelle)..' - '..$(Sexe{$(Epreuve.Sexe)}.Libelle)</text> -->
-				<text row="auto" align="center" cond="title" >title</text>
-				<row h="0.5cm"/>
-			</header>
-			<first_header />
-			<!-- <background mode="transparent" /> -->
-			<lua>
-				entite = $(Evenement.Code_entite)
-				body:SetCounter('Distance,Sexe,Categ', 'recap')
-				body:SetCounter('Distance')
-				body:SetCounter('Distance,Sexe', 'sex')
-			</lua>
-			<order key="Distance, Sexe, Categ" />
-			
-				<lua>
-					counter = body:GetCounter('recap')
-					counter1 = body:GetCounter('Distance')
-					counter2 = body:GetCounter('sex')
-				</lua>
-				<!-- <lua>counter:OrderBy('0,1')</lua> -->
-				
-				<end>
-					<!-- Par Distance -->
-					<text row="auto" col_start="1" col_end="0" border="1" align="center">'Récapitulatif par Distance'</text>
-					<row h="0.3cm"/>
-					<lua>for i=0, counter1:GetNbRows()-1 do </lua>
-					<text h="auto" col_start="1" col_end="0">
-							'distance '..counter1:GetCell(0,i)..' Km => '..counter1:GetCell('_count_',i)..'Inscrits'
-						</text>
-					<lua>sex = counter:GetCell(1,i)</lua> 
-					<lua>dista = counter1:GetCell(0,i)</lua>
-							<lua>for y=0, counter2:GetNbRows()-1 do </lua>
-								<lua>if counter2:GetCell(0,y) == dista and counter2:GetCell(1,y) == 'F' then </lua>
-									<lua>nbDamesT = counter2:GetCell('_count_',y)</lua>
-										<text row="auto" col_start="1" col_end="0">
-									'           Avec '..nbDamesT..' Dames'
-									</text>
-								
-								<lua>elseif counter2:GetCell(0,y) == dista and counter2:GetCell(1,y) == 'M' then </lua>
-									<lua>nbHommesT = counter2:GetCell('_count_',y)</lua>
-								<text row="auto" col_start="1" col_end="0">
-									'           Avec '..nbHommesT..' Hommes'
-									</text>
-								<lua>else </lua>
-									
-								<lua>end</lua>						
-							<lua>end</lua>
-						
-						
-						<row h="0.1cm"/>
-					<lua>end</lua>
-					<row h="1cm"/>
-					
-					<!-- Distance, Sexe, Categ -->
-					<text row="auto" col_start="1" col_end="0" border="1" align="center">'Récapitulatif par Distance / sexe / Catégories'</text>
-					<row h="0.3cm"/>
-					<lua>for i=0, counter:GetNbRows()-1 do </lua>
-						<!-- <lua>sexe = counter:GetCell(0,i)</lua> -->
-						<!-- <lua>categ = counter:GetCell(1,i)</lua> -->
-						<!-- <lua>dist = counter:GetCell(2,i)</lua> -->
-						<!-- <lua>nb = counter:GetCell(3,i)</lua> -->
-						<lua>sexe = $(Sexe{counter:GetCell('Sexe',i)}.Libelle)</lua>
-						<lua>categ = $(Categorie{counter:GetCell('Categ',i)}.Libelle)</lua>
-						<lua>dist = counter:GetCell('Distance',i)</lua>
-						<lua>nb = counter:GetCell('_count_',i)</lua>
-							<matrix row="auto" col_start="1" col_end="0" align="center" >
-							<call option="color_alternate" file="./edition/options.xml" />
-							<!-- <col value="10, 0.2cm,5, 0.2cm,5, 0.2cm,5" /> -->
-								<row h="auto" />
-								<lua> if dist == counter:GetCell('Distance',i-1) then </lua>
-									<text col_start="1" col="10" align="left" border ="0">''</text>
-								<lua> else </lua>
-								<text col_start="1" col="10" align="left" >'distance: '..dist..'Km'</text>
-								<lua> end </lua>
-								<lua> if counter:GetCell('Sexe',i) == counter:GetCell('Sexe',i-1) then </lua>
-								<text col_start="2" col="10" align="left" border ="0" >''</text>
-								<lua> else </lua>
-								<text col_start="2" col="10" align="left">'Sexe: '..sexe</text>
-								<lua> end </lua>
-								<text col_start="3" col="10" align="left">'Catégorie: '..categ</text>
-								<lua> if counter:GetCell('Sexe',i) == 'F' then </lua>
-								<text col_start="4" col="10" align="left">'Inscrite(s): '..nb</text>
-								<lua> else </lua>
-								<text col_start="4" col="10" align="left">'Inscrit(s): '..nb</text>
-								<lua> end </lua>
-								<row h="0.2cm"/>
-							</matrix>
-						<row h="0.1cm"/>	
-				<lua>end</lua>
-					<!-- Par sexe -->
-						<!-- <text row="auto" col_start="1" col_end="0">'Racap par Sexe'</text> -->
-						<!-- <lua>for i=0, body:GetCounter('Sexe'):GetNbRows()-1 do </lua> -->
-							<!-- <text row="auto" col_start="1" col_end="0"> -->
-								<!-- body:GetCounter('Sexe'):GetCell(0,i)..'='..body:GetCounter('Sexe'):GetCell(1,i) -->
-							<!-- </text> -->
-						<!-- <lua>end</lua>	 -->
-
-				</end>
-		</report>	
-				
-		<report id="uti_podium" title="Podium par épreuve" >
-			<!-- header simplifier !-->
-			<header>
-				<spacing all="0"/>
-				<background mode="transparent"/>
-				<font name="Calibri" size="14" adjust="max" weight="bold"/>
-				<text row="auto" col="1" align="center">$(Evenement.Nom)</text>
-				<text row="auto" align="center" cond="title" >title</text>
-				<row h="0.5cm"/>
-			</header>
-			<first_header />
-			<order key="Tps, Dossard Desc" />
-			
-			<!-- <background mode="transparent" /> -->
-			<lua>entite = $(Evenement.Code_entite)</lua>	
-					<end>
-						
-						<lua>Liste_Epreuve = base:GetTable("Epreuve")</lua>
-						<lua>for i=0, Liste_Epreuve:GetNbRows()-1 do</lua>
-							<lua>catepr = $(Categorie{base:GetTable("Epreuve"):GetCell('Code_categorie',i)}.Libelle)</lua>
-							<lua>codeepr = base:GetTable("Epreuve"):GetCell('Code_epreuve',i)</lua>
-							<lua>sexepr = $(Sexe{base:GetTable("Epreuve"):GetCell('Sexe',i)}.Libelle)</lua>
-							<lua>Distepr = base:GetTable("Epreuve"):GetCell('Distance',i)</lua>
-							<text row="auto" col_start="1" col_end="0" border="1" align="center">'podium de epreuve : '..catepr..' // distance = '..Distepr..' Km '..sexepr</text>
-							<row h="0.3cm"/>
-							
-								<matrix row="auto" col_start="1" col_end="0" align="center" >
-									<lua>steph = base:GetTable("body")</lua>
-											<lua>for i=0, steph:GetNbRows()-1 do</lua>
-												<lua>if steph:GetCell('Code_epreuve',i) == codeepr and steph:GetCell('Clte',i) == '1' then </lua>
-												<matrix row="auto" col_start="1" col_end="0" align="center" >
-													<row h="auto" />
-													<text col_start="1" col="15" align="left">'1er : '..sexepr..': '..base:GetTable("body"):GetCell('Identite',i)</text>
-													<text col_start="2" col="10" align="left">'Temps : '..base:GetTable("body"):GetCell('Tps',i)</text>
-													<text col_start="3" col="10" align="left">'Club : '..base:GetTable("body"):GetCell('Club',i)</text>
-													<text col_start="4" col="10" align="left">'Ville : '..base:GetTable("body"):GetCell('Ville',i)</text>
-													</matrix>
-												<lua>end</lua>
-												<lua>if base:GetTable("body"):GetCell('Code_epreuve',i) == codeepr and base:GetTable("body"):GetCell('Clte',i) == '2' then </lua>
-													<matrix row="auto" col_start="1" col_end="0" align="center" >
-													<row h="auto" />
-													<text col_start="1" col="15" align="left">'2ème : '..sexepr..': '..base:GetTable("body"):GetCell('Identite',i)</text>
-													<text col_start="2" col="10" align="left">'Temps : '..base:GetTable("body"):GetCell('Tps',i)</text>
-													<text col_start="3" col="10" align="left">'Club : '..base:GetTable("body"):GetCell('Club',i)</text>
-													<text col_start="4" col="10" align="left">'Ville : '..base:GetTable("body"):GetCell('Ville',i)</text>
-													</matrix>
-												<lua>end</lua>
-												<lua>if base:GetTable("body"):GetCell('Code_epreuve',i) == codeepr and base:GetTable("body"):GetCell('Clte',i) == '3' then </lua>
-													<matrix row="auto" col_start="1" col_end="0" align="center" >
-													<row h="auto" />
-													<text col_start="1" col="15" align="left">'3ème : '..sexepr..': '..base:GetTable("body"):GetCell('Identite',i)</text>
-													<text col_start="2" col="10" align="left">'Temps : '..base:GetTable("body"):GetCell('Tps',i)</text>
-													<text col_start="3" col="10" align="left">'Club : '..base:GetTable("body"):GetCell('Club',i)</text>
-													<text col_start="4" col="10" align="left">'Ville : '..base:GetTable("body"):GetCell('Ville',i)</text>
-													</matrix>
-												<lua>end</lua>
-												
-												
-											<lua>end</lua>
-											<row h="0.3cm"/>
-								</matrix>
-								
-						<lua>end</lua>
-			
-					</end>
-			
-		</report>
 	
 </edition>
 
