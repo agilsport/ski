@@ -143,8 +143,21 @@
 										'Inter '..i..' : '..app.TimeToString(tps_inter, '%xs.%2f')..'  ('..clt_inter..')   '..diff_inter
 									</text>
 							<lua>end</lua>
-							<text align="center" >''</text>
-						</matrix>
+							<lua>diff = body:GetCellInt('Tps'..params.manche, row) - body:GetCellInt('Tps'..params.manche, 0);
+								if diff &gt;0 then
+									diff = '(+'..app.TimeToString(diff, '%xs.%2f')..')'
+								else
+									diff = '';
+								end
+							</lua>
+							<text align="center" font_weight="bold" cond="body:GetCellInt('Clt'..params.manche, row) ~= 1">
+									body:GetCell('Tps'..params.manche, row)..'  '..diff;
+							</text> 
+							<text  align="center" font_weight="bold" cond="body:GetCellInt('Clt'..params.manche, row) == 1">
+								<background mode="solid" color="green" cond="body:GetCell('Clt'..params.manche, row) == '1'" />
+								<font color="white" cond="body:GetCell('Clt'..params.manche, row) == '1'"/>
+									body:GetCell('Tps'..params.manche, row);
+							</text> 						</matrix>
 						<matrix row_start="1" row_end="0" col_start="2" >
 							<col value="1"/>
 							<row value="1" count="(params.nb_inter)"/>;
