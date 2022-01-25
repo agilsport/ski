@@ -1082,7 +1082,7 @@
 		</body>
 	</report>
 	
-	<!-- Liste de depart par nation et club	 -->
+	<!-- Liste de depart par nation et comite	 -->
 	<report id="part_NatClub" title="(params.title or '')" header="1" first_header="(params.first_header or '1')" >
 		<lua>
 			page_break = tonumber(params.page_break or 0);

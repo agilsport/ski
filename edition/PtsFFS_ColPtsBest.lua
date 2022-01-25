@@ -103,6 +103,7 @@ end
 
 function editionliste(evt, base, bodyliste)
 	theParams = {}
+	alert("Colum_Label: "..Colum_Label);
 	theParams.Colum_Label = Colum_Label;
 	theParams.LabelNc = LabelNc;
 	theParams.colum_Pts = colum_Pts;
