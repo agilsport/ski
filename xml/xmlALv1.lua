@@ -312,7 +312,7 @@ Raceheader = {
 		{ name = 'Season', field = 'Evenement.Code_saison' },
 		{ name = 'Codex', field = 'Epreuve.Fichier_transfert' },
 		{ name = 'Nation', field = 'Evenement.Code_nation' },
-		{ name = 'Discipline', content = { 'DH','SL','GS','SG','AC','TE','KOS','KOG','PGS','PSL','CE','IND','P','CAR' }, field = 'Epreuve.Code_discipline' },
+		{ name = 'Discipline', content = { 'DH','SL','GS','SG','AC','SC','TE','KOS','KOG','PGS','PSL','CE','IND','P','CAR' }, field = 'Epreuve.Code_discipline' },
 		{ name = 'Category', field = 'Epreuve.Code_regroupement' },
 		{ name = 'Type', content = { 'Startlist', 'Partial' ,'Unofficial', 'Official', 'Offical' }, after = afterType }, -- Bug Vola 'Offical' ...
 		{ name = 'Training', required = '0-1', content = 'string' },
