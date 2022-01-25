@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- Menu Editions Activité "FOND" !-->
-<!-- version="6.2" !-->
+<!-- version="6.0" !-->
 <!-- nettoyage du fichier mise en place de la fonction getidentitecoureur -->
 <!-- Activation de la fenetre filtrage epreuves pour une edition gerer par un .lua => Option filter="before" -->
 <!-- calcul de la note poursuite 2éme jour !-->
@@ -466,7 +466,7 @@
 			<row h="auto"/>
 			<text col="0.5cm" font_size="6" align="center" label="Pb">$(Modif_manuel) </text>
 			<text col="4" align="right" label="Dos">$(Dossard) </text>
-			<text col="7" align="left" label="Code"><font size="8" cond="group =='body'"/>$(Code_coureur):sub(4)</text>  
+			<text col="7" align="center" label="Code"><font size="8" cond="group =='body'"/>$(Code_coureur):sub(4)</text>  
 			<text col="18" align="left" label="Prénom - Nom" >GetIdentiteCoureur(officiel)</text> 
 			<text col="4" align="center" label="An">$(An)</text>
 			<text col="6" align="center" label="Categ">$(Categ)</text>
@@ -624,7 +624,7 @@
 			<spacing left="5" right="10" top="2" bottom="2" />
 			<row h="auto"/>
 			<text col="4" align="right" label="Dos">$(Dossard) </text>
-			<text col="7" align="left" label="Code"><font size="8" cond="group =='body'"/>$(Code_coureur):sub(4)</text> 
+			<text col="7" align="center" label="Code"><font size="8" cond="group =='body'"/>$(Code_coureur):sub(4)</text> 
 			<text col="20" align="left" label="Prénom - Nom" >GetIdentiteCoureur(officiel,speaker)</text>  
 			<text col="4" align="center" label="An">$(An)</text>
 			<text col="6" align="center" label="Categ">$(Categ)</text>
@@ -672,9 +672,9 @@
 			<lua>LabelCode = $(Code_coureur):sub(1,3)</lua>
 			<row h="auto"/>  <!-- <font color="Red" cond="$(Sexe) == 'F'and $(Epreuve.sexe) == 'T'"/> -->
 			<text col="4" align="center" label="Clt" font_weight="bold" font_size_step="1"> $(Clt)</text>
-			<text col="5" align="right" label="Dos">$(Dossard)</text>
-			<text col="8" align="right" label="Clt / Cat/ S."><font size_step="-1" cond="group=='body'"/>$(Cltc)..' /'..$(Categ)..' /'..$(Sexe)..' '</text>
-			<text col="8" align="left" label="Code"><font size_step="-2" cond="group =='body'"/>$(Code_coureur):sub(4)</text>  
+			<text col="3" align="right" label="Dos">$(Dossard)</text>
+			<text col="9" align="right" label="Clt /Cat / S."><font size_step="-1" cond="group=='body'"/>$(Cltc)..' /'..$(Categ)..' /'..$(Sexe)..' '</text>
+			<text col="7" align="center" label="Code"><font size_step="-2" cond="group =='body'"/>$(Code_coureur):sub(4)</text>  
 			<text col="18" align="left" label="Prénom - Nom" >GetIdentiteCoureur(officiel)</text> 
 			<text col="4" align="center" label="An">$(An)</text>
 			<text col="4" align="center" label="Nat" cond="entite == 'FIS'">$(Nation)</text>
@@ -727,18 +727,18 @@
 			<spacing left="7" right="10" top="2" bottom="2" />
 			<lua>LabelCode = $(Code_coureur):sub(1,3)</lua>
 			<row h="auto"/>  <!-- <font color="Red" cond="$(Sexe) == 'F'and $(Epreuve.sexe) == 'T'"/> -->
-			<text col="4" align="center" label="Clt" font_weight="bold" font_size_step="1"> $(Clt2)</text>
+			<text col="4" align="center" label="Clt" font_weight="bold" font_size_step="1"> $(Clt)</text>
 			<text col="3" align="right" label="Dos">$(Dossard)</text>
-			<text col="9" align="right" label="Clt /Cat / S."><font size_step="-1" cond="group=='body'"/>$(Cltc2)..' /'..$(Categ)..' /'..$(Sexe)..' '</text>
+			<text col="9" align="right" label="Clt /Cat / S."><font size_step="-1" cond="group=='body'"/>$(Cltc)..' /'..$(Categ)..' /'..$(Sexe)..' '</text>
 			<text col="7" align="center" label="Code"><font size_step="-2" cond="group =='body'"/>$(Code_coureur):sub(4)</text> 
 			<text col="18" align="left" label="Prénom - Nom" >GetIdentiteCoureur(officiel)</text>  
 			<text col="4" align="center" label="An">$(An)</text>
 			<text col="4" align="center" label="Nat" cond="entite == 'FIS'">$(Nation)</text>
 			<text col="3" align="center" label="CS." cond="entite == 'FFS'">$(Comite)</text>
 			<text col="12" align="center" label="Club" cond="entite == 'FFS'">$(Club)</text>
-			<!-- <lua>for m=1,nb_inter do</lua> -->
-				<!-- <text col="7" align="right" label="('Tps2_i'..m)" cond="nb_inter ~= 1"><font size_step="-1" cond="group == 'body'" />body:GetCell('Tps2_inter'..m,row)</text>  -->
-			<!-- <lua>end</lua> -->
+			<lua>for m=1,nb_inter do</lua>
+				<text col="7" align="right" label="('Tps2_i'..m)" cond="nb_inter ~= 1"><font size_step="-1" cond="group == 'body'" />body:GetCell('Tps2_inter'..m,row)</text> 
+			<lua>end</lua>
 			<text col="8" align="right" label="Tps2" font_weight="bold" font_size_step="1">$(Tps2)</text>
 			<text col="8" align="right" label="Ecart." font_weight="bold" font_size_step="1">$(Diff2)</text>
 			<text col="6" align="right" label="Note">$(Note)</text> 
