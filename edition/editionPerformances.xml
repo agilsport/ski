@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Editions Activité "ALP" !-->
+<edition>
+	<!-- Prise du numéro de manche -->
+	<panel name="choix_manche">
+		<padding all="10px"/>
+		<font weight="bold" size="12" color="black"/>
+		<col value="1,1" />
+		<background mode="gradient_line_vert" color_start="yellow" color_end="dkyellow"/>
+		<pen border="1" />
+		<statictext row="auto" col_start="1" align="right" label="Manche" />
+		<combobox col_start="2" name="manche" style="CB_READONLY" />
+		<row value="auto" />
+		<toolbar row="auto" col_start="1" col_end="0" name="tb" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT" />
+	</panel>
+
+	<!-- Analyse des Performances" -->
+	<report id="res_performance" title="Analyse des performances" first_header="0">
+		<!-- <order key="('Clt'..params.manche..', Dossard Desc')" /> -->
+		<lua>dofile('./xml/xmlTools.lua');
+			h_matrix_inter = 0.4 * (params.nb_inter+1)..'cm';
+			tInter = params.tInter;
+			tSecteur = params.tSecteur;
+			body:OrderBy('Clt'..params.manche..', Dossard');
+		</lua>
+
+		<!-- header standard !-->
+		<header>
+			<spacing all="0"/>
+			<background mode="transparent"/>
+			<font name="Calibri" size="14" adjust="max" weight="bold"/>
+			<text row="0.8cm" col="1" align="center">$(Evenement.Nom)</text>
+			<text row="0.7cm" align="center" cond="params.manche &gt;1">$(Discipline.Libelle)..' Manche '..params.manche..' - '..$(Evenement.Station)</text>
+			<text row="0.7cm" align="center" cond="params.manche == 1">$(Discipline.Libelle)..' - '..$(Evenement.Station)</text>
+			<!-- <text row="0.8cm" align="center">'le '..$(Epreuve.Date_epreuve)..'  Codex : '..$(Epreuve.Fichier_transfert):sub(4)</text> -->
+			<text row="0.7cm" align="center">'Analyse des performances'</text>
+
+			<!-- <text row="3cm" align="left"><font orientation="90" origin="left,bottom"/>'HELLO'</text> -->
+			<row value="0.5cm"/>
+		</header>
+		<footer>
+			<background mode="transparent"/>
+			<font name="Calibri" size="8" adjust="best" weight="normal"/>
+			<pen border="none" />
+
+			<lua>entite = entite or $(Evenement.Code_entite)</lua>
+			<lua>info = $(Epreuve.Date_epreuve,'%2D/%2M/%4Y')..' / '..$(Evenement.Station)..' ('</lua>
+			<lua cond="entite=='FIS'">info = info..$(Evenement.Code_nation)..'-'</lua>
+			<lua>info = info..$(Evenement.Code_comite).. ') / '..$(Evenement.Organisateur)</lua>
+			<text row="auto" col="1" align="left">info</text>
+			<text align="right" font_weight="bold" cond="entite=='FIS'">$(Epreuve.Fichier_transfert_int)..' (Liste n°'..$(Evenement.Code_liste)..')'</text>
+			<text align="right" font_weight="bold" cond="entite=='FFS'">$(Epreuve.Fichier_transfert)..' (Liste n°'..$(Evenement.Code_liste)..')'</text>
+			<line col_start="1" col_end="0" pen_size="2" pen_color="dkgray" border="bottom"/>
+			
+			<row value="auto" />
+			<matrix col_start="1">
+				<row value="auto"/>
+				<text col="auto" align="left">app.GetName()..' Version '..app.GetVersion()..' / FFS'</text>
+				<image col="0.4cm" adjust="width" align="left">'./res/32x32_ffs.png'</image>
+				<text col="auto" align="left" adjust="width">' / ESF'</text>
+				<image col="0.4cm" adjust="width" align="left">'./res/32x32_esf.png'</image>
+				<text col="auto" align="left">' / Agil Informatique'</text>
+				<image col="0.4cm" adjust="width" align="left">'./res/32x32_agil.png'</image>
+				<text col="auto" align="left">' / Ph.Guérindon'</text>
+				<text col="auto" align="left">os.date(' / Edité le %d-%m-%Y à %H:%M:%S')</text>
+			</matrix>	
+			<text align="right">string.format('Page %d/%s',editor:GetPageCurrent(), editor:GetPageCountLabel())</text>
+			<line col_start="1" col_end="0" border="top" />
+			<text row="auto" align="left" cond="editor:GetPageCurrent() == 1">$(Evenement.Commentaire)</text>
+		</footer>
+		<label>
+			<row value="auto" />
+			<font weight="bold" />
+			<pen border="all" size="1" />
+			<text col="3" align="center">'C.M'..params.manche</text>
+			<text col="3" align="center">'Dos'</text>
+			<text col="13" align="center">'Identité'</text>
+			<text col="4" align="center">'Cat.'</text>
+			<text col="3" align="center">'Nat.'</text>
+			<text col="10" align="center" cond="params.nb_inter &gt; 0">'Inter'</text>
+			<text col="10" align="center" cond="params.nb_inter &gt; 0">'Secteur'</text>
+			<text col="5" align="center">'Tps.M'..params.manche</text>
+		</label>
+		
+		<body>
+			<need h="(params.need)" />
+			<call option="couleur_alternee" file="./edition/options.xml" />
+			<font size="8" adjust="ellipsize"/>	
+			<row value="0.4cm" count="(params.nb_row_ligne)" />
+			<text col="3" row_start="1" row_end="(params.nb_row_ligne)" align="center" font_weight="bold" font_size_step="1">
+				<background mode="solid" color="green" cond="body:GetCell('Clt'..params.manche, row) == '1'" />
+				<font color="white" cond="body:GetCell('Clt'..params.manche, row) == '1'"/>
+				body:GetCellInt('Clt'..params.manche, row)
+			</text>
+			<text col="3" row_start="1" row_end="(params.nb_row_ligne)" align="center" font_style="italic">body:GetCell('Dossard', row)</text>
+	
+			<col w="13"/>
+			<text row_start="1" row_end="(params.nb_row_ligne -1)" align="left" >body:GetCell('Identite', row)</text> 
+			<text row_start="3" align="left" >'('..body:GetCell('Code_coureur', row):sub(4)..')'</text> 
+			<text row_start="3" align="left" cond="params.nb_inter ~= 0">'('..body:GetCell('Code_coureur', row):sub(4)..')'</text> 
+
+			<col value="4"/>
+			<text row_start="1" align="center" cond="params.nb_inter == 0">$(Categ)</text> 
+			<text row_start="1" row_end="(params.nb_row_ligne -1)" align="center" cond="params.nb_inter &gt; 0">body:GetCell('Categ', row)</text> 
+			<text align="center" >body:GetCell('Sexe', row)..' - '..body:GetCell('An', row)</text> 
+
+			<col value="3" />
+			<text row_start="1" row_end="(params.nb_row_ligne)" border="1">''</text>
+			<matrix col_start="0" row_start="1" row_end="(params.nb_row_ligne)">
+				<row value="auto, 0.4cm" />
+				<col value="1" />
+				<background mode="transparent" />
+				<text row_start="1" align="center|top" border="0">$(Nation)</text> 
+				<image row_start="2" adjust="height" align="center" border="0">
+					<background mode="transparent"/>
+					app.ImageNation($(Nation))
+				</image> 
+			</matrix>
+
+
+			<lua>if params.nb_inter &gt; 0 then</lua>
+					<col value="20" />
+					<matrix row_start="1" row_end="(params.nb_row_ligne)" col_start="0">
+						<col value="10,10" />
+						<row value="1" count="(params.nb_inter+1)"/>;
+						<matrix row_start="1" row_end="0" col_start="1">
+							<row value="1" count="(params.nb_inter+1)"/>;
+							<col value="1"/>
+							<lua>for i = 1, params.nb_inter do</lua>
+									<lua>tps_inter =  body:GetCellInt('Tps'..params.manche..'_inter'..i,row)</lua>
+									<lua>clt_inter = body:GetCellInt('Clt'..params.manche..'_inter'..i,row)</lua>
+									<lua>diff_inter = tps_inter - tInter[i].Best;
+										if diff_inter &gt; 0 then
+											diff_inter = '(+'..app.TimeToString(diff_inter, '%xs.%2f')..')';
+										end
+									</lua>
+									<text align="center" row_start="(i)">''</text>
+									<text align="center" row_start="(i)" cond="clt_inter == 1" >
+										<background mode="solid" color="yellow"/>
+										'Inter '..i..' : '..app.TimeToString(tps_inter, '%xs.%2f')..'  ('..clt_inter..')'
+									</text>
+									<text align="center" row_start="(i)" cond="clt_inter &gt; 1">
+										'Inter '..i..' : '..app.TimeToString(tps_inter, '%xs.%2f')..'  ('..clt_inter..')   '..diff_inter
+									</text>
+							<lua>end</lua>
+							<text align="center" >''</text>
+						</matrix>
+						<matrix row_start="1" row_end="0" col_start="2" >
+							<col value="1"/>
+							<row value="1" count="(params.nb_inter)"/>;
+							<lua>for i = 2, params.nb_inter +1 do
+									secteur_tps = body:GetCellInt('Secteur'..i..'_tps',row);
+									secteur_clt = body:GetCellInt('Secteur'..i..'_clt',row);
+									secteur_diff = secteur_tps - tSecteur[i].Best;
+									if secteur_diff &gt; 0 then
+										secteur_diff = '(+'..app.TimeToString(secteur_diff, '%xs.%2f')..')'
+									end
+							</lua>
+									<text align="center" row_start="(i-1)">''</text>
+									<text align="center" row_start="(i-1)" cond="secteur_clt == 1" >
+										<background mode="solid" color="yellow" />
+										'Sec. '..i..' : '..app.TimeToString(secteur_tps, '%-1m%2s.%2f')..' ('..secteur_clt..')'
+									</text>
+									<text align="center" row_start="(i-1)" cond="secteur_clt &gt; 1" >
+										'Sec. '..i..' : '..app.TimeToString(secteur_tps, '%-1m%2s.%2f')..' ('..secteur_clt..')   '..secteur_diff 
+									</text>
+							<lua>end</lua>
+						</matrix>
+					</matrix>
+			<lua>end</lua>
+			<lua>diff = body:GetCellInt('Tps'..params.manche, row) - body:GetCellInt('Tps'..params.manche, 0);
+				if diff &gt;0 then
+					diff = '(+'..app.TimeToString(diff, '%xs.%2f')..')'
+				else
+					diff = '';
+				end
+			</lua>
+			<text col="5" row_start="1" row_end="(params.nb_row_ligne)" align="center" font_weight="bold" font_size_step="1" cond="body:GetCellInt('Clt'..params.manche, row) ~= 1">
+					body:GetCell('Tps'..params.manche, row)..'\n'..diff;
+			</text> 
+			<text col="5" row_start="1" row_end="(params.nb_row_ligne)" align="center" font_weight="bold" font_size_step="1" cond="body:GetCellInt('Clt'..params.manche, row) == 1">
+				<background mode="solid" color="green" cond="body:GetCell('Clt'..params.manche, row) == '1'" />
+				<font color="white" cond="body:GetCell('Clt'..params.manche, row) == '1'"/>
+					body:GetCell('Tps'..params.manche, row);
+			</text> 
+		</body>
+	</report>
+
+	
+</edition>
+
