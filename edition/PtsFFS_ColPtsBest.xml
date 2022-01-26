@@ -1,7 +1,8 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <root>
 
-<!-- Fenètre de configuration de l'éditions des couloir de poursuite -->
+<!-- Fenètre d'explication de la fonction -->
+<!-- Version 2.2 -->
 <panel name="PtsFFS_ColPts_best">
 	<font name="Calibri" size="16" adjust="best" >
 		<padding all="2px"/>

@@ -39,7 +39,7 @@
     <matrix>
       <row value="0.05cm, 3.21cm"/>
       <col value="2.47cm, 16.02cm"/>
-      <image adjust="best">'./logo/Bandeau_FFS/Nord_2022/MARATHON-SKI-TOUR-2020.jpg'
+      <image adjust="best">'./logo/Bandeau_FFS/Nord_2022/MARATHON-SKI-TOUR.jpg'
         <background mode="transparent"/>
       </image>
     </matrix>

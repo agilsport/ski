@@ -1,7 +1,7 @@
 dofile('./interface/adv.lua');
 dofile('./interface/interface.lua');
 
--- version 1.5
+-- version 1.6
 
 function alert(txt)
 	app.GetAuiMessage():AddLine(txt);
