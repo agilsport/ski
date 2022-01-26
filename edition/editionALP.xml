@@ -26,14 +26,14 @@
 		<menu title="Résultats" image="./res/32x32_ranking.png">
 			<menu title="D'une Manche" image="./res/16x16_ranking.png" id="res_manche" choix_manche="1"/>
 			<menu title="Résultats Officieux" image="./res/16x16_ranking.png" id="res_officiel" officiel="0"/>
-			<!-- <menu title="Calcul de la Pénalité" image="./res/16x16_calc.png" language="en" action="penalite" /> -->
+			<menu title="Calcul de la Pénalité" image="./res/16x16_calc.png" language="en" action="penalite" />
 			<menu title="Résultats Officiels" image="./res/16x16_official.png" id="res_officiel" officiel="1"/>
 			<menu title="Résultats Par Catégories (filtrage des coureurs apres le calcul des points)" filter="after" image="./res/16x16_ranking.png" id="res_categ" choix_clt_max="1"/>
 			<menu title="Meilleurs Temps" image="./res/16x16_ranking.png" id="res_best" />
 			<menu title="Multi-Passages" image="./res/16x16_official.png" id="res_passage" choix_manche="1" mode_lap="2" />
 		</menu>
 		<menu title="Outils" image="./res/32x32_tools.png">
-			<menu title="Analyse des Performances" image="./res/16x16_analyse.png" id="res_performance" choix_manche="1" />
+			<menu title="Analyse des Performances" image="./res/16x16_analyse.png"  choix_manche="1" id="res_performance" lua="./edition/editionPerformances.lua"  />
 			<menu title="Edition des Séquences Chrono" image="./res/16x16_bib.png" id="chrono_seq" choix_manche="1" action="chrono_seq"/>
 			<menu title="Edition des Statistiques de Participation (FIS)" image="./res/16x16_bib.png" id="stat_participation" />
 		</menu>
@@ -830,162 +830,7 @@
 			<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
 		</body>
 	</report>
-		
-	<!-- Analyse des Performances " -->
-	<report id="res_performance" title="Analyse des performances" first_header="0">
-			<lua>dofile('./xml/xmlTools.lua');
-				tResultat_Inter = base:GetTable('Resultat_Inter');
-				nb_inter = nb_inter or 0;
-				best_inter1 = 0;
-				best_inter2 = 0;
-				best_inter3 = 0;
-				for i = 1, nb_inter do
-					cmd = "Select * From Resultat_Inter Where Code_evenement = "..params.code_evenement.." And Not Code_coureur Like 'EXT%' And Code_inter = "..i..' Order By Tps';
-					base:TableLoad(tResultat_Inter, cmd);
-					if i == 1 then best_inter1 = tResultat_Inter:GetCellInt('Tps', 0); end
-					if i == 2 then best_inter2 = tResultat_Inter:GetCellInt('Tps', 0); end
-					if i == 3 then best_inter3 = tResultat_Inter:GetCellInt('Tps', 0); end
-				end
-				best_inter1 = best_inter1 or 0;
-				best_inter2 = best_inter2 or 0;
-				best_inter3 = best_inter3 or 0;
-			</lua>
-
-		<order key="('Clt'..manche..', Dossard Desc')" />
-		<paper orientation="portrait" />
-		
-		<label>
-			<row value="auto" />
-			<font weight="bold" />
-			<pen border="all" size="1" />
-			<text col="4" align="center">'C.M'..manche</text>
-			<text col="3" align="center">'Dos'</text>
-			<text col="20" align="center">'Identité'</text>
-			<text col="6" align="center">'Cat.'</text>
-			<text col="4" align="center">'Nation'</text>
-			<text col="8" align="center">'Inter'</text>
-			<text col="8" align="center">'Tps.M'..manche</text>
-		</label>
-		
-		<body>
-			<lua>
-				if row == 0 then best_time = body:GetCellInt('Tps'..manche, row); end
-				diff = body:GetCellInt('Tps'..manche, row) - best_time;
-				diff_inter1 = body:GetCellInt('Tps'..manche..'_inter1', row) - best_inter1;
-				diff_inter2 = body:GetCellInt('Tps'..manche..'_inter2', row) - best_inter2;
-				diff_inter3 = body:GetCellInt('Tps'..manche..'_inter3', row) - best_inter3;
-				if diff_inter1 &gt; 0 then diff_inter1 = ' - (+'..app.TimeToString(diff_inter1, '%xs.%2f')..')' else diff_inter1 = ''; end ;
-				if diff_inter2 &gt; 0 then diff_inter2 = ' - (+'..app.TimeToString(diff_inter2, '%xs.%2f')..')' else diff_inter2 = ''; end ;
-				if diff_inter3 &gt; 0 then diff_inter3 = ' - (+'..app.TimeToString(diff_inter3, '%xs.%2f')..')' else diff_inter3 = ''; end;
-				diff = body:GetCellInt('Tps'..manche, row) - best_time;
-				if diff &gt; 0 then diff = ' - (+'..app.TimeToString(diff, '%xs.%2f')..')' else diff = ''; end ;
-			</lua>
-			<call option="couleur_alternee" file="./edition/options.xml" />
-			<font size="9" adjust="ellipsize"/>
-	
-			<row value="auto"/>
-			<row value="auto"/>
-			<row value="auto"/>
 			
-			<text col="4" row_start="1" row_end="0" align="center" font_weight="bold" font_size_step="1">
-				<background mode="solid" color="green" cond="body:GetCell('Clt'..manche, row) == '1'" />
-				<font color="white" cond="body:GetCell('Clt'..manche, row) == '1'"/>
-				body:GetCell('Clt'..manche, row)
-			</text>
-			<text col="3" row_start="1" row_end="0" align="center" font_style="italic">$(Dossard)</text>
-	
-			<col w="20"/>
-			<text row_start="1" row_end="2" align="left" >$(Identite)</text> 
-			<text row_start="3" align="left" >'('..$(Code_coureur):sub(4)..')'</text> 
-
-			<col value="6"/>
-			<text row_start="1" row_end="2" align="center" >$(Categ)</text> 
-			<text row_start="3" align="center" >$(Sexe)..' - '..$(An)</text> 
-
-			<col value="4" />
-			<text row_start="1" row_end="0" border="1">''</text>
-			<matrix col_start="0" row_start="1" row_end="0">
-				<row value="auto, 0.4cm" />
-				<col value="1" />
-				<background mode="transparent" />
-				<text row_start="1" align="center|top" border="0">$(Nation)</text> 
-				<image row_start="2" adjust="height" align="center" border="0">
-					<background mode="transparent"/>
-					app.ImageNation($(Nation))
-				</image> 
-			</matrix>
-		
-			<col value="8" />
-			<text row_start="1" align="center" font_size_step="-2">
-				<background mode="solid" color="yellow" cond="body:GetCell('Clt'..manche..'_inter1', row) == '1'" />
-				body:GetCell('Tps'..manche..'_inter1', row)..' '..body:GetCell('Clt'..manche..'_inter1', row):Parenthesis()..diff_inter1
-			</text> 
-
-			<text row_start="2" align="center" font_size_step="-2">
-				<background mode="solid" color="yellow" cond="body:GetCell('Clt'..manche..'_inter2', row) == '1'" />
-				body:GetCell('Tps'..manche..'_inter2', row)..' '..body:GetCell('Clt'..manche..'_inter2', row):Parenthesis()..diff_inter2
-			</text> 
-			<text row_start="3" align="center" font_size_step="-2">
-				<background mode="solid" color="yellow" cond="body:GetCell('Clt'..manche..'_inter3', row) == '1'" />
-				body:GetCell('Tps'..manche..'_inter3', row)..' '..body:GetCell('Clt'..manche..'_inter3', row):Parenthesis()..diff_inter3
-			</text> 
-
-			<text col="8" row_start="1" row_end="0" align="center" font_weight="bold" font_size_step="1">
-				<background mode="solid" color="green" cond="body:GetCell('Clt'..manche, row) == '1'" />
-				<font color="white" cond="body:GetCell('Clt'..manche, row) == '1'"/>
-					body:GetCell('Tps'..manche, row)..diff;
-			</text> 
-		</body>
-	</report>
-	
-	<!-- Résultats Multi-Passage -->
-	<report id="res_passage" title="Résultats Multi-Passages" first_header="0">
-
-		<column name="Tps_best" type="chrono" />
-		<column name="Clt_best" type="ranking" />
-		<lua>
-			for i=0,body:GetNbRows()-1 do
-				local tpsBest = chrono.KO;
-				for l=1,nb_lap do
-					local tpsPassage = body:GetCellInt('Tps'..manche..'_lap'..l, i);
-					tpsBest = chrono.Min(tpsBest, tpsPassage);
-				end
-				body:SetCell('Tps_best',i, tpsBest);
-			end
-			body:SetRanking('Clt_best', 'Tps_best');
-		</lua>
-		<order key="Clt_best, Dossard" />
-	
-		<body>
-			<call option="couleur_alternee" file="./edition/options.xml" />
-			<font size="9" adjust="ellipsize"/>
-	
-			<row value="auto"/>
-			<text col="4" align="right" label="Dos.">$(Dossard)</text>
-			<text col="25" align="left" label="Nom - Prénom" font_weight="bold" font_size_step="1">$(Identite)</text> 
-			<text col="4" align="center" label="Cat.">$(Categ)</text>
-			
-			<lua>for l=1,nb_lap do</lua>
-				<text col="8" cond="group=='label'" label="('Passage '..l)"/>
-				<matrix col="8" cond="group=='body'" fit_inside="0" >
-					<row h="1"/>
-					<font size_step="-1" />
-					<text col="7" align="right">body:GetCell('Tps'..manche..'_lap'..l,row)</text>
-					<text col="4" align="right">body:GetCell('Clt'..manche..'_lap'..l,row)</text>
-				</matrix> 
-			<lua>end</lua>
-
-			<text col="10" cond="group=='label'" label="Meilleur"/>
-			<matrix col="10" cond="group=='body'" fit_inside="0" >
-				<row h="1"/>
-				<font size_step="1" weight="bold" />
-				<text col="7" align="right">body:GetCell('Tps_best',row)</text>
-				<text col="4" align="right">body:GetCell('Clt_best',row)</text>
-			</matrix>
-				
-		</body>
-	</report>
-	
 	<!-- Edition des Séquences Chrono -->
 	<report id="chrono_seq" title="('Edition des Séquences de Chronométrage Manche n°'..manche)" first_header="0">
 		<order key="Seq" />
