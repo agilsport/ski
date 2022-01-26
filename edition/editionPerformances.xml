@@ -90,7 +90,7 @@
 			<text col="3" row_start="1" row_end="(params.nb_row_ligne)" align="center" font_weight="bold" font_size_step="1">
 				<background mode="solid" color="green" cond="body:GetCell('Clt'..params.manche, row) == '1'" />
 				<font color="white" cond="body:GetCell('Clt'..params.manche, row) == '1'"/>
-				body:GetCellInt('Clt'..params.manche, row)
+				body:GetCell('Clt'..params.manche, row)
 			</text>
 			<text col="3" row_start="1" row_end="(params.nb_row_ligne)" align="center" font_style="italic">body:GetCell('Dossard', row)</text>
 	
@@ -150,8 +150,11 @@
 									diff = '';
 								end
 							</lua>
-							<text align="center" font_weight="bold" cond="body:GetCellInt('Clt'..params.manche, row) ~= 1">
-									body:GetCell('Tps'..params.manche, row)..'  '..diff;
+							<text align="center" font_weight="bold" cond="body:GetCellInt('Clt'..params.manche, row) &gt; 1">
+									body:GetCell('Tps'..params.manche, row)..'  ('..body:GetCell('Clt'..params.manche, row)..')   '..diff;
+							</text> 
+							<text align="center" font_weight="bold" cond="body:GetCellInt('Clt'..params.manche, row) &lt;= 0">
+									body:GetCell('Tps'..params.manche, row);
 							</text> 
 							<text  align="center" font_weight="bold" cond="body:GetCellInt('Clt'..params.manche, row) == 1">
 								<background mode="solid" color="green" cond="body:GetCell('Clt'..params.manche, row) == '1'" />
