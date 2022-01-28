@@ -2,7 +2,7 @@
 <!-- Regroupement de coureurs -->
 <!-- <background mode="gradient_line_vert" color_start="white" color_end="ltgray" /> -->
 <root title="Regroupement de coureurs">
-  <config coursef1_filtre="$(Sexe):In('F') and $(Categ):In('U14')" coursef2_filtre="$(Sexe):In('F') and $(Categ):In('U16')" courseg1_filtre="$(Sexe):In('M') and $(Categ):In('U14')" courseg2_filtre="$(Sexe):In('M') and $(Categ):In('U16')" coursef1="478" courseg1="478" coursef2="478" courseg2="478" titre="Regroupement de coureurs" comboColEquipe="4" comboPrendre="0" comboPtsTps="1" comboAbdDsq="1" coefManche="100" nb_filles="1" nb_garcons="1" comboGarderEquipe="0" comboEquipeBis="0"/>
+  <config titre="Regroupement de coureurs" comboColEquipe="3" comboPrendre="0" comboPtsTps="0" comboAbdDsq="0" coefManche="100" nb_filles="1" nb_garcons="2" comboGarderEquipe="0" comboEquipeBis="0"/>
   <panel name="config">
     <lua>dofile('./interface/adv.lua');
 		dofile('./edition/functionPG.lua');
@@ -246,7 +246,7 @@
         <row value="0.5cm" count="(maxlignes)"/>
         <matrix row_start="1" row_end="0" col_start="1">
           <col value="1"/>
-          <text col_start="1" align="center" label="Clt - Equipe : Points totaux" row_start="1" row_end="0" cond="params.PtsTps ~= 2">(row+1)..'\n'..body:GetCell(0,row)..'\n'..$(Pts_total)</text>
+          <text col_start="1" align="center" label="Clt - Equipe : Points totaux" row_start="1" row_end="0" cond="params.PtsTps ~= 2">(row+1)..'\n'..body:GetCell(0,row):gsub('_',"'")..'\n'..$(Pts_total)</text>
           <text col_start="1" align="center" label="Clt - Equipe : Temps total" row_start="1" row_end="0" cond="params.PtsTps == 2">(row+1)..'\n'..body:GetCell(0,row)..'\n'..body:GetCell('Tps_total', row, '%-1h%-1m%2s.%2f')</text>
         </matrix>
         <matrix row_start="1" row_end="0" col_start="2">

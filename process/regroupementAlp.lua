@@ -875,7 +875,7 @@ function BuildEquipes()
 	for i = 0, tEquipe:GetNbRows() -1 do
 		local OK = 1;
 		local OK_BIS = 0;
-		local equipe = tEquipe:GetCell(0, i);
+		local equipe = tEquipe:GetCell(0, i):gsub("'", '_');
 		local pts_total = 0;
 		local tps_total = 0;
 		local pts_total_bis = 0;
@@ -1087,14 +1087,22 @@ function BuildEquipes()
 			end
 		end
 
+		nb_filles = 0;
+		nb_garcons = 0;
 		local tdetailfille = tEquipe:GetCell('Detail_filles', i):Split('|');
-		nb_filles = #tdetailfille;
+		if tEquipe:GetCell('Detail_filles', i):len() > 0 then
+			nb_filles = #tdetailfille;
+		end
+		local critere_filles = params.nb_filles * params.nb_courses_filles;
+		local critere_garcons = params.nb_garcons * params.nb_courses_garcons;
 		local tdetailgarcons = tEquipe:GetCell('Detail_garcons', i):Split('|');
-		nb_garcons = #tdetailgarcons;
-		if params.nb_filles > 0 and nb_filles < (params.nb_filles * params.nb_courses_filles) then
+		if tEquipe:GetCell('Detail_garcons', i):len() > 0 then
+			nb_garcons = #tdetailgarcons;
+		end
+		if params.nb_filles > 0 and nb_filles < critere_filles then
 			OK = 0;
 		end
-		if params.nb_garcons > 0 and nb_garcons < (params.nb_garcons * params.nb_courses_garcons) then
+		if params.nb_garcons > 0 and nb_garcons < critere_garcons then
 			OK = 0;
 		end
 		tEquipe:SetCell('OK',i, OK);
@@ -1227,10 +1235,10 @@ function BuildRanking();
 				tMatrice_Ranking:SetCell('Categ', row, tResultat:GetCell('Categ', r));
 				tMatrice_Ranking:SetCell('Nation', row, tResultat:GetCell('Nation', r));
 				tMatrice_Ranking:SetCell('Comite', row, tResultat:GetCell('Comite', r));
-				tMatrice_Ranking:SetCell('Club', row, tResultat:GetCell('Club', r));
-				tMatrice_Ranking:SetCell('Groupe', row, tResultat:GetCell('Groupe', r));
-				tMatrice_Ranking:SetCell('Equipe', row, tResultat:GetCell('Equipe', r));
-				tMatrice_Ranking:SetCell('Critere', row, tResultat:GetCell('Critere', r));
+				tMatrice_Ranking:SetCell('Club', row, tResultat:GetCell('Club', r):gsub("'","_"));
+				tMatrice_Ranking:SetCell('Groupe', row, tResultat:GetCell('Groupe', r):gsub("'","_"));
+				tMatrice_Ranking:SetCell('Equipe', row, tResultat:GetCell('Equipe', r):gsub("'","_"));
+				tMatrice_Ranking:SetCell('Critere', row, tResultat:GetCell('Critere', r):gsub("'","_"));
 				tMatrice_Ranking:SetCell('Code_evenement'..idxcourse, row, code_evenement);
 				tMatrice_Ranking:SetCell('Ordre_xml'..idxcourse, row, ordre_xml);
 				local tps = tResultat:GetCellInt('Tps', r, -1);
@@ -1393,8 +1401,8 @@ function main(params_c)
 	params.height = display:GetSize().height / 2;
 	params.x = (display:GetSize().width - params.width) / 2;
 	params.y = 0;
-	params.debug = false;
-	params.version = "1.8";
+	params.debug = true;
+	params.version = "1.9";
 	base = base or sqlBase.Clone();
 	tPlace_Valeur = base:GetTable('Place_Valeur');
 	tEvenement = base:GetTable('Evenement');
