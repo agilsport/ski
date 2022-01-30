@@ -106,7 +106,11 @@
 					return $(Nom):upper()..' '..$(Prenom):sub(1,1):upper()..$(Prenom):sub(2):lower();
 				else
 					local origineCoureur = $(Code_coureur):sub(1,3);
-					if origineCoureur == 'FFS' or origineCoureur == 'IFS' or origineCoureur == 'ISB' or origineCoureur == 'LCN' then 
+					if origineCoureur == 'FFS' 
+					or origineCoureur == 'IFS' 
+					or origineCoureur == 'ISB' 
+					or origineCoureur == 'LCN' 
+					or origineCoureur == 'IFO' then 
 						return $(Identite):upper();
 					elseif origineCoureur == 'TIC' then
 						return $(Nom):upper()..' '..$(Prenom):sub(1,1):upper()..$(Prenom):sub(2):lower();
