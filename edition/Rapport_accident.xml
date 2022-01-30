@@ -1,0 +1,275 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!-- version_script = '2.3'; -->
+<root>
+	<panel name="config_rapport">	
+		<padding all="2px"/>
+		<font name="Calibri" size="10" adjust="best" weight="normal"/>
+		<row h="auto" />
+		<row h="auto" />
+		<row h="auto" />
+		<row h="auto" />
+		<row h="auto" />
+		<col value="1,1,1" />
+
+	<!-- params evenement	 -->
+		<matrix row_start="1" col_start="1">
+			<col value="70px,1,1,1,20px"/>
+			<row value="30px" />
+			<row value="30px" />
+			<row value="30px" />
+			<row value="30px" />
+			<row value="30px" />
+			<row value="10px" />
+				<statictext row_start="2" col_start="1" style="ALIGN_RIGHT" label="Nom: " />
+				<textctrl row_start="2" col_start="2" col_end="4" style="ALIGN_LEFT | CB_READONLY" name="Evt_Name" validator="Rap_accident.Evt_Name" ></textctrl>
+				<statictext row_start="3" col_start="1" style="ALIGN_RIGHT" label="Date: " />
+				<textctrl row_start="3" col_start="2" style="ALIGN_LEFT | CB_READONLY" name="Evt_date" validator="Rap_accident.Evt_date"></textctrl>
+				<statictext row_start="3" col_start="3" style="ALIGN_RIGHT" label="Saison:"/>
+				<textctrl row_start="3" col_start="4" name="Code_saison" style="ALIGN_RIGHT | CB_READONLY" validator="Rap_accident.Code_saison"/>
+				<statictext row_start="4" col_start="1" style="ALIGN_RIGHT" label="Activité: " />
+				<textctrl row_start="4" col_start="2" style="ALIGN_LEFT | CB_READONLY" name="Evt_activite" validator="Rap_accident.Evt_activite" ></textctrl>
+				<statictext row_start="5" col_start="1" style="ALIGN_RIGHT" label="Codex:"/>
+				<textctrl row_start="5" col_start="2" name="Evt_codex" style="ALIGN_LEFT | CB_READONLY" validator="Rap_accident.Evt_codex" />
+				<statictext row_start="5" col_start="3" style="ALIGN_RIGHT" label="Num. rapport:"/>
+				<textctrl row_start="5" col_start="4" name="Num_rapport" style="ALIGN_RIGHT | CB_READONLY" validator="Rap_accident.Num_rapport" />
+			<staticbox row_start="1" row_end="0" col_start="1" col_end="0" label="Paramètres Evénement" />
+		</matrix>
+		
+	<!-- params epreuves	 -->
+		<matrix row_start="1" col_start="2" >
+			<col value="70px,1,60px,1,20px"/>
+			<row value="30px" />
+			<row value="30px" />
+			<row value="30px" />
+			<row value="30px" />
+			<row value="30px" />
+			<row value="10px" />
+				<statictext row_start="2" col_start="1" style="ALIGN_RIGHT" label="lieu: " />
+				<textctrl row_start="2" col_start="2" col_end="4" style="ALIGN_LEFT | CB_READONLY" name="Epreuve_lieu" validator="Rap_accident.Epreuve_lieu" ></textctrl>
+				<statictext row_start="3" col_start="1" style="ALIGN_RIGHT" label="piste: " />
+				<textctrl row_start="3" col_start="2" col_end="4" style="ALIGN_LEFT" name="Epreuve_piste" validator="Rap_accident.Epreuve_piste" ></textctrl>
+				<statictext row_start="4" col_start="1" style="ALIGN_RIGHT" label="Disc. : " />
+				<textctrl row_start="4" col_start="2" style="ALIGN_LEFT | CB_READONLY" name="Code_discipline" validator="Rap_accident.Code_discipline" ></textctrl>
+				<statictext row_start="4" col_start="3" style="ALIGN_RIGHT" label="Manche:"/>
+				<combobox row_start="4" col_start="4" name="Epr_manche" validator="Rap_accident.Epr_manche"  style="ALIGN_RIGHT | CB_READONLY" />
+				<statictext row_start="5" col_start="1" col_end="2" style="ALIGN_RIGHT" label="Heure de l\' accident: "/>
+				<textctrl row_start="5" col_start="3" style="ALIGN_LEFT" name="Acc_heure" validator="Rap_accident.Acc_heure" ></textctrl>
+			<staticbox row_start="1" row_end="0" col_start="1" col_end="0" label="Paramètres Epreuves" />
+		</matrix>	
+		
+	<!-- Info concurent	 -->
+		<matrix row_start="1" col_start="3" >
+			<col value="70px,1,1,1,15px"/>
+			<row value="30px" />
+			<row value="30px" />
+			<row value="30px" />
+			<row value="30px" />
+			<row value="30px" />
+			<row value="10px" />
+				<statictext row_start="2" col_start="1" style="ALIGN_RIGHT" label="Identité: " />
+				<textctrl row_start="2" col_start="2" col_end="4" style="ALIGN_LEFT" name="Coureur_identite" validator="Rap_accident.Coureur_identite"  ></textctrl>
+				<statictext row_start="3" col_start="1" style="ALIGN_RIGHT" label="N° Lic.: " />
+				<textctrl row_start="3" col_start="2" style="ALIGN_LEFT" name="Code_coureur" validator="Rap_accident.Code_coureur" ></textctrl>
+				<statictext row_start="3" col_start="3" style="ALIGN_RIGHT" label="Sexe:"/>
+				<combobox row_start="3" col_start="4" name="Coureur_sexe" validator="Rap_accident.Coureur_sexe" style="ALIGN_RIGHT | CB_READONLY" />
+				<statictext row_start="4" col_start="1" style="ALIGN_RIGHT" label="An. : " />
+				<textctrl row_start="4" col_start="2" style="ALIGN_LEFT" name="Coureur_annee" validator="Rap_accident.Coureur_annee" ></textctrl>
+				<statictext row_start="4" col_start="3" style="ALIGN_RIGHT" label="Tel: " />
+				<textctrl row_start="4" col_start="4" style="ALIGN_LEFT" name="Coureur_tel" validator="Rap_accident.Coureur_tel" ></textctrl>
+				<!-- <statictext row_start="5" col_start="1" style="ALIGN_RIGHT" label="Email: " /> -->
+				<!-- <textctrl row_start="5" col_start="2" col_end="4" style="ALIGN_LEFT" name="Coureur_Email" validator="Rap_accident.Coureur_Email" ></textctrl>	 -->
+			<staticbox row_start="1" row_end="0" col_start="1" col_end="0" label="Informations Coureur" />
+		</matrix>	
+	
+	<!-- Info Meteo	 -->
+		<matrix row_start="2" col_start="1" col_end="0" >
+			<col value="140px,1,1,1,50px,1,20px"/>
+			<row value="30px" />
+			<row value="30px" />
+			<row value="10px" />
+				<statictext row_start="2" col_start="1" col_end="1" style="ALIGN_RIGHT" label="Condition course: " />
+				<textctrl row_start="2" col_start="2" col_end="4" style="ALIGN_LEFT" name="Evt_cond" validator="Rap_accident.Evt_cond" ></textctrl>
+				<statictext row_start="2" col_start="5" style="ALIGN_RIGHT" label="Temps:"/>
+				<combobox row_start="2" col_start="6" name="Epr_temps" validator="Rap_accident.Epr_temps" style="ALIGN_RIGHT | CB_READONLY"/>
+			<staticbox row_start="1" row_end="0" col_start="1" col_end="0" label="Informations Méteo" />
+		</matrix>
+	
+	<!-- Info Blessure et secours	 -->	
+		<matrix row_start="3" col_start="1" col_end="0" >
+			<row value="1" />
+			<row value="10px" />
+			<col value="1,1,1"/>
+		
+			<!-- Info blessure	 -->
+			<matrix col_start="1" col_end="2" row_start="1" >
+				<row value="30px,30px,30px,30px,30px,30px,30px,30px,30px,30px,30px,30px,10px" />
+				<col value="20px,145px,180px,1,170px,130px,15px"/>
+					<!-- ligne 2	 -->
+					<statictext row_start="2" col_start="2" col_end="0" style="ALIGN_LEFT" label="Le DT remplira ce formulaire avec l\'aide des secours" />
+					<!-- ligne 3	 -->
+					<statictext row_start="3" col_start="2" col_end="4" style="ALIGN_CENTER" label="Partie du corps bléssée: " />
+					<statictext row_start="3" col_start="5" col_end="0" style="ALIGN_CENTER" label="Type de blessure: " />
+					<!-- ligne 4	 -->
+					<statictext row_start="4" col_start="2" style="ALIGN_LEFT" label="Tête - face: " />
+					<combobox row_start="4" col_start="3" name="Bles_tete" validator="Rap_accident.Bles_tete" style="CB_READONLY" />
+					<statictext row_start="4" col_start="5" col_end="5" style="ALIGN_LEFT" label="Fracture: " />
+					<combobox row_start="4" col_start="6" name="Bles_fracture" validator="Rap_accident.Bles_fracture" style="CB_READONLY" /> 
+					<!-- ligne 5	 -->
+					<statictext row_start="5" col_start="2" style="ALIGN_LEFT" label="Nuque - rachis: " />
+					<combobox row_start="5" col_start="3" name="Bles_nuque" validator="Rap_accident.Bles_nuque" style="CB_READONLY" /> 
+					<statictext row_start="5" col_start="5" style="ALIGN_LEFT" label="Entorse - élongation: " />
+					<combobox row_start="5" col_start="6" name="Bles_entorse" validator="Rap_accident.Bles_entorse" style="CB_READONLY" /> 
+					<!-- ligne 6	 -->
+					<statictext row_start="6" col_start="2" style="ALIGN_LEFT" label="Epaule - clavicule: " />
+					<combobox row_start="6" col_start="3" name="Bles_epaule" validator="Rap_accident.Bles_epaule :" style="CB_READONLY" />
+					<statictext row_start="6" col_start="5" col_end="5" style="ALIGN_LEFT" label="Contusion: "/>
+					<combobox row_start="6" col_start="6" name="Bles_contusion" validator="Rap_accident.Bles_contusion" style="CB_READONLY" /> 
+					<!-- ligne 7	 -->
+					<statictext row_start="7" col_start="2" style="ALIGN_LEFT" label="Membre supérieur:"/>
+					<combobox row_start="7" col_start="3" name="Bles_membre_sup" validator="Rap_accident.Bles_membre_sup" style="CB_READONLY" />
+					<statictext row_start="7" col_start="5" style="ALIGN_LEFT" label="Plaie: " />
+					<combobox row_start="7" col_start="6" name="Bles_plaie" validator="Rap_accident.Bles_plaie" style="CB_READONLY" />
+					<!-- ligne 8	 -->
+					<statictext row_start="8" col_start="2" style="ALIGN_LEFT" label="Bassin:"/>
+					<combobox row_start="8" col_start="3" name="Bles_bassin" validator="Rap_accident.Bles_bassin" style="CB_READONLY" />
+					<statictext row_start="8" col_start="5" style="ALIGN_LEFT" label="Ventre: " />
+					<combobox row_start="8" col_start="6" name="Bles_ventre" validator="Rap_accident.Bles_ventre" style="CB_READONLY" />
+					<!-- ligne 9	 -->
+					<statictext row_start="9" col_start="2" style="ALIGN_LEFT" label="Membre inférieur:"/>
+					<combobox row_start="9" col_start="3" name="Bles_membre_inf" validator="Rap_accident.Bles_membre_inf" style="ALIGN_LEFT | CB_READONLY" />
+					<statictext row_start="9" col_start="5" style="ALIGN_LEFT" label="Atteintes musculaires: " />
+					<combobox row_start="9" col_start="6" name="Bles_musculaire" validator="Rap_accident.Bles_musculaire" style="CB_READONLY" />
+					<!-- ligne 9	 -->
+					<statictext row_start="10" col_start="2" style="ALIGN_LEFT" label="Genou:"/>
+					<combobox row_start="10" col_start="3" name="Bles_genou" validator="Rap_accident.Bles_genou" style="CB_READONLY" />
+					<statictext row_start="10" col_start="5" style="ALIGN_LEFT" label="Autres ou je ne sais pas " />
+					<combobox row_start="10" col_start="6" name="Bles_type_autre" validator="Rap_accident.Bles_type_autre" style="CB_READONLY" />
+					<!-- ligne 9	 -->
+					<statictext row_start="11" col_start="2" style="ALIGN_LEFT" label="Cheville:"/>
+					<combobox row_start="11" col_start="3" name="Bles_cheville" validator="Rap_accident.Bles_cheville" style="CB_READONLY" />
+					<!-- ligne 10	 -->
+					<statictext row_start="12" col_start="2" style="ALIGN_LEFT" label="Autres:"/>
+					<combobox row_start="12" col_start="3" name="Bles_autres" validator="Rap_accident.Bles_autres" style="CB_READONLY" />				
+				<staticbox row_start="1" row_end="0" col_start="1" col_end="0" label="Informations blessure(s)" />
+			</matrix>
+		
+			<!-- Info evacuation	 -->
+			<matrix col_start="3" row_start="1" >
+				<row value="10px,20px,80px,30px,80px,30px,80px,10px" />
+				<col value="10px,1,10px"/>
+					<matrix row_start="3" col_start="2" >
+						<row value="1,1,10px"/>
+						<col value="10px,1,20px"/>
+						<!-- ligne 2	 -->
+						<combobox row_start="2" col_start="2" name="Situation" validator="Rap_accident.Situation" style="CB_READONLY" /> 
+						<staticbox row_start="1" row_end="0" col_start="1" col_end="0" label="Situation " />
+					</matrix>
+
+					<matrix row_start="5" col_start="2" >
+						<row value="1,1,10px"/>
+						<col value="10px,1,20px"/>
+						<!-- ligne 2	 -->
+						<combobox row_start="2" col_start="2" name="Evacuation" validator="Rap_accident.Evacuation" style="CB_READONLY" /> 								
+						<staticbox row_start="1" row_end="0" col_start="1" col_end="0" label="Evacution " />
+					</matrix>
+					
+					<matrix row_start="7" col_start="2" >
+						<row value="1,1,10px"/>
+						<col value="10px,1,20px"/>
+						<!-- ligne 2	 -->
+						<combobox row_start="2" col_start="2" name="Epr_neige" validator="Rap_accident.Epr_neige" style="CB_READONLY" /> 								
+						<staticbox row_start="1" row_end="0" col_start="1" col_end="0" label="Neige " />
+					</matrix>
+				<staticbox row_start="1" row_end="0" col_start="1" col_end="0" label="Information" />		
+			</matrix>
+		</matrix>
+	
+	<!-- Info Officiels Temoins	 -->
+		<matrix row_start="4" col_start="1" col_end="0" >
+			<row value="30px" />
+			<row value="30px" />
+			<row value="30px" />
+			<row value="30px" />
+			<row value="30px" />
+			<row value="30px" />
+			<row value="30px" />
+			<row value="30px" />
+			<row value="10px" />
+			<col value="30px,1,1,1,1,20px"/>
+				<!-- ligne 1 label	 -->
+				<statictext row_start="2" col_start="2" style="ALIGN_LEFT" label="Description"/>
+				<statictext row_start="2" col_start="3" style="ALIGN_LEFT" label="Identité"/>
+				<!-- <statictext row_start="2" col_start="4" style="ALIGN_LEFT" label="Mail"/> -->
+				<statictext row_start="2" col_start="4" style="ALIGN_LEFT" label="Tel"/>
+				<!-- ligne 2 Directeur Technique	 -->
+				<statictext row_start="3" col_start="2" style="ALIGN_LEFT" label="Délégué Technique"/>
+				<textctrl row_start="3" col_start="3" style="ALIGN_LEFT | CB_READONLY" name="Evt_dt_name" validator="Rap_accident.Evt_dt_name" ></textctrl>	
+				<!-- <textctrl row_start="3" col_start="4" style="ALIGN_LEFT" name="Evt_dt_email" validator="Rap_accident.Evt_dt_email" style="CB_READONLY"></textctrl>	 -->
+				<textctrl row_start="3" col_start="4" style="ALIGN_LEFT" name="Evt_dt_tel" validator="Rap_accident.Evt_dt_tel" ></textctrl>	
+				<!-- ligne 3 Medecin	 -->
+				<statictext row_start="4" col_start="2" style="ALIGN_LEFT" label="Medecin de Course"/>
+				<textctrl row_start="4" col_start="3" style="ALIGN_LEFT | CB_READONLY" name="Evt_Med_Name" validator="Rap_accident.Evt_Med_Name" ></textctrl>	
+				<!-- <textctrl row_start="4" col_start="4" style="ALIGN_LEFT" name="Evt_Med_email" validator="Rap_accident.Evt_Med_email" style="CB_READONLY" ></textctrl>	 -->
+				<textctrl row_start="4" col_start="4" style="ALIGN_LEFT" name="Evt_Med_Tel" validator="Rap_accident.Evt_Med_Tel" ></textctrl>	
+				<!-- ligne 4 Secours	 -->
+				<combobox row_start="5" col_start="2" name="Evt_Sec_descip" validator="Rap_accident.Evt_Sec_descip" style="ALIGN_RIGHT | CB_READONLY" />
+				<textctrl row_start="5" col_start="3" style="ALIGN_LEFT" name="Evt_Sec_Name" validator="Rap_accident.Evt_Sec_Name" ></textctrl>	
+				<!-- <textctrl row_start="5" col_start="4" style="ALIGN_LEFT" name="Evt_Sec_email" validator="Rap_accident.Evt_Sec_email" ></textctrl>	 -->
+				<textctrl row_start="5" col_start="4" style="ALIGN_LEFT" name="Evt_Sec_Tel" validator="Rap_accident.Evt_Sec_Tel" ></textctrl>	
+				<!-- ligne 5 Temoins 1	 -->
+				<statictext row_start="6" col_start="2" style="ALIGN_LEFT" label="Témoin 1:"/>
+				<textctrl row_start="6" col_start="3" style="ALIGN_LEFT" name="Evt_Tem1_Name" validator="Rap_accident.Evt_Tem1_Name" ></textctrl>	
+				<!-- <textctrl row_start="6" col_start="4" style="ALIGN_LEFT" name="Evt_Tem1_email" validator="Rap_accident.Evt_Tem1_email" ></textctrl>	 -->
+				<textctrl row_start="6" col_start="4" style="ALIGN_LEFT" name="Evt_Tem1_Tel" validator="Rap_accident.Evt_Tem1_Tel" ></textctrl>	
+				<!-- ligne 6 Temoins 2	 -->
+				<statictext row_start="7" col_start="2" style="ALIGN_LEFT" label="Témoin 2:"/>
+				<textctrl row_start="7" col_start="3" style="ALIGN_LEFT" name="Evt_Tem2_Name" validator="Rap_accident.Evt_DT_Tel" ></textctrl>	
+				<!-- <textctrl row_start="7" col_start="4" style="ALIGN_LEFT" name="Evt_Tem2_email" validator="Rap_accident.Evt_Tem2_email" ></textctrl>	 -->
+				<textctrl row_start="7" col_start="4" style="ALIGN_LEFT" name="Evt_Tem2_Tel" validator="Rap_accident.Evt_Tem2_Tel" ></textctrl>	
+				<!-- ligne 7 Temoins 3	 -->
+				<statictext row_start="8" col_start="2" style="ALIGN_LEFT" label="Témoin 3:"/>
+				<textctrl row_start="8" col_start="3" style="ALIGN_LEFT" name="Evt_Tem3_Name" validator="Rap_accident.Evt_Tem3_Name" ></textctrl>	
+				<!-- <textctrl row_start="8" col_start="4" style="ALIGN_LEFT" name="Evt_Tem3_email" validator="Rap_accident.Evt_Tem3_email" ></textctrl>	 -->
+				<textctrl row_start="8" col_start="4" style="ALIGN_LEFT" name="Evt_Tem3_Tel" validator="Rap_accident.Evt_Tem3_Tel"  ></textctrl>	
+			<staticbox row_start="1" row_end="0" col_start="1" col_end="0" label="Désignation et coordonnées des Intervenants" />
+		</matrix>	
+	
+	<!-- saisie commentaire	 -->
+	<matrix row_start="5" col_start="1" col_end="0">
+	<col value="20px,1,1,1,20px"/>
+	<row value="30px" />
+	<row value="60px" />
+	<row value="10px" />
+		<textctrl row_start="2" col_start="2" col_end="4" name="Rap_commentaire" validator="Rap_accident.Rap_commentaire" style="TE_LEFT|TE_MULTILINE" />
+		<staticbox row_start="1" row_end="0" col_start="1" col_end="0" style="ALIGN_RIGHT" label="Commentaire" />
+	</matrix>	
+	
+	<row value="auto" />	
+		<!-- Tool bar	 -->
+		<toolbar row="auto" col_start="1" col_end="0" name="tbedit" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT" />
+		
+	</panel>
+	
+	
+	
+	
+	<!-- Fenètre de pour la selection du rapport a lire ou a créer -->
+<panel name="NumFichier">
+	<padding all="2px"/>
+	<col value="5,5,5,5,5" />
+
+	<row value="auto" />
+		<statictext col_start="1" col_end="0"  style="ALIGN_CENTER" label="Sélectionner le rapport d\'accident de l\'evenement"/>
+		
+	<row value="auto" />
+		<statictext col_start="1" col_end="0"  style="ALIGN_CENTER" label="Sélectionner 0 pour créer un nouveau rapport d\'accident"/>
+	
+	<row value="auto" />
+		<statictext col_start="1" col_end="3"  style="ALIGN_RIGHT" label='Rapport à lire'/>
+		<combobox col_start="4" name="NumFichier" style="ALIGN_RIGHT | CB_READONLY" />
+		
+	<row value="auto" />
+	<toolbar name="tb" col_start="1" col_end="0" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
+</panel>
+
+</root>
