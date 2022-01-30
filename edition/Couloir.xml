@@ -1,4 +1,5 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
+<!-- Version 2.3 -->
 <root>
 
 <!-- Fenètre de configuration de l'éditions des couloir de poursuite -->
@@ -45,7 +46,8 @@
 			<text row="auto" align="center" >title</text>
 			<text row="1cm" align="center" ></text>
 			<font name="Calibri" size="26" adjust="max" weight="bold"/>
-			<text row="auto" align="center" >'Couloir N°'..params.NumCouloir</text>
+			<lua>lg = body:GetCell('Dossard',0):len()</lua>
+			<text row="auto" align="center" >'Couloir N°'..string.sub(body:GetCell('Dossard',0),lg)</text>
 			<row value="0.5cm"/>
 		</header>
 	
