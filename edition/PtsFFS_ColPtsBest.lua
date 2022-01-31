@@ -1,6 +1,8 @@
 dofile('./interface/adv.lua');
 dofile('./interface/interface.lua');
--- version 2.2
+-- version 2.3
+	-- Verification edition/PtsFFS_ColPtsBest
+	-- correction mise a jour du body pour edition liste par ordre de points selectionner
 
 
 function alert(txt)
@@ -65,14 +67,14 @@ end
 
 function LectureDonnees(evt)
 	-- alert("code_evenement = "..code_evenement);
-	alert("colum_Pts = "..colum_Pts);
+	-- alert("colum_Pts = "..colum_Pts);
 	-- alert("LabelNc = "..LabelNc);
 	-- alert("Colum_Label = "..Colum_Label);
 	Lab_NC = LabelNc;
 	tResultat = base:GetTable('Resultat');
 	cmd = "Select * From Resultat WHERE Code_evenement = "..code_evenement.." Order by Code_coureur"
 	base:TableLoad(tResultat, cmd);
-	alert("base:TableLoad(Resultat, cmd) = "..tResultat:GetNbRows()..' / '..cmd);
+	-- alert("base:TableLoad(Resultat, cmd) = "..tResultat:GetNbRows()..' / '..cmd);
 	bodyliste = tResultat:Copy(false);
 	Nbparticipant = tResultat:GetNbRows();
 	for i=0, Nbparticipant-1 do
@@ -87,14 +89,17 @@ function LectureDonnees(evt)
 		end
 		cmd = "Update Resultat SET "..colum_Pts.." = "..resultatPts..", "..Colum_Label.." = '"..LabelNc.."' Where Code_evenement = "..tonumber(code_evenement).." and Code_coureur = '"..tResultat:GetCell('Code_coureur', i).."'";
 		base:Query(cmd);
-		alert("cmd = "..cmd)
+		-- alert("cmd = "..cmd)
 	end
-	for i=0, Nbparticipant-1 do
+	
+	cmd = "Select * From Resultat WHERE Code_evenement = "..code_evenement.." Order by "..colum_Pts
+	base:TableLoad(tResultat, cmd);	
+	for i=0, tResultat:GetNbRows()-1 do
 		bodyliste:AddRow();
 		sqlTable.CopyRow(bodyliste, bodyliste:GetNbRows()-1, tResultat, i);
 	end
 	editionliste(evt, base, bodyliste);
-	
+	alert("Transfert des points:"..LabelPts.." Ok!!!")
 	-- Fermeture
 	bodyliste:Delete();
 	dlg:EndModal(idButton.OK);
