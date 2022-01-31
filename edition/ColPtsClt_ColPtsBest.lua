@@ -62,7 +62,7 @@ end
 function LectureDonnees(evt)
 	-- alert("code_evenement = "..code_evenement);
 	Evt_source = tonumber(dlg:GetWindowName('N_Course'):GetValue());
-	alert("Evt_source = "..Evt_source);
+	-- alert("Evt_source = "..Evt_source);
 	tResultat = base:GetTable('Resultat');
 	tResultat:AddColumn('CltG');
 	tResultat:AddColumn('PtsClt_G');
@@ -105,7 +105,7 @@ function LectureDonnees(evt)
 				"'";
 		end
 		base:Query(cmd);
-		alert("cmd = "..cmd)
+		-- alert("cmd = "..cmd)
 	end
 -- rechargement du body pour edition liste	
 	for i=0, Nbparticipant-1 do
@@ -114,7 +114,7 @@ function LectureDonnees(evt)
 	end
 	
 	editionliste(evt, params, base, bodyliste);
-	
+	alert("Clt du Challenge: "..Groupe..'Importer dans la colonne '..Label_col)
 	-- Fermeture
 	bodyliste:Delete();
 	dlg:EndModal(idButton.OK);
@@ -122,8 +122,6 @@ function LectureDonnees(evt)
 end
 
 function editionliste(evt, params, base, bodyliste)
-	
-		
 	-- Creation du Report
 	report = wnd.LoadTemplateReportXML({
 		xml = './edition/ColPtsClt_ColPtsBest.xml',
