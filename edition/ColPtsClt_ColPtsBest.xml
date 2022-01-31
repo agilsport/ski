@@ -1,4 +1,5 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
+<!-- version 1.5 -->
 <root>
 
 <!-- Fenètre de configuration de l'éditions des couloir de poursuite -->
@@ -66,7 +67,8 @@
 			<text col="5" align="left" label="Dos.">$(Nom)..' '..$(Prenom) </text>
 			<text col="2" align="center" label="Distance" >$(Distance)..'Km'</text>
 			<text col="2" align="center" label="Chal. Origine" >$(Moniteur)</text>
-			<text col="2" align="center" label="Pts Challenge" >$(Pts_best)</text>
+			<text col="2" align="center" cond="(label_col == 'Pts_best')" label="Pts Challenge" >$(Pts_best)</text>
+			<text col="2" align="center" cond="(label_col == 'Centre')" label="Pts Challenge" >$(Centre)</text>
 			<text col="2" align="center" label="Clt Challenge" >$(Ordre_niveau)</text>
 			<text col="2" align="center" label="N.Cl." >$(Niveau)</text>
 		</body>
