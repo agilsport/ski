@@ -32,6 +32,7 @@
 			<menu title="Meilleurs Temps" image="./res/16x16_ranking.png" id="res_best" />
 			<menu title="Multi-Passages" image="./res/16x16_official.png" id="res_passage" choix_manche="1" mode_lap="2" />
 		</menu>
+		
 		<menu title="Outils" image="./res/32x32_tools.png">
 			<menu title="Analyse des Performances" image="./res/16x16_analyse.png"  choix_manche="1" id="res_performance" lua="./edition/editionPerformances.lua"  />
 			<menu title="Edition des Séquences Chrono" image="./res/16x16_bib.png" id="chrono_seq" choix_manche="1" action="chrono_seq"/>

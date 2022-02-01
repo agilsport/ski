@@ -20,6 +20,10 @@
 			<menu title="Résultats Officiels" image="./res/16x16_ranking.png" id="res_officiel" />
 			<menu title="Résultats Saut Par Equipe" image="./res/16x16_ranking.png" id="res_equipe" action="saut_equipe" />
 		</menu>
+		
+		<menu title="Utilitaires" image="./res/32x32_options.png">
+			<menu title="Factures inscriptions" image="./res/16x16_text.png" lua="./edition/facture.lua" />
+		</menu>
 	</menu>
 	
 	<!-- footer standard !-->
