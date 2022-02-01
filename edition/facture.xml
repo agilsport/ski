@@ -191,9 +191,7 @@
 				<lua>Nomclub = Countclub:GetCell('Nation',m)</lua>
 				
 			<lua>end</lua>
-		
-			
-			
+	
 			<lua>counter_fact = body:GetCounter('fact')</lua>
 				<lua>for m=0, Countclub:GetNbRows()-1 do </lua>
 					
