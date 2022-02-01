@@ -37,10 +37,13 @@
 				<font name="Calibri" size="15" adjust="best" weight="normal"/>
 				<spacing all="0"/>
 				<background mode="transparent"/>
-				<lua>ChoixRequette = params.ChoixRequette or ''</lua>
-				<lua>codeClub = $(Evenement.Club)</lua>
-				<lua>tClub = base:GetTable('Club')</lua>
-				<lua>base:TableLoad(tClub, "Select * From Club Where Nom_reduit = '"..codeClub:EscapeQuote().."'")</lua>
+				<lua>
+					ChoixRequette = params.ChoixRequette or ''
+					codeClub = $(Evenement.Club)
+					tClub = base:GetTable('Club')
+					base:TableLoad(tClub, "Select * From Club Where Nom_reduit = '"..codeClub:EscapeQuote().."'")
+					activite = $(Evenement.Code_activite)
+				</lua>
 				
 				<font name="Calibri" size="14" adjust="max" weight="bold"/>
 				<text row="auto" col="1" col_end="0" align="center">$(Evenement.Nom)</text>
@@ -97,12 +100,12 @@
 
 							<matrix row="auto" col_start="1" col_end="0" >
 								<row value="auto" />
-								<text col_start="1" col="25" align="left">'Epreuve: '..NomEpreuve</text>
-								<text col_start="2" col="10" align="left" >dist..'Km'</text>
-								<text col_start="3" col="13" align="left">'Sexe: '..Sexe</text>
-								<text col_start="4" col="13" align="left">'Tarif: '..tarif..'€'</text>
-								<text col_start="5" col="12" align="right">'Nombre: '..nb</text>
-								<text col_start="6" col="10" align="right">MontantIns..'€'</text>
+								<text col="25" align="left">'Epreuve: '..NomEpreuve</text>
+								<text col="10" align="left" cond="(activite ~= 'ALP')" >dist..'Km'</text>
+								<text col="13" align="left">'Sexe: '..Sexe</text>
+								<text col="13" align="left">'Tarif: '..tarif..'€'</text>
+								<text col="12" align="right">'Nombre: '..nb</text>
+								<text col="10" align="right">MontantIns..'€'</text>
 								<row value="0.2cm"/>
 							</matrix>
 						<row value="0.1cm"/>
@@ -111,11 +114,11 @@
 					<row value="0.3cm"/>
 							<matrix row="auto" col_start="1" col_end="0" >
 								<row value="auto" />							
-								<text col_start="1" col="10" align="left">''</text>
-								<text col_start="2" col="10" align="left">''</text>
-								<text col_start="3" col="10" align="left">''</text>
-								<text col_start="4" col="10" align="left">'Total'</text>
-								<text col_start="5" col="10" align="right">TotalIns..'€'</text>
+								<text col="10" align="left">''</text>
+								<text col="10" align="left">''</text>
+								<text col="10" align="left">''</text>
+								<text col="10" align="left">'Total'</text>
+								<text col="10" align="right">TotalIns..'€'</text>
 								<row value="0.3cm"/>
 							</matrix>
 					
@@ -252,13 +255,13 @@
 
 								<matrix row="auto" col_start="1" col_end="0">
 									<row value="auto" />
-									<text col_start="1" col="30" align="left">'Epreuve N°: '..Epreuve..' / '..NomEpreuve</text>
-									<text col_start="2" col="13" align="left">'Sexe: '..Sexe</text>
-									<text col_start="3" col="10" align="right" >dist..'Km '</text>
+									<text col="30" align="left">'Epreuve N°: '..Epreuve..' / '..NomEpreuve</text>
+									<text col="13" align="left">'Sexe: '..Sexe</text>
+									<text col="10" align="left" cond="(activite ~= 'ALP')" >dist..'Km'</text>
 									<!-- cond="activite:In('FOND','BIATH', 'ROL')" -->
-									<text col_start="4" col="13" align="right">'Tarif: '..tarif..'€ '</text>
-									<text col_start="5" col="12" align="right">'Nombre: '..val</text>
-									<text col_start="6" col="10" align="right">MontantIns..'€'</text>
+									<text col="13" align="right">'Tarif: '..tarif..'€ '</text>
+									<text col="12" align="right">'Nombre: '..val</text>
+									<text col="10" align="right">MontantIns..'€'</text>
 									<row value="0.2cm"/>
 								</matrix>
 							<row value="0.3cm"/>		
@@ -266,11 +269,11 @@
 							<row value="0.3cm"/>
 						<matrix row="auto" col_start="1" col_end="0">
 							<row value="auto" />							
-							<text col_start="1" col="10" align="left" >''</text>
-							<text col_start="2" col="10" align="left">''</text>
-							<text col_start="3" col="10" align="left">''</text>
-							<text col_start="4" col="10" align="left">'Total'</text>
-							<text col_start="5" col="10" align="right">TotalIns..'€'</text>
+							<text col="10" align="left" >''</text>
+							<text col="10" align="left">''</text>
+							<text col="10" align="left">''</text>
+							<text col="10" align="left">'Total'</text>
+							<text col="10" align="right">TotalIns..'€'</text>
 							<row value="0.3cm"/>
 						</matrix>
 				

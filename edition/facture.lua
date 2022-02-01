@@ -1,7 +1,7 @@
 dofile('./interface/adv.lua');
 dofile('./interface/interface.lua');
 
--- version 2.5
+-- version 2.6
 
 -- point a voir avec pierre
 			-- Edition des factures par club comité ou nation 
