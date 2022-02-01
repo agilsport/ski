@@ -101,7 +101,7 @@
 							<matrix row="auto" col_start="1" col_end="0" >
 								<row value="auto" />
 								<text col="25" align="left">'Epreuve: '..NomEpreuve</text>
-								<text col="10" align="left" cond="(activite ~= 'ALP')" >dist..'Km'</text>
+								<text col="10" align="left"  cond="(activite:In('FOND', 'BIATH', 'ROL'))" >dist..'Km'</text>
 								<text col="13" align="left">'Sexe: '..Sexe</text>
 								<text col="13" align="left">'Tarif: '..tarif..'€'</text>
 								<text col="12" align="right">'Nombre: '..nb</text>
