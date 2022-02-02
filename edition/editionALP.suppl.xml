@@ -16,8 +16,8 @@
 			<menu title="Regroupement de coureurs" image="./res/32x32_official.png" lua="./process/regroupementALP.lua" />
 		</menu>
 		<menu title="Coupes d'Europe et FIS" image="./res/32x32_juges.png">
-			<menu title="Tirage en ligne des dossards sur le site de la FIS" origine="edition" image="./res/16x16_ranking.png" lua="./edition/dossard_LiveDraw.lua"/>
-			<menu title="Analyse des Performances" image="./res/16x16_calc.png" id="temps_manuel" lua="./edition/editionPerformances.lua" />
+			<menu title="Tirage en ligne des dossards sur le site de la FIS" origine="edition" image="./res/16x16_ranking.png" lua="./process/dossard_LiveDraw.lua"/>
+			<menu title="Analyse des Performances" image="./res/16x16_calc.png" id="res_performance" lua="./edition/editionPerformances.lua" />
 		</menu>
 		
 	</menu>
