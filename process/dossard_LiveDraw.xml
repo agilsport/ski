@@ -138,11 +138,16 @@
     <toolbar row="auto" col_start="1" col_end="0" name="tbtableau" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
     <row value="20px"/>
   </panel>
+  <panel name="coureur">
+    <padding all="2px"/>
+    <col value="50px,1,50px"/>
+    <row value="10px"/>
+    <grid row="1" col_start="2" name="coureur"/>
+    <row value="10px"/>
+  </panel>
   <panel name="message">
     <padding all="2px"/>
     <col value="1,3"/>
-    <statictext row="auto" col_start="1" style="ALIGN_RIGHT" label="Message :"/>
-    <combobox col_start="2" name="message"/>
     <toolbar row="auto" col_start="1" col_end="0" name="tb" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
   </panel>
   <panel name="discipline">
@@ -164,7 +169,7 @@
     </header>
     <first_header>
       <font name="Calibri" size="11" adjust="width" weight="bold"/>
-      <text row="0.5cm" align="center">"Racers' Board for bib drawing"</text>
+      <text row="0.5cm" align="center">"Draw List for bib drawing"</text>
     </first_header>
     <footer>
       <background mode="transparent"/>
@@ -259,13 +264,16 @@
       <lua>if x == 5 then x = 0; end</lua>
     </body>
   </report>
-  <report id="print_tableau" title="Racers' Board" first_header="0">
+  <report id="print_tableau" title="Draw List" first_header="0">
     <header>
       <spacing all="0"/>
       <background mode="transparent"/>
       <font name="Calibri" size="14" adjust="max" weight="bold"/>
       <text row="1cm" align="center">$(Evenement.Nom)</text>
+      <text align="right" cond="$(Epreuve.Sexe) == 'M'">"Men's"</text>
+      <text align="right" cond="$(Epreuve.Sexe) == 'F'">"Ladies's"</text>
       <text row="1cm" align="center" cond="title">title</text>
+      <text align="right" >$(Epreuve.Code_discipline)..'     '</text>
       <!-- <text row="3cm" align="left"><font orientation="90" origin="left,bottom"/>'HELLO'</text> -->
       <row value="0.5cm"/>
     </header>
@@ -301,9 +309,10 @@
     <layers/>
     <!-- <layer /> -->
     <!-- <order key="(params.Orderby)" /> -->
+    <!-- <paper orientation="portrait"/> -->
     <paper orientation="landscape"/>
     <margin top="50" bottom="50"/>
-    <lua>lignedouble = 0; lastrowECSL_30 = 0;
+    <lua>lignedouble = 0; lastrowECSL_30 = 0; current_group = 1;
 		</lua>
     <body>
       <font size="10" weight="normal" adjust="ellipsize"/>
@@ -315,6 +324,9 @@
 	  </lua>
        <background mode="solid" color="ltyellow" cond="body:GetCellInt('ECSL_30', row) == 99"/>
       <lua>end</lua>
+	  <row value="0.3cm" cond="body:GetCellInt('Groupe_tirage', row) ~= current_group" />
+	  <lua>current_group = body:GetCellInt('Groupe_tirage', row)</lua>
+      <!-- <text col="4" align="center" label="Rank">$(Rang_tirage)</text> -->
       <row value="auto"/>
       <text col="4" align="center" label="Rank">$(Rang_tirage)</text>
       <text col="4" align="center" label="Group">$(Groupe_tirage)</text>
@@ -332,9 +344,9 @@
       <lua>end</lua>
       <text col="5" align="center" label="WCSL pts">$(WCSL_points)</text>
       <text col="5" align="center" label="WCSL rank">$(WCSL_rank)</text>
-      <text col="5" align="center" label="/ All Pts">$(ECSL_overall_points)</text>
-      <text col="5" align="center" label="/ All rank">$(ECSL_overall_rank)</text>
-      <text col="5" align="center" label="Winner CC">$(Winner_CC)</text>
+      <text col="5" align="center" label="OA Pts">$(ECSL_overall_points)</text>
+      <!-- <text col="5" align="center" label="OA rank">$(ECSL_overall_rank)</text> -->
+      <text col="5" align="center" label="CC Winner">$(Winner_CC)</text>
       <!-- <text col="5" align="center" label="ECSL_30">$(ECSL_30)</text> -->
       <lua>else</lua>
       <text col="5" align="center" label="FIS Pts">$(FIS_pts)</text>

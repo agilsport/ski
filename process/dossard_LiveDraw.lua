@@ -62,6 +62,12 @@ function OnClose()
 	if draw.timer ~= nil then
 		draw.timer:Delete();
 	end
+	
+	if grid_coureur then
+		local mgr = app.GetAuiManager();
+		mgr:DeletePane(panel_coureur);
+		panel_coureur = nil;
+	end
 end
 
 function ReadECSL(build_table)
@@ -834,7 +840,7 @@ function CommandSendList()
 		local tData = {};
 		if draw.bolEstCE then
 			table.insert(tData, {rank = ecsl_rank, points = ecsl_points, event = draw.discipline, category = 'ECSL'});
-			table.insert(tData, {rank = ecsl_overall_rank, points = ecsl_overall_points, event = 'ALL', category = 'EC'});
+			table.insert(tData, {rank = ecsl_overall_rank, points = ecsl_overall_points, event = 'OA', category = 'EC'});
 			table.insert(tData, {rank = wcsl_rank, points = wcsl_points, event = draw.discipline, category = 'WCSL'});
 			table.insert(tData, {rank = winner_rank, points = winner_points, event = draw.discipline, category = 'CC WINNER'});
 			table.insert(tData, {rank = fis_clt, points = fis_pts, event = draw.discipline, category = 'FIS'});
@@ -1166,7 +1172,6 @@ function OnAjouterCoureur()
 	local prenom = dlgTableau:GetWindowName('prenom'):GetValue();
 	local sexe = draw.sexe;
 	local an = tonumber(dlgTableau:GetWindowName('an'):GetValue()) or 0;
-	local code_saison = draw.code_saison;
 	local categ = nil;
 	local nation = dlgTableau:GetWindowName('nation'):GetValue();
 	local comite = '';
@@ -1177,6 +1182,9 @@ function OnAjouterCoureur()
 	if type(draw.tECSL[code_coureur]) == 'table' then
 		ecsl_points = draw.tECSL[code_coureur].Pts;
 		ecsl_rank = draw.tECSL[code_coureur].Clt;
+	else
+		ecsl_points = 0;
+		ecsl_rank = 0;
 	end
 	if dlgTableau:GetWindowName('comite') then
 		comite = dlgTableau:GetWindowName('comite'):GetValue();
@@ -1189,7 +1197,6 @@ function OnAjouterCoureur()
 		prenom = tCoureur:GetCell('Prenom', 0);
 		sexe = tCoureur:GetCell('Sexe', 0);
 		an = tCoureur:GetCell('Naissance', 0, '%4Y');
-		code_saison = tCoureur:GetCellInt('Code_saison', 0);
 		nation = tCoureur:GetCell('Code_nation', 0);
 	end
 	categ = GetCateg(an);
@@ -1205,11 +1212,6 @@ function OnAjouterCoureur()
 		tDraw:GetRecord():Set('Prenom', prenom);
 		tDraw:GetRecord():Set('Sexe', sexe);
 		tDraw:GetRecord():Set('An',an);
-		if nation == 'FRA' and code_saison ~= draw.code_saison then
-			modif_manuel = 'D';
-			tDraw:GetRecord():Set('Modif_manuel',modif_manuel);
-			app.GetAuiFrame():MessageBox(msg, "Veuillez vérifier la licence FFS.", msgBoxStyle.OK+msgBoxStyle.ICON_WARNING);
-		end
 		tDraw:GetRecord():Set('Categ',categ);
 		tDraw:GetRecord():Set('Nation', nation);
 		tDraw:GetRecord():Set('Comite', comite);
@@ -2097,6 +2099,55 @@ Groupe 6 On poursuit selon les points FIS.
 	ChecktDraw();
 end
 
+function OnRowSelected(evt)
+	local row = evt:GetRow();
+	local col = evt:GetCol();
+	local t = grid_coureur:GetTable();
+	local colName = t:GetColumnName(t:GetVisibleColumnsIndex(col));
+	grid_coureur:SelectRow(row);
+	if col > 0 then
+		dlgTableau:GetWindowName('code'):SetValue(t:GetCell('Code_coureur', row):sub(4));
+		local mgr = app.GetAuiManager();
+		mgr:DeletePane(panel_coureur);
+		panel_coureur = nil;
+	end
+end
+
+function CreatePanelCoureur()
+	local xlabel = 'Recherche des coureurs - discipline de la course : '..draw.discipline..' - version '..draw.version..' du script  -  course n° '..draw.code_evenement..' - CODEX : '..tEvenement:GetCell('Codex', 0);
+	panel_coureur = wnd.CreatePanel({ parent = app.GetAuiFrame() });
+	panel_coureur:LoadTemplateXML({ 
+		xml = './process/dossard_LiveDraw.xml',
+		node_name = 'root/panel', 
+		node_attr = 'name', 	
+		node_value = 'coureur' 
+	});
+	grid_coureur = panel_coureur:GetWindowName('coureur');
+	grid_coureur:Set({
+		table_base = tCoureur,
+		columns = 'Code_coureur, Nom, Prenom, Naissance, Code_nation, Code_comite, Club',
+		selection_mode = gridSelectionModes.CELLS,
+		sortable = false,
+		enable_editing = false
+	});
+	grid_coureur:Bind(eventType.GRID_SELECT_CELL, OnRowSelected);
+	local mgr = app.GetAuiManager();
+	mgr:AddPane(panel_coureur, {
+		icon = './res/16x16_agil.png',
+		caption = xlabel,
+		caption_visible = true,
+		close_button = true,
+		pin_button = true,
+		show = true,
+		float = true, 
+		floating_position = {app.GetAuiFrame():GetDisplayArea().x+100, 50},
+		floating_size = {1000, 800},
+		dockable = false
+		
+	});
+	mgr:Update();
+end
+
 function OnAfficheTableau()
 	if not draw.socket then
 		parentFrame = wnd.GetParentFrame();
@@ -2892,7 +2943,7 @@ function OnAfficheTableau()
 		
 	dlgTableau:Bind(eventType.TEXT, 
 		function(evt)
-			if not draw.tECSL then
+			if draw.bolEstCE and not draw.tECSL then
 				local msg = "Veuillez charger le fichier ECSL en premier.";
 				app.GetAuiFrame():MessageBox(msg, "ATTENTION !! ", msgBoxStyle.OK+msgBoxStyle.ICON_WARNING);
 				return;
@@ -2916,6 +2967,48 @@ function OnAfficheTableau()
 			end
 		end
 		, dlgTableau:GetWindowName('code'));
+
+	dlgTableau:Bind(eventType.TEXT, 
+		function(evt)
+			if draw.bolEstCE and not draw.tECSL then
+				local msg = "Veuillez charger le fichier ECSL en premier.";
+				app.GetAuiFrame():MessageBox(msg, "ATTENTION !! ", msgBoxStyle.OK+msgBoxStyle.ICON_WARNING);
+				return;
+			end
+			draw.cherche_nom = dlgTableau:GetWindowName('nom'):GetValue();
+			draw.cherche_prenom = draw.cherche_prenom or '';
+			draw.cherche_coureur = "Select * From Coureur Where Code_coureur Like 'FIS%' And Nom Like '"..draw.cherche_nom.."%' And Prenom Like '"..draw.cherche_prenom.."%' Order By Nom, Prenom";
+			base:TableLoad(tCoureur, draw.cherche_coureur);
+			draw.code_coureur = nil;
+			if not panel_coureur and draw.cherche_nom:len() > 0 then
+				CreatePanelCoureur()
+			end
+			if tCoureur:GetNbRows() > 0 then
+				grid_coureur:SynchronizeRows();
+			end
+		end
+		, dlgTableau:GetWindowName('nom'));
+
+	dlgTableau:Bind(eventType.TEXT, 
+		function(evt)
+			if draw.bolEstCE and not draw.tECSL then
+				local msg = "Veuillez charger le fichier ECSL en premier.";
+				app.GetAuiFrame():MessageBox(msg, "ATTENTION !! ", msgBoxStyle.OK+msgBoxStyle.ICON_WARNING);
+				return;
+			end
+			draw.cherche_prenom = dlgTableau:GetWindowName('prenom'):GetValue();
+			draw.cherche_nom = draw.cherche_nom or '';
+			draw.cherche_coureur = "Select * From Coureur Where Code_coureur Like 'FIS%' And Nom Like '"..draw.cherche_nom.."%' And Prenom Like '"..draw.cherche_prenom.."%' Order By Nom, Prenom";
+			base:TableLoad(tCoureur, draw.cherche_coureur);
+			draw.code_coureur = nil;
+			if not panel_coureur and draw.cherche_prenom:len() > 0  then
+				CreatePanelCoureur()
+			end
+			if tCoureur:GetNbRows() > 0 then
+				grid_coureur:SynchronizeRows();
+			end
+		end
+		, dlgTableau:GetWindowName('prenom'));
 
 	dlgTableau:Bind(eventType.BUTTON, 
 		function(evt)
@@ -2955,7 +3048,7 @@ function main(params_c)
 	draw.height = display:GetSize().height - 30;
 	draw.x = 0;
 	draw.y = 0;
-	draw.version = "3.4";
+	draw.version = "3.5";
 	draw.orderbyCE = 'Rang_tirage, Groupe_tirage, ECSL_points DESC, WCSL_points DESC, ECSL_overall_points DESC, Winner_CC DESC, FIS_pts, Nom, Prenom';
 	draw.orderbyFIS = 'Rang_tirage, Groupe_tirage, FIS_pts, Nom, Prenom';
 	draw.hostname = 'live.fisski.com';
@@ -3117,6 +3210,7 @@ function main(params_c)
 			if draw.doc then
 				draw.doc:SaveFile();
 			end
+			OnClose();
 			dlgConfig:EndModal(idButton.CANCEL) 
 		 end,  btnClose);
 
