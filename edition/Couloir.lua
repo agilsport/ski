@@ -1,9 +1,10 @@
 dofile('./interface/adv.lua');
 dofile('./interface/interface.lua');
 
--- version 2.2
+-- version 2.3
 	-- calcul du diff Heure_depart2
 	-- mise de 00.0 au premier Dos au lieu d'avoir la case vide pour l'ecart
+	-- affichage du N° de couloir en prenant le 1er chiffre du 1er Dos du body 
 	
 -- point a voir avec pierre
 			-- voir si la façon de mettre la police ds le body est ok si qq veut la modifier si format A3 par exemple 
@@ -46,7 +47,7 @@ function main(params)
 	
 	-- Tri du body
 	body:OrderBy('Heure_depart2 Asc' );
-
+	-- body:OrderBy('Dossard' );
 	-- Ajout et Mise à Jour de la colonne Diff_Heure_depart2
 	body:AddColumn({ name = 'Diff_heure_depart2', label = 'Diff_heure_depart2', type = sqlType.CHRONO });	
 	if body:GetNbRows() > 0 then
@@ -114,22 +115,18 @@ function LectureDonnees(evt)
 
 end
 
-function editionCouloir_n(evt, params, base, body, NumCouloir, NbCouloir)
-
+function editionCouloir_n(evt, params, base, body, ind, NbCouloir)
+	-- AfficheNumCouloir = NumCouloir+1
 	bodyCouloir = body:Copy(false);
 	
 	for i=0, body:GetNbRows()-1 do
 		Dossard = tonumber(body:GetCell('Dossard', i)) or 0;
-		if Dossard % NbCouloir == NumCouloir then
+		
+		if Dossard % NbCouloir == ind then
+			--alert("ind= "..ind)
 			bodyCouloir:AddRow();
 			sqlTable.CopyRow(bodyCouloir, bodyCouloir:GetNbRows()-1, body, i);
 		end
-	end
-	
-	if NumCouloir == 0 then
-		theParams.NumCouloir = NbCouloir;
-	else
-		theParams.NumCouloir = NumCouloir;
 	end
 		
 	-- Creation du Report

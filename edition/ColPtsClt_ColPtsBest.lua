@@ -1,7 +1,7 @@
 dofile('./interface/adv.lua');
 dofile('./interface/interface.lua');
 
--- version 1.2
+-- version 1.5
 
 
 function alert(txt)
@@ -38,6 +38,7 @@ function main(params)
 
 	base = sqlBase.Clone();
 	code_evenement = tonumber(theParams.code_evenement);
+	Label_col = theParams.Label_col;
 	
 	-- Initialisation des controles ...
 	local comboNbCouloir = dlg:GetWindowName('N_Course');
@@ -61,7 +62,7 @@ end
 function LectureDonnees(evt)
 	-- alert("code_evenement = "..code_evenement);
 	Evt_source = tonumber(dlg:GetWindowName('N_Course'):GetValue());
-	alert("Evt_source = "..Evt_source);
+	-- alert("Evt_source = "..Evt_source);
 	tResultat = base:GetTable('Resultat');
 	tResultat:AddColumn('CltG');
 	tResultat:AddColumn('PtsClt_G');
@@ -82,13 +83,29 @@ function LectureDonnees(evt)
 		Critere = '';
 		-- alert('Place = '..Place);
 		if tonumber(Place) == 0 or Place == '' then 
-			Critere = 'Non Classer';
+			Critere = 'NQ_Cha.';
 			Points_Ch = 9999;
 			Place = 9999;
 		end
-		cmd = "Update Resultat SET Pts_best = '"..Points_Ch.."', Ordre_niveau = '"..Place.."', Niveau = '"..Critere.."', Moniteur = '"..Groupe.."' Where Code_evenement = "..tonumber(code_evenement).." and Code_coureur = '"..tResultat:GetCell('Code_coureur', i).."'";
+		if Label_col == 'Centre' then
+			cmd = "Update Resultat SET Centre = "..tonumber(Points_Ch)..
+			", Ordre_niveau = '"..Place..
+			"', Niveau = '"..Critere..
+			"', Moniteur = '"..Groupe..
+			"' Where Code_evenement = "..tonumber(code_evenement)..
+			" and Code_coureur = '"..tResultat:GetCell('Code_coureur', i)..
+			"'";
+		else
+			cmd = "Update Resultat SET Pts_best = '"..Points_Ch..
+				"', Ordre_niveau = '"..Place..
+				"', Niveau = '"..Critere..
+				"', Moniteur = '"..Groupe..
+				"' Where Code_evenement = "..tonumber(code_evenement)..
+				" and Code_coureur = '"..tResultat:GetCell('Code_coureur', i)..
+				"'";
+		end
 		base:Query(cmd);
-		alert("cmd = "..cmd)
+		-- alert("cmd = "..cmd)
 	end
 -- rechargement du body pour edition liste	
 	for i=0, Nbparticipant-1 do
@@ -97,7 +114,7 @@ function LectureDonnees(evt)
 	end
 	
 	editionliste(evt, params, base, bodyliste);
-	
+	alert("Clt du Challenge: "..Groupe..'Importer dans la colonne '..Label_col)
 	-- Fermeture
 	bodyliste:Delete();
 	dlg:EndModal(idButton.OK);
@@ -105,8 +122,6 @@ function LectureDonnees(evt)
 end
 
 function editionliste(evt, params, base, bodyliste)
-	
-		
 	-- Creation du Report
 	report = wnd.LoadTemplateReportXML({
 		xml = './edition/ColPtsClt_ColPtsBest.xml',

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- Menu Editions Activité "FOND " suplementaire !-->
-<!-- version="6.7" !-->
+<!-- version="6.6" !-->
 <!-- si possible de faire fonctionne des cond dans les menu -->
 <!-- si possible de fermer des Item par default -->
 <edition>
-<menu>
+	<menu>
 		<menu title="Edition Relais" image="./res/32x32_ranking.png" bold="false" cond ="($(Epreuve.Code_discipline)='RELAIS')">
 			<menu title="Liste Départ Relais (1-a)" image="./res/16x16_official.png" id="Lst_Relais" DossardRelais="Lettre"/>
 			<menu title="Liste Départ Relais (1/²)" image="./res/16x16_official.png" id="Lst_Relais" DossardRelais="Numeric"/>
@@ -27,14 +27,13 @@
 		
 		<menu title="Outils" image="./res/32x32_options.png">
 			<menu title="Edition des Séquences Chrono" image="./res/16x16_bib.png" id="chrono_seq" choix_manche="1" action="chrono_seq"/>
+			<menu title="Configuration des points de passages" image="./res/16x16_text.png" lua="./edition/Config_Passage.lua"  />
+			<menu title="Transfert du Clt d'un Evt X Ds la colonne Ordre_niveau et du Crietre Coursexx Dans la course sélectionner pour attribution des Dossards suivant le Clt de l'Evt xx" image="./res/16x16_fis.png" lua="./edition/Clt_EprX-ColOrdre_niveau.lua" Colum_Ref="Clt"/>
+			<menu title="Transfert de la colonne Odre_niveau d'un Evt X Ds la colonne Ordre_niveau et du Ctrietre Coursexx Dans la course sélectionner pour attribution des Dossards suivant le Clt de l'Evt xx" image="./res/16x16_fis.png" lua="./edition/Clt_EprX-ColOrdre_niveau.lua" Colum_Ref="Ordre_niveau"/>
+			<menu title="Transfert du Clt et des ponits d'un Cha. X Ds la colonne Pts_Best pour attribution des Dossards suivant le Clt de l'Evt X" image="./res/16x16_fis.png" Label_col="Pts_best" lua="./edition/ColPtsClt_ColPtsBest.lua" />
+			<menu title="Transfert du Clt et des ponits d'un Cha. X Ds la colonne Centre pour attribution des Dossards suivant le Clt de l'Evt X" image="./res/16x16_fis.png" Label_col="Centre" lua="./edition/ColPtsClt_ColPtsBest.lua" />		
 		</menu>
 		
-		<menu title="Outils Clt Saison Samse" image="./res/32x32_options.png">
-			<menu title="Transfert du Clt d'un Evt X Ds la colonne Ordre_niveau et du Crietre Coursexx pour attribution des Dossards suivant le Clt de l'Evt xx" Colum_Ref="CltG" image="./res/16x16_fis.png" lua="./edition/Clt_EprX-ColOrdre_niveau.lua" />
-			<menu title="Transfert d'une colonne Ordre_niveau d'un Evt X Ds la colonne Ordre_niveau et du Crietre Coursexx pour attribution des Dossards suivant le Clt de l'Evt xx" Colum_Ref="OrdreG" image="./res/16x16_fis.png" lua="./edition/Clt_EprX-ColOrdre_niveau.lua" />
-			<menu title="Transfert du Clt et des ponits d'un Cha. X Ds la colonne Ordre_niveau pour attribution des Dossards suivant le Clt de l'Evt X" image="./res/16x16_fis.png" lua="./edition/ColPtsClt_ColPtsBest.lua" />
-		
-		</menu>
 		<menu title="Outils Dossards FIS" image="./res/32x32_options.png">
 			<menu title="Transfert de la colonne Points (FIS Distance) dans la Colonne Pts_best" image="./res/16x16_fis.png" LabelPts="FIS_Dist" colum_Pts="Pts_best" LabelNc="NC_FIS_Dst" Colum_Label="Moniteur" lua="./edition/PtsFFS_ColPtsBest.lua" />
 			<menu title="Transfert de la colonne Points (FFS) dans la Colonne Pts_Clt" image="./res/16x16_fis.png" LabelPts="FFS" colum_Pts="PtsClt" LabelNc="NC_FFS" Colum_Label="Niveau" lua="./edition/PtsFFS_ColPtsBest.lua" />
@@ -47,7 +46,7 @@
 			<menu title="Récapitulatif du Nb d'inscrits par épreuve sexe et catégorie" image="./res/16x16_text.png" id="uti_recapilatif" />
 			<menu title="Tableau de service" image="./res/16x16_pdf.png" id="Tab_services" />
 			<menu title="Podium par épreuve Dames et Hommes" image="./res/16x16_text.png" id="uti_podium" />
-			<menu title="Saisie d'un rapport d'accident" image="./res/16x16_text.png" lua="./process/Rapport_accident.lua"  />
+			<menu title="Saisie d'un rapport d'accident" image="./res/16x16_text.png" lua="./edition/Rapport_accident.lua"  />
 			<menu title="Edition d'un rapport d'accident" image="./res/16x16_text.png" lua="./edition/editionRapport_accident.lua"  />
 			<menu title="Télécharger le Rapport d'accident (PDF remplisable)" image="./res/16x16_pdf.png" action="open ./edition/Rapport_Accident.pdf" />
 		</menu>
@@ -61,6 +60,15 @@
 			</menu>
 			<menu title="Regroupement de coureurs" image="./res/16x16_compute.png" lua="./edition/editionRegroupement.lua" />
 		</menu>
+		
+		<menu title="Edition UNSS" image="./res/32x32_juges.png">
+			<menu title="Par Dossard Equipe" image="./res/16x16_official.png" id="part_UNSS" />
+			<menu title="Résultats des 2 meilleurs" image="./res/16x16_official.png" Nb_BestTime="2" lua="./edition/best3TimeUNSS.lua" />
+			<menu title="Résultats des 3 meilleurs" image="./res/16x16_official.png" Nb_BestTime="3" lua="./edition/best3TimeUNSS.lua" />
+			<menu title="Résultats des 4 meilleurs" image="./res/16x16_official.png" Nb_BestTime="4" lua="./edition/best3TimeUNSS.lua" />
+			<menu title="Résultats Patrouille" image="./res/16x16_official.png" lua="./edition/LastTimeUNSS.lua" />
+		</menu>
+		
 	</menu>
 
 	<!-- header standard !-->
@@ -1082,7 +1090,7 @@
 		</body>
 	</report>
 	
-	<!-- Liste de depart par nation et comite	 -->
+	<!-- Liste de depart par nation et club	 -->
 	<report id="part_NatClub" title="(params.title or '')" header="1" first_header="(params.first_header or '1')" >
 		<lua>
 			page_break = tonumber(params.page_break or 0);
@@ -1094,7 +1102,7 @@
 			body:SetCounter('Nation');
 			body:SetCounter('Comite');
 		</lua>
-		<order key="Nation,Comite,Identite" />
+		<order key="Nation,Comite,Rang,Dossard,Identite" />
 		<call option="identiteCoureur" file="./edition/options.xml"/>
 		<call option="traduction" file="./edition/options.xml"/>
 		
@@ -1261,5 +1269,104 @@
 			</matrix>
 		</body>
 	</report>
+	
+<!-- Edition UNSS	 -->
+<!-- Liste Par Ordre Equipe -->
+	<report id="part_UNSS" title="(params.title or '')" header="1" first_header="0" rupture="0">
+		<call option="identiteCoureur" file="./edition/options.xml"/>
+		<order key="Equipe, Groupe, Dossard Asc" />
+		<rupture key="Equipe" >
+			<before>
+				<font size="14"/>
+				<row h="0.4cm"/>
+				<text row="auto" col="1" >'Equipe: '..$(Equipe)..'-'..$(Centre)..' -> '..$(Club)</text>
+				<!-- <text row="auto" col="1" >$(Equipe)..'-'..$(Centre)..' -> '..$(Critere)</text> -->
+			</before>
+		</rupture>
+		
+		<body>
+			<call option="color_alternate" file="./edition/options.xml" />
+			<font size="9" adjust="ellipsize"/>
+			<pen border="none" />
+			<row h="auto"/>
+			<spacing left="5" right="10" top="2" bottom="2" />
+			<text col="4" align="right" label="Dos">$(Dossard) </text>
+			<!-- <text col="7" align="center" label="Code"><font size="8" cond="group =='body'"/>$(Code_coureur):sub(4)</text> -->
+			<text col="20" align="left" label="Nom - Prénom">GetIdentiteCoureur(officiel)</text> 
+			<text col="4" align="center" label="An">$(An)</text>
+			<text col="6" align="center" label="Categ">$(Categ)</text>
+			<!-- <text col="4" align="center" label="S.">$(Sexe)</text> -->
+			<!-- <text col="4" align="center" label="Dist.">$(Distance)</text> -->
+			<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
+		</body>
+	</report>
+	
+<!-- Résultats Equipe X Best_Time-->
+	<report id="res_Tps_Equipe" title="(params.title or '')" header="1" first_header="0" rupture="0">
+		<call option="identiteCoureur" file="./edition/options.xml"/>
+
+		<order key="Clt, Critere, Dossard Asc" />
+		<rupture key="Equipe" >
+			<before>
+				<font size="14"/>
+				<row h="0.4cm"/>
+				<text row="auto" col="1" >'Clt: '..$(Clt)..'  Equipe N°:'..$(Equipe)..' Du '..$(Club)..'  Tps Equipe -> '..$(Tps_best)</text>
+			</before>
+		</rupture>
+		
+		<body>
+			<call option="color_alternate" file="./edition/options.xml" />
+			<font size="9" adjust="ellipsize"/>
+			<pen border="none" />
+			<row h="auto"/>
+			<spacing left="5" right="10" top="2" bottom="2" />
+			<!-- <text col="4" align="right" label="Dos">$(Clt)</text> -->
+			<text col="4" align="right" label="Dos">$(Dossard)</text>
+			<!-- <text col="7" align="center" label="Code"><font size="8" cond="group =='body'"/>$(Code_coureur):sub(4)</text> -->
+			<text col="20" align="left" label="Nom - Prénom">GetIdentiteCoureur(officiel)</text> 
+			<text col="4" align="center" label="An">$(An)</text>
+			<text col="6" align="center" label="Categ">$(Categ)</text>
+			<text col="4" align="center" label="S.">$(Sexe)</text>
+			<text col="4" align="center" label="Dist.">$(Distance)</text>
+			<text col="7" align="center" label="Tps.">$(Tps)..$(Clt):Parenthesis()</text>
+			<text col="4" align="center" label="Dist.">$(Tps_best)</text>
+			<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
+		</body>
+	</report>	
+
+<!-- Résultats Equipe Patrouille (derniers temps)-->	
+	<report id="res_Tps_Patrouille" title="(params.title or '')" header="1" first_header="0" rupture="0">
+		<call option="identiteCoureur" file="./edition/options.xml"/>
+		<!-- <order key="Centre Clt, Critere, Dossard Asc" /> -->
+		<rupture key="Equipe" >
+			<before>
+				<font size="14"/>
+				<row h="0.4cm"/>
+				<text row="auto" col="1" >'Clt: '..$(Clt)..'  Equipe N°:'..$(Equipe)..' Du '..$(Club)..'  Tps Equipe -> '..$(Tps_best)</text>
+				<!-- <text row="auto" col="1" >'Clt: '..$(Clt)..'  Equipe N°:'..$(Equipe)..' Du '..$(Critere)..'  Tps Equipe -> '..$(Tps_best)</text> -->
+			</before>
+		</rupture>
+		
+		<body>
+			<call option="color_alternate" file="./edition/options.xml" />
+			<font size="9" adjust="ellipsize"/>
+			<pen border="none" />
+			<row h="auto"/>
+			<spacing left="5" right="10" top="2" bottom="2" />
+			<!-- <text col="4" align="right" label="Dos">$(Clt)</text> -->
+			<text col="4" align="right" label="Dos">$(Dossard)</text>
+			<!-- <text col="7" align="center" label="Code"><font size="8" cond="group =='body'"/>$(Code_coureur):sub(4)</text> -->
+			<text col="20" align="left" label="Nom - Prénom">GetIdentiteCoureur(officiel)</text> 
+			<text col="4" align="center" label="An">$(An)</text>
+			<text col="6" align="center" label="Categ">$(Categ)</text>
+			<text col="4" align="center" label="S.">$(Sexe)</text>
+			<text col="4" align="center" label="Dist.">$(Distance)</text>
+			<text col="7" align="center" label="Dist.">$(Tps)</text>
+			<text col="4" align="center" label="Dist.">$(Tps_best)</text>
+			<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
+		</body>
+	</report>	
+
+	
 </edition>
 

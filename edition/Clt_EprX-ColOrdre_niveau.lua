@@ -93,7 +93,7 @@ function LectureDonnees(evt)
 		-- alert("cmd = "..cmd)
 	end
 	
-	cmd = "Select DISTINCT * From Resultat"..
+	cmd = "Select * From Resultat"..
 			" Where Code_evenement = "..tonumber(code_evenement)..
 			" And Ordre_niveau IS NULL or Ordre_niveau = ''"
 	base:TableLoad(tResultat, cmd);

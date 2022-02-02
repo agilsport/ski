@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
+<!-- Version 2.3 -->
 <root>
 
-<!-- Fenètre d'explication de la fonction -->
-<!-- Version 2.2 -->
+<!-- Fenètre de configuration de l'éditions des couloir de poursuite -->
 <panel name="PtsFFS_ColPts_best">
 	<font name="Calibri" size="16" adjust="best" >
 		<padding all="2px"/>
@@ -25,7 +25,7 @@
 		<row h="1" />
 			<wndtext col_start="1" col_end="0" align="left" >'Penser à réorganiser les colonnes pour faire aparaitre:'</wndtext>
 		<row h="1" />
-			<wndtext col_start="1" col_end="0" align="left" >'          => Pts_best, Pts_Clt'</wndtext>
+			<wndtext col_start="1" col_end="0" align="left" >'          => Pts_best, Pts, Pts_Clt'</wndtext>
 		<row h="1" />
 			<wndtext col_start="1" col_end="0" align="left" >'          => Ainsi que Moniteur, Niveau, Info'</wndtext>
 		<row h="1" />

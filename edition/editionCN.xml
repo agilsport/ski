@@ -24,6 +24,10 @@
 			<menu title="Résultats Fond Mass Start" image="./res/16x16_ranking.png" id="res_fond_mass_start" />
 			<menu title="Résultats Final Combiné Mass Start" image="./res/16x16_ranking.png" id="res_final_combine_mass_start" />
 		</menu>
+		
+		<menu title="Utilitaires" image="./res/32x32_options.png">
+			<menu title="Factures inscriptions" image="./res/16x16_text.png" lua="./edition/facture.lua" />
+		</menu>
 	</menu>
 	
 	<!-- footer standard !-->

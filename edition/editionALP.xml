@@ -26,16 +26,18 @@
 		<menu title="Résultats" image="./res/32x32_ranking.png">
 			<menu title="D'une Manche" image="./res/16x16_ranking.png" id="res_manche" choix_manche="1"/>
 			<menu title="Résultats Officieux" image="./res/16x16_ranking.png" id="res_officiel" officiel="0"/>
-			<menu title="Calcul de la Pénalité" image="./res/16x16_calc.png" language="en" action="penalite" />
+			<!-- <menu title="Calcul de la Pénalité" image="./res/16x16_calc.png" language="en" action="penalite" /> -->
 			<menu title="Résultats Officiels" image="./res/16x16_official.png" id="res_officiel" officiel="1"/>
 			<menu title="Résultats Par Catégories (filtrage des coureurs apres le calcul des points)" filter="after" image="./res/16x16_ranking.png" id="res_categ" choix_clt_max="1"/>
 			<menu title="Meilleurs Temps" image="./res/16x16_ranking.png" id="res_best" />
 			<menu title="Multi-Passages" image="./res/16x16_official.png" id="res_passage" choix_manche="1" mode_lap="2" />
 		</menu>
+		
 		<menu title="Outils" image="./res/32x32_tools.png">
 			<menu title="Analyse des Performances" image="./res/16x16_analyse.png"  choix_manche="1" id="res_performance" lua="./edition/editionPerformances.lua"  />
 			<menu title="Edition des Séquences Chrono" image="./res/16x16_bib.png" id="chrono_seq" choix_manche="1" action="chrono_seq"/>
 			<menu title="Edition des Statistiques de Participation (FIS)" image="./res/16x16_bib.png" id="stat_participation" />
+			<menu title="Factures inscriptions" image="./res/16x16_text.png" lua="./edition/facture.lua"  />		
 		</menu>
 	</menu>
 
