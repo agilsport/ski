@@ -1585,6 +1585,9 @@ function OnCreateCourse()	--	Création d'une nouvelle course à la fin des calculs
 end
 
 function InitCombiSaut(idxcourse)
+	if matrice.debug == true then
+		adv.Alert('traitement de la course '..idxcourse..' en Combi-Saut');
+	end
 	-- tMatrice_Ranking:Snapshot('tMatrice_Ranking_avan_init_course'..idxcourse..'.db3')
 	tCS = tCS or {};
 	tCS[idxcourse] = {};
@@ -1640,6 +1643,9 @@ function InitCombiSaut(idxcourse)
 		local pts_course_saut = -1;
 		local pts_alpin = -1;
 		tMatrice_Ranking:SetCell(coltps, idxcoureur, -1); 
+		if code_coureur_pour_debug == tMatrice_Ranking:GetCell('Code_coureur', idxcoureur) then
+			adv.Alert('Pour '..tMatrice_Ranking:GetCell('Nom', idxcoureur)..', tps_alpin = '..tps_alpin..', lng_saut = '..lng_saut) ;
+		end
 		if lng_saut > 0 then
 			tMatrice_Ranking:SetCell(collng_saut, idxcoureur, lng_saut..'m');
 			tMatrice_Ranking:SetCell(coltps_saut, idxcoureur, 100000 - (lng_saut * 1000));
@@ -1649,6 +1655,9 @@ function InitCombiSaut(idxcourse)
 			pts_course_saut = pts_course_saut + matrice.numPenalisationSaut;
 			pts_course_saut = Round(pts_course_saut, 2);
 			tMatrice_Ranking:SetCell(colpts_saut, idxcoureur, pts_course_saut);
+			if code_coureur_pour_debug == tMatrice_Ranking:GetCell('Code_coureur', idxcoureur) then
+				adv.Alert('pts_course_saut = '..pts_course_saut) ;
+			end
 		else
 			pts_saut = -1; pts_course_saut = -1;
 			tMatrice_Ranking:SetCellNull(collng_saut, idxcoureur);
@@ -1659,6 +1668,9 @@ function InitCombiSaut(idxcourse)
 		if tps_alpin > 0 then
 			pts_alpin = GetPtsCourse(idxcourse, tps_alpin, tCS[idxcourse].tps_best, tCS[idxcourse].facteur_f_discipline_alpine)
 			pts_alpin = Round(pts_alpin, 2);
+			if code_coureur_pour_debug == tMatrice_Ranking:GetCell('Code_coureur', idxcoureur) then
+				adv.Alert('pts_alpin = '..pts_alpin) ;
+			end
 		else
 			pts_alpin = -1;
 		end
@@ -1667,15 +1679,24 @@ function InitCombiSaut(idxcourse)
 		if pts_alpin >= 0 and pts_course_saut >= 0 then
 			total = (pts_alpin + pts_course_saut) * 100;
 			total = Round(total, 0)
+			if code_coureur_pour_debug == tMatrice_Ranking:GetCell('Code_coureur', idxcoureur) then
+				adv.Alert('total = '..total) ;
+			end
 		else
 			total = -1;
+		end
+		if total == 0 then
+			total = 1;
 		end
 		tMatrice_Ranking:SetCell(coltps, idxcoureur, total);
 	end
 	tMatrice_Ranking:SetRanking(colclt_alpin, coltps_alpin, '');
 	tMatrice_Ranking:SetRanking(colclt_saut, coltps_saut, '');
 	tMatrice_Ranking:SetRanking(colclt, coltps, '');
-	-- tMatrice_Ranking:Snapshot('tMatrice_Ranking_apres init.db3')
+	if matrice.debug == true then
+		adv.Alert("tMatrice_Ranking:Snapshot('tMatrice_Ranking_apres_init_combi_saut.db3')");
+		tMatrice_Ranking:Snapshot('tMatrice_Ranking_apres_init_combi_saut.db3');
+	end
 end
 
 function Calculer(panel_name)		-- fonction de calcul du résultat du Challenge/Combiné/Matrice
@@ -7572,7 +7593,7 @@ function OnConfiguration(cparams)
 	else
 		return false;
 	end
-	matrice.version_script = '4.8';
+	matrice.version_script = '4.9';
 	matrice.OS = app.GetOsDescription();
 	-- vérification de l'existence d'une version plus récente du script.
 	local url = 'https://live.ffs.fr/maj_pg/challenge/last_version.txt'
@@ -7583,7 +7604,7 @@ function OnConfiguration(cparams)
 	matrice.dlgPosit.x = 1;
 	matrice.dlgPosit.y = 1;
 	base = base or sqlBase.Clone();
-	code_coureur_pour_debug = "FFS2662170";		-- provoque tous les affichages pour débug propres à ce Code_coureur
+	code_coureur_pour_debug = "FFS2676951";		-- provoque tous les affichages pour débug propres à ce Code_coureur
 	matrice.debug = false;
 	if matrice.debug == false then
 		code_coureur_pour_debug = '';
