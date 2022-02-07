@@ -112,6 +112,8 @@ function ReadECSL(build_table)
 			for i = 0, tDraw:GetNbRows() -1 do
 				tDraw:SetCellNull('ECSL_points', i);
 				tDraw:SetCellNull('ECSL_rank', i);					
+				tDraw:SetCellNull('ECSL_overall_points', i);
+				tDraw:SetCellNull('ECSL_overall_rank', i);					
 			end
 			for i = 2, #lines do
 				local cols = lines[i]:Split(',');
@@ -3025,10 +3027,7 @@ function OnAfficheTableau()
 			draw.cherche_nom = dlgTableau:GetWindowName('nom'):GetValue();
 			if draw.cherche_nom:len() == 0 then
 				if panel_coureur then
-					-- local mgr = app.GetAuiManager();
-					-- mgr:DeletePane(panel_coureur);
-						panel_coureur:Close();
-					-- mgr:Update();
+					panel_coureur:Close();
 				end
 			end
 			draw.cherche_prenom = draw.cherche_prenom or '';
@@ -3054,10 +3053,7 @@ function OnAfficheTableau()
 			draw.cherche_prenom = dlgTableau:GetWindowName('prenom'):GetValue();
 			if draw.cherche_prenom:len() == 0 then
 				if panel_coureur then
-					local mgr = app.GetAuiManager();
-					mgr:DeletePane(panel_coureur);
-						panel_coureur:Close();
-					mgr:Update();
+					panel_coureur:Close();
 				end
 			end
 			draw.cherche_nom = draw.cherche_nom or '';
@@ -3111,7 +3107,7 @@ function main(params_c)
 	draw.height = display:GetSize().height - 30;
 	draw.x = 0;
 	draw.y = 0;
-	draw.version = "3.6";
+	draw.version = "3.7";
 	draw.orderbyCE = 'Rang_tirage, Groupe_tirage, ECSL_points DESC, WCSL_points DESC, ECSL_overall_points DESC, Winner_CC DESC, FIS_pts, Nom, Prenom';
 	draw.orderbyFIS = 'Rang_tirage, Groupe_tirage, FIS_pts, Nom, Prenom';
 	draw.hostname = 'live.fisski.com';
