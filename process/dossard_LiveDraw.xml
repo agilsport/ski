@@ -146,11 +146,13 @@
     <row value="10px"/>
   </panel>
   <panel name="message">
-    <padding all="2px"/>
-    <col value="1,3"/>
-    <toolbar row="auto" col_start="1" col_end="0" name="tb" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
-  </panel>
-  <panel name="discipline">
+		<padding all="2px"/>
+		<col value="1,3"/>
+		<statictext row="auto" col_start="1" style="ALIGN_RIGHT" label="Message :"/>
+		<combobox col_start="2" name="message"/>
+		<toolbar row="auto" col_start="1" col_end="0" name="tb" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
+   </panel>
+   <panel name="discipline">
     <padding all="2px"/>
     <col value="5,1,1,5"/>
     <row value="auto"/>
@@ -218,6 +220,157 @@
       <text col_start="8" cond="params.EstCE == 0" align="center">$(FIS_pts)</text>
     </body>
   </panel>
+  
+ 	<!-- Participants - par nations -->
+	<report id="parti_factorise" title="Entry List By " first_header="0">
+		<lua>dofile('./interface/adv.lua');</lua>
+		<lua>rupture = params.Rupture;
+			label = params.Rupture;
+			title = title..label;
+			body:SetCounter(rupture);
+			if rupture ~= 'Nation' then
+				body:SetCounter('Nation');
+			end
+			orderby = rupture..", Sexe, Point, Nom, Prenom";
+			somme_rupture = 0;
+			nb_etrangers = 0;
+			saut_page = 0;
+			page_break = 0;
+			bolAjouter = false;
+			comite = {};
+
+		</lua>
+		<header>
+		  <spacing all="0"/>
+		  <background mode="transparent"/>
+		  <font name="Calibri" size="14" adjust="max" weight="bold"/>
+		  <text row="1cm" align="center">$(Evenement.Nom)</text>
+		  <text align="right" cond="$(Epreuve.Sexe) == 'M'">"Men's"</text>
+		  <text align="right" cond="$(Epreuve.Sexe) == 'F'">"Ladies's"</text>
+		  <text row="1cm" align="center" cond="title">title</text>
+		  <text align="right" >$(Epreuve.Code_discipline)..'     '</text>
+		  <!-- <text row="3cm" align="left"><font orientation="90" origin="left,bottom"/>'HELLO'</text> -->
+		  <row value="0.5cm"/>
+		</header>
+		<first_header/>
+		<footer>
+			<background mode="transparent"/>
+			<font name="Calibri" size="8" adjust="best" weight="normal"/>
+			<pen border="none" />
+
+			<lua>entite = entite or $(Evenement.Code_entite)</lua>
+			<lua>info = $(Epreuve.Date_epreuve,'%2D/%2M/%4Y')..' / '..$(Evenement.Station)..' ('</lua>
+			<lua cond="entite=='FIS'">info = info..$(Evenement.Code_nation)..'-'</lua>
+			<lua>info = info..$(Evenement.Code_comite).. ') / '..$(Evenement.Organisateur)</lua>
+			<text row="auto" col="1" align="left">info</text>
+			<text align="right" font_weight="bold" cond="entite=='FIS'">$(Epreuve.Fichier_transfert_int)..' (Liste n°'..$(Evenement.Code_liste)..')'</text>
+			<text align="right" font_weight="bold" cond="entite=='FFS'">$(Epreuve.Fichier_transfert)..' (Liste n°'..$(Evenement.Code_liste)..')'</text>
+			<line col_start="1" col_end="0" pen_size="2" pen_color="dkgray" border="bottom"/>
+			<!-- <text row="auto" align="left"><pen border="top" />app.GetName()..' Version '..app.GetVersion()..' (FFS - ESF - Agil Informatique) - '..os.date('Edité le %d-%m-%Y à %H:%M:%S')</text> -->
+			
+			<row value="auto" />
+			<matrix col_start="1">
+				<row value="auto"/>
+				<text col="auto" align="left">app.GetName()..' Version '..app.GetVersion()..' / FFS'</text>
+				<image col="0.4cm" adjust="width" align="left">'./res/32x32_ffs.png'</image>
+				<text col="auto" align="left" adjust="width">' / ESF'</text>
+				<image col="0.4cm" adjust="width" align="left">'./res/32x32_esf.png'</image>
+				<text col="auto" align="left">' / Agil Informatique'</text>
+				<image col="0.4cm" adjust="width" align="left">'./res/32x32_agil.png'</image>
+				<text col="auto" align="left">os.date(' / Edité le %d-%m-%Y à %H:%M:%S')</text>
+			</matrix>	
+			<text align="right">string.format('Page %d/%s',editor:GetPageCurrent(), editor:GetPageCountLabel())</text>
+			<line col_start="1" col_end="0" border="top" />
+			<text row="auto" align="left" cond="editor:GetPageCurrent() == 1">$(Evenement.Commentaire)</text>
+		</footer>
+		<call option="comite_origine" file="./edition/options.xml" />
+		<order key="(orderby)" />
+		<rupture key="(rupture)">
+			<before>
+				<pagebreak cond="row ~= 0 and page_break ~= 0" />
+				<need h="2cm" />
+				<font size="16"/>
+				<row value="0.5cm" />
+				<lua>codelu = body:GetCell(rupture, row);
+					if codelu:len() > 0 then
+						somme_rupture = somme_rupture + body:GetCounterValue(rupture, codelu);
+					end
+					if body:GetCell('Nation', row) ~= 'FRA' then
+						nb_etrangers = nb_etrangers + body:GetCounterValue(rupture, codelu);
+					end
+					num = 0;
+					</lua>
+				<text row="auto" col="1" cond="codelu:len() &gt; 0">codelu..' ('..body:GetCounterValue(rupture, codelu)..')'</text>
+				<text row="auto" col="1" cond="codelu:len() == 0">'Non renseigné ('..body:GetCounterValue(rupture, codelu)..')'</text>
+			</before>
+		</rupture>
+
+		<body>
+			<lua>if $(Comite) == 'EQ' then
+					comite_origine = string.sub(GetComiteOrigine($(Code_coureur),$(Comite)),-2)
+					if not comite[comite_origine] then
+						comite[comite_origine] = {};
+						comite[comite_origine].EQ = 0;
+					end
+					if bolAjouter == true then
+						comite[comite_origine].EQ = comite[comite_origine].EQ + 1;
+					else
+						bolAjouter = true;
+					end
+				end
+				clt = base:GetClassementCoureur($(Code_coureur)):GetCell('Clt',0);
+			</lua>
+			<call option="couleur_alternee" file="./edition/options.xml" />
+
+			<row value="auto"/>
+			<text col="2" align="center" label="#"><font size="8" cond="group =='body'"/>num</text>
+			<text col="5" align="center" label="Code"><font size="8" cond="group =='body'"/>$(Code_coureur):sub(4)</text>
+			<text col="20" align="left" label="Identity" font_weight="bold" font_size_step="1">$(Nom)..' '..$(Prenom)</text> 
+			<!-- <text col="2" align="center" label="S." cond="">$(Sexe)</text> -->
+			<text col="4" align="center" label="YoB">$(An)</text>
+			<!-- <text col="4" align="center" label="Nation" >$(Nation)</text> -->
+			<!-- <text col="12" align="center" label="Club" >$(Club)</text> -->
+			<text col="7" align="center" label="Points">$(Point)</text>
+			<text col="4" align="center" label="Rank" cond="saut_page==0">'('..clt..')'</text>
+			<lua>num = num+ 1;</lua>
+			
+			<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
+		</body>
+		<end>
+			<lua>if rupture ~= 'Club' then</lua>
+				<pagebreak/>
+				<row value="0.5cm" />
+				<pen border="all" />
+				<text row="auto" col="1" font_size="14" align="center">'SUMMARY  -  number of '..rupture..' = '..body:GetCounter(rupture):GetNbRows()</text>
+				<text col="1" font_size="14" align="center" cond="rupture ~= 'Nation' and body:GetCounterCount('Nation') &gt; 1">'Rappel des Nations engagées'</text>
+				<lua>max_ligne_recap = math.max(body:GetCounterCount('Nation'), body:GetCounterCount(rupture))</lua>
+				<row value="auto" count="(body:GetCounter(rupture):GetNbRows())" />
+				<font size="10"/>
+				
+				<lua>for i=0, max_ligne_recap -1 do 
+						rupture_label1 = body:GetCounter(rupture):GetCell(0,i);
+						rupture_label2 = body:GetCounter('Nation'):GetCell(0,i);
+						if rupture_label1:len() == 0 then
+							rupture_label1 = 'Non renseigné';
+						end
+						if not comite[rupture_label1] then
+							comite[rupture_label1] = {};
+							comite[rupture_label1].EQ = 0;
+						end
+						counter_col1 = tonumber(body:GetCounter(rupture):GetCell(1,i)) or 0;
+						</lua>	
+						<row value="auto" />
+						<text col_start="1" align="center" cond="counter_col1 == 0">''</text>
+						<text col_start="1" align="center" cond="comite[rupture_label1].EQ == 0 and counter_col1 &gt; 0">rupture_label1..' : '..body:GetCounter(rupture):GetCell(1,i)</text>
+						<text col_start="1" align="center" cond="comite[rupture_label1].EQ &gt; 0 and counter_col1 &gt; 0">rupture_label1..' : '..body:GetCounter(rupture):GetCell(1,i)..'    (+ '..comite[rupture_label1].EQ..' EQ)'</text>
+						<text col_start="2" align="center" cond="rupture ~= 'Nation'">rupture_label2..' : '..body:GetCounter('Nation'):GetCell(1,i)</text>
+						<text row="auto" col_start="1" align="center" cond="i == max_ligne_recap -1">'Racers with column '..rupture..' informed : '..somme_rupture</text>
+						<text row="auto" col_start="1" align="center" cond="i == max_ligne_recap -1">'Total number of foreigners '..nb_etrangers</text>
+				<lua>end</lua>
+			<lua>end</lua>
+		</end>
+	</report>
+
   <!-- Edition factorisée des étiquettes -->
   <report id="parti_etiquette_factorise" title="Liste Alphabétique des Participants par Nation" first_header="0">
     <header/>
@@ -254,7 +407,7 @@
       <matrix row_start="3" col_start="1" col_end="0">
         <col value="17cm,1"/>
         <text row="auto" col_start="2" cond="body:GetCellInt('WCSL_points', row) &gt; 0">'ECSL pts/rank  '..$(ECSL_points)..' / '..$(ECSL_rank)..'\nWCSL pts/rank '..$(WCSL_points)..' / '..$(WCSL_rank)</text>
-        <text row="auto" col_start="2" cond="body:GetCellInt('ECSL_overall_points', row) &gt; 0">'ECSL pts/rank  '..$(ECSL_points)..' / '..$(ECSL_rank)..'\nECSL Overall Pts/rank '..$(ECSL_overall_points)..' / '..$(ECSL_overall_rank)</text>
+        <text row="auto" col_start="2" cond="body:GetCellInt('ECSL_overall_points', row) &gt; 0">'ECSL pts/rank  '..$(ECSL_points)..' / '..$(ECSL_rank)..'\nEC OA Pts/rank '..$(ECSL_overall_points)..' / '..$(ECSL_overall_rank)</text>
         <text row="auto" col_start="2" cond="body:GetCell('Winner_CC', row):len() &gt; 0">'ECSL pts/rank  '..$(ECSL_points)..' / '..$(ECSL_rank)..'\nCC Winner'</text>
        </matrix>
       <lua>end</lua>
@@ -312,9 +465,10 @@
     <!-- <paper orientation="portrait"/> -->
     <paper orientation="landscape"/>
     <margin top="50" bottom="50"/>
-    <lua>lignedouble = 0; lastrowECSL_30 = 0; current_group = 1;
+    <lua>lignedouble = 0; lastrowECSL_30 = 0;
 		</lua>
     <body>
+		<lua>if row == 0 then current_group = body:GetCellInt('Groupe_tirage', row); end</lua>
       <font size="10" weight="normal" adjust="ellipsize"/>
       <call option="couleur_alternee" file="./edition/options.xml"/>
       <lua>if params.EstCE == 1 then
@@ -329,7 +483,7 @@
       <!-- <text col="4" align="center" label="Rank">$(Rang_tirage)</text> -->
       <row value="auto"/>
       <text col="4" align="center" label="Rank">$(Rang_tirage)</text>
-      <text col="4" align="center" label="Group">$(Groupe_tirage)</text>
+      <text col="4" align="center" label="Group">math.abs(body:GetCellInt('Groupe_tirage', row))</text>
       <text col="5" align="center" label="Code">$(Code_coureur):sub(4)</text>
       <text col="20" label="Identity" font_weight="bold" font_size_step="1">$(Nom)..'   '..$(Prenom)</text>
       <text col="4" align="center" label="Nation">$(Nation)</text>
@@ -344,7 +498,7 @@
       <lua>end</lua>
       <text col="5" align="center" label="WCSL pts">$(WCSL_points)</text>
       <text col="5" align="center" label="WCSL rank">$(WCSL_rank)</text>
-      <text col="5" align="center" label="OA Pts">$(ECSL_overall_points)</text>
+      <text col="5" align="center" label="EC OA Pts">$(ECSL_overall_points)</text>
       <!-- <text col="5" align="center" label="OA rank">$(ECSL_overall_rank)</text> -->
       <text col="5" align="center" label="CC Winner">$(Winner_CC)</text>
       <!-- <text col="5" align="center" label="ECSL_30">$(ECSL_30)</text> -->

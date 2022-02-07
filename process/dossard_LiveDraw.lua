@@ -75,6 +75,8 @@ function ReadECSL(build_table)
 	local filename = '';
 	local idxcolPts = nil;
 	local idxcolClt = nil;
+	local idxcolPtsAll = nil;
+	local idxcolCltAll = nil;
 	local fileDialog = wnd.CreateFileDialog(dlgScriptLua,
 		"Recherche du fichier ECSL ",
 		app.GetPath(), 
@@ -99,6 +101,12 @@ function ReadECSL(build_table)
 			if cols[i] == draw.discipline..'pos' then
 				idxcolClt = i;
 			end
+			if cols[i] == 'ALLpoints' then
+				idxcolPtsAll = i;
+			end
+			if cols[i] == 'ALLpos' then
+				idxcolCltAll = i;
+			end
 		end
 		if idxcolPts and idxcolClt then
 			for i = 0, tDraw:GetNbRows() -1 do
@@ -111,13 +119,21 @@ function ReadECSL(build_table)
 				draw.tECSL[fiscode] = {};
 				local pts = tonumber(cols[idxcolPts]) or 0;
 				local clt = tonumber(cols[idxcolClt]) or 0;
+				local allpts = tonumber(cols[idxcolPtsAll]) or 0;
+				local allclt = tonumber(cols[idxcolCltAll]) or 0;
 				draw.tECSL[fiscode].Pts = pts;
 				draw.tECSL[fiscode].Clt = clt;
+				draw.tECSL[fiscode].ALLPts = allpts;
+				draw.tECSL[fiscode].ALLClt = allclt;
 				local r = tDraw:GetIndexRow('Code_coureur', fiscode);
 				if r and r >= 0 then
 					if pts > 0 then
 						tDraw:SetCell('ECSL_points', r, pts);
 						tDraw:SetCell('ECSL_rank', r, clt);
+					end
+					if allpts >= 450 then
+						tDraw:SetCell('ECSL_overall_points', r, allpts);
+						tDraw:SetCell('ECSL_overall_rank', r, allclt);
 					end
 				end
 			end
@@ -257,11 +273,11 @@ function OnAide()
 	local msg = "le ranking en Coupe d'Europe se fait de la façon suivante :\n"..
 				"Groupe 1-2 : les 15 premiers de la dernière European Cup Starting List produite par la FIS dans la discipline courue. "..
 				"Ce groupe 1 sera divisé en deux sous groupe (1 à 7 et 8 à 15). Ces sous groupes sont augmentés en cas d'exaequo.\n"..
-				"Groupe 3 : Ceux qui auront marqué au moins 450 points dans la ECSL toutes disciplines confondues dans la saison précédente ou celle en cours.\n"..
+				"Groupe 3 : Ceux qui auront marqué au moins 450 points en EC toutes disciplines confondues dans la saison précédente ou celle en cours.\n"..
 				"Groupe 4 : les coureurs dans les 30 premiers World Cup dans la discipline (au jour j).\n"..
 				"           en cas d'exaequos, ils seront départagés par les Pts ECSL ou les points FIS.\n"..
 				"Groupe 5 : On continue dans l'ordre de la Starting List jusqu'à avoir 30 coureurs listés.\n"..
-				"           Cette série peut être interrompue au rang 31 par un ou plusieurs vainqueurs des autres\n"..
+				"           Cette série peut être interrompue au rang 31 (ou avant) par un ou plusieurs vainqueurs des autres\n"..
 				"           Coupes Continentales dans la discipline courue. Vous mettrez un caractère quelquonque dans 'Winner CC'.\n"..
 				"           La série interrompue reprend ensuite pour en avoir 30 sur la ECSL\n"..
 				"           Les coureurs pris au titre des points 'Overall' comptent parmi ces 30.\n"..
@@ -461,6 +477,21 @@ function OnPrintTableau(orderby)
 	
 end
 
+function OnPrintNation()
+	-- Creation du Report
+	local estce = 0;
+	report = wnd.LoadTemplateReportXML({
+		xml = './process/dossard_LiveDraw.xml',
+		node_name = 'root/report',
+		node_attr = 'id',
+		node_value = 'parti_factorise',
+		base = base,
+		body = tDraw,
+		params = {EstCE = estce, EstVitesse = vitesse, Rupture = 'Nation'}
+		});
+	
+end
+
 function OnPrintBibo(groupe)
 	ChecktDraw();
 	tDraw:OrderBy('Rang_tirage');
@@ -638,10 +669,11 @@ function OnSendMessage()
 	
 	dlg:GetWindowName('message'):Clear();
 	dlg:GetWindowName('message'):Append('Draw available');
+	dlg:GetWindowName('message'):Append('Draw in progress');
 	dlg:GetWindowName('message'):Append('Validation of racers in progress');
-	dlg:GetWindowName('message'):Append('Board of racers refreshed');
-	dlg:GetWindowName('message'):Append('Board confirmed');
-	dlg:GetWindowName('message'):Append('Board confirmed, bib drawing in progress');
+	dlg:GetWindowName('message'):Append('Draw list refreshed');
+	dlg:GetWindowName('message'):Append('Draw list confirmed');
+	dlg:GetWindowName('message'):Append('Draw list confirmed, bib drawing in progress');
 	dlg:GetWindowName('message'):Append('Bib drawing completed, the race will start at ');
 	dlg:GetWindowName('message'):SetSelection(0);
 	
@@ -785,7 +817,7 @@ function CommandSendOrder()
 		local nodeStatus = xmlNode.Create(nodeDrawStatus, xmlType.ELEMENT_NODE, "status", tDraw:GetCell('Statut', i));
  		local nodeDrawGroup = xmlNode.Create(nodeRaceEvent, xmlType.ELEMENT_NODE, "drawgroup");
 		nodeDrawGroup:AddAttribute('fiscode', code_coureur);
-		local nodeGroup = xmlNode.Create(nodeDrawGroup, xmlType.ELEMENT_NODE, "group", tDraw:GetCellInt('Groupe_tirage', i));
+		local nodeGroup = xmlNode.Create(nodeDrawGroup, xmlType.ELEMENT_NODE, "group", math.abs(tDraw:GetCellInt('Groupe_tirage', i)));
 
 		local nodeDrawOrder = xmlNode.Create(nodeRaceEvent, xmlType.ELEMENT_NODE, "draworder");
 		nodeDrawOrder:AddAttribute('fiscode', code_coureur);
@@ -1735,6 +1767,7 @@ groupe 4 Cette série est interrompue si on a un vainqueur d'une autre Coupe cont
 groupe 5 La série interrompue reprend jusqu'à en avoir 30.
 Groupe 6 On poursuit selon les points FIS.
 ]]
+	adv.Alert('draw.pts15 = '..draw.pts15);
 	for i = tDrawG1:GetNbRows() -1, 0, -1 do		-- dans les 15
 		local pts = tDrawG1:GetCellInt('ECSL_points', i, -1);
 		if pts < draw.pts15 then
@@ -1804,11 +1837,11 @@ Groupe 6 On poursuit selon les points FIS.
 			groupe = 1;
 		else
 			if ptslu >= draw.pts7 then
-				params.nb_groupe1 = 1;
-				groupe = 1;
+				-- params.nb_groupe1 = 1;
+				groupe = -1;
 			else
-				params.nb_groupe2 = 2;
-				groupe = 2;
+				-- params.nb_groupe2 = 1;
+				groupe = 1;
 			end
 		end
 		tDraw:SetCell('ECSL_30', r, 1);
@@ -2130,22 +2163,29 @@ function CreatePanelCoureur()
 		sortable = false,
 		enable_editing = false
 	});
-	grid_coureur:Bind(eventType.GRID_SELECT_CELL, OnRowSelected);
 	local mgr = app.GetAuiManager();
 	mgr:AddPane(panel_coureur, {
 		icon = './res/16x16_agil.png',
 		caption = xlabel,
 		caption_visible = true,
-		close_button = true,
+		close_button = false,
 		pin_button = true,
 		show = true,
 		float = true, 
 		floating_position = {app.GetAuiFrame():GetDisplayArea().x+100, 50},
-		floating_size = {1000, 800},
+		floating_size = {1000, 750},
 		dockable = false
 		
 	});
 	mgr:Update();
+	grid_coureur:Bind(eventType.GRID_SELECT_CELL, OnRowSelected);
+	panel_coureur:Bind(eventType.CLOSE_WINDOW, 
+		function(evt)
+			local mgr = app.GetAuiManager();
+			mgr:DeletePane(panel_coureur);
+			panel_coureur = nil;
+			mgr:Update();
+		end);
 end
 
 function OnAfficheTableau()
@@ -2248,19 +2288,6 @@ function OnAfficheTableau()
 
 	grid_tableau:AddColumnLabel(3);
     grid_tableau:AddRowLabel(1, 48);
-	-- OnOrder();
-	
-	-- for i = 0, tDraw:GetNbRows() -1 do
-		-- local code = tDraw:GetCell('Code_coureur', i);
-		-- local pts, rank, pts_VIT, rank_VIT = GetRank(codeFIS);
-		-- if pts then
-			-- tDraw:SetCell('FIS_pts', i, pts);
-			-- tDraw:SetCell('FIS_clt', i, clt);
-			-- tDraw:SetCell('FIS_SG_pts', i, pts_VIT);
-			-- tDraw:SetCell('FIS_SG_clt', i, rank_VIT);
-		-- end
-	-- end
-	-- grid_tableau:SynchronizeRows();
 
 -- Initialisation des Controles
 	
@@ -2333,6 +2360,8 @@ function OnAfficheTableau()
 	btnPrintEtiquettesParpoints = menuPrint:Append({label="Impression des étiquettes par Points", image ="./res/32x32_printer.png"});
 	menuPrint:AppendSeparator();
 	btnPrintTableau = menuPrint:Append({label="Impression du tableau des coureurs", image ="./res/32x32_printer.png"});
+	menuPrint:AppendSeparator();
+	btnPrintNation = menuPrint:Append({label="Impression des coureurs par Nation", image ="./res/32x32_printer.png"});
 	menuPrint:AppendSeparator();
 	btnPrintFeuilleTirage = menuPrint:Append({label="Impression de la feuille de tirage", image ="./res/32x32_printer.png"});
 	menuPrint:AppendSeparator();
@@ -2455,6 +2484,11 @@ function OnAfficheTableau()
 			end
 		end, btnPrintTableau);
 		
+	dlgTableau:Bind(eventType.MENU, 
+		function(evt)
+			OnPrintNation();
+		end, btnPrintNation);
+
 	dlgTableau:Bind(eventType.MENU, OnAide, btnAideCE);
 	dlgTableau:Bind(eventType.MENU, 
 		function(evt)
@@ -2589,6 +2623,9 @@ function OnAfficheTableau()
 				return;
 			end
 			if draw.tRang_tirageauto and #draw.tRang_tirageauto > 0 then
+				for i = 1, #draw.tRang_tirageauto do
+					adv.Alert('exaequo : '..draw.tRang_tirageauto[i]);
+				end
 				local msg = "Voulez-vous tirer les dossards des exaequos par double tirage ?\n"..
 						"Les coureurs doivent être validés sur le tableau au préalable.";
 				reponse = dlgTableau:MessageBox(
@@ -2605,14 +2642,24 @@ function OnAfficheTableau()
 				end
 			end
 			local groupe_tirage_30 = tDraw:GetCellInt('Groupe_tirage', 29);
-			if draw.bolVitesse then		-- on tire au sort le groupe groupe_tirage_30
+			if draw.bolVitesse and tDraw:GetCellInt('Dossard', 29) == 0 then		-- on tire au sort le groupe groupe_tirage_30
 				tDrawG6 = tDraw:Copy();
 				ReplaceTableEnvironnement(tDrawG6, 'DrawG6');
-				local strin = '2';
-				for i = 2, groupe_tirage_30 do
-					strin = strin..','..i;
+				local groupe_debut = 9;
+				for i = 0, tDrawG6:GetNbRows() -1 do
+					if tDrawG6:GetCellInt('Dossard', i) == 0 then
+						groupe_debut = tDrawG6:GetCellInt('Groupe_tirage', i);
+						break;
+					else
+						
+					end
+				end
+				local strin = groupe_debut;
+				for i = groupe_debut, groupe_tirage_30 do
+					strin = groupe_debut..','..i;
 				end
 				local filter = "$(Groupe_tirage):In("..strin..")";
+				adv.Alert('filter = '..filter);
 				tDrawG6:Filter(filter, true);
 				for row = tDrawG6:GetNbRows() -1, 0, -1 do
 					if draw.row_selected and row < draw.row_selected then
@@ -2976,6 +3023,14 @@ function OnAfficheTableau()
 				return;
 			end
 			draw.cherche_nom = dlgTableau:GetWindowName('nom'):GetValue();
+			if draw.cherche_nom:len() == 0 then
+				if panel_coureur then
+					-- local mgr = app.GetAuiManager();
+					-- mgr:DeletePane(panel_coureur);
+						panel_coureur:Close();
+					-- mgr:Update();
+				end
+			end
 			draw.cherche_prenom = draw.cherche_prenom or '';
 			draw.cherche_coureur = "Select * From Coureur Where Code_coureur Like 'FIS%' And Nom Like '"..draw.cherche_nom.."%' And Prenom Like '"..draw.cherche_prenom.."%' Order By Nom, Prenom";
 			base:TableLoad(tCoureur, draw.cherche_coureur);
@@ -2997,6 +3052,14 @@ function OnAfficheTableau()
 				return;
 			end
 			draw.cherche_prenom = dlgTableau:GetWindowName('prenom'):GetValue();
+			if draw.cherche_prenom:len() == 0 then
+				if panel_coureur then
+					local mgr = app.GetAuiManager();
+					mgr:DeletePane(panel_coureur);
+						panel_coureur:Close();
+					mgr:Update();
+				end
+			end
 			draw.cherche_nom = draw.cherche_nom or '';
 			draw.cherche_coureur = "Select * From Coureur Where Code_coureur Like 'FIS%' And Nom Like '"..draw.cherche_nom.."%' And Prenom Like '"..draw.cherche_prenom.."%' Order By Nom, Prenom";
 			base:TableLoad(tCoureur, draw.cherche_coureur);
@@ -3048,7 +3111,7 @@ function main(params_c)
 	draw.height = display:GetSize().height - 30;
 	draw.x = 0;
 	draw.y = 0;
-	draw.version = "3.5";
+	draw.version = "3.6";
 	draw.orderbyCE = 'Rang_tirage, Groupe_tirage, ECSL_points DESC, WCSL_points DESC, ECSL_overall_points DESC, Winner_CC DESC, FIS_pts, Nom, Prenom';
 	draw.orderbyFIS = 'Rang_tirage, Groupe_tirage, FIS_pts, Nom, Prenom';
 	draw.hostname = 'live.fisski.com';
