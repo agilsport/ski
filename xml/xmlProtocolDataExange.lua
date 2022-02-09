@@ -29,7 +29,17 @@ xmlProtocol = {
 			if base:GetRecord('Evenement'):GetString('Code_activite') == 'ALP' then return true else return false end
 		end
 	},
-
+	
+	-- Rajout MF le 24-01-22 Protocol Data Exchange TM Version 1 (FFS) : Uniquement Import : Ancienne Norme
+	{ description = 'xmlTMv1.lua', name = 'Telemark V1' , 
+		import = {
+			name = 'Fisresults',
+			children = { {name = 'RaceHeader', attributes = {{name = 'Sector', value = 'TM'}, {name = 'Sex', type_value = 'string'}} } }
+	},
+		export =  function()
+			if base:GetRecord('Evenement'):GetString('Code_activite') == 'TM' then return true else return false end
+		end
+	},	
 	-- Protocol Data Exchange MA FIS - Import - Export 
 	{ description = 'xmlAL.lua', name = 'Alpin' , activite = 'ALP', 
 		import = {
