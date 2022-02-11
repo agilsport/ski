@@ -6,11 +6,11 @@ dofile('./interface/device.lua');
 -- Information : Numéro de Version, Nom, Interface
 function device.GetInformation()
 	return { 
-		version = 1.3, 
+		version = 1.6, 
 		code = 'Longines-TL5005', 
 		name = 'Longines-TL5005', 
 		class = 'chrono', 
-		interface = { type='serial', bytesize = 7, baudrate = 9600 }
+		interface = {{type='serial', bytesize = '7,8' , baudrate = '9600' }}
 	};
 end
 	
@@ -107,6 +107,7 @@ function IsPacketOk(packet)
 		local chrono = GetTimeNet(Tramecomplete);
 		local bib = GetBibNet(Tramecomplete);
 		passage = -1;
+		--alert('dos:'..bib..' tps:'..chrono);
 		AddTimeNet(chrono, passage, bib);
 	elseif TypeTrame == "N" then
 		-- Temps net
@@ -117,7 +118,8 @@ function IsPacketOk(packet)
 	elseif TypeTrame == "A" then
 		-- Abandon
 		local chrono = -500;
-		local bib = GetBibNet(Tramecomplete);
+		local bib = GetBib(Tramecomplete);
+		--alert('Abd dos:'..bib);
 		passage = -1;
 		AddTimeNet(chrono, passage, bib);
 	end
@@ -151,7 +153,7 @@ function GetTimeNet(Tramecomplete)
 	local hour = Tramecomplete:sub(8, 9);
 	local minute = Tramecomplete:sub(10, 11);
 	local sec = Tramecomplete:sub(12, 13);
-	local milli = Tramecomplete:sub(14, 15);
+	local milli = Tramecomplete:sub(14, 16);
 
 	local hour = string.gsub(hour, ' ', '0');
 	local minute = string.gsub(minute, ' ', '0');
@@ -171,7 +173,6 @@ function GetBib(Tramecomplete)
 	bib = string.gsub(bib, ' ', '0'); 
 	return tonumber(bib);
 end
-
 function GetBibNet(Tramecomplete)
 	local bib = Tramecomplete:sub(5, 7);
 	bib = string.gsub(bib, ' ', '0'); 

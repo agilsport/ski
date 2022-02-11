@@ -1,11 +1,9 @@
-dofile('./interface/interface.lua');
-dofile('./interface/adv.lua');
-dofile('./interface/device.lua');
+dofile('./interface/include.lua');
 
 -- Information : Numéro de Version, Nom, Interface
 function device.GetInformation()
 	return { 
-		version = 3.2, 
+		version = 3.3, 
 		name = 'Incrustation', 
 		class = 'display', 
 		interface = {} 
@@ -60,10 +58,10 @@ function device.OnConfiguration(node)
 	dlg:GetWindowName('height'):SetRange(0, 5000);
 	dlg:GetWindowName('height'):SetValue(node:GetAttribute('height', 600));
 	
-	dlg:GetWindowName('x'):SetRange(0, 5000);
+	dlg:GetWindowName('x'):SetRange(-5000, 5000);
 	dlg:GetWindowName('x'):SetValue(node:GetAttribute('x', 0));
 		
-	dlg:GetWindowName('y'):SetRange(0, 5000);
+	dlg:GetWindowName('y'):SetRange(-5000, 5000);
 	dlg:GetWindowName('y'):SetValue(node:GetAttribute('y', 0));
 	
 	-- Scrolling

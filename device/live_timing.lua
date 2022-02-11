@@ -12,7 +12,7 @@ end
 -- Information : Numéro de Version, Nom, Interface
 function device.GetInformation()
 	return { 
-		version = 6.6;
+		version = 6.8;
 		name = 'Live Timing Async.', 
 		class = 'network'
 	};
@@ -482,7 +482,6 @@ function device.OnInit(params, node)
 		parentFrame:Bind(eventType.CURL, OnCurlLive);
 		InitLive();
 	end
-
 	
 	-- Affichage ...
 	panel:Show(true);
@@ -664,6 +663,15 @@ function SendNextPacket()
 	if live.sequence_ack == live.sequence_send then
 		return; -- Tout est Acquitté ...
 	end
+	
+	if live.method == 'socket' then
+		-- Verification de l'état du Socket ..
+		if live.socket_state == false then
+			Info('Demande de réinitialisation ...');
+			DoResetSocket();
+			return;
+		end
+	end
 
 	if live.sequence_last_send ~= nil and live.sequence_ack < live.sequence_last_send then
 		return -- la dernière séquence envoyée n'a pas encore été acquittée.
@@ -790,15 +798,22 @@ function OnResetSocket(evt)
 	) ~= msgBoxStyle.YES then
 		return;
 	end
+
+	Info('Demande de réinitialisation ....');
+	DoResetSocket();
+end
+
+function DoResetSocket()
 	-- on ferme le socket
 	if live.socket ~= nil then
 		live.socket:Close();
 	end
+
 	live.socket_state = false;
 	live.sequence_last_send = nil;
 	parentFrame = wnd.GetParentFrame();
 	live.socket = socketClient.Open(parentFrame, live.hostname, live.port);
-	Info('Demande de réinitialisation ....');
+
 	if live.socket ~= nil then
 		parentFrame:Bind(eventType.SOCKET, OnSocketLive, live.socket);
 	end
