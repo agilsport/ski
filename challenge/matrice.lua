@@ -1591,7 +1591,7 @@ function InitCombiSaut(idxcourse)
 	-- tMatrice_Ranking:Snapshot('tMatrice_Ranking_avan_init_course'..idxcourse..'.db3')
 	tCS = tCS or {};
 	tCS[idxcourse] = {};
-	tCS[idxcourse].facteur_f_discipline_alpine = tMatrice_Courses:GetCellInt('Facteur_f', idxcourse-1);
+	tCS[idxcourse].facteur_f_discipline_alpine = tMatrice_Courses:GetCellInt('Facteur_f', idxcourse-1, 1010);
 	matrice.course[idxcourse].Diff_maxi = 0;
 	-- Recalculer tous les points course et les classements pour la course idxcourse. Manche 1 = saut, manche 2 = alpin
 	-- longueur du meilleur en manche 1 = matrice.course[idxcourse][1].lasttime
@@ -1665,11 +1665,12 @@ function InitCombiSaut(idxcourse)
 		end
 		pts_course_saut = Round(pts_course_saut, 2);
 		tMatrice_Ranking:SetCell(colpts_saut, idxcoureur, pts_course_saut);
+		if tps_alpin == 0 then tps_alpin = 1; end
 		if tps_alpin > 0 then
 			pts_alpin = GetPtsCourse(idxcourse, tps_alpin, tCS[idxcourse].tps_best, tCS[idxcourse].facteur_f_discipline_alpine)
 			pts_alpin = Round(pts_alpin, 2);
 			if code_coureur_pour_debug == tMatrice_Ranking:GetCell('Code_coureur', idxcoureur) then
-				adv.Alert('pts_alpin = '..pts_alpin) ;
+				adv.Alert('tps_alpin = '..tps_alpin..', tCS[idxcourse].tps_best = '..tCS[idxcourse].tps_best..', tCS[idxcourse].facteur_f_discipline_alpine = '..tCS[idxcourse].facteur_f_discipline_alpine..', pts_alpin = '..pts_alpin) ;
 			end
 		else
 			pts_alpin = -1;
@@ -2603,11 +2604,24 @@ function LitMatriceCourses(bolcalculer);	-- lecture des courses figurant dans la
 		if tMatrice_Courses:GetCell('Code_discipline', i) == 'CS' then
 			matrice.combisaut = true;
 			matrice.prendre_manche = true;
+			if matrice.debug == true then
+				adv.Alert('Select * From Epreuve_Alpine Where Code_evenement = '..tMatrice_Courses:GetCellInt('Code', i)..' And Code_epreuve = 1');
+			end
 			base:TableLoad(tEpreuve_Alpine, 'Select * From Epreuve_Alpine Where Code_evenement = '..tMatrice_Courses:GetCellInt('Code', i)..' And Code_epreuve = 1');
 			discipline_alpine = tEpreuve_Alpine:GetCell('Info', 0);
+			if discipline_alpine:len() == 0 then
+				discipline_alpine = 'GS';
+			end
 		end
 		tMatrice_Courses:SetCell('Discipline_alpine', i, discipline_alpine);
+		if matrice.debug == true then
+			adv.Alert('discipline alpine de la course '..idxcourse..' = '..discipline_alpine)
+		end
+		
 		for j = 0, tDiscipline:GetNbRows() -1 do
+			if matrice.debug == true then
+				adv.Alert("course n° "..(i+1)..", tDiscipline:GetCell('Code', j) = "..tDiscipline:GetCell('Code', j)..", discipline_alpine = "..discipline_alpine..", tDiscipline:GetCellInt('Facteur_f', j) = "..tDiscipline:GetCellInt('Facteur_f', j));
+			end
 			if tDiscipline:GetCell('Code', j) == discipline_alpine then
 				tMatrice_Courses:SetCell('Facteur_f', i, tDiscipline:GetCellInt('Facteur_f', j))
 			end
@@ -7593,7 +7607,7 @@ function OnConfiguration(cparams)
 	else
 		return false;
 	end
-	matrice.version_script = '4.9';
+	matrice.version_script = '5.1';
 	matrice.OS = app.GetOsDescription();
 	-- vérification de l'existence d'une version plus récente du script.
 	local url = 'https://live.ffs.fr/maj_pg/challenge/last_version.txt'
@@ -7604,7 +7618,7 @@ function OnConfiguration(cparams)
 	matrice.dlgPosit.x = 1;
 	matrice.dlgPosit.y = 1;
 	base = base or sqlBase.Clone();
-	code_coureur_pour_debug = "FFS2676951";		-- provoque tous les affichages pour débug propres à ce Code_coureur
+	code_coureur_pour_debug = "FFS2696810";		-- provoque tous les affichages pour débug propres à ce Code_coureur
 	matrice.debug = false;
 	if matrice.debug == false then
 		code_coureur_pour_debug = '';
