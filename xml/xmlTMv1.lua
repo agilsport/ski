@@ -1,4 +1,6 @@
 -- FIS Alpine Data Exchange XML Protocol version 1 (FFS - VOLA SKIPRO - Compatibilité)
+-- Version 1.2
+-- Prise en compte de l'activité pour l'origine courreur en FIS 
 function beforeFisresults(t)
 	base:SetGlobalVariable({'table', 'record'}); -- tName => table Name, rName => record Name
 	base:SetBaseFormatChrono('ALP');
