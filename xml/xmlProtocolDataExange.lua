@@ -2,7 +2,8 @@ dofile('./xml/xmlTools.lua');
 -- Version 1.5 le 20-12-2021
 -- Envoi 'KO' à la FIS  Ok
 -- Envoi FOND FS à la FIS Ok
-
+-- Version 1.6 le 12-02-2022
+-- IMPORT xml TM
 -- Liste des Protocoles pris en compte ...
 xmlProtocol = {
 	-- Protocol Data Exchange pour l'Import des Listes ou les mises à jour de la base 
@@ -34,7 +35,8 @@ xmlProtocol = {
 	{ description = 'xmlTMv1.lua', name = 'Telemark V1' , 
 		import = {
 			name = 'Fisresults',
-			children = { {name = 'RaceHeader', attributes = {{name = 'Sector', value = 'TM'}, {name = 'Sex', type_value = 'string'}} } }
+			children = { {name = 'RaceHeader', attributes = {name = 'Sector', value = 'TM', {name = 'Sex', type_value = 'string'}} }},
+			-- Message('Import TM');
 	},
 		export =  function()
 			if base:GetRecord('Evenement'):GetString('Code_activite') == 'TM' then return true else return false end
@@ -67,7 +69,7 @@ xmlProtocol = {
 		import = {
 			name = 'Fisresults', 
 			children = { {name = 'RaceHeader', attributes = {{name = 'Sector', value = 'CC'}, {name = 'Sex', type_value = 'string'}} }},
-			-- Message('Import vola');
+			-- Message('Import vola CC');
 		}
 		-- export =  function()
 			-- if base:GetRecord('Evenement'):GetString('Code_activite') == 'FOND' then 
