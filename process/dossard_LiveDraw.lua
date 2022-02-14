@@ -993,9 +993,14 @@ function CommandSendList()
 		local tStandings = {};
 		local tData = {};
 		if draw.bolEstCE then
+			-- table.insert(tData, {rank = ecsl_rank, points = ecsl_points, event = draw.discipline, category = 'ECSL'});
+			-- table.insert(tData, {rank = ecsl_overall_rank, points = ecsl_overall_points, event = 'OA', category = 'EC'});
+			-- table.insert(tData, {rank = wcsl_rank, points = wcsl_points, event = draw.discipline, category = 'WCSL'});
+			-- table.insert(tData, {rank = winner_rank, points = winner_points, event = draw.discipline, category = 'CC WINNER'});
+			-- table.insert(tData, {rank = fis_clt, points = fis_pts, event = draw.discipline, category = 'FIS'});
 			table.insert(tData, {rank = ecsl_rank, points = ecsl_points, event = draw.discipline, category = 'ECSL'});
 			table.insert(tData, {rank = ecsl_overall_rank, points = ecsl_overall_points, event = 'OA', category = 'EC'});
-			table.insert(tData, {rank = wcsl_rank, points = wcsl_points, event = draw.discipline, category = 'WCSL'});
+			table.insert(tData, {points = wcsl_rank, rank = wcsl_points, event = draw.discipline, category = 'WCSL'});
 			table.insert(tData, {rank = winner_rank, points = winner_points, event = draw.discipline, category = 'CC WINNER'});
 			table.insert(tData, {rank = fis_clt, points = fis_pts, event = draw.discipline, category = 'FIS'});
 		else
@@ -2062,7 +2067,7 @@ Groupe 6 On poursuit selon les points FIS.
 		end
 	end
 	-- draw.rang_tirage = tDrawG1:GetNbRows() + tDrawG2:GetNbRows() + 1;
-	
+	tDrawG3:OrderBy('ECSL_points DESC, WCSL_points DESC')
 	if tDrawG3:GetNbRows() > 0 then
 		current_group = current_group + 1;
 		for i = 0, tDrawG3:GetNbRows() -1 do		-- dans les 30 de la WCSL 
@@ -3253,7 +3258,7 @@ function main(params_c)
 	draw.height = display:GetSize().height - 30;
 	draw.x = 0;
 	draw.y = 0;
-	draw.version = "3.9";
+	draw.version = "3.91";
 	draw.orderbyCE = 'Rang_tirage, Groupe_tirage, ECSL_points DESC, WCSL_points DESC, ECSL_overall_points DESC, Winner_CC DESC, FIS_pts, Nom, Prenom';
 	draw.orderbyFIS = 'Rang_tirage, Groupe_tirage, FIS_pts, Nom, Prenom';
 	draw.hostname = 'live.fisski.com';
