@@ -1,7 +1,7 @@
 dofile('./interface/interface.lua');
 dofile('./interface/adv.lua');
 dofile('./interface/device.lua');
--- version 2.3
+-- version 2.5
 	-- Verification edition/PtsFFS_ColPtsBest
 	-- correction mise a jour du body pour edition liste par ordre de points selectionner
 --Creation de la table
