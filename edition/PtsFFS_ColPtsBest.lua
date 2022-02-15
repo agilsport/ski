@@ -1,9 +1,15 @@
-dofile('./interface/adv.lua');
 dofile('./interface/interface.lua');
+dofile('./interface/adv.lua');
+dofile('./interface/device.lua');
 -- version 2.3
 	-- Verification edition/PtsFFS_ColPtsBest
 	-- correction mise a jour du body pour edition liste par ordre de points selectionner
+--Creation de la table
+Dlg = {};
 
+function Alert(txt)
+	Dlg.gridMessage:AddLine(txt);
+end
 
 function alert(txt)
 	app.GetAuiMessage():AddLine(txt);
@@ -11,7 +17,7 @@ end
 
 function main(params)
 	params = params or {};
-	Dlg = {};
+	
 	-- local verif = params.Colum_Label or 'BOF';
 	-- alert('Verif='..verif);
 
@@ -41,17 +47,31 @@ function main(params)
 	});
 
 	base = sqlBase.Clone();
+
 	code_evenement = params.code_evenement;
+	tEvenement = base:GetTable('Evenement');
+	tEpreuve = base:GetTable('Epreuve');
+	tResultat = base:GetTable('Resultat');
 	colum_Pts = params.colum_Pts;	 	--="Pts_best" 
 	LabelNc = params.LabelNc;            -- "NC_FFS"
 	Colum_Label = params.Colum_Label;
 	LabelPts = params.LabelPts;
 	Dlg.LabelPts = params.LabelPts;
-	-- Initialisation des controles ...
+	cmd = "Select * From Evenement Where Code = "..tonumber(code_evenement);
+	base:TableLoad(tEvenement, cmd)
+	code_activite = tEvenement:GetCell('Code_activite', 0);
+	cmd = "Select * From Epreuve Where Code_evenement = "..code_evenement..
+	" Order by Code_epreuve";
+	base:TableLoad(tEpreuve, cmd)
+	code_discipline = tEpreuve:GetCell('Code_discipline', 0);
+	--alert("code_activite "..code_activite);
+	
+-- Initialisation des controles ...
+	Dlg.gridMessage = dlg:GetWindowName('message');
 	
 	local tb = dlg:GetWindowName('tb');
 	if tb then
-		local btn_edition = tb:AddTool('OK', './res/16x16_xml.png');
+		local btn_edition = tb:AddTool('Lancement du Scrit', './res/16x16_xml.png');
 		tb:AddStretchableSpace();
 		local btn_close = tb:AddTool('Annuler', './res/16x16_close.png');
 		tb:Realize();
@@ -59,7 +79,11 @@ function main(params)
 		tb:Bind(eventType.MENU, LectureDonnees, btn_edition);
 		tb:Bind(eventType.MENU, function(evt) dlg:EndModal(idButton.CANCEL); end, btn_close);
 	end
-		
+	msg = "Transfert de la Colonne point "
+	msg = msg.."de l\'activite: "..code_activite.." et de la Discipline: "..code_discipline.." \n"
+	msg = msg.."Vers: la Colonne "..colum_Pts.." \n"
+	msg = msg.."et mettra 9999 aux non classer pour pouvoir les filtrer \n"
+	Alert(msg.." Ok!!!");	
 	dlg:Fit();
 	dlg:ShowModal();
 	dlg:Delete();
@@ -71,7 +95,7 @@ function LectureDonnees(evt)
 	-- alert("LabelNc = "..LabelNc);
 	-- alert("Colum_Label = "..Colum_Label);
 	Lab_NC = LabelNc;
-	tResultat = base:GetTable('Resultat');
+
 	cmd = "Select * From Resultat WHERE Code_evenement = "..code_evenement.." Order by Code_coureur"
 	base:TableLoad(tResultat, cmd);
 	-- alert("base:TableLoad(Resultat, cmd) = "..tResultat:GetNbRows()..' / '..cmd);
@@ -100,6 +124,7 @@ function LectureDonnees(evt)
 	end
 	editionliste(evt, base, bodyliste);
 	alert("Transfert des points:"..LabelPts.." Ok!!!")
+	
 	-- Fermeture
 	bodyliste:Delete();
 	dlg:EndModal(idButton.OK);
