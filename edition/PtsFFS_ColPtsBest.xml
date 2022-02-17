@@ -1,21 +1,15 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
-<!-- Version 2.3 -->
+<!-- Version 2.5 -->
 <root>
 
 <!-- Fenètre de configuration de l'éditions des couloir de poursuite -->
 <panel name="PtsFFS_ColPts_best">
-	<font name="Calibri" size="16" adjust="best" >
+	<font name="Calibri" size="10" adjust="best" >
 		<padding all="2px"/>
 		<col w="5,5,5,5,5" />
 		<row h="0.1cm" />
 		<row h="1" />
-			<wndtext col_start="1" col_end="0" align="left" >'Cet utilitaire permet de copier Les Points: '</wndtext>
-		<row h="1" />
-			<wndtext col_start="1" col_end="0" align="left" >'           => Fis Distance dans la colonne Pts_best'</wndtext>
-		<row h="1" />
-			<wndtext col_start="1" col_end="0" align="left" >'           => Fis Sprint dans la colonne Pts'</wndtext>
-		<row h="1" />
-			<wndtext col_start="1" col_end="0" align="left" >'           => FFS (meilleur¨FOND, ROL,BIATH) dans la colonne Pts_Clt'</wndtext>
+			<statictext col_start="1" col_end="0" align="left" label="Cet utilitaire permet de copier Les Points x ds la colonne PtsBest "></statictext>
 		<row h="1" />
 			<wndtext col_start="1" col_end="0" align="left" >'Bien mettre la course dans la bonne Entité et la bonne Discipline (surtout pour les FIS)'</wndtext>
 		<row h="1" />
@@ -30,6 +24,11 @@
 			<wndtext col_start="1" col_end="0" align="left" >'          => Ainsi que Moniteur, Niveau, Info'</wndtext>
 		<row h="1" />
 			<wndtext col_start="1" col_end="0" align="left" >'Pour avoir les Non Classés de la Discipline'</wndtext>
+		<row value="auto" />
+		<staticbox col_start="1" col_end= "0" label="Message" name="sb_mesage">
+			<row value="1.5cm" />
+			<gridmessage col_start="1" col_end= "0" name="message"/>
+		</staticbox>
 	</font>
 	<row value="auto" />
 	<toolbar name="tb" col_start="1" col_end="0" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>

@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- Menu Editions Activité "FOND " suplementaire !-->
-<!-- version="6.6" !-->
+<!-- version="6.7" !-->
 <!-- si possible de faire fonctionne des cond dans les menu -->
 <!-- si possible de fermer des Item par default -->
+<!-- mise en place de la fonction page break -->
 <edition>
 	<menu>
 		<menu title="Edition Relais" image="./res/32x32_ranking.png" bold="false" cond ="($(Epreuve.Code_discipline)='RELAIS')">
@@ -39,7 +40,7 @@
 			<menu title="Transfert de la colonne Points (FFS) dans la Colonne Pts_Clt" image="./res/16x16_fis.png" LabelPts="FFS" colum_Pts="PtsClt" LabelNc="NC_FFS" Colum_Label="Niveau" lua="./edition/PtsFFS_ColPtsBest.lua" />
 			<menu title="Transfert de la colonne Points (FIS Sprint) dans la Colonne Pts" image="./res/16x16_fis.png" LabelPts="FIS_Spr" colum_Pts="Pts" LabelNc="NC_FIS_Spr" Colum_Label="Info" lua="./edition/PtsFFS_ColPtsBest.lua" />
 			<menu title="Start List pour controle avec les 3 colonnes Pts (FFS, Fis Distance, Fis sprint) par Ordre de dossards" image="./res/16x16_official.png" id="lst_FIS" Qrcode="0" officiel="0" />			
-			<menu title="Par Nation / Comité" image="./res/16x16_ranking.png" id="part_NatClub" page_break="1" first_header="0" orderby="Nation" choix_manche="1" /></menu>
+			<menu title="Par Nation / Comité" image="./res/16x16_ranking.png" id="part_NatClub" first_header="0" orderby="Nation" choix_manche="1" /></menu>
 		
 		<menu title="Utilitaires" image="./res/32x32_options.png">
 			<menu title="Factures inscriptions" image="./res/16x16_text.png" lua="./edition/facture.lua"  />
@@ -1093,7 +1094,7 @@
 	<!-- Liste de depart par nation et club	 -->
 	<report id="part_NatClub" title="(params.title or '')" header="1" first_header="(params.first_header or '1')" >
 		<lua>
-			page_break = tonumber(params.page_break or 0);
+			page_break = page_break or 1;
 			officiel = tonumber(params.officiel or 0);
 			
 			entite = $(Evenement.Code_entite);
