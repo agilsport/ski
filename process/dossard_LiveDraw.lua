@@ -160,8 +160,6 @@ function ReadECSL()
 				if draw.annee_1 == false then
 					tDraw:SetCellNull('ECSL_points', i);
 					tDraw:SetCellNull('ECSL_rank', i);					
-					tDraw:SetCellNull('ECSL_overall_points', i);
-					tDraw:SetCellNull('ECSL_overall_rank', i);
 				end
 			end
 			for i = 2, #lines do
@@ -1837,6 +1835,8 @@ function SetuptDraw()
 		tDraw:OrderBy('Rang_tirage');
 		return;
 	end
+	local cmd = "Update Resultat Set Dossard = Null Where Code_evenement = "..draw.code_evenement;
+	base:Query(cmd);
 	for i = 0, tDraw:GetNbRows() -1 do
 		tDraw:SetCellNull('Critere', i);
 		tDraw:SetCellNull('Groupe', i);
@@ -2023,19 +2023,30 @@ Groupe 6 On poursuit selon les points FIS.
 	end
 
 	nb_exaequo = 0;
+	tDrawG2:OrderBy('ECSL_points, FIS_pts');				-- les + de 450 pts
 	if tDrawG2:GetNbRows() > 0 then
-		draw.rang_tirage = draw.rang_tirage + 1;
 		current_group = current_group + 1;
+		local pts_overall_next  = nil;
+		local pts_ecsl_next  = nil;
+		local pts_fis_next  = nil;
 		for i = 0, tDrawG2:GetNbRows() -1 do		-- les plus de 450 - 200 pts 
 			local code_coureur = tDrawG2:GetCell('Code_coureur', i);
-			local pts = tDrawG2:GetCellInt('ECSL_overall_points', i);
-			if i > 0 then
-				if pts < tDrawG2:GetCellInt('ECSL_overall_points', i-1) then
+			local pts_overall = tDrawG2:GetCellInt('ECSL_overall_points', i);
+			local pts_ecsl = tDrawG2:GetCellInt('ECSL_points', i);
+			local pts_fis = tDrawG2:GetCellDouble('FIS_pts', i);
+			-- adv.Alert('tDrawG2, identité = '..tDrawG2:GetCell('Nom', i).." "..tDrawG2:GetCell('Prenom', i))
+			if i < tDrawG2:GetNbRows() -1 then
+				pts_ecsl_next = tDrawG2:GetCellInt('ECSL_points', i+1);
+				pts_fis_next = tDrawG2:GetCellDouble('FIS_pts', i+1);
+				if pts_ecsl == pts_ecsl_next and pts_fis == pts_fis_next then
+					nb_exaequo = nb_exaequo + 1;
+				else
 					draw.rang_tirage = draw.rang_tirage + 1 + nb_exaequo;
 					nb_exaequo = 0;
-				else
-					nb_exaequo = nb_exaequo + 1;
 				end
+			else
+				draw.rang_tirage = draw.rang_tirage + 1 + nb_exaequo;
+				nb_exaequo = 0;
 			end
 			local r = tDraw:GetIndexRow('Code_coureur', code_coureur);
 			tDraw:SetCell('TG', r, 'tDrawG2');
@@ -2067,7 +2078,7 @@ Groupe 6 On poursuit selon les points FIS.
 		end
 	end
 	-- draw.rang_tirage = tDrawG1:GetNbRows() + tDrawG2:GetNbRows() + 1;
-	tDrawG3:OrderBy('ECSL_points DESC, WCSL_points DESC')
+	tDrawG3:OrderBy('ECSL_points, FIS_pts, WCSL_rank');				-- dans les 30 de la WCSL
 	if tDrawG3:GetNbRows() > 0 then
 		current_group = current_group + 1;
 		for i = 0, tDrawG3:GetNbRows() -1 do		-- dans les 30 de la WCSL 
@@ -3258,7 +3269,7 @@ function main(params_c)
 	draw.height = display:GetSize().height - 30;
 	draw.x = 0;
 	draw.y = 0;
-	draw.version = "3.91";
+	draw.version = "3.92";
 	draw.orderbyCE = 'Rang_tirage, Groupe_tirage, ECSL_points DESC, WCSL_points DESC, ECSL_overall_points DESC, Winner_CC DESC, FIS_pts, Nom, Prenom';
 	draw.orderbyFIS = 'Rang_tirage, Groupe_tirage, FIS_pts, Nom, Prenom';
 	draw.hostname = 'live.fisski.com';
