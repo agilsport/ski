@@ -1,9 +1,11 @@
 -- Synthaxe Progression :
--- Version 4.0
+-- Version 4.1
 -- Rectif placement en final
 -- rajout de dim_min en tab nordique
--- rajout du KO_12 en 'FOND,ROL'
 -- Création d'un niveau KO_Spec pour pouvoir faire des ko30 ou autre spécifique en cas de reclamation ou de repeche ou l'on faire un duel a 7 a la place de 6 par exemple 
+-- rajout du KO_12 en 'FOND,ROL'
+-- rajout du KO_42 et MontDesc 10 en 'FOND,ROL'
+-- Creation du Progression Cut pour les tableaux Montée_Descente
 -- clt/duel/tour/ordre/tri : clt (obligatoire ...), duel, tour, ordre (non obligatoires ...)
 -- exemple 1 : 12 => 12ième du tour précédent (et de tous les duels)
 -- exemple 2 : 2/3 => 2ème du duel 3 du tour précédent
@@ -97,6 +99,62 @@ function GetLabelDuelFS_4Tours(progression, tour, duel)
 			return 'Small \n Final';
 		end
 	end
+end
+
+function Getprogression_cut(dim, active_progression)
+	local progression = active_progression.progression;
+	-- Gestion du Tour 1
+	local progression_tour1 = progression[1];
+
+	for j=1, #progression_tour1 do
+		local bib = tonumber(progression_tour1[j][1]);
+
+		if bib > dim then
+			while #progression_tour1 >= j do
+				table.remove(progression_tour1);
+			end
+			break;
+		end
+	end
+	
+	-- Gestions des Tours suivants 
+	local nb_tour = #progression;
+	-- app.GetAuiMessage(true):AddLine('nb_tour ds progression : '..tostring(nb_tour));
+	local nb_duel = #progression_tour1;
+	app.GetAuiMessage(true):AddLine('nb_duel tour 1 after Cut : '..tostring(nb_duel));
+	for t=2, nb_tour do
+		local progression_tour = progression[t];
+		-- app.GetAuiMessage(true):AddLine('Cut progression_tour N°: '..tostring(t)..' lg = '..tostring(#progression_tour));
+		while #progression_tour > nb_duel do
+			table.remove(progression_tour);
+			-- app.GetAuiMessage(true):AddLine('progression_tour effacer: '..tostring(#progression_tour));
+		end
+		-- app.GetAuiMessage(true):AddLine('Cut progression_tour After N°: '..tostring(t)..' lg = '..tostring(#progression_tour));
+
+		for duel=1, #progression_tour do
+			local tDuel = progression_tour[duel];
+			local start = 5;
+			
+			for couloir=1, #tDuel do
+				local valProgression = tDuel[couloir];
+				local sep = string.find(valProgression, '/');
+				-- app.GetAuiMessage(true):AddLine('sep: '..tostring(sep));
+				if sep ~= nil then
+					local srcDuel = tonumber(string.sub(valProgression, sep+1)) or 0;
+					local PosClt = tonumber(string.sub(valProgression, 1, 1)) or 0;
+					--app.GetAuiMessage(true):AddLine('PosClt N°: '..PosClt);
+					if srcDuel > nb_duel and duel == nb_duel then
+						if PosClt == 1 then start = couloir end
+						-- app.GetAuiMessage(true):AddLine('srcDuel N°: '..tostring(srcDuel));
+						valProgression = tostring(start)..'/'..tostring(nb_duel);
+						tDuel[couloir] = valProgression;
+						start = tonumber(start) + 1;
+					end
+				end
+			end
+		end
+	end
+	-- app.GetAuiMessage(true):AddLine('Progression Cut : Dimension ='..tostring(dim));
 end
 
 -- Table définissant l'ensemble des progressions ...
@@ -1092,6 +1150,8 @@ duel_progression = {
 		
 		niveau = 'KO_MT_D5',
 		
+		progression_cut = Getprogression_cut,
+		
 		progression = {
 			{ 
 				-- tour 1 : 17 duels de 5 couloirs
@@ -1121,7 +1181,7 @@ duel_progression = {
 				{ '1/1', '2/1', '3/1', '1/2', '2/2' }, 		-- D1
 				{ '4/1', '5/1', '3/2', '1/3', '2/3' }, 		-- D2
 				{ '4/2', '5/2', '3/3', '1/4', '2/4' },		-- D3
-				{ '4/3', '5/3', '3/4', '1/5', '2/5' }, 		-- D4
+				{ '4/3', '5/3', '3/4', '1/5', '2/5' },	 	-- D4
 				{ '4/4', '5/4', '3/5', '1/6', '2/6' }, 		-- D5
 				{ '4/5', '5/5', '3/6', '1/7', '2/7' }, 		-- D6
 				{ '4/6', '5/6', '3/7', '1/8', '2/8' }, 		-- D7
@@ -1175,6 +1235,7 @@ duel_progression = {
 		GetLabelDuel = GetLabelDuel_Mont_Desc,
 		GetLabelDuelWidth = function() return 8; end,
 		-- GetLabelDuelWidth = function(progression, tour, duel) if tour == 1 then return 10 else return 20 end end,
+		progression_cut = Getprogression_cut,
 		
 		progression = {
 			{ 
@@ -1250,6 +1311,7 @@ duel_progression = {
 		GetLabelDuelWidth = function() return 8; end,
 		
 		niveau = 'KO_MT_10',
+		progression_cut = Getprogression_cut,
 		
 		progression = {
 			{ 
@@ -1294,4 +1356,7 @@ duel_progression = {
 		}
 	},
 };
+
+
+
 
