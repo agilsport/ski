@@ -18,9 +18,9 @@
 
 		<menu title="Listes de Départ" image="./res/32x32_bib.png">
 			<menu title="Officielle" image="./res/16x16_official.png" id="lst_officiel" choix_manche="1"/> 
-			<menu title="Par Club" image="./res/16x16_bib.png" rupture="Club" id="lst_factorise"/>
-			<menu title="Par Comité" image="./res/16x16_bib.png" label="Comité" rupture="Comite" id="lst_factorise"/>
-			<menu title="Par Nation" image="./res/16x16_bib.png" rupture="Nation" id="lst_factorise"/>
+			<menu title="Par Club" image="./res/16x16_bib.png" rupture="Club" id="lst_factorise" choix_manche="1"/>
+			<menu title="Par Comité" image="./res/16x16_bib.png" label="Comité" rupture="Comite" id="lst_factorise" choix_manche="1"/>
+			<menu title="Par Nation" image="./res/16x16_bib.png" rupture="Nation" id="lst_factorise" choix_manche="1"/>
 		</menu>
 
 		<menu title="Résultats" image="./res/32x32_ranking.png">
@@ -393,31 +393,25 @@
 		<lua>dofile('./interface/adv.lua');</lua>
 		<lua>entite = $(Evenement.Code_entite);
 			rupture = params.rupture;
-			saut_page = params.page or 1;
-			saut_page = tonumber(saut_page) or 1;
 			label = params.label or params.rupture;
 			title = title..label;
 			body:SetCounter(rupture);
 			if rupture ~= 'Nation' then
 				body:SetCounter('Nation');
 			end
-			if saut_page == 1 then
-				orderby = rupture..", Sexe, Nom, Prenom";
-			else
-				orderby = rupture..", Sexe, Point, Nom, Prenom";
-			end
 			somme_rupture = 0;
 			nb_etrangers = 0;
 			comite = {};
-			page_break = saut_page;
 			bolAjouter = false;
 
 		</lua>
 		<call option="comite_origine" file="./edition/options.xml" />
 		<order key="(orderby)" />
+
+
 		<rupture key="(rupture)">
 			<before>
-				<pagebreak cond="row ~= 0 and page_break ~= 0" />
+				<pagebreak cond="row ~= 0 and page_break == 1" />
 				<need h="2cm" />
 				<font size="16"/>
 				<row value="0.5cm" />
@@ -453,15 +447,15 @@
 
 			<row value="auto"/>
 			<text col="7" align="center" label="Code"><font size="8" cond="group =='body'"/>$(Code_coureur):sub(4)</text>
-			<text col="20" align="left" label="Identity" font_weight="bold" font_size_step="1">$(Identite)</text> 
+			<text col="20" align="left" label="Identité" font_weight="bold" font_size_step="1">$(Identite)</text> 
 			<text col="2" align="center" label="S.">$(Sexe)</text>
-			<text col="4" align="center" label="YoB">$(An)</text>
+			<text col="4" align="center" label="Année">$(An)</text>
 			<text col="5" align="center" label="Cat.">$(Categ)</text>
 			<text col="4" align="center" label="Nat" cond="entite == 'FIS'">$(Nation)</text>
-			<text col="5" align="center" label="CS" cond="saut_page==1">GetComiteOrigine($(Code_coureur),$(Comite))</text>
-			<text col="12" align="center" label="Club" cond="saut_page==1">$(Club)</text>
-			<text col="7" align="center" label="Rank" cond="saut_page==0">clt</text>
-			<text col="7" align="center" label="Points">$(Point)</text>
+			<text col="5" align="center" label="CS" >GetComiteOrigine($(Code_coureur),$(Comite))</text>
+			<text col="12" align="center" label="Club" >$(Club)</text>
+			<text col="7" align="center" label="Clt" cond="entite == 'FIS'">clt</text>
+			<text col="7" align="center" label="Points" cond="entite == 'FIS'">$(Point)</text>
 			
 			<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
 		</body>
@@ -577,19 +571,19 @@
 	</report>
 	
 	<!-- Liste de départ factorisée -->
-	<report id="lst_factorise" title="Liste Par " first_header="0">
+	<report id="lst_factorise" title="Liste de départ Par " first_header="0">
 		<lua>entite = $(Evenement.Code_entite);
 			rupture = params.rupture;
 			label = params.label or params.rupture;
 			title = title..label;
 			body:SetCounter(rupture);
-			orderby = rupture..", Nom, Prenom";
-		</lua>
+			orderby = rupture..", Rang"..manche..", Dossard";
+			</lua>
 		<call option="comite_origine" file="./edition/options.xml" />
 		<order key="(orderby)" />
 		<rupture key="(rupture)">
 			<before>
-				<pagebreak cond="row ~= 0" />
+				<pagebreak cond="row ~= 0 and page_break == 1" />
 				<need h="2cm" />
 				<font size="16"/>
 				<row value="0.5cm" />
@@ -608,6 +602,7 @@
 			<call option="couleur_alternee" file="./edition/options.xml" />
 	
 			<row value="auto"/>
+			<text col="4" align="center" label="Rang" cond="manche &gt; 1" font_weight="bold" font_size_step="1">body:GetCellInt('Rang'..manche,row)</text>
 			<text col="4" align="center" label="Dos" font_weight="bold" font_size_step="1">$(Dossard)</text>
 			<text col="7" align="center" label="Code"><font size_step="-1" cond="group =='body'"/>$(Code_coureur):sub(4)</text>
 			<text col="20" align="left" label="Nom - Prénom" font_weight="bold" font_size_step="1">$(Identite)</text> 
