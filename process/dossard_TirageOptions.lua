@@ -105,6 +105,7 @@ end
 
 function OnTirageManche1()
 	base:TableLoad(tResultat, 'Select * From Resultat Where Code_evenement = '..params.code_evenement);
+	base:TableLoad(tResultat, 'Select * From Resultat Where Code_evenement = '..params.code_evenement);
 	tResultat:OrderBy('Rang, Dossard');
 	local dossard1 = tResultat:GetCellInt('Dossard', 0);
 	if dossard1 > 0 then
@@ -120,6 +121,7 @@ function OnTirageManche1()
 	tResultat:OrderBy('Point');
 	if string.find(option2, '3%.') then
 		params.bibo, params.dossard = GetBibo(15);
+		params.bibo_sav = params.bibo;
 	end
 	params.bibo = params.bibo or -1;
 	params.pts_bibo = -1;
@@ -127,6 +129,7 @@ function OnTirageManche1()
 	local tSexe = {'T'};
 	if string.find(clef1, '1%.') then		-- par sexe
 		tSexe = {'F', 'M'};
+		params.dossards_dames = 0;
 	end
 	for idx = 1, #tSexe do
 		local sexe_encours = tSexe[idx];
@@ -136,6 +139,9 @@ function OnTirageManche1()
 			filtre = "$(Sexe):In('F')";
 		elseif sexe_encours == 'M' then
 			filtre = "$(Sexe):In('M')";
+			if params.dossards_dames > 0 then
+				params.dossard = params.dossards_dames;
+			end
 		else
 			filtre = "$(Sexe):In('F', 'M')";
 		end
@@ -170,6 +176,9 @@ function OnTirageManche1()
 			for i = 0, tResultat_Filtre:GetNbRows() -1 do
 				tResultat_Filtre:SetCell('Dossard', i, params.dossard);
 				params.dossard = params.dossard + 1;
+				if sexe_encours == 'F' then
+					params.dossards_dames = params.dossard;
+				end					
 			end
 			base:TableBulkUpdate(tResultat_Filtre, 'Dossard', 'Resultat');
 		end
@@ -565,10 +574,14 @@ function SetDossardMixte()
 	tResultat_Garcons = tResultat:Copy();
 	local filtre = "$(Sexe):In('F')";
 	tResultat_Filles:Filter(filtre, true);
+	tResultat_Filles:OrderBy('Prenom');
+	tResultat_Filles:OrderRandom();
 	tResultat_Filles:OrderRandom();
 	tResultat_Filles:OrderRandom();
 	local filtre = "$(Sexe):In('M')";
 	tResultat_Garcons:Filter(filtre, true);
+	tResultat_Garcons:OrderBy('Prenom');
+	tResultat_Garcons:OrderRandom();
 	tResultat_Garcons:OrderRandom();
 	tResultat_Garcons:OrderRandom();
 		
