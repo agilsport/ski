@@ -29,6 +29,22 @@ function AfficheAide()
 	end
 end
 
+function CreateXMLLayerPerso(xml_layers)
+	local utf8 = true;
+	local doc_layer = xmlDocument.Create();
+	local nodeRoot = xmlNode.Create(nil, xmlNodeType.ELEMENT_NODE, "layers");
+	if doc_layer:SetRoot(nodeRoot) == false then
+		return;
+	end
+	if not nodeRoot then
+		return;
+	end
+	doc_layer:SaveFile(xml_layers);
+	doc_layer:Delete();
+
+end
+
+
 -- Event Timer
 function OnTimer()
 	if matrice.action == 'close' then
@@ -7607,7 +7623,7 @@ function OnConfiguration(cparams)
 	else
 		return false;
 	end
-	matrice.version_script = '5.1';
+	matrice.version_script = '5.2';
 	matrice.OS = app.GetOsDescription();
 	-- vérification de l'existence d'une version plus récente du script.
 	local url = 'https://live.ffs.fr/maj_pg/challenge/last_version.txt'
@@ -7644,6 +7660,10 @@ function OnConfiguration(cparams)
 	local xml_config = app.GetPath()..'/challenge/matrice_config.xml';
 	if not app.FileExists(xml_config) then
 		CreateXMLConfig();
+	end
+	local xml_layers = app.GetPath()..'/edition/layer.perso.xml';
+	if not app.FileExists(xml_layers) then
+		CreateXMLLayerPerso(xml_layers);
 	end
 	VerifNodePodium();
 	XML = app.GetPath().."/challenge/matrice.xml";
