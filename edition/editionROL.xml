@@ -1,21 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- Menu Editions Activité "ROL" !-->
-<!-- version="6.2" !-->
+<!-- version="6.4" !-->
 <!-- nettoyage du fichier mise en place de la fonction getidentitecoureur -->
+<!-- option page break -->
+<!-- correction bug Qr code -->
 <!-- Activation de la fenetre filtrage epreuves pour une edition gerer par un .lua => Option filter="before" -->
+
+<!-- a voir -->
 <!-- calcul de la note poursuite 2éme jour !-->
 <!-- si possible de faire fonctionner les cond="discipline:In('POURS')" dans les <menus> ?? dans <marging> et dans les <options> -->
 <!-- <paper orientation="landscape" cond="Nb_tps_inter >= 4 "/> -->
-
 
 <edition>
 	<menu>
 		<menu title="Listes des Participants " image="./res/32x32_juges.png">
 			<menu title="Par Ordre Alphabétique" image="./res/16x16_juges.png" id="part_officiel" />
-			<menu title="Par Nation / Alphabétique" image="./res/16x16_juges.png" page_break="1" orderby="Nation" id="participants" />
-			<menu title="Par Comité / Alphabétique" image="./res/16x16_juges.png" page_break="1" orderby="Comite" id="participants" />
-			<menu title="Par Club / Alphabétique" image="./res/16x16_juges.png" page_break="1" orderby="Club" id="participants" />
+			<menu title="Par Nation / Alphabétique" image="./res/16x16_juges.png" orderby="Nation" id="participants" />
+			<menu title="Par Comité / Alphabétique" image="./res/16x16_juges.png" orderby="Comite" id="participants" />
+			<menu title="Par Club / Alphabétique" image="./res/16x16_juges.png" orderby="Club" id="participants" />
 			<menu title="Par Ordre de Points" image="./res/16x16_juges.png" id="part_officiel_points" />
 			<menu title="Par Epreuve / Alphabétique" image="./res/16x16_juges.png" id="part_epreuve" />
 			<menu title="édition des tickets courses " image="./res/16x16_text.png" lua="./edition/TicketsCourse.lua"  />
@@ -24,9 +27,9 @@
 		<menu title="Listes de Départ" image="./res/32x32_bib.png">
 			<menu title="Sans entête" image="./res/16x16_official.png" header="1" first_header="0" id="Lst_officielle" officiel="0"/>
 			<menu title="Officielle" image="./res/16x16_official.png" id="Lst_officielle" Qrcode="0" officiel="1"/>
-			<menu title="Par Nation" image="./res/16x16_bib.png" page_break="1" orderby="Nation" id="Lst_officielle_Filtrer"/>
-			<menu title="Par Comite" image="./res/16x16_bib.png" page_break="1" orderby="Comite" id="Lst_officielle_Filtrer"/>
-			<menu title="Par Club" image="./res/16x16_bib.png" page_break="1" orderby="Club" id="Lst_officielle_Filtrer"/>
+			<menu title="Par Nation" image="./res/16x16_bib.png" orderby="Nation" id="Lst_officielle_Filtrer"/>
+			<menu title="Par Comite" image="./res/16x16_bib.png" orderby="Comite" id="Lst_officielle_Filtrer"/>
+			<menu title="Par Club" image="./res/16x16_bib.png" orderby="Club" id="Lst_officielle_Filtrer"/>
 			<menu title="Officielle poursuite" image="./res/16x16_official.png" id="Lst_officielle_pours" choix_manche="1" cond="discipline:In('POURS')" officiel="1"/>
 			<menu title="Poursuite (avec ecart)" image="./res/16x16_official.png" id="Lst_officielle_pours" choix_manche="1" cond="discipline:In('POURS')" officiel="0"/>
 			<menu title="Avec Qrcode Live" image="./res/16x16_official.png" id="Lst_officielle" Qrcode="1" officiel="1"/>
@@ -40,7 +43,7 @@
 			<menu title="Officieux" image="./res/16x16_ranking.png" id="res_officiel" first_header="0" officiel="0" />
 			<menu title="Officiels" image="./res/16x16_official.png" id="res_officiel" officiel="1" />
 			<menu title="Officiels poursuite 2éme Jour" image="./res/16x16_official.png" id="res_off_Pours" officiel="1" />
-			<menu title="par épreuve / catégories et sexe" image="./res/16x16_ranking.png" id="res_categ" header="1" first_header="0" page_break="0" choix_clt_max="1"/>
+			<menu title="par épreuve / catégories et sexe" image="./res/16x16_ranking.png" id="res_categ" header="1" first_header="0" choix_clt_max="1"/>
 			<menu title="Multi épreuve(poursuite)" image="./res/16x16_juges.png"  id="res_epr2"/>
 		</menu>
 	</menu>
@@ -76,7 +79,7 @@
 		<matrix row_start="-3" row_end="0" col_start="10" col_end="0">
 			<row h="1.5cm" />
 			<col w="1, 1.5cm" />
-			<qrcode adjust="best" col_start="2" cond="tonumber(params.Qrcode)==1 and entite=='FFS' ">'https://live.ffs.fr/live_timing/live_cc.php?codex='..$(Epreuve.Fichier_transfert)</qrcode>
+			<qrcode adjust="best" col_start="2" cond="tonumber(params.Qrcode)==1 and entite=='FFS' ">'https://live.ffs.fr/live_timing/live_cc.php?codex='..$(Evenement)</qrcode>
 			<qrcode adjust="best" col_start="2" cond="tonumber(params.Qrcode)==1 and entite=='FIS' and $(Evenement.Commentaire_live):len() &gt; 0">'live.fis-ski.com/lv-al'..string.sub($(Epreuve.Fichier_transfert),4)..'.htm#/short'</qrcode>
 		</matrix>
 		<!-- affichage de la ligne d'heure de départ en massstart ou fond pop si pas de first header -->
@@ -345,7 +348,7 @@
 	<report id="participants" title="(params.title)" header="1" first_header="0">
 		<call option="identiteCoureur" file="./edition/options.xml"/>
 		<lua>
-			page_break = tonumber(params.page_break) or 0;
+			page_break = page_break or 1;
 			entite = $(Evenement.Code_entite);
 			body:SetCounter(params.orderby);
 		</lua>
@@ -536,7 +539,7 @@
 	<report id="Lst_officielle_Filtrer" title="(params.title or '')" header="1" first_header="0">
 		<call option="identiteCoureur" file="./edition/options.xml"/>
 		<lua>
-			page_break = tonumber(params.page_break) or 0;
+			page_break = page_break or 1;
 			discipline = $(Epreuve.Code_discipline);
 			entite = $(Evenement.Code_entite);
 			body:SetCounter(params.orderby);
@@ -594,6 +597,7 @@
 	<report id="Lst_epr_speaker" title="(params.title or '')" header="1" first_header="0">
 		<call option="identiteCoureur" file="./edition/options.xml"/>
 		<lua>
+			page_break = page_break or 1;
 			entite = $(Evenement.Code_entite);
 			discipline = $(Epreuve.Code_discipline);
 			body:SetCounter('Code_epreuve');
@@ -756,19 +760,21 @@
 		<column name="Tps_status">chrono.Status(body:GetCellInt('Tps', row))</column>
 		<column name="Oder_Categ">$(Categorie{$(Categ)}.Ordre)</column>
 		<call option="identiteCoureur" file="./edition/options.xml"/>
-		<lua>entite = $(Evenement.Code_entite)
-			nb_manche = base:GetTable('Epreuve'):GetCellInt('Nombre_de_manche', 0, 1)
+		<lua>
+			entite = $(Evenement.Code_entite);
+			nb_manche = base:GetTable('Epreuve'):GetCellInt('Nombre_de_manche', 0, 1);
+			page_break = page_break or 0;
 		</lua>
 		<order key="Code_epreuve, Oder_Categ, Sexe, Tps,  Dossard Desc" />
 
 		<rupture key="Code_epreuve" >
 			<before>
+				<pagebreak cond="row > 0 " />
 				<lua>epr = $(Code_epreuve)</lua>
 				<lua>cat = $(Epreuve{epr}.Code_categorie)</lua>
 				<lua>NomEpr = $(Categorie{cat}.Libelle)..'  //  '..$(Epreuve{epr}.Distance)..'Km'</lua>
 				<font size="16"/>
 				<row h="0.6cm"/>
-				<pagebreak cond="row > 0 and page_break == 1 " />
 				<text row="auto" col="1" align="left" ><font color="red" />'Epreuve N°'..$(Code_epreuve)..' -> '..NomEpr</text>
 			</before>
 		</rupture>
@@ -778,7 +784,7 @@
 			<lua>
 				SexeEpr = $(Sexe)
 				if body:GetCell('Code_epreuve', row) == body:GetCell('Code_epreuve', row-1) then
-					if body:GetCell('Sexe', row) ~= body:GetCell('Sexe', row-1) and body:GetCell('Categ', row) == body:GetCell('Categ', row-1) then 
+				if body:GetCell('Sexe', row) ~= body:GetCell('Sexe', row-1) and body:GetCell('Categ', row) == body:GetCell('Categ', row-1) then 
 			</lua>
 				<pagebreak cond="row > 0 and page_break == 1 " />
 				<font size="14"/>
@@ -794,6 +800,7 @@
 		<rupture key="Categ" >
 			<before>
 				<lua>SexeEpr = $(Sexe)</lua>
+				<pagebreak cond="row > 0 and page_break == 1 " />
 				<font size="14"/>
 				<row h="0.4cm"/>
 				<text row="auto" col="1" >$(Categorie{$(Categ)}.Libelle)..' -> '..$(Sexe{SexeEpr}.Libelle)</text>
@@ -955,20 +962,16 @@
 			<first_header />
 			<!-- <background mode="transparent" /> -->
 			<lua>
-				entite = $(Evenement.Code_entite)
-				body:SetCounter('Distance,Sexe,Categ', 'recap')
-				body:SetCounter('Distance')
-				body:SetCounter('Distance,Sexe', 'sex')
+				entite = $(Evenement.Code_entite);
+				body:SetCounter('Distance,Sexe,Categ', 'recap');
+				body:SetCounter('Distance');
+				body:SetCounter('Distance,Sexe', 'sex');
+				counter = body:GetCounter('recap');
+				counter1 = body:GetCounter('Distance');
+				counter2 = body:GetCounter('sex');
 			</lua>
 			<order key="Distance, Sexe, Categ" />
-			
-				<lua>
-					counter = body:GetCounter('recap')
-					counter1 = body:GetCounter('Distance')
-					counter2 = body:GetCounter('sex')
-				</lua>
-				<!-- <lua>counter:OrderBy('0,1')</lua> -->
-				
+
 				<end>
 					<!-- Par Distance -->
 					<text row="auto" col_start="1" col_end="0" border="1" align="center">'Récapitulatif par Distance'</text>
