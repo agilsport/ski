@@ -10,7 +10,7 @@ function device.GetInformation()
 		code = 'Longines-TL5005', 
 		name = 'Longines-TL5005', 
 		class = 'chrono', 
-		interface = {{type='serial', bytesize = '7,8' , baudrate = '9600' }}
+		interface = { {type='serial', bytesize = '7,8' , baudrate = '1200,2400,4800,9600' }}
 	};
 end
 	
@@ -66,7 +66,7 @@ end
 
 function IsPacketOk(packet)
 	local lg = #packet;
-	alert("lg ="..lg);
+	--alert("lg ="..lg);
 --lg = 20 si temps net
 	if lg < 5 then
 		alert("Invalid Packet Length");
@@ -77,12 +77,12 @@ function IsPacketOk(packet)
 	
 	
 	local Tramecomplete = adv.PacketString(packet, lg-23, lg);
-	alert("packet= "..Tramecomplete);
-
+	--alert("packet= "..Tramecomplete);
+    alert(Tramecomplete);
 	local TypeTrame = Tramecomplete:sub(1, 1);
 	local channel = Tramecomplete:sub(15, 15);
 	local manche = Tramecomplete:sub(16, 16);
-	alert("TypeTrame = "..TypeTrame)
+	--alert("TypeTrame = "..TypeTrame)
 	if TypeTrame == "F" then
 		local chrono = GetTime(Tramecomplete);
 		local bib = GetBib(Tramecomplete);
@@ -104,11 +104,15 @@ function IsPacketOk(packet)
 		end
 	elseif TypeTrame == "G" then
 		-- Temps net
-		local chrono = GetTimeNet(Tramecomplete);
-		local bib = GetBibNet(Tramecomplete);
-		passage = -1;
-		--alert('dos:'..bib..' tps:'..chrono);
-		AddTimeNet(chrono, passage, bib);
+		local TypeTrameG = Tramecomplete:sub(19, 19);
+		--alert("TypeTrameG = "..TypeTrameG);
+		if TypeTrameG == "N" then
+			local chrono = GetTimeNet(Tramecomplete);
+			local bib = GetBibNet(Tramecomplete);
+			passage = -1;
+			--alert('dos:'..bib..' tps:'..chrono);
+			AddTimeNet(chrono, passage, bib);
+		end
 	elseif TypeTrame == "N" then
 		-- Temps net
 		local chrono = GetTimeNet(Tramecomplete);
