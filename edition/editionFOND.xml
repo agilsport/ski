@@ -1,13 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- Menu Editions Activité "FOND" !-->
-<!-- version="6.3" !-->
+<!-- version="6.4" !-->
 <!-- nettoyage du fichier mise en place de la fonction getidentitecoureur -->
 <!-- Activation de la fenetre filtrage epreuves pour une edition gerer par un .lua => Option filter="before" -->
 <!-- calcul de la note poursuite 2éme jour !-->
 <!-- si possible de faire fonctionner les cond="discipline:In('POURS')" dans les <menus> ?? dans <marging> et dans les <options> -->
 <!-- <paper orientation="landscape" cond="Nb_tps_inter >= 4 "/> -->
-<!-- 6.3 mise en fonction du pagebreak -->
+<!-- 
+	- 6.3 mise en fonction du pagebreak 
+	- 6.4 correction bug QR code
+-->
 
 <edition>
 	<menu>
@@ -76,7 +79,7 @@
 		<matrix row_start="-3" row_end="0" col_start="10" col_end="0">
 			<row h="1.5cm" />
 			<col w="1, 1.5cm" />
-			<qrcode adjust="best" col_start="2" cond="tonumber(params.Qrcode)==1 and entite=='FFS' ">'https://live.ffs.fr/live_timing/live_cc.php?codex='..$(Epreuve.Fichier_transfert)</qrcode>
+			<qrcode adjust="best" col_start="2" cond="tonumber(params.Qrcode)==1 and entite=='FFS' ">'https://live.ffs.fr/live_timing/live_cc.php?codex='..$(Evenement.Codex)</qrcode>
 			<qrcode adjust="best" col_start="2" cond="tonumber(params.Qrcode)==1 and entite=='FIS' and $(Evenement.Commentaire_live):len() &gt; 0">'live.fis-ski.com/lv-al'..string.sub($(Epreuve.Fichier_transfert),4)..'.htm#/short'</qrcode>
 		</matrix>
 		<!-- affichage de la ligne d'heure de départ en massstart ou fond pop si pas de first header -->

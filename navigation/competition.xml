@@ -43,6 +43,7 @@
 				<item name="Bosse" image="./res/ski/32x32_freestyle_bosse.png" discipline="BO"/>
 				<item name="Slopestyle" image="./res/ski/32x32_freestyle_slopestyle.png" discipline="SLS"/>
 				<item name="Halfpipe" image="./res/ski/32x32_freestyle.png" discipline="HP"/>
+				<item name="Big Air" image="./res/ski/32x32_freestyle.png" discipline="BA"/>
 			</item>	
 			<item name ="Télémark" image="./res/ski/32x32_telemark.png" activite="TM" bold="true"/>
 			<item name ="Ski de Vitesse" image="./res/ski/32x32_descente.png" activite="SS" bold="true"/>
@@ -52,14 +53,20 @@
 			</item>	
 		</item>
 	</item>
+	
 	<!-- Web FFS -->
 	<item name ="Web F.F.S." style_band="web_ffs" db="web_ffs">
-		<item name ="Web FFS" image="./res/32x32_ffs.png">
+		<item name ="Web FFS" image="./res/32x32_ffs.png" order="Ep.Date_epreuve Desc">
 			<item name ="Alpin" activite="ALP" image="./res/16x16_directory.png"/>
 			<item name ="Fond" activite="FOND" image="./res/16x16_directory.png" />
-			<item name ="Ski de fond d'été" activite="ROL" image="./res/16x16_directory.png" />
+			<item name ="Rollerski" activite="ROL" image="./res/16x16_directory.png" />
 			<item name ="Biathlon" activite="BIATH" image="./res/16x16_directory.png" />
 			<item name ="Saut" activite="SAUT" image="./res/16x16_directory.png" />
+			<item name ="Combiné-Nordique" activite="CN" image="./res/16x16_directory.png" />
+			<item name ="Snowboard" activite="SB" image="./res/16x16_directory.png" />
+			<item name ="Ski Freestyle" activite="FS" image="./res/16x16_directory.png" />
+			<item name ="Ski de Vitesse" activite="SS" image="./res/16x16_directory.png" />
+			<item name ="Télémark" activite="TM" image="./res/16x16_directory.png" />
 		</item>
 	</item>
 
