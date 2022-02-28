@@ -105,8 +105,8 @@ function BuildClassementListe(liste,indexclassement)
 	else
 		if matrice.comboActivite == 'ALP' then
 			cmd = "Select cou.Code_coureur, 0 Est_critere, cou.Code_nation Nation, cou.Code_comite Comite, CONCAT(cou.Nom, ' ',cou.Prenom) Identite,  DATE_FORMAT(cou.Naissance,'%Y') An, "..
-						"(Select Pts From Classement_coureur cla1 WHERE cla1.Code_coureur = cou.Code_coureur AND cla1.Code_liste = "..liste.." AND cla1.Type_classement='FAU'), "..
-						"(Select Clt From Classement_coureur cla1 WHERE cla1.Code_coureur = cou.Code_coureur AND cla1.Code_liste = "..liste.." AND cla1.Type_classement='FAU'), "..
+						"(Select Pts From Classement_coureur cla1 WHERE cla1.Code_coureur = cou.Code_coureur AND cla1.Code_liste = "..liste.." AND cla1.Type_classement='FAU') Pts_liste , "..
+						"(Select Clt From Classement_coureur cla1 WHERE cla1.Code_coureur = cou.Code_coureur AND cla1.Code_liste = "..liste.." AND cla1.Type_classement='FAU') Clt_liste "..
 						"FROM Coureur cou "..
 						"Where cou.Code_coureur In(Select Code_coureur From Resultat Where Code_evenement In("..matrice.Evenement_selection.."))" 	
 		end
@@ -544,12 +544,12 @@ function GetPtsListe(Code_coureur, index, row)
 				tMatrice_Ranking:SetCell('Clt_inscription', row, clt.last_discipline); 
 			end
 		else
-			pts = tClassement_Listex:GetCellDouble('Pts', r, 255);
-			clt = tClassement_Listex:GetCellInt('Clt', r, nil);
+			pts = tClassement_Listex:GetCellDouble('Pts_liste', r, 255);
+			clt = tClassement_Listex:GetCellInt('Clt_liste', r, nil);
 			tMatrice_Ranking:SetCell('Pts_last_discipline', row, pts);
 			tMatrice_Ranking:SetCell('Clt_last_discipline', row, clt);
-			tMatrice_Ranking:SetCell('Pts_FFS', row, pts);
-			tMatrice_Ranking:SetCell('Clt_FFS', row, clt);
+			tMatrice_Ranking:SetCell('Pts_liste'..index, row, pts);
+			tMatrice_Ranking:SetCell('Clt_liste'..index, row, clt);
 			tMatrice_Ranking:SetCell('Pts_inscription', row, pts); 
 			tMatrice_Ranking:SetCell('Clt_inscription', row, clt); 
 		end
@@ -7623,7 +7623,7 @@ function OnConfiguration(cparams)
 	else
 		return false;
 	end
-	matrice.version_script = '5.2';
+	matrice.version_script = '5.3';
 	matrice.OS = app.GetOsDescription();
 	-- vérification de l'existence d'une version plus récente du script.
 	local url = 'https://live.ffs.fr/maj_pg/challenge/last_version.txt'
