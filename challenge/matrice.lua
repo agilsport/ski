@@ -2100,6 +2100,7 @@ function Calculer(panel_name)		-- fonction de calcul du résultat du Challenge/Co
 						end
 						if string.find(matrice.comboTypePoint, 'place') then  
 							raceData.Pts = GetPointPlace(raceData.Clt, matrice.course[idxcourse].Grille);
+							
 							raceData.Pts = raceData.Pts * matrice.course[idxcourse].Coef_course / 100;
 							raceData.Pts  = CorrectionPtsPlace(idxcourse, matrice.coefReduction, raceData.Pts) 
 							if matrice.numPtsPresence and not string.find(matrice.course[idxcourse].Prendre, '2') then
@@ -2232,7 +2233,7 @@ function Calculer(panel_name)		-- fonction de calcul du résultat du Challenge/Co
 								end
 								diffrun = runData[idxrun].Tps - best_time;
 								tMatrice_Ranking:SetCell('Tps'..idxcourse..'_run'..idxrun..'_diff', idxcoureur, runData[idxrun].Tps - best_time);
-								tMatrice_Ranking:SetCell('Pts'..idxcourse..'_run'..idxrun, idxcoureur, 'Pts'..idxcourse..'_run'..idxrun, runData[idxrun].Pts);
+								-- tMatrice_Ranking:SetCell('Pts'..idxcourse..'_run'..idxrun, idxcoureur, 'Pts'..idxcourse..'_run'..idxrun, runData[idxrun].Pts);
 							end
 						end
 						runData[idxrun].Tps = tMatrice_Ranking:GetCellInt('Tps'..idxcourse..'_run'..idxrun, idxcoureur, -600);
@@ -6851,24 +6852,28 @@ function OnAfficheCourses(idxcoursestart)
 			msgBoxStyle.OK + msgBoxStyle.ICON_WARNING);
 		return false;
 	end
-	for idx = idxcoursestart, idxcoursestart + 19 do
+	local idxlu = idxcoursestart;
+	for idx = 0, 19 do
 		dlgCourses:GetWindowName('chk'..idx):SetValue(false);
-		if idx > tMatrice_Courses:GetNbRows() -1 then
+		if idxlu > tMatrice_Courses:GetNbRows() -1 then
 			dlgCourses:GetWindowName('date'..idx):SetValue('');
 			dlgCourses:GetWindowName('codex'..idx):SetValue('');
 			dlgCourses:GetWindowName('evenement'..idx):SetValue('');
 			dlgCourses:GetWindowName('station'..idx):SetValue('');
 			dlgCourses:GetWindowName('chk'..idx):Enable(false);
+			dlgCourses:GetWindowName('chk'..idx):SetLabel('');
 		else
-			matrice.course[(idx+1)].code = tMatrice_Courses:GetCellInt('Code', idx)
-			table.insert(matrice.courselue, idx);
+			matrice.course[(idxlu+1)].code = tMatrice_Courses:GetCellInt('Code', idxlu)
+			table.insert(matrice.courselue, idxlu);
 			dlgCourses:GetWindowName('chk'..idx):Enable(true);
-			dlgCourses:GetWindowName('date'..idx):SetValue(tMatrice_Courses:GetCell('Date_epreuve', idx));
-			dlgCourses:GetWindowName('codex'..idx):SetValue(tMatrice_Courses:GetCell('Codex', idx));
-			dlgCourses:GetWindowName('station'..idx):SetValue(tMatrice_Courses:GetCell('Station', idx));
-			local str = tMatrice_Courses:GetCell('Flag_param', idx)..'['..tMatrice_Courses:GetCell('Code', idx)..'  -  '..tMatrice_Courses:GetCell('Code_discipline', idx)..'  -  '..tMatrice_Courses:GetCellInt('Bloc', idx)..']   '..tMatrice_Courses:GetCell('Nom', idx);
+			dlgCourses:GetWindowName('chk'..idx):SetLabel((idxlu + 1)..'  ');
+			dlgCourses:GetWindowName('date'..idx):SetValue(tMatrice_Courses:GetCell('Date_epreuve', idxlu));
+			dlgCourses:GetWindowName('codex'..idx):SetValue(tMatrice_Courses:GetCell('Codex', idxlu));
+			dlgCourses:GetWindowName('station'..idx):SetValue(tMatrice_Courses:GetCell('Station', idxlu));
+			local str = tMatrice_Courses:GetCell('Flag_param', idx)..'['..tMatrice_Courses:GetCell('Code', idxlu)..'  -  '..tMatrice_Courses:GetCell('Code_discipline', idxlu)..'  -  '..tMatrice_Courses:GetCellInt('Bloc', idxlu)..']   '..tMatrice_Courses:GetCell('Nom', idxlu);
 			dlgCourses:GetWindowName('evenement'..idx):SetValue(str);
 		end
+		idxlu = idxlu + 1;
 	end
 end
 
@@ -6914,7 +6919,7 @@ function AffichedlgCourses()	-- affichage des courses contenues dans matrice.Eve
 	OnAfficheCourses(idxcoursestart);
 	-- Bind
 	tbvoirlescourses:Bind(eventType.MENU, function(evt) dlgCourses:EndModal(idButton.CANCEL) end, btnRetour);
-	for i = 0, 14 do
+	for i = 0, 19 do
 		dlgCourses:Bind(eventType.CHECKBOX, 
 			function(evt) 
 				if dlgCourses:GetWindowName('chk'..i):GetValue() == true then
@@ -6926,9 +6931,8 @@ function AffichedlgCourses()	-- affichage des courses contenues dans matrice.Eve
 	end
 	tbvoirlescourses:Bind(eventType.MENU, 
 			function(evt)
-				if idxcoursestart + 20 <= tMatrice_Courses:GetNbRows() -1 then
-					idxcoursestart = idxcoursestart + 20;
-				else
+				idxcoursestart = idxcoursestart + 20;
+				if idxcoursestart > tMatrice_Courses:GetNbRows() -1 then
 					idxcoursestart = 0;
 				end
 				OnAfficheCourses(idxcoursestart);
@@ -7623,7 +7627,7 @@ function OnConfiguration(cparams)
 	else
 		return false;
 	end
-	matrice.version_script = '5.3';
+	matrice.version_script = '5.4';
 	matrice.OS = app.GetOsDescription();
 	-- vérification de l'existence d'une version plus récente du script.
 	local url = 'https://live.ffs.fr/maj_pg/challenge/last_version.txt'
