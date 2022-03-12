@@ -3,7 +3,7 @@
 <root>
 
 <!-- Fenètre de configuration de l'éditions des couloir de poursuite -->
-<panel name="Clt_EprX-ColOrdre_niveau">
+<panel name="Clt_EprX_ColOrdre_niveau">
 	<font name="Calibri" size="16" adjust="best" >
 	<padding all="2px"/>
 	<col w="5,5,5,5,5" />
@@ -11,9 +11,9 @@
 	<row h="1" />
 		<wndtext col_start="1" col_end="0" align="left" >'Cet utilitaire permet de copier Le Clt d\'une Course Source xx'</wndtext>
 	<row h="1" />
-		<wndtext col_start="1" col_end="0" align="left" >'Dans la colonne PtsClt '</wndtext>
+		<wndtext col_start="1" col_end="0" align="left" >'Dans la colonne Ordre_niveau '</wndtext>
 	<row h="1" />
-		<wndtext col_start="1" col_end="0" align="left" >'PS: Il faut bien avoir fait un Résultat Officiel De l'evenement par epreuve'</wndtext>
+		<wndtext col_start="1" col_end="0" align="left" >'PS: Il faut bien avoir fait un Résultat Officiel De l\'évènement par epreuve'</wndtext>
 	<row h="1" />
 		<wndtext col_start="1" col_end="0" align="left" >'après le transfert pour faire l\'atribution des dossard par rapport au Clt de l\'evt Source'</wndtext>
 	<row h="1" />
