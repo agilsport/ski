@@ -14,8 +14,8 @@
 		<comboTpsDuDernier>Non</comboTpsDuDernier>
 		<numPtsPresence>0</numPtsPresence>
 		<comboPresentationCourses>Présentation horizontale type Ski Chrono Tour (par défaut)</comboPresentationCourses>
-		<comboPrendreBloc1>1.Classement général</comboPrendreBloc1>
-		<comboPrendreBloc2>1.Classement général</comboPrendreBloc2>
+		<comboPrendreBloc1>Classement général</comboPrendreBloc1>
+		<comboPrendreBloc2>Classement général</comboPrendreBloc2>
 		<coefDefautCourseBloc1>100</coefDefautCourseBloc1>
 		<coefDefautCourseBloc2>100</coefDefautCourseBloc2>
 		<coefDefautMancheBloc1>100</coefDefautMancheBloc1>
@@ -27,8 +27,7 @@
 		<texteImprimerDeparts>Non</texteImprimerDeparts>
 		<texteFontSize>8</texteFontSize>
 		<texteLigne2Texte>Nombre de courses :</texteLigne2Texte>
-		<texteImprimerHeader>Oui</texteImprimerHeader>
-		<texteImprimerStatCourses>Non</texteImprimerStatCourses>
+		<texteImprimerHeader>Non</texteImprimerHeader>
 		<texteCodeComplet>Non</texteCodeComplet>
 		<texteImprimerClubLong>Non</texteImprimerClubLong>
 		<texteFiltreSupplementaire>Non</texteFiltreSupplementaire>
@@ -423,15 +422,15 @@
 		<matrix col_start="2" row="auto">
 			<row value="40px"/>
 			<col value="1,1,1,2,1,1,1,2,1"/>
-			<statictext row="auto" col_start="1" col_end="4" label="Prendre les points de la liste "/>
+			<statictext row="auto" col_start="1" col_end="4" style="ALIGN_RIGHT" label="Prendre les points de la liste "/>
 			<combotable col_start="5" name="analyseGaucheListe" style="ALIGN_LEFT|CB_READONLY" />
 			<statictext row="60px" col_start="1" col_end="0" style="ALIGN_CENTER" label="(params.txt_label)"/>
-			<statictext row="auto" col_start="1" col_end="4" label="Discipline choisie : "/>
+			<statictext row="auto" col_start="1" col_end="4" style="ALIGN_RIGHT" label="Discipline choisie : "/>
 			<combobox col_start="5" name="analyseGaucheDiscipline" style="ALIGN_LEFT|CB_READONLY" />
 			<row value="10px"/>
 			<statictext row="140px" col_start="1" col_end="0" style="ALIGN_CENTER" label="On sépare les critères les uns des autres par le signe +.\nUn critère peut comprendre plusieurs sous-critères de type ET / OU.\nSi on met une * dans le choix de la discipline, on prendra en compte toutes les courses sans distinction.\nSi le premier critère n\'est pas rempli, il faut valider le critère suivant et ainsi de suite.\nOn ne peut pas mixier les ET avec les OU dans le même critère."/>
 			<lua>for i = 1, 10 do</lua>
-				<statictext row="auto" col_start="2" label="faire"/>
+				<statictext row="auto" col_start="2" style="ALIGN_CENTER" label="faire"/>
 				<combobox col_start="1" name="('etou'..i)" cond="i &gt; 1"/>
 				<textctrl col_start="3" name="('gfaire'..i)"/>
 				<statictext col_start="4" style="TE_CENTER" label="fois dans les"/>
@@ -444,8 +443,9 @@
 		</matrix>
 		<row value="15px"/>
 		<staticbox row_start="1" row_end="0" col_start="1" col_end="0" label="Critères d\'analyse statistique des performances"/>
-		<row value="1"/>
+		<row value="15px"/>
 		<toolbar row="auto" col_start="1" col_end="0" name="tbanalyse" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
+		<row value="1"/>
 		<row value="50px"/>
 	</panel>
 	<panel name="criteretype1">
@@ -606,11 +606,11 @@
 		<statictext col_start="5" style="ALIGN_CENTER" label="Station"/>
 		<statictext col_start="6" style="ALIGN_CENTER" label="* (si paramétrage spécifique)     [Code - Discipline - Bloc] Evenement"/>
 		<lua>for i = 0, 19 do</lua>
-		<textctrl row="auto" col_start="3" style="TE_READONLY|TE_CENTER" name="('date'..i)"/>
+		<checkbox row="auto" col_start="2" style="CHK_2STATE|ALIGN_RIGHT" name="('chk'..i)"/>
+		<textctrl col_start="3" style="TE_READONLY|TE_CENTER" name="('date'..i)"/>
 		<textctrl col_start="4" style="TE_READONLY|TE_CENTER" name="('codex'..i)"/>
 		<textctrl col_start="5" style="TE_READONLY|TE_LEFT" name="('station'..i)"/>
 		<textctrl col_start="6" style="TE_READONLY|TE_LEFT" name="('evenement'..i)"/>
-		<checkbox col_start="2" style="CHK_2STATE|ALIGN_RIGHT" name="('chk'..i)"/>
 		<lua>end</lua>
 		<row value="1"/>
 		<toolbar row="auto" col_start="1" col_end="5" name="tbvoirlescourses" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>

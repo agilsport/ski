@@ -1,0 +1,552 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Device_FIS Date="2021-01-05">
+<!-- Timer -->
+	<Device type="Timer">
+		<Brand>AGIL</Brand>
+		<Model>IMHP 870</Model>
+		<HomologationNumber>AGI.078T.09</HomologationNumber>
+		<ValidUntil>2024</ValidUntil>
+		<Comment>With external printer</Comment>
+	</Device>
+	<Device type="Timer">
+		<Brand>ALGE</Brand>
+		<Model>S4</Model>
+		<HomologationNumber>ALG.005T.10</HomologationNumber>
+		<ValidUntil>2025</ValidUntil>
+		<Comment>With external printer</Comment>
+	</Device>
+	<Device type="Timer">
+		<Brand>ALGE</Brand>
+		<Model>TdC 8000</Model>
+		<HomologationNumber>ALG.002T.10</HomologationNumber>
+		<ValidUntil>2025</ValidUntil>
+		<Comment></Comment>
+	</Device>
+	<Device type="Timer">
+		<Brand>ALGE</Brand>
+		<Model>TdC 8001</Model>
+		<HomologationNumber>ALG.003T.10</HomologationNumber>
+		<ValidUntil>2025</ValidUntil>
+		<Comment></Comment>
+	</Device>
+	<Device type="Timer">
+		<Brand>ALGE</Brand>
+		<Model>Timy PXE</Model>
+		<HomologationNumber>ALG.001T.10</HomologationNumber>
+		<ValidUntil>2025</ValidUntil>
+		<Comment></Comment>
+	</Device>
+	<Device type="Timer">
+		<Brand>ALGE</Brand>
+		<Model>Timy XE</Model>
+		<HomologationNumber>ALG.004T.10</HomologationNumber>
+		<ValidUntil>2025</ValidUntil>
+		<Comment>With external printer</Comment>
+	</Device>
+	<Device type="Timer">
+		<Brand>ALGE</Brand>
+		<Model>Timy2 PXE</Model>
+		<HomologationNumber>ALG.080T.10</HomologationNumber>
+		<ValidUntil>2025</ValidUntil>
+		<Comment></Comment>
+	</Device>
+	<Device type="Timer">
+		<Brand>ALGE</Brand>
+		<Model>Timy2 XE</Model>
+		<HomologationNumber>ALG.083T.10</HomologationNumber>
+		<ValidUntil>2025</ValidUntil>
+		<Comment>With external printer</Comment>
+	</Device>
+	<Device type="Timer">
+		<Brand>ALGE</Brand>
+		<Model>Timy3 W</Model>
+		<HomologationNumber>ALG.089.14</HomologationNumber>
+		<ValidUntil>2029</ValidUntil>
+		<Comment>With external printer</Comment>
+	</Device>
+	<Device type="Timer">
+		<Brand>ALGE</Brand>
+		<Model>Timy3 WP</Model>
+		<HomologationNumber>ALG.090.14</HomologationNumber>
+		<ValidUntil>2029</ValidUntil>
+		<Comment></Comment>
+	</Device>
+	<Device type="Timer">
+		<Brand>DIGITECH</Brand>
+		<Model>MASTER 3</Model>
+		<HomologationNumber>DIG.087.14</HomologationNumber>
+		<ValidUntil>2029</ValidUntil>
+		<Comment></Comment>
+	</Device>
+	<chrono code="EMI.001T.20" label="ETS2" company="EMIT" year="2035" />
+	<Device type="Timer">
+		<Brand>EMIT</Brand>
+		<Model>ETS2</Model>
+		<HomologationNumber>EMI.001T.20</HomologationNumber>
+		<ValidUntil>2035</ValidUntil>
+		<Comment></Comment>
+	</Device>
+ 	<Device type="Timer">
+		<Brand>FDS-TIMING</Brand>
+		<Model>TBox</Model>
+		<HomologationNumber>FDS.001T.20</HomologationNumber>
+		<ValidUntil>2035</ValidUntil>
+		<Comment>With external printer</Comment>
+	</Device>
+  	<Device type="Timer">
+		<Brand>LONGINES</Brand>
+		<Model>TL5005</Model>
+		<HomologationNumber>LON.003T.10</HomologationNumber>
+		<ValidUntil>2025</ValidUntil>
+		<Comment></Comment>
+	</Device>
+  	<Device type="Timer">
+		<Brand>MICROGATE</Brand>
+		<Model>RACETIME2</Model>
+		<HomologationNumber>MGA.002T.11</HomologationNumber>
+		<ValidUntil>2025</ValidUntil>
+		<Comment></Comment>
+	</Device>
+  	<Device type="Timer">
+		<Brand>MICROGATE</Brand>
+		<Model>REI 2</Model>
+		<HomologationNumber>MGA.001T.15</HomologationNumber>
+		<ValidUntil>2030</ValidUntil>
+		<Comment></Comment>
+	</Device>
+  	<Device type="Timer">
+		<Brand>MICROGATE</Brand>
+		<Model>REI.PRO</Model>
+		<HomologationNumber>MGA.003T.19</HomologationNumber>
+		<ValidUntil>2034</ValidUntil>
+		<Comment></Comment>
+	</Device>
+  	<Device type="Timer">
+		<Brand>OMEGA</Brand>
+		<Model>OGM5005</Model>
+		<HomologationNumber>OME.001T.97</HomologationNumber>
+		<ValidUntil>2025</ValidUntil>
+		<Comment></Comment>
+	</Device>
+  	<Device type="Timer">
+		<Brand>OMEGA</Brand>
+		<Model>POWERTIME</Model>
+		<HomologationNumber>OME.003T.16</HomologationNumber>
+		<ValidUntil>2031</ValidUntil>
+		<Comment></Comment>
+	</Device>
+  	<Device type="Timer">
+		<Brand>SEIKO</Brand>
+		<Model>CT-400</Model>
+		<HomologationNumber>SEI.002T.11</HomologationNumber>
+		<ValidUntil>2025</ValidUntil>
+		<Comment></Comment>
+	</Device>
+ 	<Device type="Timer">
+		<Brand>SEIKO</Brand>
+		<Model>CT-500</Model>
+		<HomologationNumber>SEI.084T.11</HomologationNumber>
+		<ValidUntil>2025</ValidUntil>
+		<Comment></Comment>
+	</Device>
+  	<Device type="Timer">
+		<Brand>SEIKO</Brand>
+		<Model>MPT-07</Model>
+		<HomologationNumber>SEI.075T.09</HomologationNumber>
+		<ValidUntil>2024</ValidUntil>
+		<Comment></Comment>
+	</Device>
+  	<Device type="Timer">
+		<Brand>SUMMIT SYSTEMS</Brand>
+		<Model>SRT1000</Model>
+		<HomologationNumber>SUM.001.03</HomologationNumber>
+		<ValidUntil>2018</ValidUntil>
+		<Comment>With external printer</Comment>
+	</Device>
+  	<Device type="Timer">
+		<Brand>SWISS TIMING</Brand>
+		<Model>Chronos</Model>
+		<HomologationNumber>SWI.071T.10</HomologationNumber>
+		<ValidUntil>2025</ValidUntil>
+		<Comment></Comment>
+	</Device>
+  	<Device type="Timer">
+		<Brand>SWISS TIMING</Brand>
+		<Model>Quantum</Model>
+		<HomologationNumber>SWI.086.12</HomologationNumber>
+		<ValidUntil>2027</ValidUntil>
+		<Comment>With external printer</Comment>
+	</Device>
+  	<Device type="Timer">
+		<Brand>TAG HEUER</Brand>
+		<Model>CP 540</Model>
+		<HomologationNumber>TAG.070T.08</HomologationNumber>
+		<ValidUntil>2023</ValidUntil>
+		<Comment></Comment>
+	</Device>
+  	<Device type="Timer">
+		<Brand>TAG HEUER</Brand>
+		<Model>CP 545</Model>
+		<HomologationNumber>TAG.092.14</HomologationNumber>
+		<ValidUntil>2029</ValidUntil>
+		<Comment></Comment>
+	</Device>
+  	<Device type="Timer">
+		<Brand>TAG HEUER</Brand>
+		<Model>Minitimer HL440</Model>
+		<HomologationNumber>TAG.076T.09</HomologationNumber>
+		<ValidUntil>2024</ValidUntil>
+		<Comment>With external printer</Comment>
+	</Device>
+  	<Device type="Timer">
+		<Brand>TAG HEUER</Brand>
+		<Model>PTB 605 - PTB 606</Model>
+		<HomologationNumber>TAG.005T.10</HomologationNumber>
+		<ValidUntil>2024</ValidUntil>
+		<Comment>With external printer</Comment>
+	</Device>
+<!-- Photocell -->
+  	<Device type="Photocell">
+		<Brand>ALGE</Brand>
+		<Model>PR1a</Model>
+		<HomologationNumber>ALG.L74T.09</HomologationNumber>
+		<ValidUntil>2024</ValidUntil>
+		<Comment></Comment>
+	</Device>
+  	<Device type="Photocell">
+		<Brand>ALGE</Brand>
+		<Model>PR1aW</Model>
+		<HomologationNumber>ALG.L91.14</HomologationNumber>
+		<ValidUntil>2029</ValidUntil>
+		<Comment>Only wired is allowed</Comment>
+	</Device>
+  	<Device type="Photocell">
+		<Brand>ALGE</Brand>
+		<Model>RLS1</Model>
+		<HomologationNumber>ALG.L65.03</HomologationNumber>
+		<ValidUntil>2023</ValidUntil>
+		<Comment></Comment>
+	</Device>
+  	<Device type="Photocell">
+		<Brand>ALGE</Brand>
+		<Model>RLS1c</Model>
+		<HomologationNumber>ALG.L44.03</HomologationNumber>
+		<ValidUntil>2023</ValidUntil>
+		<Comment></Comment>
+	</Device>
+  	<Device type="Photocell">
+		<Brand>ALGE</Brand>
+		<Model>RLS1c RX</Model>
+		<HomologationNumber>ALG.L66.03</HomologationNumber>
+		<ValidUntil>2023</ValidUntil>
+		<Comment></Comment>
+	</Device>
+  	<Device type="Photocell">
+		<Brand>ALGE</Brand>
+		<Model>RLS1n</Model>
+		<HomologationNumber>ALG.L45.03</HomologationNumber>
+		<ValidUntil>2023</ValidUntil>
+		<Comment></Comment>
+	</Device>
+  	<Device type="Photocell">
+		<Brand>ALGE</Brand>
+		<Model>RLS1n RX</Model>
+		<HomologationNumber>ALG.L46.03</HomologationNumber>
+		<ValidUntil>2023</ValidUntil>
+		<Comment></Comment>
+	</Device>
+  	<Device type="Photocell">
+		<Brand>FDS-TIMING</Brand>
+		<Model>WIRC</Model>
+		<HomologationNumber>FDS.L001.20</HomologationNumber>
+		<ValidUntil>2035</ValidUntil>
+		<Comment>Only wired is allowed</Comment>
+	</Device>
+  	<Device type="Photocell">
+		<Brand>MICROGATE</Brand>
+		<Model>FCT3</Model>
+		<HomologationNumber>MGA.L69.03</HomologationNumber>
+		<ValidUntil>2023</ValidUntil>
+		<Comment></Comment>
+	</Device>
+  	<Device type="Photocell">
+		<Brand>OMEGA</Brand>
+		<Model>Transtime</Model>
+		<HomologationNumber>OME.L67.03</HomologationNumber>
+		<ValidUntil>2023</ValidUntil>
+		<Comment></Comment>
+	</Device>
+  	<Device type="Photocell">
+		<Brand>SEIKO</Brand>
+		<Model>PBU-1000</Model>
+		<HomologationNumber>SEI.L99.16</HomologationNumber>
+		<ValidUntil>2031</ValidUntil>
+		<Comment></Comment>
+	</Device>
+  	<Device type="Photocell">
+		<Brand>SEIKO</Brand>
+		<Model>PBU-600</Model>
+		<HomologationNumber>SEI.L60.03</HomologationNumber>
+		<ValidUntil>2023</ValidUntil>
+		<Comment></Comment>
+	</Device>
+  	<Device type="Photocell">
+		<Brand>SEIKO</Brand>
+		<Model>PBU-601</Model>
+		<HomologationNumber>SEI.L61.03</HomologationNumber>
+		<ValidUntil>2023</ValidUntil>
+		<Comment></Comment>
+	</Device>
+  	<Device type="Photocell">
+		<Brand>SEIKO</Brand>
+		<Model>PBU-700</Model>
+		<HomologationNumber>SEI.L62.03</HomologationNumber>
+		<ValidUntil>2023</ValidUntil>
+		<Comment></Comment>
+	</Device>
+  	<Device type="Photocell">
+		<Brand>SEIKO</Brand>
+		<Model>PBU-710</Model>
+		<HomologationNumber>SEI.L63.03</HomologationNumber>
+		<ValidUntil>2023</ValidUntil>
+		<Comment></Comment>
+	</Device>
+  	<Device type="Photocell">
+		<Brand>SEIKO</Brand>
+		<Model>PBU-800</Model>
+		<HomologationNumber>SEI.L64.03</HomologationNumber>
+		<ValidUntil>2023</ValidUntil>
+		<Comment></Comment>
+	</Device>
+  	<Device type="Photocell">
+		<Brand>SEIKO</Brand>
+		<Model>PBU-810</Model>
+		<HomologationNumber>SEI.L65.03</HomologationNumber>
+		<ValidUntil>2023</ValidUntil>
+		<Comment></Comment>
+	</Device>
+  	<Device type="Photocell">
+		<Brand>SEIKO</Brand>
+		<Model>PBU-900</Model>
+		<HomologationNumber>SEI.L98.16</HomologationNumber>
+		<ValidUntil>2031</ValidUntil>
+		<Comment></Comment>
+	</Device>
+  	<Device type="Photocell">
+		<Brand>SWISS TIMING</Brand>
+		<Model>Arges</Model>
+		<HomologationNumber>SWI.L85T.11</HomologationNumber>
+		<ValidUntil>2025</ValidUntil>
+		<Comment></Comment>
+	</Device>
+  	<Device type="Photocell">
+		<Brand>SWISS TIMING</Brand>
+		<Model>Cyclop/CAP 059B</Model>
+		<HomologationNumber>SWI.L73T.10</HomologationNumber>
+		<ValidUntil>2025</ValidUntil>
+		<Comment></Comment>
+	</Device>
+  	<Device type="Photocell">
+		<Brand>SWISS TIMING</Brand>
+		<Model>OEC4</Model>
+		<HomologationNumber>SWI.L68T.10</HomologationNumber>
+		<ValidUntil>2025</ValidUntil>
+		<Comment>formerly Omega/Longines</Comment>
+	</Device>
+  	<Device type="Photocell">
+		<Brand>SWISS TIMING</Brand>
+		<Model>Snowgines</Model>
+		<HomologationNumber>SWI.L97.15</HomologationNumber>
+		<ValidUntil>2030</ValidUntil>
+		<Comment></Comment>
+	</Device>
+  	<Device type="Photocell">
+		<Brand>TAG HEUER</Brand>
+		<Model>HL 2-31</Model>
+		<HomologationNumber>TAG.L47.03</HomologationNumber>
+		<ValidUntil>2023</ValidUntil>
+		<Comment></Comment>
+	</Device>
+  	<Device type="Photocell">
+		<Brand>TAG HEUER</Brand>
+		<Model>HL 2-32</Model>
+		<HomologationNumber>TAG.L49T.10</HomologationNumber>
+		<ValidUntil>2025</ValidUntil>
+		<Comment></Comment>
+	</Device>
+  	<Device type="Photocell">
+		<Brand>TAG HEUER</Brand>
+		<Model>HL 2-33</Model>
+		<HomologationNumber>TAG.L50.03</HomologationNumber>
+		<ValidUntil>2023</ValidUntil>
+		<Comment>Two separated devices for system A and B are needed</Comment>
+	</Device>
+  	<Device type="Photocell">
+		<Brand>TAG HEUER</Brand>
+		<Model>HL 2-35 R-E</Model>
+		<HomologationNumber>TAG.L48.03</HomologationNumber>
+		<ValidUntil>2023</ValidUntil>
+		<Comment></Comment>
+	</Device>
+  	<Device type="Photocell">
+		<Brand>TAG HEUER</Brand>
+		<Model>HL 3-135</Model>
+		<HomologationNumber>TAG.L100.16</HomologationNumber>
+		<ValidUntil>2031</ValidUntil>
+		<Comment>Only wired is allowed</Comment>
+	</Device>
+  	<Device type="Photocell">
+		<Brand>TAG HEUER</Brand>
+		<Model>HL 3-500</Model>
+		<HomologationNumber>TAG.L103.17</HomologationNumber>
+		<ValidUntil>2032</ValidUntil>
+		<Comment>Only wired is allowed</Comment>
+	</Device>
+  	<Device type="Start">
+		<Brand>ALGE</Brand>
+		<Model>STScM2S</Model>
+		<HomologationNumber>ALG.S51.03</HomologationNumber>
+		<ValidUntil>2023</ValidUntil>
+		<Comment></Comment>
+	</Device>
+  	<Device type="Start">
+		<Brand>ALGE</Brand>
+		<Model>STSnM2</Model>
+		<HomologationNumber>ALG.S81T.10</HomologationNumber>
+		<ValidUntil>2025</ValidUntil>
+		<Comment></Comment>
+	</Device>
+  	<Device type="Start">
+		<Brand>ALGE</Brand>
+		<Model>STSnM2S</Model>
+		<HomologationNumber>ALG.S53T.10</HomologationNumber>
+		<ValidUntil>2025</ValidUntil>
+		<Comment></Comment>
+	</Device>
+  	<Device type="Start">
+		<Brand>ALGE</Brand>
+		<Model>STSnQ</Model>
+		<HomologationNumber>ALG.S52.03</HomologationNumber>
+		<ValidUntil>2023</ValidUntil>
+		<Comment></Comment>
+	</Device>
+ 	<Device type="Start">
+		<Brand>LONGINES</Brand>
+		<Model>B65</Model>
+		<HomologationNumber>LON.S57.03</HomologationNumber>
+		<ValidUntil>2023</ValidUntil>
+		<Comment></Comment>
+	</Device>
+  	<Device type="Start">
+		<Brand>LONGINES</Brand>
+		<Model>CAP021</Model>
+		<HomologationNumber>LON.S58.03</HomologationNumber>
+		<ValidUntil>2023</ValidUntil>
+		<Comment></Comment>
+	</Device>
+  	<Device type="Start">
+		<Brand>MICROGATE</Brand>
+		<Model>FIS</Model>
+		<HomologationNumber>MGA.S56.03</HomologationNumber>
+		<ValidUntil>2023</ValidUntil>
+		<Comment></Comment>
+	</Device>
+  	<Device type="Start">
+		<Brand>MICROGATE</Brand>
+		<Model>Startgate</Model>
+		<HomologationNumber>MGA.S82T.10</HomologationNumber>
+		<ValidUntil>2025</ValidUntil>
+		<Comment></Comment>
+	</Device>
+  	<Device type="Start">
+		<Brand>OMEGA</Brand>
+		<Model>OSG2</Model>
+		<HomologationNumber>OME.S59.03</HomologationNumber>
+		<ValidUntil>2023</ValidUntil>
+		<Comment></Comment>
+	</Device>
+  	<Device type="Start">
+		<Brand>SEIKO</Brand>
+		<Model>SG800</Model>
+		<HomologationNumber>SEI.S55.03</HomologationNumber>
+		<ValidUntil>2023</ValidUntil>
+		<Comment></Comment>
+	</Device>
+  	<Device type="Start">
+		<Brand>SEIKO</Brand>
+		<Model>SG900</Model>
+		<HomologationNumber>SEI.S93.14</HomologationNumber>
+		<ValidUntil>2029</ValidUntil>
+		<Comment></Comment>
+	</Device>
+  	<Device type="Start">
+		<Brand>SWISS TIMING</Brand>
+		<Model>SNOWGATE</Model>
+		<HomologationNumber>SWI.S79T.09</HomologationNumber>
+		<ValidUntil>2024</ValidUntil>
+		<Comment></Comment>
+	</Device>
+   	<Device type="Start">
+		<Brand>TAG HEUER</Brand>
+		<Model>HL7-1</Model>
+		<HomologationNumber>TAG.S54.03</HomologationNumber>
+		<ValidUntil>2023</ValidUntil>
+		<Comment></Comment>
+	</Device>
+  	<Device type="Start">
+		<Brand>TAG HEUER</Brand>
+		<Model>HL7-1P</Model>
+		<HomologationNumber>TAG.S77T.09</HomologationNumber>
+		<ValidUntil>2024</ValidUntil>
+		<Comment></Comment>
+	</Device>
+  	<Device type="Start">
+		<Brand>ALGE</Brand>
+		<Model>Startdoor SSD1</Model>
+		<HomologationNumber>ALG.x102.16</HomologationNumber>
+		<ValidUntil>2031</ValidUntil>
+		<Comment></Comment>
+	</Device>
+  	<Device type="Start">
+		<Brand>BRANDAUER</Brand>
+		<Model>Startdoor SG2</Model>
+		<HomologationNumber>BRA.x96.15</HomologationNumber>
+		<ValidUntil>2030</ValidUntil>
+		<Comment></Comment>
+	</Device>
+  	<Device type="Start">
+		<Brand>SETTELE</Brand>
+		<Model>Startdoor FIS</Model>
+		<HomologationNumber>SET.x94.15</HomologationNumber>
+		<ValidUntil>2030</ValidUntil>
+		<Comment></Comment>
+	</Device>
+  	<Device type="Start">
+		<Brand>SETTELE</Brand>
+		<Model>Startdoor WC</Model>
+		<HomologationNumber>SET.x95.15</HomologationNumber>
+		<ValidUntil>2030</ValidUntil>
+		<Comment></Comment>
+	</Device>
+ 	<Device type="Start">
+		<Brand>SIMARD FABRICATION MECANIQUE</Brand>
+		<Model>Startdoor</Model>
+		<HomologationNumber>SIM.x140.20</HomologationNumber>
+		<ValidUntil>2035</ValidUntil>
+		<Comment>Only for parallel events</Comment>
+	</Device>
+ 	<Device type="Start">
+		<Brand>SWISS TIMING</Brand>
+		<Model>Startdoor</Model>
+		<HomologationNumber>SWI.x88.14</HomologationNumber>
+		<ValidUntil>2029</ValidUntil>
+		<Comment></Comment>
+	</Device>
+   	<Device type="Start">
+		<Brand>WALDSPRURGER</Brand>
+		<Model>Startdoor</Model>
+		<HomologationNumber>WAL.x104.18</HomologationNumber>
+		<ValidUntil>2035</ValidUntil>
+		<Comment>Only for Ski Cross(SX) Finals level 4</Comment>
+	</Device>
+</Device_FIS>

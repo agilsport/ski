@@ -4,7 +4,7 @@ dofile('./interface/device.lua');
 
 -- Information : Numéro de Version, Nom, Interface
 function device.GetInformation()
-	return { version = 3.5, name = 'TV Liste Alpin', class = 'display', interface = {} };
+	return { version = 3.6, name = 'TV Liste Alpin', class = 'display', interface = {} };
 end	
 
 -- Configuration du Device
@@ -61,7 +61,11 @@ end
 
 -- Ouverture
 function device.OnInit(params)
-
+	-- adv.Alert("début de récupération de params  OnNotifyRunErase");
+    -- for k,v in pairs(params) do
+		-- adv.Alert("k = "..k..", v = "..tostring(v));
+    -- end
+	-- adv.Alert("fin de récupération de params");
 	-- delay ...
 	device.delay_finished = tonumber(params.finished_delay) or 6 ;
 	device.delay_finished = device.delay_finished * 1000;
@@ -142,15 +146,15 @@ function device.OnInit(params)
 	device.raceInfo = raceInfo;
 
 	local tEpreuve = device.raceInfo.tables.Epreuve;
-	local codeEntite = tEpreuve:GetCell('Code_entite', 0);
+	device.code_entite = tEpreuve:GetCell('Code_entite', 0);
 
 	columnInfoRanking = 'Club';
 	columnInfoStartlist = 'Club';
 
-	if codeEntite == 'ESF' then
+	if device.code_entite == 'ESF' then
 		columnInfoRanking = 'Medaille'..device.raceInfo.Code_manche;
 		columnInfoStartlist = 'Equipe';
-	elseif codeEntite == 'FIS' then
+	elseif device.code_entite == 'FIS' then
 		columnInfoRanking = 'Nation';
 		columnInfoStartlist = 'Nation';
 	end
@@ -203,6 +207,8 @@ function device.OnInit(params)
 	app.GetAuiMessage():AddLine("TV Liste Alpin Information :");
 	app.GetAuiMessage():AddLine("=> Manche "..device.raceInfo.Code_manche.." / Nb.Inter = "..device.raceInfo.Nb_inter);
 	app.GetAuiMessage():AddLine("=> Délai Arrivée "..device.delay_finished.." / Délai Inter "..device.delay_inter);
+	device.dbTV:Query("Update Context Set Nb_inter = "..device.raceInfo.Nb_inter.." Where ID = 1");
+
 end
 
 -- Notification <passage_add> : Chrono Classique 
@@ -445,7 +451,7 @@ function device.BibInter(bib, idPassage, time_net, rank, diff)
 	else
 		bibInfo = device.BibLoad(bib);
 	end
-
+	
 	if bibInfo ~= nil and bibInfo:GetNbRows() > 0 then
 		device.tick_passage = app.GetTickCount();
 		device.tick_passage_delay = device.delay_inter;
@@ -471,7 +477,7 @@ function device.BibInter(bib, idPassage, time_net, rank, diff)
 			",Rank = '"..tostring(rank).."' "..
 			",Diff = '"..diff.."' ";
 		device.dbTV:Query(cmd);
---		adv.Alert(cmd);
+		-- adv.Alert(cmd);
 	end
 end
 
@@ -499,6 +505,7 @@ function device.OnNotifyBestTime(key, params)
 		
 		cmd = cmd .." Where ID = 1";
 		device.dbTV:Query(cmd);
+		-- adv.Alert(cmd);
 	else
 		device.dbTV:Query("Update Context Set Best_identity = '', Best_time = '', Best_timeMs = -1 Where ID = 1");
 	end
@@ -528,6 +535,8 @@ end
 function device.OnNotifyNbInter(key, params)
 	assert(key == '<nb_inter>');
 	device.raceInfo.Nb_inter = params.nb;
+	device.dbTV:Query("Update Context Set Nb_inter = "..device.raceInfo.Nb_inter.." Where ID = 1");
+
 end
 
 -- Fermeture
