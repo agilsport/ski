@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- Menu Editions Activité "FOND " suplementaire !-->
-<!-- version="6.8" !-->
+<!-- version="6.7" !-->
 <!-- si possible de faire fonctionne des cond dans les menu -->
 <!-- si possible de fermer des Item par default -->
 <!-- mise en place de la fonction page break -->
@@ -28,6 +28,7 @@
 		
 		<menu title="Outils" image="./res/32x32_options.png">
 			<menu title="Edition des Séquences Chrono" image="./res/16x16_bib.png" id="chrono_seq" choix_manche="1" action="chrono_seq"/>
+			<menu title="Configuration des points de passages" image="./res/16x16_text.png" lua="./edition/Config_Passage.lua"  />
 			<menu title="Transfert du Clt d'un Evt X Ds la colonne Ordre_niveau et du Crietre Coursexx Dans la course sélectionner pour attribution des Dossards suivant le Clt de l'Evt xx" image="./res/16x16_fis.png" lua="./edition/Clt_EprX-ColOrdre_niveau.lua" Colum_Ref="Clt"/>
 			<menu title="Transfert de la colonne Odre_niveau d'un Evt X Ds la colonne Ordre_niveau et du Ctrietre Coursexx Dans la course sélectionner pour attribution des Dossards suivant le Clt de l'Evt xx" image="./res/16x16_fis.png" lua="./edition/Clt_EprX-ColOrdre_niveau.lua" Colum_Ref="Ordre_niveau"/>
 			<menu title="Transfert du Clt et des ponits d'un Cha. X Ds la colonne Pts_Best pour attribution des Dossards suivant le Clt de l'Evt X" image="./res/16x16_fis.png" Label_col="Pts_best" lua="./edition/ColPtsClt_ColPtsBest.lua" />
@@ -49,6 +50,7 @@
 			<menu title="Saisie d'un rapport d'accident" image="./res/16x16_text.png" lua="./edition/Rapport_accident.lua"  />
 			<menu title="Edition d'un rapport d'accident" image="./res/16x16_text.png" lua="./edition/editionRapport_accident.lua"  />
 			<menu title="Télécharger le Rapport d'accident (PDF remplisable)" image="./res/16x16_pdf.png" action="open ./edition/Rapport_Accident.pdf" />
+			<menu title="Outils pour aide a la création d'équipe relais (ds la zone Equipe on met NumeroClub_NumEquipeLettreEquipier) Bien faire mettre la création de l'equipe ds critere du WebFFS" image="./res/16x16_text.png" lua="./edition/Creation_Equipe_Club.lua"  />
 		</menu>
 		
 		<menu title="Editions Supplémentaires" image="./res/32x32_options.png">

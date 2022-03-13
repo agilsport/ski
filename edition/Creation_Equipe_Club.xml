@@ -1,41 +1,32 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
-<!-- Version 1.6 -->
 <root>
 
 <!-- Fenètre de configuration de l'éditions des couloir de poursuite -->
-<panel name="Clt_EprX_ColOrdre_niveau">
-	<font name="Calibri" size="16" adjust="best" >
+<panel name="Creation_Equipe_Club">
 	<padding all="2px"/>
-	<col w="5,5,5,5,5" />
-	<row h="0.1cm" />
-	<row h="0.5cm" />
-		<wndtext col_start="1" col_end="0" align="left" >'Cet utilitaire permet de copier Le Clt d\'une Course Source xx'</wndtext>
+	<font name="Calibri" size="16" adjust="best" >
+		<col w="5,5,5,5,5" />
+		<row h="0.1cm" />
+		<row h="0.4cm" />
+			<wndtext col_start="1" col_end="0" align="left" >'Cet utilitaire permet de copier Le Critere d\'un coureur'</wndtext>
+		<row h="0.4cm" />
+			<wndtext col_start="1" col_end="0" align="left" >'Dans la colonne Equipe'</wndtext>
+		<row h="0.4cm" />
+			<wndtext col_start="1" col_end="0" align="left" >'Précéder du Numero de son club '</wndtext>
+		<row h="0.4cm" />
+			<wndtext col_start="1" col_end="0" align="left" >'Dans skiFFS en faisant un tri croissant'</wndtext>
+		<row h="0.4cm" />
+			<wndtext col_start="1" col_end="0" align="left" >'Cela facilite la composition de l\'equipe'</wndtext>
+		<row h="0.1cm" />
 	</font>
-	
-	<row value="auto" />
-		<staticbox col_start="1" col_end= "0" label="Message" name="sb_mesage">
-			<row value="1.5cm" />
-			<gridmessage col_start="1" col_end= "0" name="message"/>
-		</staticbox>
-	<row h="0.1cm" />
-	
-	<row h="auto" />
-	<statictext col_start="1" col_end="3"  align="right" label="N° de la course Source"/>
-	<textctrl col_start="4"  col_end="4" name="N_Course" ></textctrl>
-
-	<row h="0.1cm" />
-		
 	<row h="auto" />
 	<toolbar name="tb" col_start="1" col_end="0" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
 </panel>
 
 <!-- édition -->
-	<report id="ListeClt" title="('liste des participants et Clt Evt1')" >
-		
-		<order key="Distance, Ordre_niveau" />
-		
+	<report id="ListeEquipe" title="liste des participants" >
+		<order key="Centre, Nom" />
 		<first_header />
-	
 		<header>
 			<spacing all="0"/>
 			<background mode="transparent"/>		
@@ -45,7 +36,7 @@
 			<text row="auto" align="center" >title</text>
 			<text row="1cm" align="center" ></text>
 			<font name="Calibri" size="26" adjust="max" weight="bold"/>
-			<text row="auto" align="center" >'liste Clt'</text>
+			<text row="auto" align="center" >'avec code club_numeroEquipe|Lettreequiper'</text>
 			<row value="0.5cm"/>
 		</header>
 	
@@ -56,10 +47,8 @@
 			<spacing left="5" right="10" top="2" bottom="2" />
 			<text col="2" align="left" label="Dos.">$(Nom)..' '..$(Prenom) </text>
 			<text col="2" align="center" label="Distance" >$(Distance)</text>
-			<text col="2" align="center" label="Clt evt xx" >$(Ordre_niveau)</text>
-			<text col="2" align="center" label="Evt N°" >$(Niveau)</text>
+			<text col="2" align="center" label="Code_coureur" >$(Code_coureur)</text>
+			<text col="2" align="center" label="Centre" >$(Equipe)</text>
 		</body>
 	</report>
-
-
 </root>
