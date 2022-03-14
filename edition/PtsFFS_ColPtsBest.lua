@@ -1,18 +1,24 @@
 dofile('./interface/interface.lua');
 dofile('./interface/adv.lua');
 dofile('./interface/device.lua');
--- version 2.5
+-- version 2.6
 	-- Verification edition/PtsFFS_ColPtsBest
 	-- correction mise a jour du body pour edition liste par ordre de points selectionner
+	
+
+function Success(txt)
+	app.GetAuiMessage():AddLineSuccess(txt);
+end
+
+function alert(txt)
+	app.GetAuiMessage():AddLine(txt);
+end
+
 --Creation de la table
 Dlg = {};
 
 function Alert(txt)
 	Dlg.gridMessage:AddLine(txt);
-end
-
-function alert(txt)
-	app.GetAuiMessage():AddLine(txt);
 end
 
 function main(params)
@@ -126,6 +132,7 @@ function LectureDonnees(evt)
 	alert("Transfert des points:"..LabelPts.." Ok!!!")
 	
 	-- Fermeture
+	Success('Transfert Ok!!!');
 	bodyliste:Delete();
 	dlg:EndModal(idButton.OK);
 

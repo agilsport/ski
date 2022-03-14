@@ -1,5 +1,5 @@
 -- Synthaxe Progression :
--- Version 4.2
+-- Version 4.3 (12/03/2022)
 -- Rectif placement en final
 -- rajout de dim_min en tab nordique
 -- Création d'un niveau KO_Spec pour pouvoir faire des ko30 ou autre spécifique en cas de reclamation ou de repeche ou l'on faire un duel a 7 a la place de 6 par exemple 
@@ -7,6 +7,8 @@
 -- rajout du KO_42 et MontDesc 10 en 'FOND,ROL'
 -- Creation du Progression Cut pour tt les tableaux Montée_Descente
 -- start~= nil pour eviter un bug ds le proression cut
+-- corection d'une possition ds le couloir en Mont_Desc_10
+
 -- clt/duel/tour/ordre/tri : clt (obligatoire ...), duel, tour, ordre (non obligatoires ...)
 -- exemple 1 : 12 => 12ième du tour précédent (et de tous les duels)
 -- exemple 2 : 2/3 => 2ème du duel 3 du tour précédent
@@ -1335,7 +1337,7 @@ duel_progression = {
 				-- tour 2 : 10 duels de 10 couloirs
 				{ '1/1', '2/1', '3/1',  '4/1', '5/1', '6/1', '7/1', '1/2', '2/2', '3/2' }, 		-- D1
 				{ '8/1', '9/1', '10/1',  '4/2', '5/2', '6/2', '7/2', '1/3','2/3', '3/3' }, 		-- D2
-				{ '8/2', '9/2', '10/2',  '4/3', '5/3', '6/3', '7/3', '1/4','2/4', '2/4' }, 		-- D3
+				{ '8/2', '9/2', '10/2',  '4/3', '5/3', '6/3', '7/3', '1/4','2/4', '3/4' }, 		-- D3
 				{ '8/3', '9/3', '10/3',  '4/4', '5/4', '6/4', '7/4', '1/5','2/5', '3/5' }, 		-- D4
 				{ '8/4', '9/4', '10/4',  '4/5', '5/5', '6/5', '7/5', '1/6','2/6', '3/6' }, 		-- D5
 				{ '8/5', '9/5', '10/5',  '4/6', '5/6', '6/6', '7/6', '1/7','2/7', '3/7' }, 		-- D6
@@ -1348,7 +1350,7 @@ duel_progression = {
 				-- tour 3 : 10 duels de 10 couloirs
 				{ '1/1', '2/1', '3/1',  '4/1', '5/1', '6/1', '7/1', '1/2', '2/2', '3/2' }, 		-- D1
 				{ '8/1', '9/1', '10/1',  '4/2', '5/2', '6/2', '7/2', '1/3','2/3', '3/3' }, 		-- D2
-				{ '8/2', '9/2', '10/2',  '4/3', '5/3', '6/3', '7/3', '1/4','2/4', '2/4' }, 		-- D3
+				{ '8/2', '9/2', '10/2',  '4/3', '5/3', '6/3', '7/3', '1/4','2/4', '3/4' }, 		-- D3
 				{ '8/3', '9/3', '10/3',  '4/4', '5/4', '6/4', '7/4', '1/5','2/5', '3/5' }, 		-- D4
 				{ '8/4', '9/4', '10/4',  '4/5', '5/5', '6/5', '7/5', '1/6','2/6', '3/6' }, 		-- D5
 				{ '8/5', '9/5', '10/5',  '4/6', '5/6', '6/6', '7/6', '1/7','2/7', '3/7' }, 		-- D6

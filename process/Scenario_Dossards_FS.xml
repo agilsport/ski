@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<root>
+<!-- fenetre de parametre Script_inversion_Dossards-->
+	<panel name="Script_Dossards_FS">
+		<spacing all="3"/>
+		<pen border="0" />
+		<padding all="2px"/>
+		<col value="2,5,4,4,5" />
+
+		<padding all="2px" />
+		<row value="auto" />
+		<statictext col_start="1" col_end="2"  align="center" label="Scénario Dossard FS :" />
+		
+		<row value="auto" />
+		<statictext col_start="3" col_end="4"  align="right" label='1er Dossard Dames'/>
+		<spinctrl col_start="5" name="FirstBibD">'1'</spinctrl>
+		
+		<row value="auto" />
+		<statictext col_start="3" col_end="4"  align="right" label='1er Dossard Hommes'/>
+		<textctrl col_start="5" name="FirstBibH"></textctrl>
+		
+		<row value="auto" />
+		<statictext col_start="3" col_end="4"  align="right" label='Choix du SEEDING FIS'/>
+		<combobox col_start="5" name="Code_SEEDING"  style="ALIGN_RIGHT | CB_READONLY" />
+		
+		<row value="auto" />
+	
+		<staticbox col_start="1" col_end= "0" label="Message" name="sb_mesage">
+			<row value="2cm" />
+			<gridmessage col_start="1" col_end= "0" name="message"/>
+		</staticbox>
+		
+		<row value="auto" />
+		<toolbar name="tb" col_start="1" col_end="0" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
+	</panel>
+
+	<panel name="Seeding_Table">
+		<pen border="0" />
+		<spacing all="3"/>
+		<col value="1" />
+		
+		<row value="1"/>
+		<grid col_start="1" col_end="0" name="grid_Code_SEEDING" />
+		
+		<row value="auto"/>
+		<toolbar col_start="1" col_end="0" name="tb" style="TB_FLAT,TB_HORIZONTAL" />
+	</panel>
+</root>

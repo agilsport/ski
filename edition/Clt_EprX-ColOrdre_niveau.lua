@@ -1,10 +1,24 @@
-dofile('./interface/adv.lua');
 dofile('./interface/interface.lua');
+dofile('./interface/adv.lua');
+dofile('./interface/device.lua');
 
--- version 1.6
+-- version 1.8
+	-- corection du nom de colonne
+	-- corection d'un \ ds le .xml
+	-- rajout d'un grid message pour avoir des données interactives
 
 function alert(txt)
 	app.GetAuiMessage():AddLine(txt);
+end
+
+function Success(txt)
+	app.GetAuiMessage():AddLineSuccess(txt);
+end
+
+Dlg = {};
+
+function Alert(txt)
+	Dlg.gridMessage:AddLine(txt);
 end
 
 function main(params)
@@ -23,7 +37,7 @@ function main(params)
 		y = y,
 		width=780, -- widthControl, 
 		height=500, -- heightControl, 
-		label='transfert Clt dans Pts_Best', 
+		label='transfert Clt dans Ordre_niveau', 
 		icon='./res/32x32_agil.png'
 	});
 	
@@ -32,14 +46,20 @@ function main(params)
 		xml = './edition/Clt_EprX-ColOrdre_niveau.xml', 		-- Obligatoire
 		node_name = 'root/panel', 			-- Obligatoire
 		node_attr = 'name', 				-- Facultatif si le node_name est unique ...
-		node_value = 'Clt_EprX-ColOrdre_niveau',			-- Facultatif si le node_name est unique ...	
+		node_value = 'Clt_EprX_ColOrdre_niveau',			-- Facultatif si le node_name est unique ...	
 	});
 
 	base = sqlBase.Clone();
 	code_evenement = tonumber(theParams.code_evenement);
 	Colum_Ref = theParams.Colum_Ref;
+	if Colum_Ref == 'Clt' then
+		Colum_Ref = 'CltG';
+	elseif Colum_Ref == 'Ordre_niveau' then
+		Colum_Ref = 'OrdreG';
+	end
 	
 	-- Initialisation des controles ...
+	Dlg.gridMessage = dlg:GetWindowName('message');
 	local comboNbCouloir = dlg:GetWindowName('N_Course');
 	
 	local tb = dlg:GetWindowName('tb');
@@ -52,7 +72,14 @@ function main(params)
 		tb:Bind(eventType.MENU, LectureDonnees, btn_edition);
 		tb:Bind(eventType.MENU, function(evt) dlg:EndModal(idButton.CANCEL); end, btn_close);
 	end
-		
+	
+	msg = "Transfert de la Colonne "..theParams.Colum_Ref.." \n"
+	msg = msg.."d'un evenement: XX \n"
+	msg = msg.."Vers la Colonne Ordre_niveau de votre evenement\n"
+	msg = msg.."et mettra 9999 aux non classer pour pouvoir les filtrer \n"
+	msg = msg.."renseigner le code evenement ci dessous"
+	Alert(msg.." Ok!!!");	
+	
 	dlg:Fit();
 	dlg:ShowModal();
 	dlg:Delete();
@@ -79,7 +106,7 @@ function LectureDonnees(evt)
 	-- Place = tResultat:GetCell('CltG', i);
 	-- Place = tResultat:GetCell('OrdreG', i);
 	Place = tResultat:GetCell(Colum_Ref, i);
-	--alert("Place: "..Place);
+	alert("Place: "..Place);
 	Critere = 'Evt_'..Evt_source;
 	-- alert('Place = '..Place);
 		if tonumber(Place) == 0 or Place == '' then 
@@ -99,7 +126,7 @@ function LectureDonnees(evt)
 	base:TableLoad(tResultat, cmd);
 	-- alert("tResultat:GetNbRows(); "..tResultat:GetNbRows());
 	
-	local Nbparticipant = tResultat:GetNbRows();
+	local Nbparticipant = 0;
 	for i=0, Nbparticipant-1 do
 		Place = 9999; 
 		local Critere2 = 'Abs'..Evt_source;
@@ -119,18 +146,15 @@ function LectureDonnees(evt)
 		bodyliste:AddRow();
 		sqlTable.CopyRow(bodyliste, bodyliste:GetNbRows()-1, tResultat, i);
 	end
-	
 	editionliste(evt, params, base, bodyliste);
-	
 	-- Fermeture
+	Success('Transfert Ok!!!');
 	bodyliste:Delete();
 	dlg:EndModal(idButton.OK);
 
 end
 
 function editionliste(evt, params, base, bodyliste)
-	
-		
 	-- Creation du Report
 	report = wnd.LoadTemplateReportXML({
 		xml = './edition/Clt_EprX-ColOrdre_niveau.xml',
