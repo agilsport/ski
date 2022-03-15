@@ -8,7 +8,7 @@ function device.GetInformation()
 	return { 
 		version = 2.5, 
 		code = 'microgate_rei2', 
-		name = 'MICROGATE Rei2', 
+		name = 'MICROGATE Rei2 / RTPRO', 
 		class = 'chrono', 
 		interface = { { type='serial', baudrate = '9600,1200,2400,4800,19200,28800,38400,57600' } } 
 	};
