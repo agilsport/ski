@@ -117,6 +117,53 @@ function VerifNodePodium()
 	doc_config:Delete();
 end
 
+function GetStatHandiBody(body)
+	body:SetCounter('Nation');
+	body:SetCounter('Tps_status');
+	tStat = {};
+	tStat[99] = {};
+	tStat[99].Classes = body:GetCounterValue('Tps_status', 'ok')
+	tStat[99].DNQ = 0;
+	tStat[99].NPTS = 0;
+	tStat[99].DNS = 0;
+	tStat[99].DNF = 0;
+	tStat[99].DSQ = 0;
+	
+	-- -600 = DNS, -500 = DNF, -800 = DSQ
+	for run = 1, nb_manche do
+		body:SetCounter('Tps'..run);
+		tStat[run] = {};
+		tStat[run].DNQ = 0;
+		tStat[run].NPTS = 0;
+		tStat[run].DNS = body:GetCounterValue('Tps'..run, -600)
+		tStat[run].DNF = body:GetCounterValue('Tps'..run, -500)
+		tStat[run].DSQ = body:GetCounterValue('Tps'..run, -800)
+		tStat[99].DNS = tStat[99].DNS + tStat[run].DNS;
+		tStat[99].DNF = tStat[99].DNF + tStat[run].DNF;
+		tStat[99].DSQ = tStat[99].DSQ +tStat[run].DSQ;
+	end
+end
+
+function GetPointPlaceHandi(clt, nbclt)
+	clt = tonumber(clt) or 0;
+	local pts = 0;
+	local r = tPlace_Valeur:GetIndexRow('Place', clt);
+	if r and r >= 0 then
+		pts = tPlace_Valeur:GetCellDouble('Point', r);
+	end
+	return pts;
+end
+
+function InitReportHandi(code_evenement)
+	base = base or params.base;
+	tEvenement = base:GetTable('Evenement');
+	tEpreuve = base:GetTable('Epreuve');
+	tResultat = base:GetTable('Resultat');
+	tPlace_Valeur = base:GetTable('Place_Valeur');
+	cmd = "Select * From Place_Valeur Where Code_activite = 'CHA-CMB' And Code_entite = 'FFS' And Code_saison = '"..tEvenement:GetCell('Code_saison', 0).."' And Code_grille = 'FIS-CM'";
+	base:TableLoad(tPlace_Valeur, cmd)
+end
+
 function OnDecodeJsonBibo(code_evenement, groupe)
 	cmd = 'Select * From Resultat_Info_Bibo Where Code_evenement = '..code_evenement..' And Groupe = '..groupe;
 	base:TableLoad(tResultat_Info_Bibo, cmd);
