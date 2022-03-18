@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- Menu Editions Activité "Challenge" !-->
-<!-- version="2.0" !-->
+<!-- version="2.1" !-->
+	<!-- reste a finir le calcul de points challenge FS -->
 <edition>
 	<menu>
 		<menu title="Matrice LUA " image="./res/24x24_login.png">
@@ -13,6 +14,7 @@
 		
 		<menu title="Résultats Challenge " image="./res/32x32_ranking.png">
 			<menu title="Résultats Officiels Challenge Scrath" image="./res/16x16_ranking.png" header="Résultats Officiels" id="res_Cha"/>
+			<menu title="Résultats Challenge Scrath Freestyle" image="./res/16x16_ranking.png" header="Résultats Officiels" id="res_Cha_FS"/>
 			<menu title="Résultats Officiels Challenge Scrath (Rglt Nordic Challenge)" image="./res/16x16_ranking.png" header="Résultats Officiels" id="res_Cha_Vit"/>
 			<menu title="Résultats par Sexe / catégories" image="./res/16x16_ranking.png" id="res_Cha_Cat" choix_clt_max="1"/>
 			<menu title="Résultats par Club" image="./res/16x16_ranking.png" id="res_Cha_Cat_club" choix_clt_max="1"/>
@@ -77,14 +79,24 @@
 <!-- Résultats challenge Scratch -->
 	<!-- Edition challenge Générique-->
 	<report id="res_Cha" title="(params.title or '')" header="1" first_header="0" >
-		<lua>body:SetRanking('Clt', 'PtsClt Desc')</lua>
-		<!-- <column name="Tps_status">chrono.Status(body:GetCellInt('Tps', row))</column> -->
-		<!-- <lua>type_edition = id:sub(1,4)</lua> -->
-		<!-- <lua>body:SetCounter('Tps_status')</lua> -->
-		<!-- <lua>entite = $(Evenement.Code_entite)</lua> -->
-		<lua>tEprChal = base:GetTable('EpreuveEvenement_Challenge')</lua>
-		<lua>base:TableLoad(tEprChal, 'Select * from EpreuveEvenement_Challenge where Code_evenement = '..params.code_evenement..' Group By Code_epreuve')</lua>	
-		<lua>nb_Epreuve = tEprChal:GetNbRows()</lua>
+	<lua>
+			tEprChal = base:GetTable('EpreuveEvenement_Challenge');
+			base:TableLoad(tEprChal, 'Select * from EpreuveEvenement_Challenge where Code_evenement = '..params.code_evenement..' Group By Code_epreuve');
+			nb_Epreuve = tEprChal:GetNbRows();
+			
+			NbrowBody = body:GetNbRows();
+
+			for i=0, NbrowBody-1 do
+				cal_PtsClt = 0;
+				for j=0, nb_Epreuve-1 do
+					Epr_Pts = tonumber(body:GetCell('PtsClt'..j+1, i)) or 0
+					cal_PtsClt = cal_PtsClt + Epr_Pts;
+				end
+				if tonumber(cal_PtsClt) == 0 then cal_PtsClt = NULL end
+				body:SetCell("PtsClt", i, tonumber(cal_PtsClt));
+			end
+			body:SetRanking('Clt', 'PtsClt Desc NULL_KO')
+	</lua>
 		<order key="Clt Asc" />
 		<!-- <paper orientation="landscape" /> -->
 		<paper orientation="portrait" />
@@ -195,6 +207,122 @@
 		<!-- <end cond="params.title=='Résultats Officiels'"> -->
 			<!-- <call option="signature_dt" file="./edition/options.xml" /> -->
 		<!-- </end> -->
+	</report>
+	
+<!-- Edition challenge Générique epreuve par colonne-->
+	<report id="res_Cha_FS" title="(params.title or '')" header="1" first_header="0" >
+	<lua>
+			tEprChal = base:GetTable('EpreuveEvenement_Challenge');
+			tResultatManche = base:GetTable('Resultat_Manche');
+			base:TableLoad(tEprChal, 'Select * from EpreuveEvenement_Challenge where Code_evenement = '..params.code_evenement..' Group By Code_epreuve');
+			nb_Epreuve = tEprChal:GetNbRows();
+			
+			NbrowBody = body:GetNbRows();
+
+			for i=0, NbrowBody-1 do
+				cal_PtsClt = 0;
+				cmd = "Select * from Resultat_Manche Where Code_evenement = "..params.code_evenement..
+						" And Code_coureur = '"..body:GetCell('Code_coureur', i)..
+						"' And PtsClt IS NOT NULL order by PtsClt"
+				base:TableLoad(tResultatManche, cmd);
+				Nb_CltPts = tResultatManche:GetNbRows();
+				
+				if tonumber(Nb_CltPts) >= 3 then
+					for i=2, Nb_CltPts-1 do 
+						Epr_Pts = tonumber(tResultatManche:GetCell('PtsClt', i));
+						cal_PtsClt = cal_PtsClt + Epr_Pts;
+					end 
+				end 
+				if tonumber(cal_PtsClt) == 0 then cal_PtsClt = '' end
+				body:SetCell("PtsClt", i, tonumber(cal_PtsClt));
+			end
+			body:SetRanking('Clt', 'PtsClt Desc NULL_KO')
+	</lua>
+		<!-- app.GetAuiMessage(true):AddLine('Nb_CltPts ='..tostring(Nb_CltPts)); -->
+		<order key="Clt Asc" />
+		<!-- <paper orientation="landscape" /> -->
+		<paper orientation="portrait" />
+		
+		<!-- ne pas mettre de first header ca ne sert a rien en challenge  -->
+		<first_header />
+		
+	<!-- libelle colonne	 -->
+		<label>
+			<row value="3cm" />
+			<row value="1.5cm" />
+			<row value="1.5cm" />
+			<row value="1.5cm" />
+			<row value="1cm" />
+			<font weight="bold" />
+			<pen border="all" size="1" />
+			<col value="1cm"/>
+			<text row_start="5" row_end="0" align="center">'Clt'</text>
+			
+			<col value="4cm"/>
+			<background mode="transparent" />
+			<text row_start="4" align="left">' Identité'</text>
+			<!-- <text row_start="4" align="right" >'Code Coureur '</text> -->
+			<background mode="solid" />
+			<text row_start="5" align="left" cond="entite == 'FIS'">' Nation (Comité)'</text> 
+			<text row_start="5" align="left" cond="entite == 'FFS'">' Club (Comité)'</text>
+			
+			<col value="2cm"/>
+			<text row_start="4" row_end="4" align="center" >' Cat.'</text> 
+			<text row_start="5" align="center" >' Sexe - An'</text> 
+				<lua>
+					for m=0,nb_Epreuve-1 do
+						Epr_lieu = base:GetTable('EpreuveEvenement_Challenge'):GetCell('Ev_Station',m)
+						Evt_date = base:GetTable('EpreuveEvenement_Challenge'):GetCell('Date_epreuve',m)
+						Epr_discipline = base:GetTable('EpreuveEvenement_Challenge'):GetCell('Code_discipline',m)
+				</lua>
+					<col value="1.5cm"/>
+					<text row_start="1" row_end="3" align="center" >Epr_lieu</text>
+					<text row_start="3" row_end="3" align="center" >Epr_discipline</text>
+					<text row_start="4" row_end="5" align="center" >Evt_date</text>
+				<lua>end</lua>
+			<col value="1.2cm"/>
+			<text row_start="4" row_end="5" align="center">'Pts Tot.'</text>
+			
+		</label>
+	<!-- colonne du body -->
+		<body>
+			<call option="couleur_alternee" file="./edition/options.xml" />
+			<call option="identite" file="./edition/options.xml"/>
+			<font name="calibri" size="9" adjust="ellipsize" />
+			<spacing left="5" right="10" top="2" bottom="2" />
+	
+			<row value="auto"/>
+			<row value="auto"/>
+			
+			<col value="1cm"/>
+				<text row_start="1" row_end="0" align="center" font_weight="bold" font_size_step="1">
+				<background mode="solid" color="green" cond="$(Clt) == '1'" />
+				<font color="white" cond="$(Clt) == '1'"/>$(Clt)
+				</text>
+	
+			<col value="4cm"/>
+			<text row_start="1">''</text> 
+			<background mode="transparent" />
+			<text row_start="1" align="left" >' '..Prenom_NOM</text> 
+			<text row_start="2" align="right" >$(Code_coureur):sub(4)</text> 
+			<background mode="solid" />
+			<text row_start="2" align="left" cond="entite == 'FIS'">$(Nation)..' - '..$(Comite{$(Comite)}.Nom):Parenthesis()</text> 
+			<text row_start="2" align="left" cond="entite == 'FFS'">$(Club)..' - '..$(Comite{$(Comite)}.Nom):Parenthesis()</text>
+			
+			<col value="2cm"/>
+			<text row_start="1" align="center" >$(Categ)</text> 
+			<text row_start="2" align="center" >$(Sexe)..' - '..$(An)</text> 
+			
+			<lua>for m=0,nb_Epreuve-1 do</lua>
+				<col value="1.5cm"/>
+				<text row_start="1" row_end="0" align="right" ><font size_step="-1" />body:GetCell('PtsClt'..m+1,row)</text> 
+			<lua>end</lua>
+			
+			<col value="1.2cm"/>
+			<!-- <text row_start="1" row_end="0" align="right" font_weight="bold" font_size_step="1">$(PtsClt)</text>  -->
+			<text row_start="1" row_end="0" align="right" font_weight="bold" font_size_step="1"></text> 
+			
+		</body>
 	</report>
 	
 	<!-- Edition challenge Reglement Challenge Vittoz-->	
@@ -453,7 +581,7 @@
 			<row value="auto"/>
 			<row value="auto"/>
 			
-			<text col="3" row_start="1" row_end="0" align="center" font_weight="bold" font_size_step="1"><background mode="solid" color="green" cond="$(Cltc) == '1'" /><font color="white" cond="$(Cltc) == '1'"/>$(Cltc)</text>
+			<text col="3" row_start="1" row_end="0" align="center" font_weight="bold" font_size_step="1"><background mode="solid" color="green" cond="$(Cltc) == '1'" /><font color="white" cond="$(Cltc) == '1'"/>$(Clt)</text>
 	
 			<col value="9"/>
 			<text row_start="1">''</text> 
@@ -906,7 +1034,10 @@
 		<paper orientation="landscape" />
 		
 		<!-- Mise en place du layer MST par default  -->
-		<layer id="FFS_MST"/> 
+		<!-- <lua>if params.toto = '27' then layerID = 'FFS_MST' else layerID = 'FFS_MST2' end </lua> -->
+		<!-- <lua>layerFile = './edition/layers.xml'</lua> -->
+		<!-- <layer id="(layerID)" file="(layerFile)"/>  -->
+		<layer id="FFS_MST" /> 
 		
 		<!-- reglage de marges pour mettre le layer au dessus  -->
 		<!-- <Marges left="5" right="5" top="50" bottom="2" /> -->
