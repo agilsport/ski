@@ -1,16 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- Menu Editions Activité "FOND " suplementaire !-->
-<!-- version="6.7" !-->
+<!-- version="6.8" !-->
 <!-- si possible de faire fonctionne des cond dans les menu -->
 <!-- si possible de fermer des Item par default -->
-<!-- mise en place de la fonction page break -->
+<!-- 6.7 mise en place de la fonction page break -->
+<!-- 6.8 resultats officiels relais avec entete -->
+<!-- 6.9 amelioration liste de départ -->
 <edition>
 	<menu>
 		<menu title="Edition Relais" image="./res/32x32_ranking.png" bold="false" cond ="($(Epreuve.Code_discipline)='RELAIS')">
-			<menu title="Liste Départ Relais (1-a)" image="./res/16x16_official.png" id="Lst_Relais" DossardRelais="Lettre"/>
+			<menu title="Liste Départ Relais (1-a)" image="./res/16x16_official.png"  Officiel="0" first_header="0" id="Lst_Relais" DossardRelais="Lettre"/>
+			<menu title="Liste Départ Relais (1-a) Officiels" image="./res/16x16_official.png"  Officiel="1" first_header="1" id="Lst_Relais" DossardRelais="Lettre"/>
 			<menu title="Liste Départ Relais (1/²)" image="./res/16x16_official.png" id="Lst_Relais" DossardRelais="Numeric"/>
-			<menu title="Résultats Relais (1-a)" image="./res/16x16_official.png" id="res_Relais" DossardRelais="Lettre" />
+			<menu title="Résultats Officieux Relais (1-a)" image="./res/16x16_official.png" id="res_Relais" Officiel="0" DossardRelais="Lettre" />
+			<menu title="Résultats Officiels Relais (1-a)" image="./res/16x16_official.png" id="res_Relais" Officiel="1" DossardRelais="Lettre" />
 			<menu title="Résultats Relais (1/²)" image="./res/16x16_official.png" id="res_Relais" DossardRelais="Numeric" />
 			<menu title="Résultats Tours (1-a)" image="./res/16x16_official.png" id="res_Tour" DossardRelais="Lettre" />
 		</menu>
@@ -50,7 +54,6 @@
 			<menu title="Saisie d'un rapport d'accident" image="./res/16x16_text.png" lua="./edition/Rapport_accident.lua"  />
 			<menu title="Edition d'un rapport d'accident" image="./res/16x16_text.png" lua="./edition/editionRapport_accident.lua"  />
 			<menu title="Télécharger le Rapport d'accident (PDF remplisable)" image="./res/16x16_pdf.png" action="open ./edition/Rapport_Accident.pdf" />
-			<menu title="Outils pour aide a la création d'équipe relais (ds la zone Equipe on met NumeroClub_NumEquipeLettreEquipier) Bien faire mettre la création de l'equipe ds critere du WebFFS" image="./res/16x16_text.png" lua="./edition/Creation_Equipe_Club.lua"  />
 		</menu>
 		
 		<menu title="Editions Supplémentaires" image="./res/32x32_options.png">
@@ -84,7 +87,7 @@
 			type_edition = id:sub(1,4)
 			officiel = tonumber(params.officiel)
 			Regroupement = $(Epreuve.Code_regroupement)
-			if type_edition == 'Lst_' then
+			if type_edition == 'Lst_' and discipline ~= 'RELAIS' then
 				Titre = 'Liste de départ \n '..params.title
 			elseif type_edition == 'part' then
 				Titre = 'Liste de Participants \n '..params.title
@@ -95,7 +98,8 @@
 			if params ~= nil and params.Qrcode ~= nil then flagQrCode = params.Qrcode end
 		</lua>	
 		<text row="auto" col="1" align="center">$(Evenement.Nom)</text>
-		<text row="auto" align="center">$(Discipline.Libelle)</text>
+		<text row="auto" align="center" cond="discipline ~= 'RELAIS'">$(Discipline.Libelle)</text>
+		<text row="auto" align="center" cond="discipline == 'RELAIS'">$(Discipline.Libelle)..' '..SexeEpreuve</text>
 		<text row="auto" align="center" cond="params.code_epreuve ~= -1">$(Categorie{$(Epreuve.Code_categorie)}.Libelle)..' - '..$(Sexe{$(Epreuve.Sexe)}.Libelle)</text>
 		<text row="auto" align="center" >Titre</text>
 		<row h="0.5cm"/>
@@ -128,7 +132,7 @@
 			entite = $(Evenement.Code_entite)
 			discipline = $(Epreuve.Code_discipline)
 		</lua>
-		<col w="6,5,1, 0.2cm,4,4,1, 0.2cm,4,4,1" />
+		<col w="6,5,2, 0.2cm,4,4,1, 0.2cm,4,4,1" />
 
 		<row h="auto" />
 		<text col_start="1" col_end="3" align="center" underlined="1" font_size_step="1" font_weight="bold">'JURY DE COMPETITION'</text>
@@ -170,7 +174,7 @@
 		
 		<row h="auto" />
 		<text col_start="1" align="left">'COORDONNATEUR- '..entite..':'</text>
-		<text col_start="2" align="left">GetIdentiteOfficiels('ffs_coordinateur')</text>
+		<text col_start="2" align="left">GetIdentiteOfficiels('COORDINATOR')</text>
 		<text col_start="5" align="left" >'Montée Totale. :'</text>
 		<text col_start="6" align="left" >$(Epreuve.Montee_tot)</text>
 		<text col_start="9" align="left">'Style :'</text>
@@ -644,9 +648,28 @@
 	
 <!-- Edition Relais-->
 	<!-- Liste de départ relais-->
-	<report id="Lst_Relais" title="Liste de départ Relais " header="1" first_header="0">
-		
+	<report id="Lst_Relais" header="1" first_header="(params.first_header or '1')" >
 		<!-- <paper orientation="landscape" /> -->
+		<lua>
+			if $(Epreuve.Sexe) == 'F' then 		
+				SexeEpreuve = 'Féminin';
+			elseif $(Epreuve.Sexe) == 'M' then 		
+				SexeEpreuve = 'Masculin';
+			elseif $(Epreuve.Sexe) == 'T' then 		
+				SexeEpreuve = 'Mixte';
+			else
+				SexeEpreuve = "";
+			end
+			
+			if tonumber(params.Officiel) == 1 then
+				title = "Liste de départ Officielle \n par équipe"
+			elseif	tonumber(params.Officiel) == 0 then
+				title = "Liste de départ Officieuse  \n par équipe"
+			else
+				title = "Liste de départ  \n par équipe "
+			end
+		</lua>
+		<order key="Dossard"/>	
 		<lua>
 			bodyrelais = body:Copy(false);
 			for i=0, body:GetNbRows()-1 do
@@ -665,19 +688,23 @@
 			body:SetCounter('Code_epreuve');
 			NbEquipiers = tonumber($(Epreuve_Nordique.Equipe)) or 2;
 		</lua>
-		<order key="Dossard"/>
 		
 		<label>
+			<col w="2,8,4,6cm,1.6cm,3cm,1.5cm,3"/>
+			<row h="auto" />
+			<text col_start="1" col_end="3"  align="center"><background mode="solid" color="green" />'Equipe'</text>
+			<text col_start="4" col_end="7"  align="center"><background mode="solid" color="yellow" />'Relayeurs'</text>
+			<!-- <text col_start="8" col_end="0"  align="center"><background mode="solid" color="green" /></text> -->
 			<row h="auto" />
 			<pen border="all" size="1" />
-			<text col="2" align="center">'Dos'</text>
-			<text col="12" align="center">'Nom - Equipe'</text>
-			<text col="6" align="center">'S. Relais'</text>
-			<text col="6cm" align="left">'Dos - Identité Relayeur'</text>
-			<text col="2cm" align="center">'S. Relayeur'</text>
-			<text col="2cm" align="center">'Pts Relayeur'</text>
-			<text col="3" align="center">'CS.'</text>
-			<text col="5" align="center">'Pts. Rel.'</text>
+			<text col_start="1" align="center">'Dos'</text>
+			<text col_start="2" align="center">'Nom - Equipe'</text>
+			<text col_start="3" align="center">'Sexe'</text>
+			<text col_start="4" align="left">'Dos - Identité'</text>
+			<text col_start="5" align="center">'Categ.(S.)'</text>
+			<text col_start="6" align="center">'Club (CS.)'</text>
+			<text col_start="7" align="center">'Pts'</text>
+			<text col_start="8" align="center">'Pts.Equ.'</text>
 			<row h="0.4cm"/>
 		</label>
 		
@@ -699,22 +726,19 @@
 			<lua>for n=0,tonumber(NbEquipiers)-1 do</lua>
 			<row h="0.5cm"/>
 			<lua>end</lua>
-			<col w="2"/>
-			<text row_start="1" row_end="0" align="right" >$(Dossard)</text>
-			<col w="12"/>
-			<text row_start="1" row_end="0" align="left" >$(Identite)</text> 
-			<col w="6"/>
-				<lua>
-					if $(Sexe) == 'F' then 		
-						SexeEquipe = 'Féminine';
-					elseif $(Sexe) == 'M' then 		
-						SexeEquipe = 'Masculine';
-					elseif $(Sexe) == 'T' then 		
-						SexeEquipe = 'Mixte';
-					end
-				</lua>
-			<text row_start="1" row_end="0" align="center" >SexeEquipe</text>
-			<col w="6cm,2cm,2cm"/>
+			<col w="2,8,4,6cm,1.6cm,3cm,1.5cm,3" />
+			<text row_start="1" row_end="0" col_start="1" align="right" >$(Dossard)</text>
+			<text row_start="1" row_end="0" col_start="2" align="left" >$(Identite)</text> 
+			<lua>
+				if $(Sexe) == 'F' then 		
+					SexeEquipe = 'Féminine';
+				elseif $(Sexe) == 'M' then 		
+					SexeEquipe = 'Masculine';
+				elseif $(Sexe) == 'T' then 		
+					SexeEquipe = 'Mixte';
+				end
+			</lua>
+			<text row_start="1" row_end="0" col_start="3" align="center" >SexeEquipe</text>
 			<lua>
 				TableResultatEquipe = base:GetTable('Resultat_Equipe')
 						cmd = "Select * From Resultat_Equipe Where Code_evenement = "..$(Evenement.Code)..
@@ -726,6 +750,8 @@
 						IdentiteEquipier = base:TableLoad(TableResultatEquipe, cmd):GetCell('Nom', m);
 						SexeEquipier = base:TableLoad(TableResultatEquipe, cmd):GetCell('Sexe', m);
 						CategEquipier = base:TableLoad(TableResultatEquipe, cmd):GetCell('Categ', m);
+						ClubEquipier = base:TableLoad(TableResultatEquipe, cmd):GetCell('Club', m);
+						CsEquipier = base:TableLoad(TableResultatEquipe, cmd):GetCell('Comite', m);
 						PointEquipier = base:TableLoad(TableResultatEquipe, cmd):GetCell('Point', m);
 						if params.DossardRelais == 'Lettre' then
 							LettreDossard = $(Dossard)..'-'..base:TableLoad(TableResultatEquipe, cmd):GetCell('Numero', m);
@@ -733,22 +759,36 @@
 							LettreDossard = $(Dossard)..'/'..m+1;
 						end
 			</lua>
-			
-			<text row_start='(m+1)' col_start="4" align="left"  >LettreDossard..' - '..IdentiteEquipier</text>
-			<text row_start='(m+1)' col_start="5" align="center"  >SexeEquipier</text>
-			<text row_start='(m+1)' col_start="6" align="center"  >PointEquipier</text>
+			<text row_start='(m+1)' col_start="4" align="left" >LettreDossard..' - '..IdentiteEquipier</text>
+			<text row_start='(m+1)' col_start="5" align="center" >CategEquipier..''..SexeEquipier:Parenthesis()</text>
+			<text row_start='(m+1)' col_start="6" align="center" >ClubEquipier..''..CsEquipier:Parenthesis()</text>
+			<text row_start='(m+1)' col_start="7" align="center" >PointEquipier</text>
 			<lua>end</lua>  
-			
-			<col w="3"/>
-			<text row_start="1" row_end="0" align="center" >$(Comite)</text>
-			<col w="5"/>
-			<text row_start="1" row_end="0" align="right" >$(Point)</text>
+			<text row_start="1" row_end="0" col_start="8" align="right" >$(Point)</text>
 			<row h="0.6cm"/>
 		</body>
 	</report>	
 
 	<!-- Resultat de relais-->
-	<report id="res_Relais" title="Résultats Relais " header="1" first_header="0">
+	<report id="res_Relais" title="Résultats Relais " header="1" first_header="(params.first_header or '1')">
+		<lua>
+			if $(Epreuve.Sexe) == 'F' then 		
+				SexeEpreuve = 'Féminin';
+			elseif $(Epreuve.Sexe) == 'M' then 		
+				SexeEpreuve = 'Masculin';
+			elseif $(Epreuve.Sexe) == 'T' then 		
+				SexeEpreuve = 'Mixte';
+			else
+				SexeEpreuve = "";
+			end
+			if tonumber(params.Officiel) == 1 then
+				title = "Résultats Officiels "
+			elseif	tonumber(params.Officiel) == 0 then
+				title = "Résultats Officieux "
+			else
+				title = "Résultats Provisoires "
+			end
+		</lua>
 		<column name="Tps_status">chrono.Status(body:GetCellInt('Tps', row))</column>
 		<rupture key="Tps_status">
 			<before cond="$(Tps_status) ~= 'ok'">
@@ -878,13 +918,19 @@
 				
 					<lua>end</lua>
 			<col w="2"/>
-			<text row_start="1" row_end="1" align="center" label="CS." border="none" >$(Comite)</text>
+			<!-- <text row_start="1" row_end="1" align="center" label="CS." border="none" >$(Comite)</text> -->
+			<text row_start="1" row_end="1" align="center" label="CS." border="none" >$(Club)</text>
 			<col w="5"/>
 			<text row_start="1" row_end="1" align="right" label="Tps. Equipe" border="none" >$(Tps)</text>
 			<col w="4"/>
-			<text row_start="1" row_end="1" align="right" label="Tps. Equipe" border="none" >$(Diff)</text>
+			<text row_start="1" row_end="1" align="right" label="Ecart. Equipe" border="none" >$(Diff)</text>
 			<row h="0.6cm"/>
 		</body>
+		
+		<end cond="tonumber(params.Officiel)==1">
+			<lua>sqlBase.FixationTableRanking(body)</lua>
+			<call option="signature_dt" file="./edition/options.xml" />
+		</end>
 	</report>
 	
 	<!-- Tableau de services -->
