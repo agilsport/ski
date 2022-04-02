@@ -4,12 +4,12 @@ dofile('./interface/device.lua');
 dofile('./interface/adv.lua');
 
 -- Information : Numéro de Version, Nom, Interface
-	-- 6.5 sur les microgate u tab supression du temps tournant si ouvreur en course on affiche Ouvreur A ou B...
+	-- 6.6 sur les microgate u tab supression du temps tournant si ouvreur en course on affiche Ouvreur A ou B...
 	-- 	Rectification pour le Alge gaz 4
-	-- relecture apres la version 6.4 de pierre
+	-- relecture apres la version 6.5de pierre
 function device.GetInformation()
 	return { 
-		version = 6.5, 
+		version = 6.6, 
 		code = 'matrix_board', 
 		name = 'Tableau Matrice', 
 		class = 'display', 
@@ -78,8 +78,10 @@ function device.OnInit(params, node)
 
 	-- TCP agil_pi_display => Mode Async 
 	params.target = params.target or '';
-	if params.type == "tcp" and string.find(params.target, 'agil_pi_display') == 1 then
-		params.type = 'tcp_async';
+	if params.type == "tcp" then
+		if string.find(params.target, 'agil_pi_display') == 1 or string.find(params.target, 'agil_pi_led') == 1 then
+			params.type = 'tcp_async';
+		end
 	end
 
 	-- Appel OnInit Metatable
@@ -845,7 +847,6 @@ function InitTemplateFieldsMessage(node)
 	local rowCount = displayBoard:MatrixGetRowCount();
 	local columnCount = displayBoard:MatrixGetColumnCount();
 	
-	-- permet d'envoyer un message a bandeau défilant sur le microtab 1 ligne 9 colonnes
 	local target = displayBoard:MatrixGetTarget();
 	if target == 'agil_pi_led' then
 		columnCount = 255;
@@ -1099,7 +1100,8 @@ function SynchroFieldsAgilPiLed(fields)
 					if type(field.agil_pi_display_font) == 'string' then
 						font = field.agil_pi_display_font;
 					end
-					
+
+					field.txt = field.txt:TrimAll(); 
 					if font == '-scroll8x8' then
 						cmd = cmd..string.char(3)..'-scroll8x8 "'..field.txt..'" '..tostring(GetFieldColor(field):GetRGB())..' 0 '..tostring(row)..' 96 '..tostring(8)..' '..tostring(field.timer);
 					else
