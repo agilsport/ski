@@ -13,8 +13,8 @@
 			<menu title="Liste Départ Relais (1-a)" image="./res/16x16_official.png"  Officiel="0" first_header="0" id="Lst_Relais" DossardRelais="Lettre"/>
 			<menu title="Liste Départ Relais (1-a) Officiels" image="./res/16x16_official.png"  Officiel="1" first_header="1" id="Lst_Relais" DossardRelais="Lettre"/>
 			<menu title="Liste Départ Relais (1/²)" image="./res/16x16_official.png" id="Lst_Relais" DossardRelais="Numeric"/>
-			<menu title="Résultats Officieux Relais (1-a)" image="./res/16x16_official.png" id="res_Relais" Officiel="0" DossardRelais="Lettre" />
-			<menu title="Résultats Officiels Relais (1-a)" image="./res/16x16_official.png" id="res_Relais" Officiel="1" DossardRelais="Lettre" />
+			<menu title="Résultats Officieux Relais (1-a)" image="./res/16x16_official.png" id="res_Relais" Officiel="0" first_header="0" DossardRelais="Lettre" />
+			<menu title="Résultats Officiels Relais (1-a)" image="./res/16x16_official.png" id="res_Relais" Officiel="1" first_header="1" DossardRelais="Lettre" />
 			<menu title="Résultats Relais (1/²)" image="./res/16x16_official.png" id="res_Relais" DossardRelais="Numeric" />
 			<menu title="Résultats Tours (1-a)" image="./res/16x16_official.png" id="res_Tour" DossardRelais="Lettre" />
 		</menu>
