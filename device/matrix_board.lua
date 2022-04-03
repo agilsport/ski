@@ -4,9 +4,12 @@ dofile('./interface/device.lua');
 dofile('./interface/adv.lua');
 
 -- Information : Numéro de Version, Nom, Interface
+	-- 6.6 sur les microgate u tab supression du temps tournant si ouvreur en course on affiche Ouvreur A ou B...
+	-- 	Rectification pour le Alge gaz 4
+	-- relecture apres la version 6.5de pierre
 function device.GetInformation()
 	return { 
-		version = 6.3, 
+		version = 6.6, 
 		code = 'matrix_board', 
 		name = 'Tableau Matrice', 
 		class = 'display', 
@@ -22,6 +25,7 @@ end
 boardTarget = 
 { 
 	'agil_pi_display',
+	'agil_pi_led',
 	'alge_dtrn',
 	'alge_gaz4m',
 	'eridan',
@@ -74,8 +78,10 @@ function device.OnInit(params, node)
 
 	-- TCP agil_pi_display => Mode Async 
 	params.target = params.target or '';
-	if params.type == "tcp" and string.find(params.target, 'agil_pi_display') == 1 then
-		params.type = 'tcp_async';
+	if params.type == "tcp" then
+		if string.find(params.target, 'agil_pi_display') == 1 or string.find(params.target, 'agil_pi_led') == 1 then
+			params.type = 'tcp_async';
+		end
 	end
 
 	-- Appel OnInit Metatable
@@ -236,7 +242,7 @@ end
 -- <= 12 Caractères
 function InitTemplateFieldsMini()
 	local columnCount = displayBoard:MatrixGetColumnCount();
-	local lgBib = 3;
+	lgBib = 3;
 	if displayBoard:MatrixGetColumnCount() <= 8 then lgBib = 2 end
 	
 	-- Dossard
@@ -834,11 +840,19 @@ function InitTemplateFieldsMessage(node)
 	local color2 = color.Create(node:GetAttribute('color2', 'red'))
 	local color3 = color.Create(node:GetAttribute('color3', 'red'))
 	
+	local timer1 = tonumber(node:GetAttribute('timer1', '0')) or 0;
+	local timer2 = tonumber(node:GetAttribute('timer2', '0')) or 0;
+	local timer3 = tonumber(node:GetAttribute('timer3', '0')) or 0;
+	
 	local rowCount = displayBoard:MatrixGetRowCount();
 	local columnCount = displayBoard:MatrixGetColumnCount();
 	
-	-- permet d'envoyer un message a bandeau défilant sur le microtab 1 ligne 9 colonnes
 	local target = displayBoard:MatrixGetTarget();
+	if target == 'agil_pi_led' then
+		columnCount = 255;
+	end
+	
+	-- permet d'envoyer un message a bandeau défilant sur le microtab 1 ligne 9 colonnes
 	local mode = displayBoard:MatrixGetMode(); 
 	if target == "microgate_tab" and (mode:find('message') or -1) == 1 then
 		local msg = node:GetAttribute('message');
@@ -865,6 +879,12 @@ function InitTemplateFieldsMessage(node)
 		elseif r == 1 then templateFieldsMsg['row1'].color = color2;
 		else templateFieldsMsg['row'..tostring(r)].color = color3;
 		end
+
+		if r == 0 then templateFieldsMsg['row0'].timer = timer1;
+		elseif r == 1 then templateFieldsMsg['row1'].timer = timer2;
+		else templateFieldsMsg['row'..tostring(r)].timer = timer3;
+		end
+		
 	end
 
 	local msg = node:GetAttribute('message');
@@ -1029,6 +1049,72 @@ function SynchroFieldsAgilPi(fields)
 	
 	if type(mt_device.obj) == 'table' and cmd:len() > 0 then
 		cmd = '-c '..cmd..'-s ';
+		socket.SendTcpAsync(displayBoard, mt_device.obj.hostname, mt_device.obj.port, cmd);
+--		adv.Alert('cmd='..cmd);
+	end
+end
+
+function SynchroFieldsAgilPiLed(fields)
+	if fields == nil then
+		if type(mt_device.obj) == 'table' then
+			socket.SendTcpAsync(displayBoard, mt_device.obj.hostname, mt_device.obj.port, '-c'..string.char(0));
+		end
+		return;
+	end
+
+	local cmd = '';
+	for i=1,#fields.array do
+		local item = fields.array[i];
+		local field = fields[item.code];
+		if type(field) == 'table' then
+			local condition = true;
+			if type(field.condition) == 'function' then
+				condition = field.condition(item.txt);
+			end
+			if condition == true then
+				if string.sub(item.txt,1,2) == '[[' then
+					cmd = string.sub(item.txt,3);
+					cmd = cmd:Replace('$', string.char(3));
+					cmd = cmd..string.char(0);
+					socket.SendTcpAsync(displayBoard, mt_device.obj.hostname, mt_device.obj.port, cmd);
+					return;
+				end
+
+				field.txt = GetFieldText(field, item.txt);
+				if type(field.agil_pi_display_fmt) == 'function' then
+					field.agil_pi_display_fmt(field, item.client_data);
+				end
+				if field.txt ~= '' then
+					local row = item.row;
+					if row == nil then row = field.row end
+					row = row*8;
+					local col = field.col*8;
+					if type(field.agil_pi_display_col) == 'number' then
+						col = field.agil_pi_display_col;
+					end
+					local font = '-t8x8';
+					if field.timer ~= nil and tonumber(field.timer) > 0 then
+						font = '-scroll8x8';
+					end
+					
+					if type(field.agil_pi_display_font) == 'string' then
+						font = field.agil_pi_display_font;
+					end
+
+					field.txt = field.txt:TrimAll(); 
+					if font == '-scroll8x8' then
+						cmd = cmd..string.char(3)..'-scroll8x8 "'..field.txt..'" '..tostring(GetFieldColor(field):GetRGB())..' 0 '..tostring(row)..' 96 '..tostring(8)..' '..tostring(field.timer);
+					else
+						if row == 8 then row = 9 end
+						cmd = cmd..string.char(3)..font..' '..'"'..field.txt..'" '..tostring(GetFieldColor(field):GetRGB())..' '..tostring(col)..' '..tostring(row);
+					end
+				end
+			end
+		end
+	end
+	
+	if type(mt_device.obj) == 'table' and cmd:len() > 0 then
+		cmd = '-c'..string.char(3)..'-cscroll'..string.char(3)..cmd..string.char(3)..'-s'..string.char(0);
 		socket.SendTcpAsync(displayBoard, mt_device.obj.hostname, mt_device.obj.port, cmd);
 --		adv.Alert('cmd='..cmd);
 	end
@@ -1310,7 +1396,7 @@ function Board_RunningTime(running_time)
 		end
 		
 		ResetArrayField(templateFields);
-		AddField(templateFields, 'bib_running', tRunning:GetCell('Dossard', row));
+		AddField(templateFields, 'bib_running', tRunning:GetCell('Dossard', row):upper());
 		AddField(templateFields, 'identity_running', GetIdentity(tRunning, row));
 		
 		if displayBoard:MatrixGetRunningTime() == 100 then
@@ -1523,6 +1609,10 @@ function SynchroRow(rowMin, rowMax, fields)
 	if target == 'agil_pi_display' then
 		-- Agil PI-DISPLAY
 		SynchroFieldsAgilPi(fields);
+	elseif target == 'agil_pi_led' then
+		-- Agil PI-LED
+		SynchroFieldsAgilPiLed(fields);
+
 	elseif target == 'alge_dtrn' then
 		-- Alge DTRN
 		local txt = '';
@@ -1546,7 +1636,19 @@ function SynchroRow(rowMin, rowMax, fields)
 	elseif target == 'microgate_tab' then
 		-- Microgate Tab 
 		for row=rowMin, rowMax do
-			local txt = displayBoard:MatrixGetText(row, 0, row, colCount-1);
+				-- Microgate Tab 
+			txt = displayBoard:MatrixGetText(row, 0, row, colCount-1);
+			local Dossard = displayBoard:MatrixGetText(row, 0, row, colCount-1); 
+			local Dossard = Dossard:sub(lgBib,lgBib)		
+			-- adv.Alert("Dossard :"..Dossard);
+			local DosOuvreur = {"A", "B", "C", "D", "E", "F", "G", "H"};
+			for i, k in ipairs(DosOuvreur) do
+				if k == Dossard:upper() then
+					-- adv.Alert("k:upper() :"..Dossard:upper());
+					txt = 'Ouvreur '..Dossard:upper();
+				end
+			end
+			-- adv.Alert("txt :"..txt);
 			SynchroMicrogateTab(mt_device.obj, row, txt); 
 		end
 	elseif target == 'microgate_graph' then
@@ -1780,7 +1882,7 @@ function SynchroAlgeGaz4meca(fields)
 
 	local bibGaz4 = '';	
 	local timeGaz4 = '';
-	local rkGaz4 = '';
+	local rkGaz4 = '  '; -- bien laisser les 2 espaces pour le tps tournant
 	
 	for i=1,#fields.array do
 		local item = fields.array[i];
@@ -1816,6 +1918,7 @@ function SynchroAlgeGaz4meca(fields)
 			elseif item.code == "rank_finish" or item.code == "rank__inter" then
 				rkGaz4 = txtValue;
 				rkGaz4 = string.format('%2d', tonumber(rkGaz4) or 99)
+				--adv.Alert("txtValue :"..txtValue);
 			end
 		end
 	end
