@@ -729,11 +729,12 @@ function LitRegroupementCourses();	-- lecture des courses figurant dans la valeu
 			rRegroupement_Courses:Set('Code_entite', code_entite);
 			rRegroupement_Courses:Set('Code_activite', code_activite);
 			rRegroupement_Courses:Set('Code_saison', code_saison);
+
 			if filtre:len() > 0 then
+				filtre = "$(Sexe):In('F') and "..filtre;
 				rRegroupement_Courses:Set('Filtre', filtre);
 			else
-				filtre = "$(Sexe):In('F')";
-				rRegroupement_Courses:Set('Filtre', filtre);
+				rRegroupement_Courses:Set('Filtre', "$(Sexe):In('F')");
 			end
 
 			rRegroupement_Courses:Set('Date', tEpreuve:GetCell('Date_epreuve', 0, '%2D-%2M-%4Y'));
@@ -773,10 +774,10 @@ function LitRegroupementCourses();	-- lecture des courses figurant dans la valeu
 			rRegroupement_Courses:Set('Code_activite', tEvenement:GetCell('Code_activite', 0));
 			rRegroupement_Courses:Set('Code_saison', tEvenement:GetCell('Code_saison', 0));
 			if filtre:len() > 0 then
+				filtre = "$(Sexe):In('M') and "..filtre;
 				rRegroupement_Courses:Set('Filtre', filtre);
 			else
-				filtre = "$(Sexe):In('M')";
-				rRegroupement_Courses:Set('Filtre', filtre);
+				rRegroupement_Courses:Set('Filtre', "$(Sexe):In('M')");
 			end
 			rRegroupement_Courses:Set('Date', tEpreuve:GetCell('Date_epreuve', 0, '%2D-%2M-%4Y'));
 			rRegroupement_Courses:Set('Code_discipline', tEpreuve:GetCell('Code_discipline', 0));
