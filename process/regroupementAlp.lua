@@ -731,7 +731,11 @@ function LitRegroupementCourses();	-- lecture des courses figurant dans la valeu
 			rRegroupement_Courses:Set('Code_saison', code_saison);
 			if filtre:len() > 0 then
 				rRegroupement_Courses:Set('Filtre', filtre);
+			else
+				filtre = "$(Sexe):In('F')";
+				rRegroupement_Courses:Set('Filtre', filtre);
 			end
+
 			rRegroupement_Courses:Set('Date', tEpreuve:GetCell('Date_epreuve', 0, '%2D-%2M-%4Y'));
 			rRegroupement_Courses:Set('Code_discipline', tEpreuve:GetCell('Code_discipline', 0));
 			rRegroupement_Courses:Set('Facteur_f', facteur_f);
@@ -770,6 +774,9 @@ function LitRegroupementCourses();	-- lecture des courses figurant dans la valeu
 			rRegroupement_Courses:Set('Code_saison', tEvenement:GetCell('Code_saison', 0));
 			if filtre:len() > 0 then
 				rRegroupement_Courses:Set('Filtre', filtre);
+			else
+				filtre = "$(Sexe):In('M')";
+				rRegroupement_Courses:Set('Filtre', filtre);
 			end
 			rRegroupement_Courses:Set('Date', tEpreuve:GetCell('Date_epreuve', 0, '%2D-%2M-%4Y'));
 			rRegroupement_Courses:Set('Code_discipline', tEpreuve:GetCell('Code_discipline', 0));
@@ -790,7 +797,7 @@ function LitRegroupementCourses();	-- lecture des courses figurant dans la valeu
 		local filter = tRegroupement_Courses:GetCell('Filtre', i);
 		local code = tRegroupement_Courses:GetCellInt('Code', i);
 		local sexe = tRegroupement_Courses:GetCell('Sexe', i);
-		local cmd = 'Select * From Resultat Where Code_evenement = '..code..' Order By Tps DESC';
+		local cmd = 'Select * From Resultat Where Code_evenement = '..code.." and Sexe = '"..sexe.."' Order By Tps DESC";
 		base:TableLoad(tResultat, cmd);
 
 		if filter:len() > 0 then
@@ -1401,8 +1408,8 @@ function main(params_c)
 	params.height = display:GetSize().height / 2;
 	params.x = (display:GetSize().width - params.width) / 2;
 	params.y = 0;
-	params.debug = true;
-	params.version = "1.9";
+	params.debug = false;
+	params.version = "2.0";
 	base = base or sqlBase.Clone();
 	tPlace_Valeur = base:GetTable('Place_Valeur');
 	tEvenement = base:GetTable('Evenement');
