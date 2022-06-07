@@ -2,7 +2,6 @@
 <!-- Matrice Individuelle PG -->
 <!-- <background mode="gradient_line_vert" color_start="white" color_end="ltgray" /> -->
 <root title="Tirage des dossards avec options">
-  <config clef1="3" option1="4" option2="4"/>
   <panel name="bibo">
     <padding all="10px"/>
     <col value="1"/>
@@ -19,6 +18,48 @@
       <row value="20px"/>
       <toolbar row="auto" col_start="1" col_end="0" name="tbbibo" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
     </matrix>
+    <row value="1"/>
+  </panel>
+  <panel name="setup">
+    <lua>dofile('./interface/adv.lua');
+		dofile('./edition/functionPG.lua');
+		</lua>
+    <padding all="5px"/>
+    <col value="1,20px,1"/>
+    <row value="20px"/>
+	<statictext row="auto" col_start="1" col_end="0" font_weight="bold" style="ALIGN_CENTER" label="Indiquer les ordres de tirage dans les différents groupes de tirage.\nLe nombre de groupes est alors défini automatiquement."/>
+	<statictext row="auto" col_start="1" col_end="0" font_weight="bold" style="ALIGN_CENTER" label="\'1-2\' signifie : du groupe 1 au groupe 2 sans prise en compte du groupe d\'appartenance.\n\'1,2\' signifie : le groupes 1 puis le groupe 2 pris et traités dans cet ordre"/>
+    <row value="20px"/>
+    <matrix col_start="1" row="auto">
+	<row value="30px"/>
+      <col value="1,1,2"/>
+	<row value="auto" count="(params.nbmanches +1)" />
+	<statictext row_start="2" col_start="2" font_weight="bold" style="ALIGN_CENTER" label="Groupes"/>
+	<statictext row_start="2" col_start="3" font_weight="bold" style="ALIGN_CENTER" label="Mode de tirage"/>
+	<lua>for i = 1, params.nbmanches do</lua>
+		<statictext row_start="(i+2)" col_start="1" font_weight="bold" style="ALIGN_RIGHT" label="('Manche '..i)"/>
+		<textctrl row_start="(i+2)" col_start="2" name="('course1_manche'..i)" />
+		<combobox row_start="(i+2)" col_start="3" name="('course1_sens'..i)" style="CB_READONLY"/>
+	<lua>end</lua>
+    </matrix>
+    <matrix col_start="3" row_start="-1" row="auto">
+	<row value="30px"/>
+      <col value="1,1,2"/>
+	<row value="auto" count="(params.nbmanches + 1)" />
+	<statictext row_start="2" col_start="1" font_weight="bold" style="ALIGN_RIGHT" label="Garder les dossards"/>
+	<statictext row_start="2" col_start="3" font_weight="bold" style="ALIGN_CENTER" label="Mode de tirage"/>
+	<combobox row_start="2" col_start="2" name="bib_skip" />
+	<lua>for i = 1, params.nbmanches do</lua>
+		<statictext row_start="(i+2)" col_start="1" font_weight="bold" style="ALIGN_RIGHT" label="('Manche '..i)"/>
+		<textctrl row_start="(i+2)" col_start="2" name="('course2_manche'..i)" />
+		<combobox row_start="(i+2)" col_start="3" name="('course2_sens'..i)" style="CB_READONLY"/>
+	<lua>end</lua>
+    </matrix>
+      <row value="20px"/>
+     <staticbox row_start="-2" row_end="0" col_start="1" label="Course 1"/>
+     <staticbox row_start="-2" row_end="0" col_start="3" label="Course 2"/>
+       <row value="20px"/>
+      <toolbar row="auto" col_start="1" col_end="0" name="tbsetup" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
     <row value="1"/>
   </panel>
   <panel name="config">
@@ -43,8 +84,7 @@
       <matrix row="auto" col_start="2" col_end="3">
         <col value="1,1,3"/>
         <statictext row="auto" col_start="1" col_end="0" style="ALIGN_CENTER" label="Courses concernées pour le tirage"/>
-        <row value="5px"/>
-        <statictext row="auto" col_start="1" style="ALIGN_RIGHT" label="Course 1 : "/>
+        <row value="5px"/>        <statictext row="auto" col_start="1" style="ALIGN_RIGHT" label="Course 1 : "/>
         <textctrl col_start="2" name="course1"/>
         <textctrl col_start="3" name="course1_nom"/>
         <statictext row="auto" col_start="1" style="ALIGN_RIGHT" label="Course 2 : "/>
@@ -52,7 +92,7 @@
         <textctrl col_start="3" name="course2_nom"/>
       </matrix>
       <row value="10px"/>
-      <staticbox row_start="-3" row_end="0" col_start="2" col_end="3" label="Courses Nationales ou Coupes d\'Argent U14/U16"/>
+      <staticbox row_start="-3" row_end="0" col_start="2" col_end="3" label="Prise en compte des courses"/>
       <row value="10px"/>
       <row value="20px"/>
       <toolbar row="auto" col_start="1" col_end="0" name="tbconfig" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
