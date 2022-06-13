@@ -190,9 +190,9 @@ function OnSetup(selection)
 	dlgSetup:ShowModal();
 end
 
-function CheckExaequo(idx);
-	local tablex = tResultat_Copy:Copy();
-	params.row_exaequo = {};
+function CheckExaequo(tablex, idx);
+	params.row_exaequo =  {};
+	params.tExaequo =  {};
 	local rang_tirage = 0;
 	if idx > 1 then
 		rang_tirage = tBibo[idx-1].NbRows;
@@ -200,50 +200,53 @@ function CheckExaequo(idx);
 	local nb_points = rang_tirage;
 	local exaequo_ajoute = 0;
 	local nb_exeaquo = 0;
-	tNePasTirer = tNePasTirer or {};
-	params.tExaequo = params.tExaequo or {};
 --	table.insert(tBibo, {Sexe = 'M', NbRows = tResultat:GetCounterValue('Sexe', 'M'), RowFirst = row_first, RowEnd = row_end, PtsBibo = 0, LastRowBibo = -1,  LastRowPts = -1, FirstRowPtsNull = -1, Reserves = {}});
 	for i = 0, tablex:GetNbRows() -1 do
+		local code_coureur = tablex:GetCell('Code_coureur', i);
+		local r = tResultat:GetIndexRow('Code_coureur', code_coureur);
 		local point = tablex:GetCellDouble('Point', i, -1);
-		if point >= 0 then
+		local point_next = -1;
+		if i < tablex:GetNbRows() -1 then
+			point_next = tablex:GetCellDouble('Point', i+1, -1);
+		end
+		if point >= 0 and point > tBibo[idx].PtsBibo then
 			nb_points = nb_points + 1
 			if nb_exeaquo == 0 then
 				rang_tirage = rang_tirage + 1 + exaequo_ajoute;
 				tablex:SetCell('Rang', i, rang_tirage);
+				tResultat:SetCell('Rang', r, rang_tirage);
 				exaequo_ajoute = 0;
 			else
 				exaequo_ajoute = exaequo_ajoute + 1;
 				nb_exeaquo = nb_exeaquo - 1;
-			end
-			if tablex:GetCellDouble('Point', i+1) == point then
-				if not tNePasTirer[rang_tirage] then
-					tNePasTirer[rang_tirage] = {};
-				end
-				-- tNePasTirer[rang_tirage] = {};
-				params.row_exaequo[rang_tirage] = {};
-				nb_exeaquo = nb_exeaquo + 1;
-				for j = 1, #params.tExaequo do
-					if not params.tExaequo[j] then
-						table.insert(params.tExaequo, rang_tirage);
-					else
-						break;
-					end
-				end
-				if params.tExaequo[#params.tExaequo] ~= rang_tirage then
-					tNePasTirer[rang_tirage] = {};
-				end
-			end
-			if tNePasTirer[rang_tirage] then
 				tablex:SetCell('Rang', i, rang_tirage);
-				table.insert(params.tExaequo, rang_tirage);
-			end 
-		else
+				tResultat:SetCell('Rang', r, rang_tirage);
+			end
+			if point_next == point then
+				if not params.row_exaequo[rang_tirage] then
+					params.row_exaequo[rang_tirage] = {};
+					table.insert(params.tExaequo, rang_tirage);
+				end
+				nb_exeaquo = nb_exeaquo + 1;
+			end
+			if nb_exeaquo > 0 then
+				tablex:SetCell('Rang', i, rang_tirage);
+				tResultat:SetCell('Rang', r, rang_tirage);
+			end
+		elseif point < 0 then
 			tablex:SetCell('Rang', i, nb_points +1);
-			table.insert(params.tExaequo, nb_points +1);
-			tNePasTirer[nb_points +1] = {};
+			tResultat:SetCell('Rang', r, nb_points +1);
+			if not params.row_exaequo[nb_points +1] then
+				params.row_exaequo[nb_points +1] = {};
+				table.insert(params.tExaequo, nb_points +1);
+				--adv.Alert('dans CheckExaequo, ne pas tirer le rang : '..(nb_points +1)..' de tablex');
+			end
 		end
 	end
-	base:TableBulkUpdate(tablex, 'Rang', 'Resultat');
+	-- adv.Alert('sortie de CheckExaequo, taille de params.tExaequo = '..#params.tExaequo)
+	for j = 1, #params.tExaequo do
+		-- adv.Alert('exeaquo sur : '..params.tExaequo[j]);
+	end
 end
 
 function GetBibo(bibo, bib_first)
@@ -426,7 +429,7 @@ function OnTirageManche1()
 			intercaler = 1;
 		end
 	end
-	local groupe_en_cours = '';
+	local groupe_en_cours = 'Je suis le groupe en cours';
 	local groupe_lu = '';
 	local row_start = 0;
 	local row_end = 0;
@@ -434,80 +437,97 @@ function OnTirageManche1()
 	local reserve = 0;
 	local sexe_count = tResultat:GetCounter('Sexe'):GetNbRows() -1;
 	for i = 1, #tBibo do
-		params.bib_first = 1;
+		base:TableLoad(tResultat, 'Select * From Resultat Where Code_evenement = '..params.code_evenement..' Order By Rang, Dossard');
 		tResultat:OrderRandom();		-- ordre par défaut à la mêlée
-		tResultat_Copy = tResultat:Copy();
-		
+		params.bib_first = 1;
 		-- table.insert(tBibo, {Sexe = 'M', NbRows = tResultat:GetCounterValue('Sexe', 'M'), RowFirst = row_first, RowEnd = row_end, PtsBibo = 0, LastRowBibo = -1, LastRowPts = -1, Reserves = {}});
-		-- local tReserves = {};
+		local tReserves = {};
 		if dlgConfig:GetWindowName('option2'):GetSelection() == 2 then	-- gestion du bibo
-			local filter = "$(Sexe):In('"..tBibo[i].Sexe.."')";
-			tResultat_Copy:Filter(filter, true);
+			tResultat:OrderBy('Point');
 			if i > 1 then
 				params.bib_first = tBibo[i-1].NbRows + 1;
 			end
-			tResultat_Copy:OrderBy('Point');
 			if params.bibo < 0 then
 				params.bibo, params.dossard = GetBibo(15);
 			end
-			for row = 0, tResultat_Copy:GetNbRows() -1 do
-				if tBibo[i].PtsBibo == 0 then
-					tBibo[i].PtsBibo = tResultat_Copy:GetCellDouble('Point', params.bibo - 1);
-				end
-				local pts = tResultat_Copy:GetCellDouble('Point', row, 10000);
-				if pts <= tBibo[i].PtsBibo then
-					if tBibo[i].LastRowBibo < 0 then
+			tDraw = tResultat:Copy();
+			local filter = "$(Sexe):In('"..tBibo[i].Sexe.."')";
+			tDraw:Filter(filter, true);
+			CheckExaequo(tDraw, i);
+			tBibo[i].PtsBibo = tDraw:GetCellDouble('Point', params.bibo - 1);
+			for row = 0, tDraw:GetNbRows() -1 do
+				local code_coureur = tDraw:GetCell('Code_coureur', row);
+				local point = tDraw:GetCellDouble('Point', row, 10000);
+				local r = tResultat:GetIndexRow('Code_coureur', code_coureur);
+				if point <= tBibo[i].PtsBibo then
+					if row == 0 then
 						reserve = reserve + 1;
-						-- table.insert(tReserves, reserve);
 					end
+					if #tReserves < 1 then
+						table.insert(tReserves, reserve);
+					end
+					tReserves[1] = reserve;
 					tBibo[i].LastRowBibo = row;
-				elseif pts < 10000 then
-					if tBibo[i].LastRowPts < 0 then
+				elseif point < 10000 then
+					if row == tBibo[i].LastRowBibo + 1 then
 						reserve = reserve + 1;
-						-- table.insert(tReserves, reserve);
+					end
+					if #tReserves < 2 then
+						table.insert(tReserves, reserve);
 					end
 					tBibo[i].LastRowPts = row;
 				else
-					if tBibo[i].FirstRowPtsNull < 0 then
+					if row == tBibo[i].LastRowPts + 1 then
 						reserve = reserve + 1;
-						-- table.insert(tReserves, reserve);
-						tBibo[i].FirstRowPtsNull = row;
+					end
+					if #tReserves < 3 then
+						table.insert(tReserves, reserve);
 					end
 				end
-				tResultat_Copy:SetCell('Reserve', row, reserve);
+				tDraw:SetCell('Reserve', row, reserve);
+				tResultat:SetCell('Reserve', r, reserve);
 			end
-			base:TableBulkUpdate(tResultat_Copy, 'Reserve', 'Resultat');
-			CheckExaequo(i);
-			if i == #tBibo then
-				for exaequo = 1, #params.tExaequo do
-					if params.tExaequo[exaequo] < tResultat:GetNbRows() then
-						BuildTableTirage(params.tExaequo[exaequo], false, false) -- tirage des exaequo par groupe de Reserve
+			tBibo[i].Reserves = tReserves;
+			for ireserve = 1,  tReserves[#tReserves] do
+				local reserve = tReserves[ireserve];
+				if reserve == 1 or reserve == 4 then
+					local tablex = tResultat:Copy();
+					filter = "$(Reserve):In("..reserve..")";
+					tablex:Filter(filter, true);
+					-- tirage à la mêlée
+					-- BuildTableTirage(tDraw, rang_tirage, bib_first, set_rang);
+					BuildTableTirage(tablex, nil, params.bib_first, false);
+				else
+					for exaequo = 1, #params.tExaequo do
+						local tablex = tResultat:Copy();
+						BuildTableTirage(tablex, params.tExaequo[exaequo], nil, false) -- tirage des exaequo par groupe de Reserve
 					end
 				end
-				tResultat:OrderBy('Rang');
-				for row = 0, tResultat:GetNbRows() -1 do
-					if tResultat:GetCellInt('Dossard', row) == 0 then
-						tResultat:SetCell('Dossard', row, row+1);
-					end
+				for row = 0, tDraw:GetNbRows() -1 do
+					local code_coureur = tDraw:GetCell('Code_coureur', row);
+					local r = tResultat:GetIndexRow('Code_coureur', code_coureur);
+					
+					if tResultat:GetCellInt('Dossard', r) == 0 then
+						tResultat:SetCell('Dossard', r, tResultat:GetCellInt('Rang', r));
+					end					
 				end
-				base:TableBulkUpdate(tResultat, 'Dossard', 'Resultat');
 			end
 		else	-- pas de gestion du bibo
 			local reserve = 0;
 			tReserve = {};
 			local sexe_encours = tBibo[i].Sexe;
-			if string.find(clef1, '1%.') == 0 then	-- par sexe
+			if string.find(clef1, '1%.') then		-- par sexe
 				tResultat_Copy:OrderBy('Sexe');
 			elseif string.find(clef1, '2%.') then	-- par sexe et categ
 				tResultat_Copy:AddColumn({ name = 'Categ_ordre', type = sqlType.LONG, style = sqlStyle.NULL });
 				for row = 0, tResultat_Copy:GetNbRows() -1 do
-					-- for icateg = 0, tCategorie:GetNbRows() -1 do
-						-- local ordre = tCategorie:GetCellInt('Ordre', icateg) 
-						-- if categ ==  tCategorie:GetCell('Code', icateg) then
-							-- tResultat_Copy:SetCell('Categ_ordre', row, ordre);
-							-- break;
-						-- end
-					-- end
+					for icateg = 0, tCategorie:GetNbRows() -1 do
+						local ordre = tCategorie:GetCellInt('Ordre', icateg) 
+						if categ ==  tCategorie:GetCell('Code', icateg) then
+							tResultat_Copy:SetCell('Categ_ordre', row, ordre);
+							break;
+						end
+					end
 					local categ = tResultat_Copy:GetCell('Categ', row);
 					local r = tCategorie:GetIndexRow('Code', categ);
 					if r and r >= 0 then
@@ -528,7 +548,7 @@ function OnTirageManche1()
 				end
 			end
 			for row = 0, tResultat_Copy:GetNbRows() -1 do
-				if string.find(clef1, '1%.') == 0 then	-- par sexe
+				if string.find(clef1, '1%.') then		-- par sexe
 					groupe_lu = tResultat_Copy:GetCell('Sexe', row);
 				elseif string.find(clef1, '2%.') then	-- par sexe et catzg
 					if intercaler == 0 then			-- les dames avant les hommes
@@ -553,17 +573,13 @@ function OnTirageManche1()
 			end
 			base:TableBulkUpdate(tResultat_Copy,'Rang, Reserve', 'Resultat');
 			base:TableLoad(tResultat, 'Select * From Resultat Where Code_evenement = '..params.code_evenement..' Order By Rang');
-			
+			params.bib_first = 1;
 			for reserve = 1, #tReserve do
-				if reserve == 1 then
-					params.bib_first = 1;
-				else
-					params.bib_first = params.bib_first + tResultat_Copy:GetCounterValue('Rang', reserve-1)
-				end
-				BuildTableTirage(reserve, true, false);
+				local tablex = tResultat:Copy();
+				BuildTableTirage(tablex, reserve, params.bib_first, false);
 			end
 		end
-		break;
+		base:TableBulkUpdate(tResultat);
 	end
 end
 
@@ -581,10 +597,8 @@ function OnTirageManche2Special()
 	cmd = 'Delete From Resultat_Manche Where Code_evenement = '..params.code_evenement..' And Code_manche = 2';
 	base:Query(cmd);
 	base:TableLoad(tResultat, 'Select * From Resultat Where Code_evenement = '..params.code_evenement);
-	tCoureur = {};
 	for i = 0, tResultat:GetNbRows() -1 do
 		local code_coureur = tResultat:GetCell('Code_coureur', i);
-		tCoureur[code_coureur] = {};
 		tCoureur[code_coureur].Dossard = tResultat:GetCellInt('Dossard', i);
 	end
 	-- faire les groupes pour la manche 1
@@ -658,11 +672,13 @@ function OnTirageManche2Special()
 	end
 end
 
-function BuildTableTirage(rang_tirage, bib_first, set_rang);
-	tResultat_Copy = tResultat:Copy();
-	local filter = "$(Rang):In("..rang_tirage..")";
-	tResultat_Copy:Filter(filter, true);
-	adv.Alert('BuildTableTirage( rang = '..rang_tirage..', bib_first = '..bib_first..', setrang = '..tostring(set_rang)..')'..', tResultat_Copy:GetNbRows() = '..tResultat_Copy:GetNbRows());
+function BuildTableTirage(tablex, rang_tirage, bib_first, set_rang);
+	-- adv.Alert('dans BuildTableTirage avant filtrage, tablex:GetNbRows() = '..tablex:GetNbRows());
+	if rang_tirage then
+		local filter = "$(Rang):In("..rang_tirage..")";
+		tablex:Filter(filter, true);
+	end
+	-- adv.Alert('dans BuildTableTirage rang = '..tostring(rang_tirage)..', bib_first = '..tostring(bib_first)..', setrang = '..tostring(set_rang)..')'..', tablex:GetNbRows() = '..tablex:GetNbRows());
 	params.tableDossards1 = {};
 	local shuffle = true;
 
@@ -670,7 +686,7 @@ function BuildTableTirage(rang_tirage, bib_first, set_rang);
 	if bib_first then
 		bib = bib_first;
 	end
-	for row = 0, tResultat_Copy:GetNbRows() - 1 do
+	for row = 0, tablex:GetNbRows() - 1 do
 		table.insert(params.tableDossards1, bib);
 		bib = bib + 1;
 		if bib_first then
@@ -685,23 +701,19 @@ function BuildTableTirage(rang_tirage, bib_first, set_rang);
 	for row = 1, #params.tableDossards1 do
 		local new_row1 = tTableTirage1:AddRow();
 		tTableTirage1:SetCell('Row', new_row1, row);	-- setCell du rang fictif en lien avec  params.tableDossards1
-	end
-	if shuffle then
 		tTableTirage1:OrderRandom();
 	end
 	
 	for row = 0, tTableTirage1:GetNbRows() -1 do
 		local rang_fictif = tTableTirage1:GetCellInt('Row', row);
-		local code_coureur = tResultat_Copy:GetCell('Code_coureur', row);
+		local code_coureur = tablex:GetCell('Code_coureur', row);
+		tCoureur[code_coureur] = tCoureur[code_coureur] or {};
 		local row_coureur = tResultat:GetIndexRow('Code_coureur', code_coureur);
 		local dossard = params.tableDossards1[rang_fictif];
-		adv.Alert('row_coureur = '..row_coureur..', dossard = '..dossard..", tResultat:GetCellInt('Dossard', row_coureur) = "..tResultat:GetCellInt('Dossard', row_coureur));
-		if tResultat:GetCellInt('Dossard', row_coureur) == 0 then
-			tCoureur[code_coureur].Dossard = dossard;
-			tResultat:SetCell('Dossard', row_coureur, dossard);
-			if set_rang then
-				tResultat:SetCell('Rang', row_coureur, rang_tirage);
-			end
+		tCoureur[code_coureur].Dossard = dossard;
+		tResultat:SetCell('Dossard', row_coureur, dossard);
+		if set_rang then
+			tResultat:SetCell('Rang', row_coureur, rang_tirage);
 		end
 	end
 end
@@ -755,13 +767,12 @@ function SetDossardBackOffice(course, nbGroupes)
 	-- la colonne Reserve sera mise à jour selon les différents groupes
 	if course == 1 or params.bib_skip == 0 then
 		for i = 1, #tBibo do
-			adv.Alert('SetDossardBackOffice - #tBibo = '..#tBibo)
 			tBibo[i].Reserves = {};
 			SetGroupes(nbGroupes, i);
 			local tReserve = tBibo[i].Reserves
 			for ireserve = 1, #tReserve do
-				adv.Alert('BuildTableTirage( rang = '..tReserve[ireserve]..', bib_first = '..params.bib_first..', setrang = '..tostring(true)..')'..', tResultat_Copy:GetNbRows() = '..tResultat_Copy:GetNbRows());
-				BuildTableTirage(tReserve[ireserve], params.bib_first, true) ;
+				-- adv.Alert('BuildTableTirage( rang = '..tReserve[ireserve]..', bib_first = '..params.bib_first..', setrang = '..tostring(true)..')'..', tResultat_Copy:GetNbRows() = '..tResultat_Copy:GetNbRows());
+				BuildTableTirage(tResultat, tReserve[ireserve], params.bib_first, true) ;
 			end
 		end
 	end
@@ -795,7 +806,7 @@ function OnTirageM2(option2)
 	end
 end
 	
-function OnTirageBackOffice(course, paramsManche)
+function OnTirageBackOffice(course, paramsManche, manche_start)
 	-- selection = 3 : 4. Tirage pour des courses de 3 manches
 	-- selection = 4 : 5. Tirage pour des courses de 4 manches
 	-- selection = 5 : 6. Tirage pour des courses de 2 manches
@@ -804,7 +815,7 @@ function OnTirageBackOffice(course, paramsManche)
 	tResultat:OrderBy('Dossard');
 	tResultat:SetCounter('Reserve');
 	tResultat:SetCounter('Sexe');
-	for run = 2, nbmanches do
+	for run = manche_start, nbmanches do
 		local rang = 0;
 		local groupes = paramsManche[run].Groupes;
 		local tGroupes = groupes:Split(',');
@@ -877,7 +888,17 @@ function main(params_c)
 	tResultat = base:GetTable('Resultat');
 	tResultat_Copy = tResultat:Copy();
 	ReplaceTableEnvironnement(tResultat_Copy, '_Resultat_Copy');
+	tCoureur = {};
 	base:TableLoad(tResultat, 'Select * From Resultat Where Code_evenement = '..params.code_evenement..' Order By Rang, Dossard');
+	tDraw = tResultat:Copy();
+	ReplaceTableEnvironnement(tDraw, '_tDraw');
+	for row = 0, tResultat:GetNbRows() -1 do
+		local code_coureur = tResultat:GetCell('Code_coureur', row);
+		tCoureur[code_coureur] = {};
+		tCoureur[code_coureur].Reserve = -1;
+		tCoureur[code_coureur].Dossard = -1;
+		tCoureur[code_coureur].Rang = -1;
+	end
 	params.dossard1 = tResultat:GetCellInt('Dossard', 0);
 	tResultat_Manche = base:GetTable('Resultat_Manche');
 	tEpreuve = base:GetTable('Epreuve');
@@ -1166,16 +1187,32 @@ function main(params_c)
 					if course == 1 or params.bib_skip == 0 then
 						local ok = SetDossardBackOffice(course, nbGroupes);
 						if ok then
-							OnTirageBackOffice(course, paramsManche)
+							OnTirageBackOffice(course, paramsManche, 2)
 						end
 					end
 					if course == 2 and params.bib_skip == 1 then
+					-- function OnTirageGroupe(code_evenement, manche, reserve, sens, rang)
 						for row = 0, tResultat:GetNbRows()-1 do
 							local code_coureur = tResultat:GetCell('Code_coureur', row);
 							if tCoureur[code_coureur] then
-								adv.Alert('coureur trouvé, dossard = '..tostring(tCoureur[code_coureur].Dossard)..', reserve = '..tCoureur[code_coureur].Reserve);
 								tResultat:SetCell('Dossard', row, tCoureur[code_coureur].Dossard);
 								tResultat:SetCell('Reserve', row, tCoureur[code_coureur].Reserve);
+							end
+						end
+						for run = 1, #paramsManche do
+							local rang = 0;
+							local groupes = paramsManche[run].Groupes;
+							local tGroupes = groupes:Split(',');
+							local sens = paramsManche[run].Sens;
+							for i = 1, #tGroupes do
+								local reserve = tGroupes[i];
+								rang = OnTirageGroupe(params['course'..course], run, reserve, sens, rang);
+							end
+							if tResultat:GetCounter('Sexe'):GetNbRows() > 1 then
+								for i = 1, #tGroupes do
+									local reserve = tGroupes[i] + #tGroupes;
+									rang = OnTirageGroupe(params['course'..course], run, reserve, sens, rang);
+								end
 							end
 						end
 					end
@@ -1184,7 +1221,7 @@ function main(params_c)
 			end
 		end
 		local cmd = 'Update Resultat Set Rang = NULL Where Code_evenement IN('..params.course1..','..params.course2..')';
-		--base:Query(cmd);
+		base:Query(cmd);
 	end
 	if params.doc then params.doc:Delete(); end
 	if params.doc_config then params.doc_config:Delete(); end

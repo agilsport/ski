@@ -207,9 +207,7 @@ function BuildTableTirage(row_first, row_last, rang_tirage, bib_first, shuffle);
 	for row = 1, #params.tableDossards1 do
 		local new_row1 = tTableTirage1:AddRow();
 		tTableTirage1:SetCell('Row', new_row1, row);	-- setCell du rang fictif en lien avec  params.tableDossards1
-	end
-	if shuffle then
-		tTableTirage1:OrderRandom('Prenom');
+		tTableTirage1:OrderRandom();
 	end
 	
 	for row = 0, tTableTirage1:GetNbRows() -1 do
@@ -355,6 +353,20 @@ function main(params_c)
 	end
 	
 	bolSplitBibo = false;
+	if tEpreuve:GetCell('Code_entite', 0) == 'FIS' then
+		if tEpreuve:GetCell('Code_niveau', 0):In('EC', 'NC') then
+			if tEpreuve:GetCell('Code_discipline', 0):In('SL','GS') then
+				bolSplitBibo = true;
+			else
+				local msg = "ATTENTION, ce script n'est valable que pour les FIS en GS et en SL.";
+				app.GetAuiFrame():MessageBox(msg,
+							"ATTENTION", 
+						msgBoxStyle.OK+msgBoxStyle.ICON_WARNING
+							);
+				return ;
+			end
+		end
+	end
 	tResultat:OrderBy('Point');
 	params.pts_7 = tResultat:GetCellDouble('Point', 6);
 	params.pts_15 = tResultat:GetCellDouble('Point', 14);
@@ -433,11 +445,6 @@ function main(params_c)
 	local cmd = 'Update Resultat Set Rang = NULL Where Code_evenement = '..params.code_evenement;
 	base:Query(cmd);
 
-
-
-	if tEpreuve:GetCell('Code_entite', 0) == 'FIS' and tEpreuve:GetCell('Code_niveau', 0):In('EC', 'NC') and tEpreuve:GetCell('Code_discipline', 0):In('SL','GS') then
-		bolSplitBibo = true;
-	end
 	if not bolSplitBibo then
 		if not params.print_alone then
 			tResultat:OrderBy('Point');
