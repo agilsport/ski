@@ -76,7 +76,7 @@
       <combobox col_start="3" name="clef1" style="CB_READONLY"/>
       <statictext row="auto" col_start="2" style="ALIGN_RIGHT" label="Option n°1 du tirage : "/>
       <combobox col_start="3" name="option1" style="CB_READONLY"/>
-      <statictext row="auto" col_start="2" style="ALIGN_RIGHT" label="Options en manche 2 : "/>
+      <statictext row="auto" col_start="2" style="ALIGN_RIGHT" label="Options particulières ou pour la manche 2 : "/>
       <combobox col_start="3" name="option2" style="CB_READONLY"/>
       <row value="20px"/>
       <staticbox row_start="1" row_end="0" col_start="2" col_end="3" label="Configuration du tirage au sort"/>

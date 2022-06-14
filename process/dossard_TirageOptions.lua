@@ -3,7 +3,7 @@ dofile('./edition/functionPG.lua');
 dofile('./interface/adv.lua');
 
 function GetMenuName()
-	return "Tirage V2 des dossards ou des rangs de départ avec options de tirage";
+	return "Tirage des dossards ou des rangs de départ avec options de tirage";
 end
 function GetActivite()
 	return "ALP,TM";
