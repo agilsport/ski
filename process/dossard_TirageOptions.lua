@@ -9,6 +9,41 @@ function GetActivite()
 	return "ALP,TM";
 end
 
+function SetupDefault(evt)
+	local selection = dlgConfig:GetWindowName('option1'):GetSelection();
+	local nbmanches = 2;
+	if selection == 3 then
+		nbmanches = 3;
+	elseif selection == 4 then
+		nbmanches = 4;
+	end
+	adv.Alert('SetupDefault');
+	if params.doc_config then
+		adv.Alert('params.doc_config existe');
+		params.doc_config:Delete();
+	else
+		adv.Alert('params.doc_config existe pas ');
+	
+	end
+	xml_config = app.GetPath()..'/process/dossard_TirageOptions_config.xml'
+	app.RemoveFile(xml_config);
+	CreateXMLConfig();
+	params.doc_config = xmlDocument.Create(xml_config);
+	params.nodeSetupx4 = params.doc_config:FindFirst('root/manchesx4');
+	params.nodeSetup2x2 = params.doc_config:FindFirst('root/manches2x2');
+	params.nodeSetupx3 = params.doc_config:FindFirst('root/manchesx3');
+	if selection == 3 then
+		params.activeNode = params.nodeSetupx3;
+	elseif selection == 4 then
+		params.activeNode = params.nodeSetupx4;
+	else
+		params.activeNode = params.nodeSetup2x2;
+	end
+	dlgSetup:EndModal();
+	OnSetup(selection, true)
+end
+
+
 function CreateXMLConfig()
 	local utf8 = true;
 	local doc_config = xmlDocument.Create();
@@ -106,12 +141,29 @@ function DecodeActiveNode()
 	return params.tirageCourse;
 end
 
-function OnSetup(selection)
+function OnSetup(selection, quit)
 	local nbmanches = 2;
 	if selection == 3 then
 		nbmanches = 3;
 	elseif selection == 4 then
 		nbmanches = 4;
+	end
+	function SaveSetup()
+		params.activeNode:ChangeAttribute('bib_skip', dlgSetup:GetWindowName('bib_skip'):GetSelection());
+		local node = params.activeNode:GetChildren();
+		while node ~= nil do
+			local course = node:GetName();
+			local idxcourse = tonumber(course:sub(-1));
+			for run = 1, nbmanches do
+				local m = dlgSetup:GetWindowName('course'..idxcourse..'_manche'..run):GetValue();
+				local sens = dlgSetup:GetWindowName('course'..idxcourse..'_sens'..run):GetSelection();
+				node:ChangeAttribute('m'..run, m);
+				node:ChangeAttribute('m'..run..'_sens', sens);
+			end
+			node = node:GetNext();
+		end
+		params.doc_config:SaveFile();
+		dlgSetup:EndModal(idButton.OK);
 	end
 	dlgSetup = wnd.CreateDialog(
 		{
@@ -135,6 +187,8 @@ function OnSetup(selection)
 	local tbsetup = dlgSetup:GetWindowName('tbsetup');
 	tbsetup:AddStretchableSpace();
 	local btnSave = tbsetup:AddTool("Valider", "./res/vpe32x32_save.png");
+	tbsetup:AddSeparator();
+	local btnDefault = tbsetup:AddTool("Valeurs par défaut", "./res/32x32_param.png");
 	tbsetup:AddSeparator();
 	local btnClose = tbsetup:AddTool("Quitter", "./res/32x32_end.png");
 	tbsetup:AddStretchableSpace();
@@ -164,24 +218,14 @@ function OnSetup(selection)
 			dlgSetup:GetWindowName(name_sens):SetSelection(paramsManche[run].Sens);
 		end
 	end
+	if quit == true then
+		SaveSetup();
+	end
 	dlgSetup:Bind(eventType.MENU, 
 		function(evt) 
-			params.activeNode:ChangeAttribute('bib_skip', dlgSetup:GetWindowName('bib_skip'):GetSelection());
-			local node = params.activeNode:GetChildren();
-			while node ~= nil do
-				local course = node:GetName();
-				local idxcourse = tonumber(course:sub(-1));
-				for run = 1, nbmanches do
-					local m = dlgSetup:GetWindowName('course'..idxcourse..'_manche'..run):GetValue();
-					local sens = dlgSetup:GetWindowName('course'..idxcourse..'_sens'..run):GetSelection();
-					node:ChangeAttribute('m'..run, m);
-					node:ChangeAttribute('m'..run..'_sens', sens);
-				end
-				node = node:GetNext();
-			end
-			params.doc_config:SaveFile();
-			dlgSetup:EndModal(idButton.OK);
+			SaveSetup();
 		end, btnSave); 
+	dlgSetup:Bind(eventType.MENU, SetupDefault, btnDefault); 
 	dlgSetup:Bind(eventType.MENU, 
 		function(evt) 
 			dlgSetup:EndModal(idButton.KO);
@@ -882,7 +926,7 @@ function main(params_c)
 	params.height = display:GetSize().height / 2;
 	params.x = (display:GetSize().width - params.width) / 2;
 	params.y = 200;
-	params.version = "3.0";
+	params.version = "3.1";
 	base = base or sqlBase.Clone();
 	tEvenement = base:GetTable('Evenement');
 	base:TableLoad(tEvenement, 'Select * From Evenement Where Code = '..params.code_evenement);
@@ -1116,7 +1160,7 @@ function main(params_c)
 			else
 				params.activeNode = params.nodeSetup2x2;
 			end
-			OnSetup(selection);
+			OnSetup(selection, false);
 		 end,  btnSetup);
 
 	dlgConfig:Fit();
