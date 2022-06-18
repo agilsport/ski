@@ -17,14 +17,7 @@ function SetupDefault(evt)
 	elseif selection == 4 then
 		nbmanches = 4;
 	end
-	adv.Alert('SetupDefault');
-	if params.doc_config then
-		adv.Alert('params.doc_config existe');
-		params.doc_config:Delete();
-	else
-		adv.Alert('params.doc_config existe pas ');
-	
-	end
+	params.doc_config:Delete();
 	xml_config = app.GetPath()..'/process/dossard_TirageOptions_config.xml'
 	app.RemoveFile(xml_config);
 	CreateXMLConfig();
@@ -45,77 +38,12 @@ end
 
 
 function CreateXMLConfig()
-	local utf8 = true;
-	local doc_config = xmlDocument.Create();
-	local nodeRoot = xmlNode.Create(nil, xmlNodeType.ELEMENT_NODE, "root");
-	if doc_config:SetRoot(nodeRoot) == false then
-		return;
-	end
-	if not nodeRoot then
-		return;
-	end
-	
- 	local nodeConfig = xmlNode.Create(nodeRoot, xmlNodeType.ELEMENT_NODE, "config");
-	nodeConfig:ChangeAttribute('bibo', 15);
-	nodeConfig:ChangeAttribute('course1', -1);	
-	nodeConfig:ChangeAttribute('course2', -1);
-	nodeConfig:ChangeAttribute('clef1', 3);
-	nodeConfig:ChangeAttribute('option1', 0);
-	nodeConfig:ChangeAttribute('option2', 4);
-	
-	-- sens = 0 -> à la mêlée
-	-- sens = 1 -> par ordre croissant
-	-- sens = 2 -> par ordre décroissant
-	local nodeManchex4 = xmlNode.Create(nodeRoot, xmlNodeType.ELEMENT_NODE, "manchesx4");
-	nodeManchex4:ChangeAttribute('bib_skip', 0);
-	nodeManchex4:ChangeAttribute('nb_manches', 4);
-	local nodeCourse = {};
-	for i = 1, 2 do
-		nodeCourse[i] = xmlNode.Create(nil, xmlNodeType.ELEMENT_NODE, 'course'..i);
-		nodeCourse[i]:ChangeAttribute('m1', '1-2');
-		nodeCourse[i]:ChangeAttribute('m1_sens', 0);
-		nodeCourse[i]:ChangeAttribute('m2', '1,2');
-		nodeCourse[i]:ChangeAttribute('m2_sens', 2);
-		nodeCourse[i]:ChangeAttribute('m3', '2,1');
-		nodeCourse[i]:ChangeAttribute('m3_sens', 1);
-		nodeCourse[i]:ChangeAttribute('m4', '1,2');
-		nodeCourse[i]:ChangeAttribute('m4_sens', 2);
-		nodeManchex4:AddChild(nodeCourse[i]);
-	end
-	
-	local nodeManche2x2 = xmlNode.Create(nodeRoot, xmlNodeType.ELEMENT_NODE, "manches2x2");
-	nodeManche2x2:ChangeAttribute('bib_skip', 1);
-	nodeManche2x2:ChangeAttribute('nb_manches', 2);
-	nodeCourse = xmlNode.Create(nil, xmlNodeType.ELEMENT_NODE, 'course1');
-	nodeCourse:ChangeAttribute('m1', '1-2');
-	nodeCourse:ChangeAttribute('m1_sens', 0);
-	nodeCourse:ChangeAttribute('m2', '1,2');
-	nodeCourse:ChangeAttribute('m2_sens', 2);
-	nodeManche2x2:AddChild(nodeCourse);
-	nodeCourse = xmlNode.Create(nil, xmlNodeType.ELEMENT_NODE, 'course2');
-	nodeCourse:ChangeAttribute('m1', '2,1');
-	nodeCourse:ChangeAttribute('m1_sens', 1);
-	nodeCourse:ChangeAttribute('m2', '1,2');
-	nodeCourse:ChangeAttribute('m2_sens', 2);
-	nodeManche2x2:AddChild(nodeCourse);
-
-	local nodeManchex3 = xmlNode.Create(nodeRoot, xmlNodeType.ELEMENT_NODE, "manchesx3");	
-	nodeManchex3:ChangeAttribute('bib_skip', 0);
-	nodeManchex3:ChangeAttribute('nb_manches', 3);
-	nodeCourse = {};
-	for i = 1, 2 do
-		nodeCourse[i] = xmlNode.Create(nil, xmlNodeType.ELEMENT_NODE, 'course'..i);
-		nodeCourse[i]:ChangeAttribute('m1', '1-3');
-		nodeCourse[i]:ChangeAttribute('m1_sens', 0);
-		nodeCourse[i]:ChangeAttribute('m2', '2,3,1');
-		nodeCourse[i]:ChangeAttribute('m2_sens', 0);
-		nodeCourse[i]:ChangeAttribute('m3', '3,1,2');
-		nodeCourse[i]:ChangeAttribute('m3_sens', 0);
-		nodeManchex3:AddChild(nodeCourse[i]);
-	end
-      doc_config:SaveFile(app.GetPath()..'/process/dossard_TirageOptions_config.xml');
-	doc_config:Delete();
-
+	xml_config = "./process/dossard_TirageOptions_config_defaut.xml";
+	params.doc_config = xmlDocument.Create(xml_config);
+      params.doc_config:SaveFile(app.GetPath()..'/process/dossard_TirageOptions_config.xml');
+	params.doc_config:Delete()
+	xml_config = "./process/dossard_TirageOptions_config.xml";
+	params.doc_config = xmlDocument.Create(xml_config);
 end
 
 function DecodeActiveNode()
@@ -926,7 +854,7 @@ function main(params_c)
 	params.height = display:GetSize().height / 2;
 	params.x = (display:GetSize().width - params.width) / 2;
 	params.y = 200;
-	params.version = "3.1";
+	params.version = "3.11";
 	base = base or sqlBase.Clone();
 	tEvenement = base:GetTable('Evenement');
 	base:TableLoad(tEvenement, 'Select * From Evenement Where Code = '..params.code_evenement);
