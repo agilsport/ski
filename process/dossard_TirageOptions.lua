@@ -62,7 +62,7 @@ function DecodeActiveNode()
 			local idx = tonumber(node:GetAttribute('m'..i..'_sens')) or 0;
 			table.insert(paramsmanches, {Groupes = groupes, Sens = idx});
 		end
-		table.insert(params.tirageCourse, {Data = paramsmanches});	-- 4 manches ->
+		table.insert(params.tirageCourse, {Data = paramsmanches});	
 		node = node:GetNext();
 	end
 	
@@ -181,44 +181,53 @@ function CheckExaequo(tablex, idx);
 		if i < tablex:GetNbRows() -1 then
 			point_next = tablex:GetCellDouble('Point', i+1, -1);
 		end
-		if point >= 0 and point > tBibo[idx].PtsBibo then
-			nb_points = nb_points + 1
-			if nb_exeaquo == 0 then
-				rang_tirage = rang_tirage + 1 + exaequo_ajoute;
-				tablex:SetCell('Rang', i, rang_tirage);
-				tResultat:SetCell('Rang', r, rang_tirage);
-				exaequo_ajoute = 0;
-			else
-				exaequo_ajoute = exaequo_ajoute + 1;
-				nb_exeaquo = nb_exeaquo - 1;
-				tablex:SetCell('Rang', i, rang_tirage);
-				tResultat:SetCell('Rang', r, rang_tirage);
-			end
-			if point_next == point then
-				if not params.row_exaequo[rang_tirage] then
-					params.row_exaequo[rang_tirage] = {};
-					table.insert(params.tExaequo, rang_tirage);
+		if point < 0 then
+			if tBibo[idx].FirstRowPtsNull < 0 then
+				tBibo[idx].FirstRowPtsNull = i;
+				if idx > 1 then
+					tBibo[idx].FirstRowPtsNull = tBibo[idx].FirstRowPtsNull + tBibo[idx-1].NbRows;
 				end
-				nb_exeaquo = nb_exeaquo + 1;
 			end
-			if nb_exeaquo > 0 then
-				tablex:SetCell('Rang', i, rang_tirage);
-				tResultat:SetCell('Rang', r, rang_tirage);
-			end
-		elseif point < 0 then
-			tablex:SetCell('Rang', i, nb_points +1);
-			tResultat:SetCell('Rang', r, nb_points +1);
+			tablex:SetCell('Rang', i, tBibo[idx].FirstRowPtsNull + 1);
+			tResultat:SetCell('Rang', r, tBibo[idx].FirstRowPtsNull + 1);
 			if not params.row_exaequo[nb_points +1] then
 				params.row_exaequo[nb_points +1] = {};
 				table.insert(params.tExaequo, nb_points +1);
-				--adv.Alert('dans CheckExaequo, ne pas tirer le rang : '..(nb_points +1)..' de tablex');
+			end
+		else
+			nb_points = nb_points + 1
+			if point <= tBibo[idx].PtsBibo then
+				rang_tirage = i + 1;
+				if idx > 1 then
+					rang_tirage = rang_tirage + tBibo[idx-1].NbRows;
+				end
+				tablex:SetCell('Rang', i, rang_tirage);
+				tResultat:SetCell('Rang', r, rang_tirage);
+			else
+				if point == point_next then
+					if not params.row_exaequo[nb_points +1] then
+						rang_tirage = i + 1;
+						params.row_exaequo[nb_points +1] = {};
+						table.insert(params.tExaequo, nb_points +1);
+					end
+					tablex:SetCell('Rang', i, rang_tirage);
+					tResultat:SetCell('Rang', r, rang_tirage);
+				else
+					rang_tirage = i + 1;
+					if idx > 1 then
+						rang_tirage = rang_tirage + tBibo[idx-1].NbRows;
+					end
+					tablex:SetCell('Rang', i, rang_tirage);
+					tResultat:SetCell('Rang', r, rang_tirage);
+				end
 			end
 		end
+		-- adv.Alert('tBibo['..idx..'].PtsBibo = '..tBibo[idx].PtsBibo..', point = '..point..', rang_tirage = '..rang_tirage);
 	end
 	-- adv.Alert('sortie de CheckExaequo, taille de params.tExaequo = '..#params.tExaequo)
-	for j = 1, #params.tExaequo do
+	-- for j = 1, #params.tExaequo do
 		-- adv.Alert('exeaquo sur : '..params.tExaequo[j]);
-	end
+	-- end
 end
 
 function GetBibo(bibo, bib_first)
@@ -319,6 +328,9 @@ function ValideClef1(clef1, option1, option2)
 		if string.find(clef1, '2%.') or string.find(clef1, '3%.') then
 			dlgConfig:GetWindowName('option2'):SetSelection(4);
 		end
+		if #tBibo > 1 then
+			dlgConfig:GetWindowName('clef1'):SetSelection(0);
+		end
 	end
 end
 
@@ -376,6 +388,9 @@ function ValideOption2(clef1, option1, option2)
 			dlgConfig:GetWindowName('option2'):SetSelection(4);
 		end
 	end
+	if string.find(option2, '3%.') and #tBibo > 1 then
+		dlgConfig:GetWindowName('clef1'):SetSelection(0);
+	end
 end
 
 function OnTirageManche1()
@@ -414,74 +429,63 @@ function OnTirageManche1()
 		params.bib_first = 1;
 		-- table.insert(tBibo, {Sexe = 'M', NbRows = tResultat:GetCounterValue('Sexe', 'M'), RowFirst = row_first, RowEnd = row_end, PtsBibo = 0, LastRowBibo = -1, LastRowPts = -1, Reserves = {}});
 		local tReserves = {};
-		if dlgConfig:GetWindowName('option2'):GetSelection() == 2 then	-- gestion du bibo
+		if dlgConfig:GetWindowName('option2'):GetSelection() == 2 then	-- gestion du bibo -> les dames avant les hommes
 			tResultat:OrderBy('Point');
-			if i > 1 then
-				params.bib_first = tBibo[i-1].NbRows + 1;
-			end
 			if params.bibo < 0 then
 				params.bibo, params.dossard = GetBibo(15);
+			end
+			if i > 1 then
+				params.bib_first = tBibo[i-1].NbRows + 1;
 			end
 			tDraw = tResultat:Copy();
 			local filter = "$(Sexe):In('"..tBibo[i].Sexe.."')";
 			tDraw:Filter(filter, true);
-			CheckExaequo(tDraw, i);
 			tBibo[i].PtsBibo = tDraw:GetCellDouble('Point', params.bibo - 1);
+			-- adv.Alert('pts bibo = '..tBibo[i].PtsBibo)
 			for row = 0, tDraw:GetNbRows() -1 do
 				local code_coureur = tDraw:GetCell('Code_coureur', row);
 				local point = tDraw:GetCellDouble('Point', row, 10000);
 				local r = tResultat:GetIndexRow('Code_coureur', code_coureur);
 				if point <= tBibo[i].PtsBibo then
-					if row == 0 then
-						reserve = reserve + 1;
-					end
-					if #tReserves < 1 then
-						table.insert(tReserves, reserve);
-					end
-					tReserves[1] = reserve;
+					reserve = 1;
 					tBibo[i].LastRowBibo = row;
 				elseif point < 10000 then
-					if row == tBibo[i].LastRowBibo + 1 then
-						reserve = reserve + 1;
-					end
-					if #tReserves < 2 then
-						table.insert(tReserves, reserve);
-					end
+					reserve = 2;
 					tBibo[i].LastRowPts = row;
 				else
-					if row == tBibo[i].LastRowPts + 1 then
-						reserve = reserve + 1;
-					end
-					if #tReserves < 3 then
-						table.insert(tReserves, reserve);
-					end
+					reserve = 3;
+				end
+				if reserve == 1 then
+					tReserves[1] = 1;
+				elseif reserve == 2 then
+					tReserves[#tReserve + 1] = 2;
+				else
+					tReserves[#tReserve + 1] = 3;
 				end
 				tDraw:SetCell('Reserve', row, reserve);
 				tResultat:SetCell('Reserve', r, reserve);
 			end
 			tBibo[i].Reserves = tReserves;
-			for ireserve = 1,  tReserves[#tReserves] do
-				local reserve = tReserves[ireserve];
-				if reserve == 1 or reserve == 4 then
-					local tablex = tResultat:Copy();
-					filter = "$(Reserve):In("..reserve..")";
-					tablex:Filter(filter, true);
-					-- tirage à la mêlée
-					-- BuildTableTirage(tDraw, rang_tirage, bib_first, set_rang);
-					BuildTableTirage(tablex, nil, params.bib_first, false);
-				else
-					for exaequo = 1, #params.tExaequo do
-						local tablex = tResultat:Copy();
-						BuildTableTirage(tablex, params.tExaequo[exaequo], nil, false) -- tirage des exaequo par groupe de Reserve
-					end
-				end
-				for row = 0, tDraw:GetNbRows() -1 do
-					local code_coureur = tDraw:GetCell('Code_coureur', row);
-					local r = tResultat:GetIndexRow('Code_coureur', code_coureur);
-					
-					if tResultat:GetCellInt('Dossard', r) == 0 then
-						tResultat:SetCell('Dossard', r, tResultat:GetCellInt('Rang', r));
-					end					
+			CheckExaequo(tDraw, i);
+			-- function BuildTableTirage(tablex, rang_tirage, bib_first, set_rang);
+			-- on tire tous les exaequos : points égaux ou sans points
+			for j = 1, #params.tExaequo do
+				local tablex = tDraw:Copy();
+				BuildTableTirage(tablex, params.tExaequo[j], nil , false);
+			end
+			tDraw:OrderBy('Reserve, Point');
+			tDraw:SetCounter('Reserve');
+			if tDraw:GetCounterValue('Reserve', 1) > 0 then
+				local tablex = tDraw:Copy();
+				local filter = "$(Reserve):In('1')";
+				tablex:Filter(filter, true);
+				BuildTableTirage(tablex, nil, params.bib_first, false);
+			end
+			-- adv.Alert('tirage des sans dossards,, tDraw:GetNbRows() = '..tDraw:GetNbRows());
+			for row = 0, tResultat:GetNbRows() -1 do
+				if tResultat:GetCellInt('Dossard', row) == 0 then
+					local dossard = tResultat:GetCellInt('Rang', row);
+					tResultat:SetCell('Dossard', row, dossard);
 				end
 			end
 		else	-- pas de gestion du bibo
@@ -854,7 +858,7 @@ function main(params_c)
 	params.height = display:GetSize().height / 2;
 	params.x = (display:GetSize().width - params.width) / 2;
 	params.y = 200;
-	params.version = "3.11";
+	params.version = "3.12";
 	base = base or sqlBase.Clone();
 	tEvenement = base:GetTable('Evenement');
 	base:TableLoad(tEvenement, 'Select * From Evenement Where Code = '..params.code_evenement);
