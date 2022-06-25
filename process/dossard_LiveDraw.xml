@@ -23,7 +23,7 @@
       <textctrl row="auto" col_start="3" cond="discipline=='AC'" name="discipline_vitesse"/>
       <statictext col_start="2" style="ALIGN_RIGHT" cond="discipline=='AC'" label="Discipline en vitesse : "/>
       <row value="20px"/>
-      <toolbar row="auto" col_start="1" name="tbconfig" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
+      <toolbar row="auto" col_start="1" col_end="0" name="tbconfig" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
     </matrix>
     <row value="1"/>
   </panel>
@@ -221,7 +221,8 @@
     </body>
   </panel>
   
- 	<!-- Participants - par nations -->
+   
+  	<!-- Participants - par nations -->
 	<report id="parti_factorise" title="Entry List By " first_header="0">
 		<lua>dofile('./interface/adv.lua');</lua>
 		<lua>rupture = params.Rupture;
@@ -373,6 +374,140 @@
 				<lua>end</lua>
 			<lua>end</lua>
 		</end>
+	</report>
+
+
+ 	<!-- Participants - par nations Edition pour les qualifiés à la finale-->
+	<report id="parti_finale" title="Qualified for the European Cup " first_header="0">
+		<lua>dofile('./interface/adv.lua');</lua>
+		<lua>
+			body:OrderBy('ECSL_Points DESC');
+			exaequo = 0;
+			for i=0,body:GetNbRows()-1 do
+				body:SetCellNull('Reserve', i);
+				if body:GetCellInt('WCSL_points', i) == 0 then
+					body:SetCell('Reserve', i, body:GetCellInt('ECSL_rank', i));
+				end
+			end
+			body:SetRanking('Clt','Reserve')
+			rupture = params.Rupture;
+			label = params.Rupture;
+			body:SetCounter(rupture);
+			if rupture ~= 'Nation' then
+				body:SetCounter('Nation');
+			end
+			orderby = rupture..", ECSL_points DESC";
+			somme_rupture = 0;
+			nb_etrangers = 0;
+			bolAjouter = false;
+			title = title..$(Epreuve.Code_discipline)..' Final';
+		</lua>
+		<header>
+		  <spacing all="0"/>
+		  <background mode="transparent"/>
+		  <font name="Calibri" size="14" adjust="max" weight="bold"/>
+		  <text row="0.5cm" align="center" cond="title">title</text>
+		  <text align="right" cond="$(Epreuve.Sexe) == 'M'">"Men's"</text>
+		  <text align="right" cond="$(Epreuve.Sexe) == 'F'">"Ladies's"</text>
+		  <text row="0.5cm" align="right" >$(Epreuve.Code_discipline)..'     '</text>
+		</header>
+		<first_header/>
+		<footer>
+			<background mode="transparent"/>
+			<font name="Calibri" size="8" adjust="best" weight="normal"/>
+			<pen border="none" />
+
+			
+			<row value="auto" />
+			<matrix col_start="1">
+				<row value="auto"/>
+				<text col="auto" align="left">app.GetName()..' Version '..app.GetVersion()..' / FFS'</text>
+				<image col="0.4cm" adjust="width" align="left">'./res/32x32_ffs.png'</image>
+				<text col="auto" align="left">' / Agil Informatique - Philippe Guérindon'</text>
+				<image col="0.4cm" adjust="width" align="left">'./res/32x32_agil.png'</image>
+				<text col="auto" align="left">os.date(' / Printed on %d-%m-%Y at %H:%M:%S')</text>
+			</matrix>	
+			<text align="right">string.format('Page %d/%s',editor:GetPageCurrent(), editor:GetPageCountLabel())</text>
+			<line col_start="1" col_end="0" border="top" />
+			<text row="auto" align="left" cond="editor:GetPageCurrent() == 1">$(Evenement.Commentaire)</text>
+		</footer>
+		<label>
+			<background color="white" mode="solid"/>
+			<font name="Calibri" size="9" adjust="width" weight="bold"/>
+			<col value="4,5,20,4,7,7,7,7" />
+			<text row="auto" col_start="1" align="center" >'Order'</text>
+			<text col_start="2" align="center" >'Code'</text>
+			<text col_start="3" align="center" >'Identity'</text>
+			<text col_start="4" align="center" >'YoB'</text>
+			<text col_start="5" align="center" >'ECSL Points'</text>
+			<text col_start="6" align="center" >'ECSL Rank'</text>
+			<text col_start="7" align="center" >'WCSL Points'</text>
+			<text col_start="8" align="center" >'WCSL Rank'</text>
+		</label>
+		<lua>
+			body:OrderBy('Nation, ECSL_points');
+			cltc = 0;
+			for i=0, body:GetNbRows()-1 do
+				if i &gt; 0 then
+					if body:GetCell('Nation', i) ~= body:GetCell('Nation', i-1) then
+						if body:GetCellInt('Clt', i) &gt; 0 and body:GetCellInt('Clt', i) &lt; 46 then
+							cltc = 1;
+						else
+							cltc = 0;
+						end
+					else
+						if body:GetCellInt('Clt', i) &gt; 0 and body:GetCellInt('Clt', i) &lt; 46 then
+							cltc = cltc + 1;
+						end
+					end
+				else
+					if body:GetCellInt('Clt', i) &gt; 0 and body:GetCellInt('Clt', i) &lt; 46 then
+						cltc = cltc + 1;
+					end
+				end
+				body:SetCell('Cltc', i, cltc);
+			end
+		</lua>
+		<order key="(orderby)" />
+		
+		
+		<rupture key="(rupture)">
+			<before>
+				<pagebreak cond="row ~= 0 and page_break == 1" />
+				<need h="2cm" />
+				<font size="16"/>
+				<row value="0.5cm" />
+				<lua>codelu = body:GetCell(rupture, row);
+					if codelu:len() > 0 then
+						somme_rupture = somme_rupture + body:GetCounterValue(rupture, codelu);
+					end
+					if body:GetCell('Nation', row) ~= $(Evenement.Code_nation) then
+						nb_etrangers = nb_etrangers + body:GetCounterValue(rupture, codelu);
+					end
+					</lua>
+				<background mode="solid" color="white" /> 
+				<lua>if body:GetCounterValue(rupture, codelu) &gt; 0 then</lua>
+					<text row="auto" col="1" cond="codelu:len() &gt; 0">codelu..' ('..body:GetCounterValue(rupture, codelu)..') - '..body:GetCellInt('Cltc', row)..' qualified'</text>
+				<lua>end</lua>
+			</before>
+		</rupture>
+
+		<body>
+			<row value="auto"/>
+			<background mode="solid" color="green" cond="body:GetCellInt('Clt', row) &lt;= 45"/> 
+			<background mode="solid" color="white" cond="body:GetCellInt('Clt', row) &gt; 45 and body:GetCellInt('WCSL_points', row) == 0"/> 
+			<background mode="solid" color="red" cond="body:GetCellInt('WCSL_points', row) &gt; 0"/> 
+			<text col="4" align="center" ><font size="8" weight="bold"/>$(Clt)</text>
+			<text col="5" align="center"><font size="8" cond="group =='body'"/>$(Code_coureur):sub(4)</text>
+			<text col="20" align="left" font_weight="bold" font_size_step="1">$(Nom)..' '..$(Prenom)</text> 
+			<text col="4" align="center" >$(An)</text>
+			<text col="7" align="center" >$(ECSL_points)</text>
+			<text col="7" align="center" >$(ECSL_rank)</text>
+			<text col="7" align="center" >$(WCSL_points)</text>
+			<text col="7" align="center" >$(WCSL_rank)</text>
+			
+			<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
+		</body>
 	</report>
 
   <!-- Edition factorisée des étiquettes -->  <report id="parti_etiquette_factorise" title="Liste Alphabétique des Participants par Nation" first_header="0">
