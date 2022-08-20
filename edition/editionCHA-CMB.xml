@@ -141,13 +141,13 @@
 				<lua>end</lua>
 			<lua>else</lua>
 				<lua>for m=0,nb_Epreuve-1 do</lua>
-					<!-- <lua>Nom_Epreuve = base:GetTable('EpreuveEvenement_Challenge'):GetCell('Ev_Nom',m)</lua> -->
-					<lua>if m == 0 then 
-							Nom_Epreuve = 'KO-Final'
-						else
-							Nom_Epreuve = 'Indiv. '
-						end
-					</lua>
+					<lua>Nom_Epreuve = base:GetTable('EpreuveEvenement_Challenge'):GetCell('Code_discipline',m+1)</lua>
+					<!-- <lua>if m == 0 then  -->
+							<!-- Nom_Epreuve = 'KO-Final' -->
+						<!-- else -->
+							<!-- Nom_Epreuve = 'Indiv. ' -->
+						<!-- end -->
+					<!-- </lua> -->
 					<col value="8"/>
 					<text row_start="1" align="center" >Nom_Epreuve</text>
 					<!-- <text row_start="3" align="left" >' Pts Epreuve'..m+1</text> -->
@@ -218,14 +218,28 @@
 			nb_Epreuve = tEprChal:GetNbRows();
 			
 			NbrowBody = body:GetNbRows();
+				
+			if nb_Epreuve == 1 then nbcourse = 1
+			elseif nb_Epreuve == 2 then nbcourse = 2
+			elseif nb_Epreuve == 3 then nbcourse = 2	
+			elseif nb_Epreuve == 4 then nbcourse = 3
+			elseif nb_Epreuve == 5 then nbcourse = 4	
+			elseif nb_Epreuve == 6 then nbcourse = 4	
+			elseif nb_Epreuve == 7 then nbcourse = 5	
+			elseif nb_Epreuve == 8 then nbcourse = 6	
+			elseif nb_Epreuve == 9 then nbcourse = 6	
+			elseif nb_Epreuve == 10 then nbcourse = 7
+			end
 
 			for i=0, NbrowBody-1 do
 				cal_PtsClt = 0;
 				cmd = "Select * from Resultat_Manche Where Code_evenement = "..params.code_evenement..
 						" And Code_coureur = '"..body:GetCell('Code_coureur', i)..
-						"' And PtsClt IS NOT NULL order by PtsClt"
+						"' And PtsClt IS NOT NULL order by PtsClt Desc"
 				base:TableLoad(tResultatManche, cmd);
 				Nb_CltPts = tResultatManche:GetNbRows();
+
+				if tonumber(Nb_CltPts) >= tonumber(nbcourse) then Nb_CltPts = nbcourse end 
 				
 				if tonumber(Nb_CltPts) >= 3 then
 					for i=2, Nb_CltPts-1 do 
@@ -239,6 +253,8 @@
 			body:SetRanking('Clt', 'PtsClt Desc NULL_KO')
 	</lua>
 		<!-- app.GetAuiMessage(true):AddLine('Nb_CltPts ='..tostring(Nb_CltPts)); -->
+		<!-- app.GetAuiMessage(true):AddLine('nb_Epreuve ='..tostring(nb_Epreuve)) -->
+		<!-- app.GetAuiMessage(true):AddLine('nbcourse ='..tostring(nbcourse)) -->
 		<order key="Clt Asc" />
 		<!-- <paper orientation="landscape" /> -->
 		<paper orientation="portrait" />
@@ -319,8 +335,7 @@
 			<lua>end</lua>
 			
 			<col value="1.2cm"/>
-			<!-- <text row_start="1" row_end="0" align="right" font_weight="bold" font_size_step="1">$(PtsClt)</text>  -->
-			<text row_start="1" row_end="0" align="right" font_weight="bold" font_size_step="1"></text> 
+			<text row_start="1" row_end="0" align="right" font_weight="bold" font_size_step="1">$(PtsClt)</text> 
 			
 		</body>
 	</report>
@@ -335,6 +350,17 @@
 			tEprChal = base:GetTable('EpreuveEvenement_Challenge')
 			base:TableLoad(tEprChal, 'Select * from EpreuveEvenement_Challenge where Code_evenement = '..params.code_evenement..' Group By Code_epreuve')
 			nb_Epreuve = tEprChal:GetNbRows()
+			
+			for i=0, body:GetNbRows()-1 do
+				cal_PtsClt = 0;
+				for j=0, nb_Epreuve-1 do
+					Epr_Pts = tonumber(body:GetCell('PtsClt'..j+1, i)) or 0
+					cal_PtsClt = cal_PtsClt + Epr_Pts;
+				end
+				
+				body:SetCell("PtsClt", i, tonumber(cal_PtsClt));
+			end
+			
 			for i=0,body:GetNbRows()-1 do 
 				AddCltEpr = 0
 				Add_Epr_Clt = 1
@@ -357,8 +383,15 @@
 				body:SetCell("Nb_Epr_Clt", i, Add_Epr_Clt);
 				body:SetCell("Best_Clt", i, Best_Clt);
 			end	
+
 			body:SetRanking('Clt', 'PtsClt Desc, Nb_Epr_Clt Desc, CltTot_Epr')
 		</lua>
+		<!--body:SetRanking('Clt', 'PtsClt Desc, Nb_Epr_Clt Desc, CltTot_Epr')
+				calcul le Clt suivant:
+					- le total des points challenge descendant
+					- le nombre d'épreuve participer tt ceux qui ont fait le max d'epreuve puis en allant jusqu'a 1 épreuve
+					- l'adition des clt de chaque epreuve en ordre ascendant 
+		-->
 		<!-- <lua> -->
 			<!-- if tonumber(nb_Epreuve) >= 4 then -->
 		<!-- </lua> -->
@@ -411,13 +444,13 @@
 				<lua>end</lua>
 			<lua>else</lua>
 				<lua>for m=0,nb_Epreuve-1 do</lua>
-					<!-- <lua>Nom_Epreuve = base:GetTable('EpreuveEvenement_Challenge'):GetCell('Ev_Nom',m)</lua> -->
-					<lua>if m == 0 then 
-							Nom_Epreuve = 'KO-Final'
-						else
-							Nom_Epreuve = 'Indiv. '
-						end
-					</lua>
+					<lua>Nom_Epreuve = base:GetTable('EpreuveEvenement_Challenge'):GetCell('Code_discipline',m)</lua>
+					<!-- <lua>if m == 0 then  -->
+							<!-- Nom_Epreuve = 'KO-Final' -->
+						<!-- else -->
+							<!-- Nom_Epreuve = 'Indiv. ' -->
+						<!-- end -->
+					<!-- </lua> -->
 					<col value="8"/>
 					<text row_start="1" align="center" >Nom_Epreuve</text>
 					<!-- <text row_start="3" align="left" >' Pts Epreuve'..m+1</text> -->
@@ -425,9 +458,12 @@
 					<text row_start="2" align="left" >' Pts place'</text>
 					
 					<lua>if m+1 ~= tonumber(nb_Epreuve) then</lua>	
-						<text row_start="3" align="left" >' Clt epr.'</text>
-					<lua>else</lua>	
-						<text row_start="3" align="left" >' Clt epr.(Add-Clt_Epr)'</text>
+						<text row_start="3" align="left" >' Clt epr.'..m+1</text>
+					<lua>
+						else
+							k = m+1;
+					</lua>
+						<text row_start="3" align="left" >' Clt epr.'..k</text> <!--  ..'  (Total_Clt)'</text> -->
 					<lua>end</lua>	
 				<lua>end</lua>
 			
@@ -481,7 +517,7 @@
 			
 			<text col="4" row_start="1" row_end="0" align="right" font_weight="bold" font_size_step="1">$(PtsClt)</text> 
 			<!-- <text col="4" row_start="1" row_end="0" align="right" font_weight="bold" font_size_step="1">$(CltTot_Epr)</text>  -->
-			<text col="4" row_start="1" row_end="0" align="right" font_weight="bold" font_size_step="1">$(Best_Clt)</text> 
+			<!-- <text col="4" row_start="1" row_end="0" align="right" font_weight="bold" font_size_step="1">$(Best_Clt)</text>  -->
 		</body>
 		
 		<!-- <end cond="params.title=='Résultats Officiels'"> -->
