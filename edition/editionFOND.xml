@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- Menu Editions Activité "FOND" !-->
-<!-- version="6.4" !-->
+<!-- version="6.5" !-->
 <!-- nettoyage du fichier mise en place de la fonction getidentitecoureur -->
 <!-- Activation de la fenetre filtrage epreuves pour une edition gerer par un .lua => Option filter="before" -->
 <!-- calcul de la note poursuite 2éme jour !-->
@@ -479,7 +479,7 @@
 			<text col="4" align="center" label="CS." cond="entite == 'FFS'">$(Comite)</text>
 			<text col="12" align="left" label="Club" cond="entite == 'FFS'">$(Club)</text>
 			<text col="6" align="right" label="Points" cond="entite == 'FFS'">$(Point)</text>
-			<text col="9" align="right" label="H. Départ" cond="discipline:In('FS','KO-QLF')">$(Heure_depart1, "%2hh%2m:%2s")</text>
+			<text col="9" align="right" label="H. Départ" cond="discipline:In('FS','KO-QLF','IND')">$(Heure_depart1, "%2hh%2m:%2s")</text>
 			<text col="11" align="right" label="H. Départ Pours" cond="discipline:In('POURS')">$(Heure_depart2, "%2hh%2m:%2s")</text>
 			<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
 		</body>
@@ -528,7 +528,7 @@
 			<text col="4" align="center" label="CS." cond="entite == 'FFS'">$(Comite)</text>
 			<text col="12" align="left" label="Club" cond="entite == 'FFS'">$(Club)</text>
 			<!-- <text col="6" align="right" label="Points" cond="entite == 'FFS'">$(Point)</text> -->
-			<!-- <text col="9" align="right" label="H. Départ" cond="discipline:In('FS','KO-QLF')">$(Heure_depart1, "%2hh%2m:%2s")</text> -->
+			<!-- <text col="9" align="right" label="H. Départ" cond="discipline:In('FS','KO-QLF','IND')">$(Heure_depart1, "%2hh%2m:%2s")</text> -->
 			<text col="11" align="right" label="H. Dépt.Pours" cond="officiel==1 " >body:GetCell(Hdpt, row, '%2hh%2m:%2s')</text>
 			<text col="11" align="right" label="('Ecart. '..discipline)" cond="officiel==0 ">$(Diff_heure_depart2, '%-1m%2s.%1f')</text>
 			<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
@@ -639,7 +639,7 @@
 			<text col="4" align="center" label="CS." cond="entite == 'FFS'">$(Comite)</text>
 			<text col="12" align="left" label="Club" cond="entite == 'FFS'">$(Club)</text>
 			<text col="6" align="right" label="Points" cond="entite == 'FFS'">$(Point)</text>
-			<text col="9" align="right" label="H. Départ" cond="discipline:In('FS','POURS', 'KO-QLF')">$(Heure_depart1, "%2hh%2m:%2s")</text>
+			<text col="9" align="right" label="H. Départ" cond="discipline:In('FS','POURS', 'KO-QLF','IND')">$(Heure_depart1, "%2hh%2m:%2s")</text>
 			<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
 		</body>
 	</report>
