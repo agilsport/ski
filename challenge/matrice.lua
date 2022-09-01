@@ -258,15 +258,6 @@ function OnChangeSaison()
 	BuildRegroupement();
 end
 
-function OnChangecomboRegroupement(value)
-	r = tRegroupement:GetIndexRow('Libelle', value);
-	if r and r >= 0 then
-		matrice.comboRegroupement = tRegroupement:GetCell('Code', r);
-		if  r == 0 then
-			AffichedlgRegroupement();
-		end
-	end
-end
 
 function OnChangecomboPrendreBlocx(bloc)	-- en cas de changement dans les points à prendre pour les courses du bloc x
 	bloc = bloc or 1;
@@ -460,8 +451,8 @@ function GetPtsListe(Code_coureur, index, row)
 	if r and r >= 0 then		-- on trouve le coureur
 		r = tClassement_Listex:GetIndexRow('Code_coureur', Code_coureur);
 		if matrice.comboEntite == 'FIS' then
-			pts.last_discipline = tClassement_Listex:GetCellDouble('Pts_'..matrice.last_discipline, r, 9999);
-			clt.last_discipline = tClassement_Listex:GetCellInt('Clt_'..matrice.last_discipline, r, 9999);
+			pts.last_discipline = tClassement_Listex:GetCellDouble('Pts_'..matrice.last_discipline, r, 999.99);
+			clt.last_discipline = tClassement_Listex:GetCellInt('Clt_'..matrice.last_discipline, r, 999999);
 			pts.SL = tClassement_Listex:GetCellDouble('Pts_SL', r, 999.99);
 			pts.GS = tClassement_Listex:GetCellDouble('Pts_GS', r, 999.99);
 			pts.SG = tClassement_Listex:GetCellDouble('Pts_SG', r, 999.99);
@@ -470,6 +461,22 @@ function GetPtsListe(Code_coureur, index, row)
 			clt.GS = tClassement_Listex:GetCellInt('Clt_GS', r, 999999);
 			clt.SG = tClassement_Listex:GetCellInt('Clt_SG', r, 999999);
 			clt.DH = tClassement_Listex:GetCellInt('Clt_DH', r, 999999);
+			if clt.SL < 999999 then
+				tMatrice_Ranking:SetCell('Pts_SL', row, pts.SL);
+				tMatrice_Ranking:SetCell('Clt_SL', row, clt.SL);
+			end
+			if clt.GS < 999999 then
+				tMatrice_Ranking:SetCell('Pts_GS', row, pts.GS);
+				tMatrice_Ranking:SetCell('Clt_GS', row, clt.GS);
+			end
+			if clt.SG < 999999 then
+				tMatrice_Ranking:SetCell('Pts_SG', row, pts.SG);
+				tMatrice_Ranking:SetCell('Clt_SG', row, clt.SG);
+			end
+			if clt.DH < 999999 then
+				tMatrice_Ranking:SetCell('Pts_DH', row, pts.DH);
+				tMatrice_Ranking:SetCell('Clt_DH', row, clt.DH);
+			end
 			if clt.SL < clt.GS then
 				clt.technique = clt.SL;
 				pts.technique = pts.SL;
@@ -502,6 +509,14 @@ function GetPtsListe(Code_coureur, index, row)
 					end			
 				end
 			end
+			if clt.technique < 999999 then
+				tMatrice_Ranking:SetCell('Pts_technique', row, pts.technique);
+				tMatrice_Ranking:SetCell('Clt_technique', row, clt.technique);
+			end
+			if clt.vitesse < 999999 then
+				tMatrice_Ranking:SetCell('Pts_vitesse', row, pts.vitesse);
+				tMatrice_Ranking:SetCell('Clt_vitesse', row, clt.vitesse);
+			end
 			if matrice['comboListe'..index] and matrice['comboListe'..index..'Classement'] then
 				if matrice['comboListe'..index..'Classement']:len() > 4 then
 					if string.find(matrice['comboListe'..index..'Classement'], 'Technique') then
@@ -518,30 +533,21 @@ function GetPtsListe(Code_coureur, index, row)
 				end
 			end
 			if index == 1 or index == 2 then
-				tMatrice_Ranking:SetCell('Clt_liste'..index, row, clt['liste'..index]);
-				tMatrice_Ranking:SetCell('Pts_liste'..index, row, pts['liste'..index]);
+				if clt['liste'..index] < 999999 then
+					tMatrice_Ranking:SetCell('Clt_liste'..index, row, clt['liste'..index]);
+					tMatrice_Ranking:SetCell('Pts_liste'..index, row, pts['liste'..index]);
+				end
 			else
 				if index == 3 then
 					pts.last_discipline = pts[matrice.analyseGaucheDiscipline]
 					clt.last_discipline = clt[matrice.analyseGaucheDiscipline]
 				end
-				tMatrice_Ranking:SetCell('Pts_last_discipline', row, pts.last_discipline);
-				tMatrice_Ranking:SetCell('Clt_last_discipline', row, clt.last_discipline);
-				tMatrice_Ranking:SetCell('Pts_SL', row, pts.SL);
-				tMatrice_Ranking:SetCell('Clt_SL', row, clt.SL);
-				tMatrice_Ranking:SetCell('Pts_GS', row, pts.GS);
-				tMatrice_Ranking:SetCell('Clt_GS', row, clt.GS);
-				tMatrice_Ranking:SetCell('Pts_technique', row, pts.technique);
-				tMatrice_Ranking:SetCell('Clt_technique', row, clt.technique);
-
-				tMatrice_Ranking:SetCell('Pts_SG', row, pts.SG);
-				tMatrice_Ranking:SetCell('Clt_SG', row, clt.SG);
-				tMatrice_Ranking:SetCell('Pts_DH', row, pts.DH);
-				tMatrice_Ranking:SetCell('Clt_DH', row, clt.DH);
-				tMatrice_Ranking:SetCell('Pts_vitesse', row, pts.vitesse);
-				tMatrice_Ranking:SetCell('Clt_vitesse', row, clt.vitesse);
 				tMatrice_Ranking:SetCell('Pts_inscription', row, pts.last_discipline); 
 				tMatrice_Ranking:SetCell('Clt_inscription', row, clt.last_discipline); 
+			end
+			if clt.last_discipline < 999999 then
+				tMatrice_Ranking:SetCell('Pts_last_discipline', row, pts.last_discipline);
+				tMatrice_Ranking:SetCell('Clt_last_discipline', row, clt.last_discipline);
 			end
 		else
 			pts = tClassement_Listex:GetCellDouble('Pts_liste', r, 255);
@@ -2878,7 +2884,6 @@ function LitMatrice()	-- lecture des variables et affectation des valeurs dans l
 	matrice.comboPrendreBloc1 = matrice.comboPrendreBloc1 or GetValue("comboPrendreBloc1", "Classement général");
 	matrice.comboPrendreBloc2 = matrice.comboPrendreBloc2 or GetValue("comboPrendreBloc2", "Classement général");
 	matrice.comboPresentationCourses = matrice.comboPresentationCourses or GetValue("comboPresentationCourses", "Présentation horizontale type Ski Chrono Tour (par défaut)");
-	matrice.comboRegroupement = matrice.comboRegroupement or GetValue("comboRegroupement", '');
 	matrice.comboSexe = matrice.comboSexe or GetValue("comboSexe", '');
 	matrice.comboTpsDuDernier = matrice.comboTpsDuDernier or GetValue("comboTpsDuDernier", "Non");
 	matrice.comboTriSortie = matrice.comboTriSortie or GetValue("comboTriSortie", "Classement");
@@ -2897,7 +2902,7 @@ function LitMatrice()	-- lecture des variables et affectation des valeurs dans l
 	matrice.numPtsMini = matrice.numPtsMini or GetValueNumber("numPtsMini", 0);
 	matrice.numPtsPresence = matrice.numPtsPresence or GetValueNumber("numPtsPresence", 0);
 	matrice.Saison = matrice.Saison or GetValue("Saison", tSaison:GetCell('Code', 0));
-	matrice.selectionMultiple =  matrice.selectionMultiple or GetValue("selectionMultiple", "'ww'");
+	matrice.selectionRegroupement =  matrice.selectionRegroupement or GetValue("selectionRegroupement", '');
 	matrice.texteCodeComplet = matrice.texteCodeComplet or GetValue ("texteCodeComplet", 'Non')
 	matrice.texteFontSize = matrice.texteFontSize or 8;
 	matrice.texteImprimerClubLong = matrice.texteImprimerClubLong or 'Oui';
@@ -3112,15 +3117,16 @@ function SplitCritere(critere, idxcritere)
 end
 
 function OnSavedlgRegroupement()
-	local cmd = "Delete From Evenement_Matrice Where Code_evenement = "..matrice.code_evenement.." And Cle = 'Evenement_filtre'";
+	local cmd = "Delete From Evenement_Matrice Where Code_evenement = "..matrice.code_evenement.." And Cle = 'Evenement_filtre' Or Cle = 'selectionRegroupement'";
 	base:Query(cmd);
-	matrice.selectionMultiple = "'ww'";
+	matrice.selectionRegroupement = "'-1'";
 	for i = 1, tRegroupement:GetNbRows() do
 		if dlgRegroupement:GetWindowName('chk'..i):GetValue() == true then
-			matrice.selectionMultiple = matrice.selectionMultiple..",'"..tRegroupement:GetCell('Code', i).."'";
+			matrice.selectionRegroupement = matrice.selectionRegroupement..",'"..tRegroupement:GetCell('Code', i-1).."'";
 		end		
 	end
-	local evenement_filtre = "Ev.Code >= 0 And Ev.Code_saison = "..matrice.Saison.." And Ev.Code_Activite = '"..matrice.comboActivite.."' And Ev.Code_entite = '"..matrice.comboEntite.."' And Ep.Sexe = '"..matrice.comboSexe.."' And Ep.Code_regroupement In("..matrice.selectionMultiple..")";
+	AddRowEvenement_Matrice('selectionRegroupement', matrice.selectionRegroupement);
+	local evenement_filtre = "Ev.Code >= 0 And Ev.Code_saison = "..matrice.Saison.." And Ev.Code_Activite = '"..matrice.comboActivite.."' And Ev.Code_entite = '"..matrice.comboEntite.."' And Ep.Sexe = '"..matrice.comboSexe.."' And Ep.Code_regroupement In("..matrice.selectionRegroupement..")";
 	AddRowEvenement_Matrice('Evenement_filtre', evenement_filtre);
 end
 
@@ -3131,7 +3137,7 @@ function AffichedlgRegroupement()
 		height = 400,
 		x = 200,
 		y = 50,
-		label='Selection multiple des codes Regroupement pour la sélection des courses', 
+		label='Selection des Codes Regroupement pour la sélection des courses', 
 		icon='./res/32x32_ffs.png'
 		});
 	
@@ -3139,19 +3145,36 @@ function AffichedlgRegroupement()
 		xml = './challenge/matrice.xml', 	-- Obligatoire
 		node_name = 'root/panel', 			-- Obligatoire
 		node_attr = 'name', 				-- Facultatif si le node_name est unique ...
-		node_value = 'selectionmultiple', 	-- Facultatif si le node_name est unique ...
+		node_value = 'selectionRegroupement', 	-- Facultatif si le node_name est unique ...
 		base = base,
 		Rows = tRegroupement:GetNbRows() 
 	});
 	
+	
 	-- Toolbar 
 	local tb = dlgRegroupement:GetWindowName('tb');
+	tb:AddStretchableSpace();
 	local btnValider = tb:AddTool("Enregistrer", "./res/vpe32x32_save.png");
 	tb:AddSeparator();
 	local btnRetour = tb:AddTool("Retour", "./res/32x32_exit.png");
 	tb:AddStretchableSpace();
 	tb:Realize();
-	dlgRegroupement:Bind(eventType.MENU, function(evt) dlgRegroupement:EndModal(idButton.CANCEL)	end, btnRetour);
+	local arSelection = matrice.selectionRegroupement:Split(',');
+	for i = 1, tRegroupement:GetNbRows() do
+		dlgRegroupement:GetWindowName('chk'..i):SetValue(false);
+		local code_regroupement = tRegroupement:GetCell('Code', i-1);
+		local libelle_regroupement = tRegroupement:GetCell('Libelle', i-1);
+		if libelle_regroupement:len() > 0 then
+			dlgRegroupement:GetWindowName('reg'..i):SetValue(code_regroupement..' : '..libelle_regroupement);
+			for j = 1, #arSelection do
+				if arSelection[j] == "'"..code_regroupement.."'" then
+					dlgRegroupement:GetWindowName('chk'..i):SetValue(true);
+					break;
+				end
+			end
+		end
+	end
+
 	dlgRegroupement:Bind(eventType.MENU, 
 		function(evt)
 			matrice.dialog = dlgRegroupement;
@@ -3163,72 +3186,11 @@ function AffichedlgRegroupement()
 			matrice.action = 'close';
 		end,
 			btnValider);
-	arSelection = matrice.selectionMultiple:Split(',');
-	local depart = 2;
-	for i = 1, tRegroupement:GetNbRows() do
-		if dlgRegroupement:GetWindowName('reg'..i) then
-			dlgRegroupement:GetWindowName('reg'..i):SetValue(tRegroupement:GetCell('Code', i)..' : '..tRegroupement:GetCell('Libelle', i));
-			for j = depart, #arSelection do
-				if tRegroupement:GetCell('Code', i) == string.gsub(arSelection[j], "'", "") then
-					dlgRegroupement:GetWindowName('chk'..i):SetValue(true);
-					depart = j;
-					break;
-				end
-			end
-		end
-	end
-	dlgRegroupement:Fit()
-	dlgRegroupement:ShowModal();
-end
 
-function AffichedlgRegroupement2()
-	dlgRegroupement = wnd.CreateDialog(
-		{
-		width = 1000,
-		height = 400,
-		x = 200,
-		y = 50,
-		label='Selection multiple des codes Regroupement pour la sélection des courses', 
-		icon='./res/32x32_ffs.png'
-		});
-	
-	dlgRegroupement:LoadTemplateXML({ 
-		xml = './challenge/matrice.xml', 	-- Obligatoire
-		node_name = 'root/panel', 			-- Obligatoire
-		node_attr = 'name', 				-- Facultatif si le node_name est unique ...
-		node_value = 'selectionmultiple', 	-- Facultatif si le node_name est unique ...
-		base = base,
-		Rows = tRegroupement:GetNbRows() 
-	});
-	
-	-- Toolbar 
-	local tb = dlgRegroupement:GetWindowName('tb');
-	local btnValider = tb:AddTool("Enregistrer", "./res/vpe32x32_save.png");
-	tb:AddSeparator();
-	local btnRetour = tb:AddTool("Retour", "./res/32x32_exit.png");
-	tb:AddStretchableSpace();
-	tb:Realize();
-	dlgRegroupement:Bind(eventType.MENU, function(evt) dlgRegroupement:EndModal(idButton.CANCEL)	end, btnRetour);
 	dlgRegroupement:Bind(eventType.MENU, 
-		function(evt)
-			OnSavedlgRegroupement();
-			dlgRegroupement:EndModal(idButton.OK);
-		end,
-			btnValider);
-	arSelection = matrice.selectionMultiple:Split(',');
-	local depart = 2;
-	for i = 1, tRegroupement:GetNbRows() -1 do
-		if dlgRegroupement:GetWindowName('reg'..i) then
-			dlgRegroupement:GetWindowName('reg'..i):SetValue(tRegroupement:GetCell('Code', i)..' : '..tRegroupement:GetCell('Libelle', i));
-			for j = depart, #arSelection do
-				if tRegroupement:GetCell('Code', i) == string.gsub(arSelection[j], "'", "") then
-					dlgRegroupement:GetWindowName('chk'..i):SetValue(true);
-					depart = j;
-					break;
-				end
-			end
-		end
-	end
+			function(evt) 
+				dlgRegroupement:EndModal(idButton.CANCEL)	
+			end, btnRetour);
 	dlgRegroupement:Fit()
 	dlgRegroupement:ShowModal();
 end
@@ -4675,21 +4637,6 @@ function BuildRegroupement()
 	end
 	cmd = cmd.." Order By Ordre";
 	base:TableLoad(tRegroupement, cmd);
-	local row = tRegroupement:AddRow();
-	tRegroupement:SetCell('Code_activite', row, matrice.comboActivite);
-	tRegroupement:SetCell('Code_entite', row, matrice.comboEntite);
-	tRegroupement:SetCell('Code_saison', row, matrice.Saison);
-	tRegroupement:SetCell('Code', row, 'X');
-	tRegroupement:SetCell('Libelle', row, 'Sélection multiple');
-	tRegroupement:SetCell('Ordre', row, -1);
-	row = tRegroupement:AddRow();
-	tRegroupement:SetCell('Code_activite', row, matrice.comboActivite);
-	tRegroupement:SetCell('Code_entite', row, matrice.comboEntite);
-	tRegroupement:SetCell('Code_saison', row, matrice.Saison);
-	tRegroupement:SetCell('Code', row, '');
-	tRegroupement:SetCell('Libelle', row, 'Suppression du filtre');
-	tRegroupement:SetCell('Ordre', row, 100);
-	tRegroupement:OrderBy('Ordre');
 end
 
 function OnSavedlgFiltrePoint(raz)
@@ -5150,6 +5097,7 @@ function SetAnalyseGauche(param, etou)
 	end
 end
 
+--toto
 function AffichedlgAnalyse()	
 	local txt = 'Les points de la liste choisie seront imprimés pour information. \nEn technique ou vitesse, le choix se fait sur le meilleur classement mondial.';
 	dlgAnalyse = wnd.CreateDialog(
@@ -5200,7 +5148,7 @@ function AffichedlgAnalyse()
 	dlgAnalyse:GetWindowName('analyseGaucheListe'):SetValue(matrice.analyseGaucheListe);
 	dlgAnalyse:GetWindowName('analyseGaucheDiscipline'):SetValue(matrice.analyseGaucheDiscipline);
 	-- 1,10,SLET1,10,GS : il faut avoir fait 1 fois dans les 10 en SL et 1 fois dans les 10 en GS, les 2 sous critères doivent être satisfaits
-	-- Ex analyseGauche1 = 3,5,* 			-> on remplit la ligne 1
+	-- Ex f = 3,5,* 			-> on remplit la ligne 1
 	--    analyseGauche2 = 1,10,SLOU1,10,GS	-> on remplit les lignes 2 et 3	
 
 	for i = 1, 10 do
@@ -5218,6 +5166,8 @@ function AffichedlgAnalyse()
 		if matrice.comboEntite == 'FIS' then
 			dlgAnalyse:GetWindowName('discipline'..i):Append('Vitesse');
 			dlgAnalyse:GetWindowName('discipline'..i):Append('Technique');
+		else
+			dlgAnalyse:GetWindowName('discipline'..i):Append('*');
 		end
 	end
 	local idxcritere = 1;
@@ -5720,6 +5670,9 @@ function BuildTableRanking()
 	cmd = cmd..' Group By Sexe, Code_coureur';
 	tMatrice_Ranking = base:TableLoad(cmd);
 	ReplaceTableEnvironnement(tMatrice_Ranking, '_tMatrice_Ranking');
+	if matrice.comboEntite == 'FIS' then
+		tMatrice_Ranking:AddColumn({ name = 'Code_FFS', label = 'Code_FFS', type = sqlType.CHAR, width = '15', style = sqlStyle.NULL});
+	end
  	tMatrice_Ranking:AddColumn({ name = 'Clt', label = 'Clt', type = sqlType.LONG, style = sqlStyle.NULL});
  	tMatrice_Ranking:AddColumn({ name = 'Dossard', label = 'Dossard', type = sqlType.LONG, style = sqlStyle.NULL});
  	tMatrice_Ranking:AddColumn({ name = 'Rang', label = 'Rang', type = sqlType.LONG, style = sqlStyle.NULL});
@@ -5824,6 +5777,12 @@ function BuildTableRanking()
 			tMatrice_Ranking:SetCell('Code_evenement'..idxcourse, row, code_evenement)
 			local coltps = 'Tps'..idxcourse;
 			local code_coureur = tMatrice_Ranking:GetCell('Code_coureur', row);
+			if matrice.comboEntite == 'FIS' and row_course == 0 then
+				base:TableLoad(tCorrespondance, "Select * From Correspondance Where Code1 = '"..code_coureur.."'");
+				if tCorrespondance:GetNbRows() > 0 then
+					tMatrice_Ranking:SetCell('Code_FFS', row, tCorrespondance:GetCell('Code2', 0));
+				end
+			end
 			local tps = -1;
 			local dossard = nil;
 			local identite = nil;
@@ -5989,9 +5948,14 @@ function AffichedlgConfiguration()
 	local btnOutils4 = menuOutils:Append({label='Créer une nouvelle course', image ="./res/32x32_journal.png"});
 	tbedit1:SetDropdownMenu(btnOutils:GetId(), menuOutils);
 	tbedit1:AddSeparator();
-	local btnFiltres = tbedit1:AddTool("Filtres", "./res/32x32_find.png");
-	tbedit1:AddSeparator();
-	local btnFiltreParPoint = tbedit1:AddTool("Filtre par points", "./res/32x32_find.png");
+	local btnFiltrage = tbedit1:AddTool("Filtres", "./res/32x32_tools.png", "Filtres à appliquer", itemKind.DROPDOWN);
+	local menuFiltres = menu.Create();
+	local btnFiltres = menuFiltres:Append({label="Filtrage des coureurs", image ="./res/32x32_config.png"});
+	menuFiltres:AppendSeparator();
+	local btnFiltreParPoint = menuFiltres:Append({label="Filtrage des coureurs par points", image ="./res/32x32_config.png"});
+	menuFiltres:AppendSeparator();
+	local btnFiltreRegroupement = menuFiltres:Append({label="Regroupement des courses", image ="./res/32x32_config.png"});
+	tbedit1:SetDropdownMenu(btnFiltrage:GetId(), menuFiltres);
 	tbedit1:AddSeparator();
 	local btnVisuCourses = tbedit1:AddTool("Visu Courses", "./res/32x32_pencil.png");
 	tbedit1:AddSeparator();
@@ -6041,6 +6005,8 @@ function AffichedlgConfiguration()
 	tbedit1:Bind(eventType.MENU, AffichedlgCopycolonnes, btnOutils2);
 	tbedit1:Bind(eventType.MENU, AffichedlgScriptLua, btnOutils3);
 	tbedit1:Bind(eventType.MENU, AffichedlgInscription, btnOutils4);
+	
+	tbedit1:Bind(eventType.MENU, AffichedlgRegroupement, btnFiltreRegroupement);
 	tbedit1:Bind(eventType.MENU, AffichedlgVisuFiltrexPoints, btnFiltreParPoint);
 	tbedit1:Bind(eventType.MENU, AffichedlgColonne, btnColonnes);
 	tbedit1:Bind(eventType.MENU, AffichedlgColonne, btnColonnes1);
@@ -6084,6 +6050,7 @@ function AffichedlgConfiguration()
 			if matrice.Cle_filtrage then
 				tResultat:Filter(matrice.Cle_filtrage, true);
 			end
+			adv.Alert('tResultat:GetNbRows() = '..tResultat:GetNbRows());
 			if tResultat:GetNbRows() > 0 then
 				local filterCmd = wnd.FilterConcurrentDialog({ 
 					sqlTable = tResultat,
@@ -6175,12 +6142,6 @@ function AffichedlgConfiguration()
 	dlgConfiguration:Bind(eventType.COMBOBOX, OnChangecomboEntite, dlgConfiguration:GetWindowName('comboEntite'));
 	dlgConfiguration:Bind(eventType.COMBOBOX, OnChangeSaison, dlgConfiguration:GetWindowName('Saison'));
 	dlgConfiguration:Bind(eventType.COMBOBOX, OnChangecomboTpsDuDernier, dlgConfiguration:GetWindowName('comboTpsDuDernier'));
-	dlgConfiguration:Bind(eventType.COMBOBOX, 
-		function(evt)
-			local value = dlgConfiguration:GetWindowName('comboRegroupement'):GetValue();
-			OnChangecomboRegroupement(value); 
-		end,
-		dlgConfiguration:GetWindowName('comboRegroupement'));
 	dlgConfiguration:Bind(eventType.COMBOBOX,
 		function(evt)
 			OnChangecomboPrendreBlocx(1); 
@@ -6218,7 +6179,6 @@ function AffichedlgConfiguration()
 	
 	LitMatrice();
 	LitMatriceCourses(false);
-	dlgConfiguration:GetWindowName('comboRegroupement'):SetTable(tRegroupement,'Libelle', 'Code, Libelle');
 	if string.find(matrice.comboTypePoint, 'place') then
 		dlgConfiguration:GetWindowName('comboGrille'):Clear();
 		for i = 0, tGrille_Point_Place:GetNbRows() -1 do
@@ -7077,18 +7037,23 @@ function AffichedlgVisuCoursex(rowcourse)	-- affichage du paramétrage de la cour
 		dlgVisuCoursex:GetWindowName('comboGrille'):Append(tGrille_Point_Place:GetCell("Libelle", i));
 	end
 	dlgVisuCoursex:GetWindowName('comboPrendre'):Clear();
+	-- 1.Classement général"
+	-- 2.Classement à la manche"
+	-- 3.Idem plus le classement général"
+	-- 4.Général PLUS meilleure manche"
+	-- 5.Général OU meilleure manche"
 	if string.find(matrice.comboTypePoint, 'place') then
 		dlgVisuCoursex:GetWindowName('comboPrendre'):Append("Idem matrice");
-		dlgVisuCoursex:GetWindowName('comboPrendre'):Append("Classement à la manche");
-		dlgVisuCoursex:GetWindowName('comboPrendre'):Append("Idem plus le classement total");
-		dlgVisuCoursex:GetWindowName('comboPrendre'):Append("Classement général");
-		dlgVisuCoursex:GetWindowName('comboPrendre'):Append("Général PLUS meilleure manche");
-		dlgVisuCoursex:GetWindowName('comboPrendre'):Append("Général OU meilleure manche");
+		dlgVisuCoursex:GetWindowName('comboPrendre'):Append("1.Classement général");
+		dlgVisuCoursex:GetWindowName('comboPrendre'):Append("2.Classement à la manche");
+		dlgVisuCoursex:GetWindowName('comboPrendre'):Append("3.Idem plus le classement général");
+		dlgVisuCoursex:GetWindowName('comboPrendre'):Append("4.Général PLUS meilleure manche");
+		dlgVisuCoursex:GetWindowName('comboPrendre'):Append("5.Général OU meilleure manche");
 	else
 		dlgVisuCoursex:GetWindowName('comboPrendre'):Append("Idem matrice");
-		dlgVisuCoursex:GetWindowName('comboPrendre'):Append("Classement à la manche");
-		dlgVisuCoursex:GetWindowName('comboPrendre'):Append("Idem plus le classement total");
-		dlgVisuCoursex:GetWindowName('comboPrendre'):Append("Classement général");
+		dlgVisuCoursex:GetWindowName('comboPrendre'):Append("1.Classement général");
+		dlgVisuCoursex:GetWindowName('comboPrendre'):Append("2.Classement à la manche");
+		dlgVisuCoursex:GetWindowName('comboPrendre'):Append("3.Idem plus le classement général");
 	end
 
 	-- affectation des variables
@@ -7116,7 +7081,7 @@ function AffichedlgVisuCoursex(rowcourse)	-- affichage du paramétrage de la cour
 	if tMatrice_Courses:GetCell('Prendre', rowcourse) == matrice['comboPrendreBloc'..tMatrice_Courses:GetCellInt('Bloc', rowcourse)] then
 		dlgVisuCoursex:GetWindowName('comboPrendre'):SetSelection(0);
 	else
-		dlgVisuCoursex:GetWindowName('comboPrendre'):SetValue(tMatrice_Courses:GetCellInt('Prendre', rowcourse));
+		dlgVisuCoursex:GetWindowName('comboPrendre'):SetValue(tMatrice_Courses:GetCell('Prendre', rowcourse));
 	end
 	AfficheCoefCoursex(rowcourse);
 	-- Toolbar 
@@ -7294,13 +7259,8 @@ function OnSavedlgConfiguration()	-- sauvegarde des paramètres de la matrice.
 	if matrice.comboSexe then
 		strfiltre = strfiltre.." And Ep.Sexe = '"..matrice.comboSexe.."'";
 	end
-	if matrice.comboRegroupement:len() > 0 then
-		if matrice.comboRegroupement ~= 'X' then
-			strfiltre = strfiltre.." And Ep.Code_regroupement = '"..matrice.comboRegroupement.."'";
-		else
-			AddRowEvenement_Matrice('selectionMultiple', matrice.selectionMultiple);
-			strfiltre = strfiltre.." And Ep.Code_regroupement In("..matrice.selectionMultiple..")";
-		end
+	if matrice.selectionRegroupement:len() > 0 then
+		strfiltre = strfiltre.." And Ep.Code_regroupement In("..matrice.selectionRegroupement..')';
 	end
 	
 	AddRowEvenement_Matrice('Evenement_filtre', strfiltre);
@@ -7309,7 +7269,6 @@ function OnSavedlgConfiguration()	-- sauvegarde des paramètres de la matrice.
 	AddRowEvenement_Matrice('comboEntite', matrice.comboEntite);
 	AddRowEvenement_Matrice('comboActivite', matrice.comboActivite);
 	AddRowEvenement_Matrice('Saison', matrice.Saison);
-	AddRowEvenement_Matrice('comboRegroupement', matrice.comboRegroupement);
 	AddRowEvenement_Matrice('comboSexe', matrice.comboSexe);
 	AddRowEvenement_Matrice('comboAbdDsq', matrice.comboAbdDsq);
 	AddRowEvenement_Matrice('comboGarderInfQuota', matrice.comboGarderInfQuota);
@@ -7433,10 +7392,6 @@ function ControleData()
 		matrice.ErreurMessage = matrice.ErreurMessage..'\nSexe des coureurs non renseigné !!';
 		ok = false;
 	end
-	if dlgConfiguration:GetWindowName('comboRegroupement'):GetValue() == '' then 
-		matrice.ErreurMessage = matrice.ErreurMessage..'\nCode regroupement manquant';
-		ok = false;
-	end
 	if dlgConfiguration:GetWindowName('comboPrendreBloc1'):GetValue() == '' then 
 		matrice.ErreurMessage = matrice.ErreurMessage..'\nQuoi prendre en compte pour le bloc 1 ??';
 		ok = false;
@@ -7549,10 +7504,6 @@ function SetDatadlgConfiguration()
 	else
 		dlgConfiguration:GetWindowName('numMalusAbs'):SetValue('');
 	end
-	local r = tRegroupement:GetIndexRow('Code', matrice.comboRegroupement)
-	if r and r >= 0 then
-		dlgConfiguration:GetWindowName('comboRegroupement'):SetValue(tRegroupement:GetCell('Libelle', r));
-	end
 	dlgConfiguration:GetWindowName('comboTriSortie'):SetValue(matrice.comboTriSortie);
 	dlgConfiguration:GetWindowName('comboPresentationCourses'):SetValue(matrice.comboPresentationCourses);
 	dlgConfiguration:GetWindowName('comboOrientation'):SetValue(matrice.comboOrientation);
@@ -7627,7 +7578,7 @@ function OnConfiguration(cparams)
 	else
 		return false;
 	end
-	matrice.version_script = '5.4';
+	matrice.version_script = '5.7';
 	matrice.OS = app.GetOsDescription();
 	-- vérification de l'existence d'une version plus récente du script.
 	local url = 'https://live.ffs.fr/maj_pg/challenge/last_version.txt'
@@ -7649,6 +7600,7 @@ function OnConfiguration(cparams)
 	tEvenement_Matrice = base:GetTable('Evenement_Matrice');
 	tSaison = base:GetTable('Saison');
 	tEntite = base:GetTable('Entite');
+	tCorrespondance = base:GetTable('Correspondance');
 	tDiscipline = base:GetTable('Discipline');
 	tComite = base:GetTable('Comite');
 	tClub = base:GetTable('Club');

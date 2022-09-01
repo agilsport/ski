@@ -50,7 +50,7 @@
 		<row value="200px"/>
 		<statictext font_size="10" style="ALIGN_CENTER" label="Enregistrement des paramètres" />
 	</panel>
-	<panel name="selectionmultiple">
+	<panel name="selectionRegroupement">
 		<lua>nbrows = tonumber(params.Rows);
 		nbrows1 = math.ceil(nbrows / 2);
 		</lua>
@@ -65,10 +65,9 @@
 		</matrix>
 		<matrix row="auto" col_start="2" row_start="-1">
 			<col value="20px,1,10"/>
-			<lua>depart = nbrows1 + 1;
-		   for i = depart, nbrows do</lua>
-			<textctrl row="auto" col_start="3" name="('reg'..i)" style="TE_READONLY"/>
-			<checkbox col_start="2" name="('chk'..i)" style="CHK_2STATE|ALIGN_LEFT"/>
+			<lua>for i = nbrows1 + 1, nbrows do</lua>
+				<textctrl row="auto" col_start="3" name="('reg'..i)" style="TE_READONLY"/>
+				<checkbox col_start="2" name="('chk'..i)" style="CHK_2STATE|ALIGN_LEFT"/>
 			<lua>end</lua>
 		</matrix>
 		<row value="50px"/>
@@ -105,7 +104,7 @@
 			<statictext row="auto" col_start="1" label="ABS : malus en points si la valeur \nest &gt;= 10, sinon malus en secondes"/>
 			<textctrl col_start="2" name="numMalusAbs"/>
 			<statictext row="auto" col_start="1" label="Regroupement des courses"/>
-			<combotable col_start="2" name="comboRegroupement"/>
+			<statictext col_start="2" style="ALIGN_LEFT" label=" : N.B. ce paramètre se règle maintenant dans les Filtres"/>
 			<statictext row="auto" col_start="1" label="Trier le résultat par"/>
 			<combobox col_start="2" name="comboTriSortie" style="CB_READONLY"/>
 			<statictext row="auto" col_start="1" label="Présentation des courses"/>
@@ -418,17 +417,17 @@
 		<col value="200px,1,200px"/>
 		<pen border="0"/>
 		<padding all="5px"/>
-		<row value="30px"/>
+		<row value="15px"/>
 		<matrix col_start="2" row="auto">
-			<row value="40px"/>
-			<col value="1,1,1,2,1,1,1,2,1"/>
+			<row value="25px"/>
+			<col value="1,1,1,2,1+30px,1,1,2,1"/>
 			<statictext row="auto" col_start="1" col_end="4" style="ALIGN_RIGHT" label="Prendre les points de la liste "/>
 			<combotable col_start="5" name="analyseGaucheListe" style="ALIGN_LEFT|CB_READONLY" />
 			<statictext row="60px" col_start="1" col_end="0" style="ALIGN_CENTER" label="(params.txt_label)"/>
 			<statictext row="auto" col_start="1" col_end="4" style="ALIGN_RIGHT" label="Discipline choisie : "/>
 			<combobox col_start="5" name="analyseGaucheDiscipline" style="ALIGN_LEFT|CB_READONLY" />
-			<row value="10px"/>
-			<statictext row="140px" col_start="1" col_end="0" style="ALIGN_CENTER" label="On sépare les critères les uns des autres par le signe +.\nUn critère peut comprendre plusieurs sous-critères de type ET / OU.\nSi on met une * dans le choix de la discipline, on prendra en compte toutes les courses sans distinction.\nSi le premier critère n\'est pas rempli, il faut valider le critère suivant et ainsi de suite.\nOn ne peut pas mixier les ET avec les OU dans le même critère."/>
+			<row value="5px"/>
+			<statictext row="auto" col_start="1" col_end="0" style="ALIGN_CENTER" label="On sépare les critères les uns des autres par le signe +.\nUn critère peut comprendre plusieurs sous-critères de type ET / OU.\nSi on met une * dans le choix de la discipline, on prendra en compte toutes les courses sans distinction.\nSi le premier critère n\'est pas rempli, il faut valider le critère suivant et ainsi de suite.\nOn ne peut pas mixier les ET avec les OU dans le même critère."/>
 			<lua>for i = 1, 10 do</lua>
 				<statictext row="auto" col_start="2" style="ALIGN_CENTER" label="faire"/>
 				<combobox col_start="1" name="('etou'..i)" cond="i &gt; 1"/>
@@ -441,12 +440,12 @@
 			<lua>end</lua>
 			<staticbox row_start="1" row_end="0" col_start="1" col_end="0" label="Critères à valider en cascade"/>
 		</matrix>
-		<row value="15px"/>
-		<staticbox row_start="1" row_end="0" col_start="1" col_end="0" label="Critères d\'analyse statistique des performances"/>
-		<row value="15px"/>
+		<!-- <row value="15px"/> -->
+		<!-- <staticbox row_start="1" row_end="0" col_start="1" col_end="0" label="Critères d\'analyse statistique des performances"/> -->
+		<row value="10px"/>
+		<row value="30px"/>
 		<toolbar row="auto" col_start="1" col_end="0" name="tbanalyse" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
 		<row value="1"/>
-		<row value="50px"/>
 	</panel>
 	<panel name="criteretype1">
 		<wnd name="statictext" style="ALIGN_RIGHT" />
