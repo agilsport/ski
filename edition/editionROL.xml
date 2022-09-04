@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- Menu Editions Activité "ROL" !-->
-<!-- version="6.5" !-->
-<!-- nettoyage du fichier mise en place de la fonction getidentitecoureur -->
-<!-- option page break -->
-<!-- correction bug Qr code -->
-<!-- Activation de la fenetre filtrage epreuves pour une edition gerer par un .lua => Option filter="before" -->
-<!-- Gestion de la discipline IND sur les liste de depart -->
 
+<!-- version="6.5"  place de la fonction getidentitecoureur 
+		 option page break 
+		 correction bug Qr code 
+		 Activation de la fenetre filtrage epreuves pour une edition gerer par un .lua => Option filter="before" 
+		 6.5 Gestion de la discipline IND sur les liste de depart 
+		 6.6 corection bug coordinateur
+ !-->
+ 
 <!-- a voir -->
 <!-- calcul de la note poursuite 2éme jour !-->
 <!-- si possible de faire fonctionner les cond="discipline:In('POURS')" dans les <menus> ?? dans <marging> et dans les <options> -->
@@ -146,7 +148,7 @@
 		
 		<row h="auto" />
 		<text col_start="1" align="left">'COORDONNATEUR- '..entite..':'</text>
-		<text col_start="2" align="left">GetIdentiteOfficiels('ffs_coordinateur')</text>
+		<text col_start="2" align="left">GetIdentiteOfficiels('COORDINATOR')</text>
 		<text col_start="5" align="left" >'Montée Totale. :'</text>
 		<text col_start="6" align="left" >$(Epreuve.Montee_tot)</text>
 		<text col_start="9" align="left">'Style :'</text>

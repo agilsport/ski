@@ -466,7 +466,7 @@
 				<text row_start="3" align="right" col_start="(c)" label="Pen.Tir." cond="code_activite == 'BIATH'" >$(Penalite_tir)..' Sec.'</text> <!-- cond="code_activite == 'BIATH'" --> 
 				 <!-- colonne 10 -->
 				<text lua="c=c+1" row_start="2" align="right" col_start="(c)" label="Fact.F">$(Facteur_f)</text>
-				<text row_start="3" align="right" col_start="(c)" label="Péna Ap.">$(Penalite_calculee)</text>
+				<text row_start="3" align="right" col_start="(c)" label="Péna Ap.">$(Penalite_appliquee)</text>
 				 <!-- colonne 11 -->
 				<text lua="c=c+1" row_start="2" row_end="0" col_start="(c)" align="center" label="Codex Epr.">$(Fichier_transfert)</text>
 				 <lua>
