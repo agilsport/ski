@@ -3,12 +3,13 @@ dofile('./edition/functionPG.lua');
 dofile('./interface/adv.lua');
 dofile('./interface/interface.lua');
 --[[
+Coupes d'Europe :
 groupe 1 ECSL de la discipline : de 1 à 15 (ou plus)
 groupe 2 Si plus de 450 pts en EC la saison dernière de 16 à x
-groupe 2 on met en plus dans ce groupe les coureurs de la WC dans les 30 de la WCSL de la discipline. On départage selon les pts ECSL sinon les pts WCSL
+groupe 2 on met en plus dans ce groupe les coureurs de la WC dans les 30 de la WCSL de la discipline. On départage selon les pts ECSL sinon les pts WCSL sinon les Pts FIS
 groupe 4 On continue avec les Pts de la ECSL jusqu'à en avoir 30 pris au titre de la ECSL
 groupe 5 Cette série est interrompue si on a un vainqueur d'une autre Coupe continentale qui par systématiquement en 31 ème position.
-groupe 6 La série interrompue reprend jusqu'à en avoir 30.
+groupe 6 La série éventuellement interrompue des ECSL reprend jusqu'à en avoir 30.
 Groupe 7 On poursuit selon les points FIS.
 
 grid:Filter() = on réapplique le filtre avec la table sourse Src
@@ -70,13 +71,18 @@ function OnClose()
 	end
 end
 
-function ReadClubs()
-	draw.tClubs = {};
-	local idxcolSkiclub = nil;
-	local idxcolFiscode = nil;
+function ReadDataFisList()
 	local filename = '';
-	local idxcolCode = nil;
-	local idxcolClub = nil;
+	draw.tDataFisList = {};
+	local idxcolFiscode = nil;
+	local idxcolFirstname = nil;
+	local idxcolLastname = nil;
+	local idxcolNationcode = nil;
+	local idxcolSkiclub = nil;
+	local idxcolBirthyear = nil;
+	local idxcolFisPts = nil;
+	local idxcolFisClt = nil;
+	
 	local fileDialog = wnd.CreateFileDialog(dlgScriptLua,
 		"Recherche de la liste FIS csv",
 		app.GetPath(), 
@@ -94,22 +100,39 @@ function ReadClubs()
 		end
 		local cols = lines[1]:Split(',');
 		for i = 1, #cols do
-			if cols[i] == 'Skiclub' then
-				idxcolSkiclub = i;
-			end
 			if cols[i] == 'Fiscode' then
 				idxcolFiscode = i;
+			elseif cols[i] == 'Lastname' then
+				idxcolLastname = i;
+			elseif cols[i] == 'Firstname' then
+				idxcolFirstname = i;
+			elseif cols[i] == 'Nationcode' then
+				idxcolNationcode = i;
+			elseif cols[i] == 'Skiclub' then
+				idxcolSkiclub = i;
+			elseif cols[i] == 'Birthyear' then
+				idxcolBirthyear = i;
+			elseif cols[i] == draw.discipline..'points' then
+				idxcolFispoints = i;
+			elseif cols[i] == draw.discipline..'pos' then
+				idxcolFispos = i;
 			end
 		end
 		for i = 2, #lines do
 			local cols = lines[i]:Split(',');
 			local fiscode = 'FIS'..cols[idxcolFiscode];
-			draw.tClubs[fiscode] = {};
-			local club = cols[idxcolSkiclub]:upper();
-			club = club:gsub('"','');
+			draw.tDataFisList[fiscode] = {};
+			local fisskiclub = cols[idxcolSkiclub]:upper();
+			fisskiclub = fisskiclub:gsub('"','');
 			local r = tDraw:GetIndexRow('Code_coureur', fiscode);
 			if r and r >= 0 then
-				tDraw:SetCell('Club', r, club);
+				tDraw:SetCell('Nom', r, cols[idxcolLastname]);
+				tDraw:SetCell('Prenom', r, cols[idxcolFirstname]);
+				tDraw:SetCell('Nation', r, cols[idxcolNationcode]);
+				tDraw:SetCell('Club', r, fisskiclub);
+				tDraw:SetCell('An', r, tonumber(cols[idxcolBirthyear]));
+				tDraw:SetCell('Fis_pts', r, tonumber(cols[idxcolFispoints]));
+				tDraw:SetCell('Fis_clt', r, tonumber(cols[idxcolFispos]));
 			end
 		end
 		base:TableBulkUpdate(tDraw, 'Club', 'Resultat');
@@ -135,7 +158,6 @@ function ReadECSL()
 		filename = string.gsub(fileDialog:GetPath(), app.GetPathSeparator(), "/");
 	end
 	if filename:len() > 0 then
-		-- local f = assert(io.open(filename, "r"))
 		lines = {};
 		for line in io.lines(filename) do 
 			lines[#lines + 1] = line
@@ -157,40 +179,28 @@ function ReadECSL()
 		end
 		if idxcolPts and idxcolClt then
 			for i = 0, tDraw:GetNbRows() -1 do
-				if draw.annee_1 == false then
-					tDraw:SetCellNull('ECSL_points', i);
-					tDraw:SetCellNull('ECSL_rank', i);					
-				end
+				tDraw:SetCellNull('ECSL_points', i);
+				tDraw:SetCellNull('ECSL_rank', i);					
+				tDraw:SetCellNull('ECSL_overall_points', i);
+				tDraw:SetCellNull('ECSL_overall_rank', i);
 			end
 			for i = 2, #lines do
 				local cols = lines[i]:Split(',');
 				local fiscode = 'FIS'..cols[1];
 				draw.tECSL[fiscode] = {};
-				local pts = tonumber(cols[idxcolPts]) or 0;
-				local clt = tonumber(cols[idxcolClt]) or 0;
-				local allpts = tonumber(cols[idxcolPtsAll]) or 0;
-				local allclt = tonumber(cols[idxcolCltAll]) or 0;
-				draw.tECSL[fiscode].Pts = pts;
-				draw.tECSL[fiscode].Clt = clt;
-				draw.tECSL[fiscode].ALLPts = allpts;
-				draw.tECSL[fiscode].ALLClt = allclt;
+				draw.tECSL[fiscode].Point = tonumber(cols[idxcolPts]);
+				draw.tECSL[fiscode].Clt = tonumber(cols[idxcolClt]);
+				draw.tECSL[fiscode].AllPoint = tonumber(cols[idxcolPtsAll]);
+				draw.tECSL[fiscode].AllClt = tonumber(cols[idxcolCltAll]);
 				local r = tDraw:GetIndexRow('Code_coureur', fiscode);
 				if r and r >= 0 then
-					if draw.annee_1 == false then	-- on lit la saison en cours
-						if pts > 0 then
-							tDraw:SetCell('ECSL_points', r, pts);
-							tDraw:SetCell('ECSL_rank', r, clt);
-						end
-						if allpts >= 450 then
-							tDraw:SetCell('ECSL_overall_points', r, allpts);
-							tDraw:SetCell('ECSL_overall_rank', r, allclt);
-						end
-					else							-- on lit la saison n-1
-						local pts_oa_lu = tDraw:GetCellInt('ECSL_overall_points', r);
-						if pts_oa_lu < 450 and allpts >= 450 then
-							tDraw:SetCell('ECSL_overall_points', r, allpts);
-							tDraw:SetCell('ECSL_overall_rank', r, allclt);
-						end
+					if draw.tECSL[fiscode].Point and draw.tECSL[fiscode].Point > 0 then
+						tDraw:SetCell('ECSL_points', r, draw.tECSL[fiscode].Point);
+						tDraw:SetCell('ECSL_rank', r, draw.tECSL[fiscode].Clt);
+					end
+					if draw.tECSL[fiscode].AllPoint and draw.tECSL[fiscode].AllPoint >= 450 then
+						tDraw:SetCell('ECSL_overall_points', r, draw.tECSL[fiscode].AllPoint);
+						tDraw:SetCell('ECSL_overall_rank', r, draw.tECSL[fiscode].AllClt);
 					end
 				end
 			end
@@ -199,7 +209,7 @@ function ReadECSL()
 	end
 end
 
-function ReadWCSL(build_table)
+function ReadWCSL()
 	draw.tWCSL = {};
 	local filename = '';
 	local idxcolPts = nil;
@@ -215,7 +225,6 @@ function ReadWCSL(build_table)
 		filename = string.gsub(fileDialog:GetPath(), app.GetPathSeparator(), "/");
 	end
 	if filename:len() > 0 then
-		-- local f = assert(io.open(filename, "r"))
 		lines = {};
 		for line in io.lines(filename) do 
 			lines[#lines + 1] = line
@@ -238,19 +247,13 @@ function ReadWCSL(build_table)
 				local cols = lines[i]:Split(',');
 				local fiscode = 'FIS'..cols[1];
 				draw.tWCSL[fiscode] = {};
-				local pts = tonumber(cols[idxcolPts]) or 0;
-				local clt = tonumber(cols[idxcolClt]) or 0;
-				local allpts = tonumber(cols[idxcolPtsAll]) or 0;
-				local allclt = tonumber(cols[idxcolCltAll]) or 0;
-				draw.tWCSL[fiscode].Pts = pts;
-				draw.tWCSL[fiscode].Clt = clt;
-				draw.tWCSL[fiscode].ALLPts = allpts;
-				draw.tWCSL[fiscode].ALLClt = allclt;
+				draw.tWCSL[fiscode].Pts = tonumber(cols[idxcolPts]) or 0;
+				draw.tWCSL[fiscode].Clt = tonumber(cols[idxcolClt]) or 0;
 				local r = tDraw:GetIndexRow('Code_coureur', fiscode);
 				if r and r >= 0 then
-					if clt > 0 and clt <= 30 then
-						tDraw:SetCell('WCSL_points', r, pts);
-						tDraw:SetCell('WCSL_rank', r, clt);
+					if draw.tWCSL[fiscode].Pts > 0 and draw.tWCSL[fiscode].Clt <= 30 then
+						tDraw:SetCell('WCSL_points', r, draw.tWCSL[fiscode].Pts);
+						tDraw:SetCell('WCSL_rank', r, draw.tWCSL[fiscode].Clt);
 					end
 				end
 			end
@@ -403,11 +406,10 @@ function OnAide()
 				"           S'il y en a moins de 30, on prendra dans ce groupe les viennent ensuite par ordre de leurs points FIS.\n"..
 				"Groupe 6 : Le ranking se poursuit selon les points FIS.\n"..
 				"			Les exaequos dans les coureurs 'points FIS' sont départagés par double tirage.\n\n"..
-				"Vous pouvez charger depuis les outils le fichiers csv du classement ECSL pris sur le site de la FIS '\n"..
-				"           dans votre Member Section.Les points ECSL seront alors placés automatiquement dans le tableau\n"..
-				"ATTENTION à bien vérifier que la dernière course a été prise en compte sur la page de la FIS.";
-	dlgTableau:MessageBox(msg, "Aide sur le ranking en CE.",
-		msgBoxStyle.OK+msgBoxStyle.ICON_INFORMATION);
+				"Vous pouvez charger depuis les outils les fichiers csv du classement ECSL et WCSL pris sur le site de la FIS '\n"..
+				"dans votre Member Section.Les points ECSL et WCSL seront alors placés automatiquement dans le tableau.\n"..
+				"Vous devrez télécharger également le fichiers : 'Special starting positions at COC events' se trouvant dans 'ALPINE Documents' (CC winners dans la discipline et Pts OverAll de la saison n-1).";
+	dlgTableau:MessageBox(msg, "Aide sur le ranking en CE.", msgBoxStyle.OK+msgBoxStyle.ICON_INFORMATION);
 end
 
 function OnDecaler(row, bolVersLeBas, bolGroupe)
@@ -494,7 +496,7 @@ function OnPrintDoubleTirage(groupe)
 		OnEncodeJsonBibo(draw.code_evenement, groupe);
 		params.tableDossards1, params.tableDossards2 = OnDecodeJsonBibo(draw.code_evenement, groupe);
 	end
-	if groupe == 1 then
+	if groupe == -1 then
 		params.nb_groupe1 = #params.tableDossards1;
 		report = wnd.LoadTemplateReportXML({
 			xml = './process/dossard_DoubleTirage.xml',
@@ -515,7 +517,7 @@ function OnPrintDoubleTirage(groupe)
 			paper_orientation = 'portrait',
 			params = {Nom = params.evenementNom, tableDossards1 = params.tableDossards1, tableDossards2 = params.tableDossards2, Draw = 1, Version = draw.version, NbGroupe1 = 0}
 		});
-	elseif groupe == 2 then
+	else
 		local editor = report:GetEditor();
 		editor:PageBreak(); -- Saut de Page entre les 2 éditions ...
 		wnd.LoadTemplateReportXML({
@@ -605,6 +607,30 @@ function OnPrintNation()
 		node_value = 'parti_factorise',
 		base = base,
 		body = tDraw,
+		params = {EstCE = estce, EstVitesse = vitesse, Rupture = 'Nation'}
+		});
+	
+end
+
+function OnPrintFinale()
+	-- Creation du Report
+	local estce = 0;
+	report = wnd.LoadTemplateReportXML({
+		xml = './process/dossard_LiveDraw.xml',
+		node_name = 'root/report',
+		node_attr = 'id',
+		node_value = 'parti_finale',
+		base = base,
+		body = tDraw,
+		margin_first_top = 250,
+		margin_first_left = 80,
+		margin_first_right = 80,
+		margin_first_bottom = 160,
+		margin_top = 245,
+		margin_left = 80, 
+		margin_right = 80,
+		margin_bottom = 160,
+		paper_orientation = 'portrait',
 		params = {EstCE = estce, EstVitesse = vitesse, Rupture = 'Nation'}
 		});
 	
@@ -955,11 +981,6 @@ function CommandSendOrder()
 	nodeRoot:AddChild(nodeCommand);
 	CreateXML(nodeRoot);
 	dlgTableau:GetWindowName('info'):SetValue("Ordre des coureurs dans le tableau envoyé");
-	-- if draw.statut == 'UF' then
-		-- SendMessage('Board of racers refreshed (you might have to refresh the page)');
-	-- else
-		-- SendMessage('Board confirmed, bib drawing in progress (you might have to refresh the page)');
-	-- end
 end
 
 -- Envoi Course
@@ -991,14 +1012,9 @@ function CommandSendList()
 		local tStandings = {};
 		local tData = {};
 		if draw.bolEstCE then
-			-- table.insert(tData, {rank = ecsl_rank, points = ecsl_points, event = draw.discipline, category = 'ECSL'});
-			-- table.insert(tData, {rank = ecsl_overall_rank, points = ecsl_overall_points, event = 'OA', category = 'EC'});
-			-- table.insert(tData, {rank = wcsl_rank, points = wcsl_points, event = draw.discipline, category = 'WCSL'});
-			-- table.insert(tData, {rank = winner_rank, points = winner_points, event = draw.discipline, category = 'CC WINNER'});
-			-- table.insert(tData, {rank = fis_clt, points = fis_pts, event = draw.discipline, category = 'FIS'});
 			table.insert(tData, {rank = ecsl_rank, points = ecsl_points, event = draw.discipline, category = 'ECSL'});
 			table.insert(tData, {rank = ecsl_overall_rank, points = ecsl_overall_points, event = 'OA', category = 'EC'});
-			table.insert(tData, {points = wcsl_rank, rank = wcsl_points, event = draw.discipline, category = 'WCSL'});
+			table.insert(tData, {rank = wcsl_points, points = wcsl_rank, event = draw.discipline, category = 'WCSL'});
 			table.insert(tData, {rank = winner_rank, points = winner_points, event = draw.discipline, category = 'CC WINNER'});
 			table.insert(tData, {rank = fis_clt, points = fis_pts, event = draw.discipline, category = 'FIS'});
 		else
@@ -1154,7 +1170,7 @@ function CommandRaceInfo()
 	xmlNode.Create(nodeRacedef, xmlType.ELEMENT_NODE, "drawgroup", '');	
 	xmlNode.Create(nodeRacedef, xmlType.ELEMENT_NODE, "drawstatus", '');	
 	xmlNode.Create(nodeRacedef, xmlType.ELEMENT_NODE, "drawbib", '');	
-	local tInfo = {legend = {abbreviation = {{description = 'ECSL', title = 'ECSL'}, {description = '400-200 Cup Points', title = '400-200'}, {description = 'WCSL top 30', title = 'Top 30'}, {description = 'Ranked by FIS points', title = 'FIS Points'}}}};
+	local tInfo = {legend = {abbreviation = {{description = 'ECSL', title = 'ECSL'}, {description = '450 Cup Points', title = '400-200'}, {description = 'WCSL top 30', title = 'Top 30'}, {description = 'Ranked by FIS points', title = 'FIS Points'}}}};
 	if draw.bolEstCE == false then
 		tInfo = {legend = {abbreviation = {{description = 'Ranked by FIS points', title = 'FIS Points'}}}};
 	end
@@ -1334,14 +1350,15 @@ function OnAjouterCoureur()
 	local comite = '';
 	local ecsl_rank = nil;
 	local ecsl_points = nil;
+	local ecsl_all_rank = nil;
+	local ecsl_all_points = nil;	
 	local point = tonumber(dlgTableau:GetWindowName('points'):GetValue()) or 0;
 	local clt = tonumber(dlgTableau:GetWindowName('classement'):GetValue()) or 0;
 	if type(draw.tECSL[code_coureur]) == 'table' then
-		ecsl_points = draw.tECSL[code_coureur].Pts;
-		ecsl_rank = draw.tECSL[code_coureur].Clt;
-	else
-		ecsl_points = 0;
-		ecsl_rank = 0;
+		ecsl_points = draw.tECSL[code_coureur].Point or 0;
+		ecsl_rank = draw.tECSL[code_coureur].Clt or 0;
+		ecsl_all_points = draw.tECSL[code_coureur].AllPoint or 0;
+		ecsl_all_rank = draw.tECSL[code_coureur].AllClt or 0;
 	end
 	if dlgTableau:GetWindowName('comite') then
 		comite = dlgTableau:GetWindowName('comite'):GetValue();
@@ -1383,9 +1400,13 @@ function OnAjouterCoureur()
 		tDraw:GetRecord():SetNull('WCSL_points');
 		tDraw:GetRecord():SetNull('Winner_CC');
 		if draw.bolEstCE then
-			if ecsl_rank > 1 and ecsl_points > 0 then
+			if ecsl_points and ecsl_points > 0 then
 				tDraw:GetRecord():Set('ECSL_rank', ecsl_rank);
 				tDraw:GetRecord():Set('ECSL_points', ecsl_points);
+			end
+			if ecsl_all_points and ecsl_all_points > 0 then
+				tDraw:GetRecord():Set('ECSL_overall_rank', ecsl_all_rank);
+				tDraw:GetRecord():Set('ECSL_overall_points', ecsl_all_points);
 			end
 		end
 		if point > 0 and clt > 0 then
@@ -1525,7 +1546,7 @@ function OnChercheCoureurCode(code);
 		local pts, rank, pts_VIT, rank_VIT = GetRank(codeFIS);
 		if draw.bolEstCE then 
 			if draw.tECSL[codeFIS] == 'table' then
-				dlgTableau:GetWindowName('ecsl_points'):SetValue(draw.tECSL[codeFIS].Pts);
+				dlgTableau:GetWindowName('ecsl_points'):SetValue(draw.tECSL[codeFIS].Point);
 				dlgTableau:GetWindowName('ecsl_rank'):SetValue(draw.tECSL[codeFIS].Clt);
 			end
 		end
@@ -1750,7 +1771,7 @@ function RefreshGrid(bolTableSource)	-- bolTableSource = true ou false
 		grid_tableau:SynchronizeRowsView();
 	end
 	base:TableBulkUpdate(tDraw,'Dossard, Critere', 'Resultat');
-	base:TableBulkUpdate(tDraw,'Groupe_tirage, Rang_tirage, WCSL_points, WCSL_rank, ECSL_points, ECSL_rank, ECSL_30, ECSL_overall_points, ECSL_overall_rank, Winner_CC, FIS_pts, FIS_clt, FIS_SG_pts, FIS_SG_clt, Statut', 'Resultat_Info_Tirage');
+	base:TableBulkUpdate(tDraw,'Code_evenement, Groupe_tirage, Rang_tirage, WCSL_points, WCSL_rank, ECSL_points, ECSL_rank, ECSL_30, ECSL_overall_points, ECSL_overall_rank, Winner_CC, FIS_pts, FIS_clt, FIS_SG_pts, FIS_SG_clt, Statut', 'Resultat_Info_Tirage');
 end
 
 function BuildTablesDraw()	-- on ajoute ou on supprime des enregistrements dans la table Resultat_Info_Tirage
@@ -1775,6 +1796,7 @@ function BuildTablesDraw()	-- on ajoute ou on supprime des enregistrements dans 
 			tResultat_Info_Tirage:SetCell('Groupe_tirage', row, 5);
 			tResultat_Info_Tirage:SetCell('Statut', row, 'UF');
 			if pts then
+				tResultat:SetCell('Point', i, pts);
 				tResultat_Info_Tirage:SetCell('FIS_pts', row, pts);
 				tResultat_Info_Tirage:SetCell('FIS_clt', row, rank);
 			else
@@ -1794,6 +1816,8 @@ function BuildTablesDraw()	-- on ajoute ou on supprime des enregistrements dans 
 			end
 		end
 	end
+	base:TableBulkUpdate(tResultat, 'Point', 'Resultat');
+
 end
 
 function TraitementtDrawG4(current_group)
@@ -1863,6 +1887,7 @@ function SetuptDraw()
 			tDraw:SetCell('Statut', i, 'CF');
 		end
 	end
+	-- prise en compte des points de la ligne 15 et écentuellement 7 en technique (EC et NC)
 	if draw.bolEstCE then
 		tDraw:OrderBy('ECSL_points DESC, FIS_pts');
 	else
@@ -1941,7 +1966,6 @@ Groupe 6 On poursuit selon les points FIS.
 		end
 	end
 
-
 	-- les groupes 1 et 2 en technique ou groupe 1 seulement en vitesse
 	draw.rang_tirage = 0;
 	local current_group = 0;
@@ -1953,8 +1977,8 @@ Groupe 6 On poursuit selon les points FIS.
 	local fis_pts = -1;
 	local ptslu = nil;
 	local ptsencours = nil;
-	tDrawG1:OrderBy('ECSL_points DESC, FIS_pts');
-	for i = 0, tDrawG1:GetNbRows() -1 do		-- On est forcément en Coupe d'Europe
+	tDrawG1:OrderBy('ECSL_points DESC, FIS_pts');	-- départage des exaequos ECSL par les pts FIS
+	for i = 0, tDrawG1:GetNbRows() -1 do		-- On est forcément en Coupe d'Europe sinon tDrawG1 est vide
 		draw.nb_pris_ecsl = draw.nb_pris_ecsl + 1;
 		ptslu = tDrawG1:GetCellInt('ECSL_points', i);
 		local code_coureur = tDrawG1:GetCell('Code_coureur', i);
@@ -1964,10 +1988,8 @@ Groupe 6 On poursuit selon les points FIS.
 			groupe = 1;
 		else
 			if ptslu >= draw.pts7 then
-				-- params.nb_groupe1 = 1;
 				groupe = -1;
 			else
-				-- params.nb_groupe2 = 1;
 				groupe = 1;
 			end
 		end
@@ -2215,11 +2237,11 @@ Groupe 6 On poursuit selon les points FIS.
 			if not draw.bolVitesse then
 				if draw.code_niveau == 'NC' then		-- Championnats de France
 					if pts <= draw.ptsFIS7 then
-						current_group = 1;
+						current_group = -1;
 					elseif pts <= draw.ptsFIS15 then
-						current_group = 2;
+						current_group = 1;
 					else
-						current_group = 3;
+						current_group = 2;
 					end
 				elseif not draw.bolEstCE then
 					if pts <= draw.ptsFIS15 then
@@ -2433,8 +2455,7 @@ function OnAfficheTableau()
 	tbTableau:AddStretchableSpace();
 	btnSendMessage = tbTableau:AddTool("Messages", "./res/32x32_journal.png");
 	tbTableau:AddSeparator();
-	
-	
+		
 	btnMenuCommande = tbTableau:AddTool("Commandes", "./res/chrono32x32_ko.png",'', itemKind.DROPDOWN);
 	menuCommande = menu.Create();
 	menuCommande:AppendSeparator();
@@ -2501,6 +2522,8 @@ function OnAfficheTableau()
 	menuPrint:AppendSeparator();
 	btnPrintNation = menuPrint:Append({label="Impression des coureurs par Nation", image ="./res/32x32_printer.png"});
 	menuPrint:AppendSeparator();
+	btnPrintFinale = menuPrint:Append({label="Qualifiés pour les finales", image ="./res/32x32_printer.png"});
+	menuPrint:AppendSeparator();
 	btnPrintFeuilleTirage = menuPrint:Append({label="Impression de la feuille de tirage", image ="./res/32x32_printer.png"});
 	menuPrint:AppendSeparator();
 	tbTableau:SetDropdownMenu(btnMenuPrint:GetId(), menuPrint);
@@ -2525,7 +2548,7 @@ function OnAfficheTableau()
 	menuOutils:AppendSeparator();
 	btnDecalerGroupeHaut = menuOutils:Append({label="Décaler les groupes de tirage vers le haut", image ="./res/32x32_up.png"});
 	menuOutils:AppendSeparator();
-	btnGetClubs = menuOutils:Append({label="Charger les Clubs depuis une liste FIS csv", image ="./res/32x32_startlist.png"});
+	btnGetDataFisList = menuOutils:Append({label="Charger les Clubs depuis une liste FIS csv", image ="./res/32x32_startlist.png"});
 	menuOutils:AppendSeparator();
 	btnGetECSL = menuOutils:Append({label="Charger un fichier csv ECSL", image ="./res/32x32_startlist.png"});
 	menuOutils:AppendSeparator();
@@ -2593,10 +2616,13 @@ function OnAfficheTableau()
 	dlgTableau:Bind(eventType.MENU, 
 		function(evt)
 			ChecktDraw();
-			OnPrintDoubleTirage(1);
+			tDraw:OrderBy('Rang_tirage');
+			local groupe1 = tDraw:GetCellInt('Groupe_tirage', 0);
+			OnPrintDoubleTirage(groupe1);
 			if not draw.bolVitesse then
 				if draw.bolEstCE or draw.code_niveau == 'NC' then
-					OnPrintDoubleTirage(2);
+					local groupe2 = tDraw:GetCellInt('Groupe_tirage', 14);
+					OnPrintDoubleTirage(groupe2);
 				end
 			end
 		end, btnPrintDoubleTirageBibo);
@@ -2630,6 +2656,11 @@ function OnAfficheTableau()
 		function(evt)
 			OnPrintNation();
 		end, btnPrintNation);
+
+	dlgTableau:Bind(eventType.MENU, 
+		function(evt)
+			OnPrintFinale();
+		end, btnPrintFinale);
 
 	dlgTableau:Bind(eventType.MENU, OnAide, btnAideCE);
 	dlgTableau:Bind(eventType.MENU, 
@@ -2666,6 +2697,7 @@ function OnAfficheTableau()
 			CommandSendList();
 			CommandSendOrder();
 			base:TableBulkUpdate(tDraw, 'Statut', 'Resultat_Info_Tirage');
+			SendMessage('Board refreshed');
 		end
 		, btnValiderSelection);
 	dlgTableau:Bind(eventType.MENU, 
@@ -2680,12 +2712,13 @@ function OnAfficheTableau()
 			CommandSendList();
 			CommandSendOrder();
 			base:TableBulkUpdate(tDraw, 'Statut', 'Resultat_Info_Tirage');
+			SendMessage('Board refreshed');
 		end
 		, btnInValiderSelection);
 	dlgTableau:Bind(eventType.MENU, 
 		function(evt)
 			OnSendTableau()
-			SendMessage('Board refreshed');
+			SendMessage('Draw available');
 		end
 		, btnSendTableau);
 	dlgTableau:Bind(eventType.MENU, 
@@ -2698,12 +2731,12 @@ function OnAfficheTableau()
 				return;
 			end
 			CommandRenvoyerDossards(false);
-			-- SendMessage('Board and bibs refreshed');
+			SendMessage('Draw in progress');
 		end
 		, btnSendDossards);
 	dlgTableau:Bind(eventType.MENU, 
 		function(evt)
-			-- les coureurs ont un rang de tirage <= 15
+			-- les coureurs sont du groupe de tirage 1
 			ChecktDraw();
 			local msg = "Cliquer sur Oui pour lancer le double tirage du BIBO.\n"..
 					"Les coureurs doivent être validés sur le tableau au préalable.\n\n"..
@@ -2722,36 +2755,33 @@ function OnAfficheTableau()
 				dlgTableau:MessageBox(msg, "Erreur", msgBoxStyle.OK+msgBoxStyle.ICON_WARNING)
 				return;
 			end
+			base:Query('Delete From Resultat_Info_Bibo Where Code_evenement = '..draw.code_evenement);
 			draw.start_Bib = nil;
-			-- draw.EnableToolPrintBibo = true;
-			-- en technique, on a deux sous groupes
-			-- en vitesse, on a 1 seul groupe
 			tDrawG6 = tDraw:Copy();
+			tDrawG6:OrderBy('Rang_tirage');
 			ReplaceTableEnvironnement(tDrawG6, 'DrawG6');
+			local groupe1 = tDrawG6:GetCellInt('Groupe_tirage', 0);
 			for i = tDrawG6:GetNbRows() -1, 0, -1 do -- traitement du groupe 1
-				local groupe_tirage = tDrawG6:GetCellInt('Groupe_tirage', i, -1);
-				if groupe_tirage < 0 or groupe_tirage > 1 then
+				if tDrawG6:GetCellInt('Groupe_tirage', i) ~= groupe1 then
 					tDrawG6:RemoveRowAt(i);
 				end
 			end
 			params.nb_groupe1 = tDrawG6:GetNbRows();
 			BuildTableTirage(1, tDrawG6:GetNbRows() - 1);
-			-- CommandRenvoyerDossards(false);
-			OnPrintDoubleTirage(1);
+			OnPrintDoubleTirage(groupe1);
 			if not draw.bolVitesse then
 				if draw.bolEstCE or draw.code_niveau == 'NC' then
 					tDrawG6 = tDraw:Copy();
 					ReplaceTableEnvironnement(tDrawG6, 'DrawG6');
 					tDrawG6:OrderBy('Rang_tirage');
+					local groupe2 = tDrawG6:GetCellInt('Groupe_tirage', 14)
 					for i = tDrawG6:GetNbRows() -1, 0, -1 do
-						local groupe_tirage = tDrawG6:GetCellInt('Groupe_tirage', i, -1);
-						if groupe_tirage ~= 2 then
+						if tDrawG6:GetCellInt('Groupe_tirage', i) ~= groupe2 then
 							tDrawG6:RemoveRowAt(i);
 						end
 					end
 					BuildTableTirage(params.nb_groupe1 + 1, tDrawG6:GetNbRows() -1);
-					-- CommandRenvoyerDossards(false);
-					OnPrintDoubleTirage(2);
+					OnPrintDoubleTirage(groupe2);
 				end
 			end
 		end
@@ -3120,21 +3150,13 @@ function OnAfficheTableau()
 		end, btnDecalerGroupeHaut);
 	dlgTableau:Bind(eventType.MENU, 
 		function(evt)
-			draw.annee_1 = false;
-			local msg = "Chargez-vous le fichier de la saison précédente\n"..
-						"pour ne lire que les Pts OA ?";
-			if dlgTableau:MessageBox(
-				msg, "Lecture du fichier n-1", 
-				msgBoxStyle.YES_NO+msgBoxStyle.NO_DEFAULT+msgBoxStyle.ICON_INFORMATION) == msgBoxStyle.YES then
-				draw.annee_1 = true;
-			end
 			ReadECSL();
 		end, btnGetECSL);
 
 	dlgTableau:Bind(eventType.MENU, 
 		function(evt)
-			ReadClubs();
-		end, btnGetClubs);
+			ReadDataFisList();
+		end, btnGetDataFisList);
 
 	dlgTableau:Bind(eventType.MENU, 
 		function(evt)
@@ -3154,7 +3176,7 @@ function OnAfficheTableau()
 	dlgTableau:Bind(eventType.TEXT, 
 		function(evt)
 			if draw.bolEstCE and not draw.tECSL then
-				local msg = "Veuillez charger le fichier ECSL en premier.";
+				local msg = "Veuillez charger le fichier ECSL (.csv) en premier.";
 				app.GetAuiFrame():MessageBox(msg, "ATTENTION !! ", msgBoxStyle.OK+msgBoxStyle.ICON_WARNING);
 				return;
 			end
@@ -3182,7 +3204,7 @@ function OnAfficheTableau()
 	dlgTableau:Bind(eventType.TEXT, 
 		function(evt)
 			if draw.bolEstCE and not draw.tECSL then
-				local msg = "Veuillez charger le fichier ECSL en premier.";
+				local msg = "Veuillez charger le fichier ECSL (.csv) en premier.";
 				app.GetAuiFrame():MessageBox(msg, "ATTENTION !! ", msgBoxStyle.OK+msgBoxStyle.ICON_WARNING);
 				return;
 			end
@@ -3193,7 +3215,7 @@ function OnAfficheTableau()
 				end
 			end
 			draw.cherche_prenom = draw.cherche_prenom or '';
-			draw.cherche_coureur = "Select * From Coureur Where Code_coureur Like 'FIS%' And Nom Like '"..draw.cherche_nom.."%' And Prenom Like '"..draw.cherche_prenom.."%' Order By Nom, Prenom";
+			draw.cherche_coureur = "Select * From Coureur Where Code_coureur Like 'FIS%' And Nom Like '"..draw.cherche_nom.."%' And Prenom Like '"..draw.cherche_prenom.."%' and Sexe = '"..draw.sexe.."' Order By Nom, Prenom";
 			base:TableLoad(tCoureur, draw.cherche_coureur);
 			draw.code_coureur = nil;
 			if not panel_coureur and draw.cherche_nom:len() > 0 then
@@ -3208,7 +3230,7 @@ function OnAfficheTableau()
 	dlgTableau:Bind(eventType.TEXT, 
 		function(evt)
 			if draw.bolEstCE and not draw.tECSL then
-				local msg = "Veuillez charger le fichier ECSL en premier.";
+				local msg = "Veuillez charger le fichier ECSL (.csv) en premier.";
 				app.GetAuiFrame():MessageBox(msg, "ATTENTION !! ", msgBoxStyle.OK+msgBoxStyle.ICON_WARNING);
 				return;
 			end
@@ -3219,7 +3241,7 @@ function OnAfficheTableau()
 				end
 			end
 			draw.cherche_nom = draw.cherche_nom or '';
-			draw.cherche_coureur = "Select * From Coureur Where Code_coureur Like 'FIS%' And Nom Like '"..draw.cherche_nom.."%' And Prenom Like '"..draw.cherche_prenom.."%' Order By Nom, Prenom";
+			draw.cherche_coureur = "Select * From Coureur Where Code_coureur Like 'FIS%' And Nom Like '"..draw.cherche_nom.."%' And Prenom Like '"..draw.cherche_prenom.."%' and Sexe = '"..draw.sexe.."' Order By Nom, Prenom";
 			base:TableLoad(tCoureur, draw.cherche_coureur);
 			draw.code_coureur = nil;
 			if not panel_coureur and draw.cherche_prenom:len() > 0  then
@@ -3259,17 +3281,15 @@ end
 function main(params_c)
 	draw = {};
 	params = {};
-	draw.code_evenement = params_c.code_evenement;
-	params.code_evenement = params_c.code_evenement;
+	draw.code_evenement = params_c.code_evenement or -1;
 	if draw.code_evenement < 0 then
 		return;
 	end
-	params.origine = params.origine or 'scenario';	
 	draw.width = display:GetSize().width;
 	draw.height = display:GetSize().height - 30;
 	draw.x = 0;
 	draw.y = 0;
-	draw.version = "3.92";
+	draw.version = "4.2"; -- 4.1 pour 2022-2023
 	draw.orderbyCE = 'Rang_tirage, Groupe_tirage, ECSL_points DESC, WCSL_points DESC, ECSL_overall_points DESC, Winner_CC DESC, FIS_pts, Nom, Prenom';
 	draw.orderbyFIS = 'Rang_tirage, Groupe_tirage, FIS_pts, Nom, Prenom';
 	draw.hostname = 'live.fisski.com';
@@ -3281,61 +3301,63 @@ function main(params_c)
 	end
 	base = base or sqlBase.Clone();
 	tEvenement = base:GetTable('Evenement');
-	base:TableLoad(tEvenement, 'Select * From Evenement Where Code = '..draw.code_evenement);
 	tResultat = base:GetTable('Resultat');
-	base:TableLoad(tResultat, 'Select * From Resultat Where Code_evenement = '..draw.code_evenement);
 	tEpreuve = base:GetTable('Epreuve');
-	base:TableLoad(tEpreuve, 'Select * From Epreuve Where Code_evenement = '..draw.code_evenement);
 	tPistes = base:GetTable('Pistes');
 	tNation = base:GetTable('Nation');
 	tResultat_Info_Tirage = base:GetTable('Resultat_Info_Tirage');
-	if tResultat_Info_Tirage == nil then
-		CreateTableResultat_Info_Tirage();
-		tResultat_Info_Tirage = base:GetTable('Resultat_Info_Tirage');
-	end
 	tResultat_Info_Bibo = base:GetTable('Resultat_Info_Bibo');
-	if tResultat_Info_Bibo == nil then
-		CreateTableResultat_Info_Bibo();
-		tResultat_Info_Bibo = base:GetTable('Resultat_Info_Bibo');
-	end
 	tCoureur = base:GetTable('Coureur');
 	tCategorie = base:GetTable('Categorie');
 	tClassement_Coureur = base:GetTable('Classement_Coureur');
 	tEpreuve_Alpine_Manche = base:GetTable('Epreuve_Alpine_Manche');
-	base:TableLoad(tEpreuve_Alpine_Manche, 'Select * From Epreuve_Alpine_Manche Where Code_evenement = '..draw.code_evenement);
+	if tResultat_Info_Tirage == nil then
+		CreateTableResultat_Info_Tirage();
+	end
+	if tResultat_Info_Bibo == nil then
+		CreateTableResultat_Info_Bibo();
+	end
+	tResultat_Info_Tirage = base:GetTable('Resultat_Info_Tirage');
+	tResultat_Info_Bibo = base:GetTable('Resultat_Info_Bibo');
 	
+	base:TableLoad(tEvenement, 'Select * From Evenement Where Code = '..draw.code_evenement);
+	
+	draw.code_entite = tEvenement:GetCell("Code_entite",0);
+	draw.code_activite = tEvenement:GetCell("Code_activite",0);
+	if draw.code_activite ~= 'ALP' or draw.code_entite ~= 'FIS' then
+		local msg = "L'environnement ne permet pas la mise \nen ligne du tableau des coureurs\nsur le site de la FIS !!";
+		app.GetAuiFrame():MessageBox(msg, "Attention aux erreurs !!!", msgBoxStyle.OK+msgBoxStyle.ICON_ERROR);
+		return;
+	end
+	
+	base:TableLoad(tResultat, 'Select * From Resultat Where Code_evenement = '..draw.code_evenement);
+	base:TableLoad(tEpreuve, 'Select * From Epreuve Where Code_evenement = '..draw.code_evenement);
+	base:TableLoad(tEpreuve_Alpine_Manche, 'Select * From Epreuve_Alpine_Manche Where Code_evenement = '..draw.code_evenement);
+	draw.code_piste = tEpreuve_Alpine_Manche:GetCellInt('Code_piste', 0);
+	base:TableLoad(tPistes, "Select * From Pistes Where Code_activite = 'ALP' And Matricule = "..draw.code_piste);
+	-- création des tables pour le double tirage des dossards
 	tTableTirage1 = sqlTable.Create('_TableTirage1');
 	tTableTirage1:AddColumn({ name = 'Row', type = sqlType.LONG, style = sqlStyle.NULL });
 	ReplaceTableEnvironnement(tTableTirage1, '_TableTirage1');
 	tTableTirage2 = sqlTable.Create('_TableTirage2');
 	tTableTirage2:AddColumn({ name = 'Row', type = sqlType.LONG, style = sqlStyle.NULL });
 	ReplaceTableEnvironnement(tTableTirage2, '_TableTirage2');
-
-	draw.code_piste = tEpreuve_Alpine_Manche:GetCellInt('Code_piste', 0);
-	base:TableLoad(tPistes, "Select * From Pistes Where Code_activite = 'ALP' And Matricule = "..draw.code_piste);
+	
 	draw.code_liste = tEvenement:GetCellInt("Code_liste", 0)
-	draw.code_entite = tEvenement:GetCell("Code_entite",0);
-	draw.code_activite = tEvenement:GetCell("Code_activite",0);
 	draw.code_niveau = tEpreuve:GetCell('Code_niveau', 0);
 	draw.code_regroupement = tEpreuve:GetCell('Code_regroupement', 0);
 	draw.sexe = tEpreuve:GetCell('Sexe', 0);
+	draw.bolEstCE = false;
 	if draw.code_niveau == 'EC' or draw.code_regroupement == 'CE' then
 		draw.bolEstCE = true;
-	else
-		draw.bolEstCE = false;
 	end
 	draw.code_saison = tEvenement:GetCell("Code_saison", 0);
 	draw.discipline = tEpreuve:GetCell('Code_discipline', 0);
 	draw.bolVitesse = false;
-	if draw.discipline == 'DH' or draw.discipline == 'SG' then
+	if draw.discipline:In('DH','TRA','SG') then
 		draw.bolVitesse = true;
 	end
 	draw.code_grille_categorie = tEpreuve:GetCell("Code_grille_categorie", 0);
-	if draw.code_activite ~= 'ALP' or draw.code_entite ~= 'FIS' then
-		local msg = "L'environnement ne permet pas la mise \nen ligne du tableau des coureurs\nsur le site de la FIS !!";
-		app.GetAuiFrame():MessageBox(msg, "Attention aux erreurs !!!", msgBoxStyle.OK+msgBoxStyle.ICON_ERROR);
-		return;
-	end
 
 	draw.codex = string.sub(tEvenement:GetCell("Codex", 0),4);
 	draw.codex = draw.codex:Split("%.");
