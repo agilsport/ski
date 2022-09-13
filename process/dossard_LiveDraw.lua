@@ -1354,11 +1354,13 @@ function OnAjouterCoureur()
 	local ecsl_all_points = nil;	
 	local point = tonumber(dlgTableau:GetWindowName('points'):GetValue()) or 0;
 	local clt = tonumber(dlgTableau:GetWindowName('classement'):GetValue()) or 0;
-	if type(draw.tECSL[code_coureur]) == 'table' then
-		ecsl_points = draw.tECSL[code_coureur].Point or 0;
-		ecsl_rank = draw.tECSL[code_coureur].Clt or 0;
-		ecsl_all_points = draw.tECSL[code_coureur].AllPoint or 0;
-		ecsl_all_rank = draw.tECSL[code_coureur].AllClt or 0;
+	if draw.bolEstCE then
+		if type(draw.tECSL[code_coureur]) == 'table' then
+			ecsl_points = draw.tECSL[code_coureur].Point or 0;
+			ecsl_rank = draw.tECSL[code_coureur].Clt or 0;
+			ecsl_all_points = draw.tECSL[code_coureur].AllPoint or 0;
+			ecsl_all_rank = draw.tECSL[code_coureur].AllClt or 0;
+		end
 	end
 	if dlgTableau:GetWindowName('comite') then
 		comite = dlgTableau:GetWindowName('comite'):GetValue();
@@ -1416,10 +1418,6 @@ function OnAjouterCoureur()
 		tDraw:AddRow();
 		table.insert(draw.tModifs_tableau, {Code_coureur = code_coureur:sub(4), Nom = nom, Prenom = prenom, Nation = nation, Status = 'AD'});
 		-- OnOrder()
-	else
-		local msg = 'Ce coureur est déjà présent dans la course !!!';
-		app.GetAuiFrame():MessageBox(msg, "Attention aux erreurs !!!", msgBoxStyle.OK+msgBoxStyle.ICON_WARNING);
-		return;
 	end
 	draw.build_table = true;
 	OnOrder();
@@ -2437,6 +2435,15 @@ function OnAfficheTableau()
 			});
 		end
 	else
+		for i = 0, tDraw:GetNbRows() -1 do
+			tDraw:SetCellNull('ECSL_points', i);
+			tDraw:SetCellNull('ECSL_rank', i);					
+			tDraw:SetCellNull('ECSL_overall_points', i);
+			tDraw:SetCellNull('ECSL_overall_rank', i);
+			tDraw:SetCellNull('WCSL_points', i);
+			tDraw:SetCellNull('WCSL_rank', i);					
+			tDraw:SetCellNull('CC_winner', i);					
+		end
 		grid_tableau:Set({
 			table_base = tDraw,
 			columns = 'Dossard, Rang_tirage, Groupe_tirage, Code_coureur, Nom, Prenom, Nation, Comite, Club, FIS_pts, FIS_clt, Statut, Action',
@@ -2447,7 +2454,7 @@ function OnAfficheTableau()
 	end
 
 	grid_tableau:AddColumnLabel(3);
-    grid_tableau:AddRowLabel(1, 48);
+      grid_tableau:AddRowLabel(1, 48);
 
 -- Initialisation des Controles
 	
@@ -3255,6 +3262,22 @@ function OnAfficheTableau()
 
 	dlgTableau:Bind(eventType.BUTTON, 
 		function(evt)
+			local fiscode = 'FIS'..dlgTableau:GetWindowName('code'):GetValue();
+			local r = tDraw:GetIndexRow('Code_coureur', fiscode);
+			if r > -1 then
+				local msg = 'Ce coureur est déjà présent dans la course !!!';
+				app.GetAuiFrame():MessageBox(msg, "Attention aux erreurs !!!", msgBoxStyle.OK+msgBoxStyle.ICON_WARNING);
+				dlgTableau:GetWindowName('code'):SetValue('');
+				dlgTableau:GetWindowName('groupe'):SetValue('');
+				dlgTableau:GetWindowName('nom'):SetValue('');
+				dlgTableau:GetWindowName('prenom'):SetValue('');
+				dlgTableau:GetWindowName('an'):SetValue('');
+				dlgTableau:GetWindowName('nation'):SetValue('');
+				dlgTableau:GetWindowName('points'):SetValue('');
+				dlgTableau:GetWindowName('classement'):SetValue('');
+				return;
+			end
+
 			for i = 0, tDraw:GetNbRows() -1 do
 				tDraw:SetCellNull('Rang_tirage', i);
 				tDraw:SetCellNull('Groupe_tirage', i);
@@ -3289,7 +3312,7 @@ function main(params_c)
 	draw.height = display:GetSize().height - 30;
 	draw.x = 0;
 	draw.y = 0;
-	draw.version = "4.2"; -- 4.1 pour 2022-2023
+	draw.version = "4.3"; -- 4.1 pour 2022-2023
 	draw.orderbyCE = 'Rang_tirage, Groupe_tirage, ECSL_points DESC, WCSL_points DESC, ECSL_overall_points DESC, Winner_CC DESC, FIS_pts, Nom, Prenom';
 	draw.orderbyFIS = 'Rang_tirage, Groupe_tirage, FIS_pts, Nom, Prenom';
 	draw.hostname = 'live.fisski.com';
