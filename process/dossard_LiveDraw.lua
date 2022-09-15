@@ -1904,6 +1904,8 @@ function SetuptDraw()
 	draw.pts7 = tDraw:GetCellInt('ECSL_points', 6);
 	draw.pts15 = tDraw:GetCellInt('ECSL_points', 14);
 	tDraw:OrderBy('ECSL_points DESC, FIS_pts');
+	tDrawECSL = tDraw:Copy();	-- tous ceux qui ont des points ECSL ou Overall
+	ReplaceTableEnvironnement(tDrawECSL, 'tDrawECSL');
 	tDrawG1 = tDraw:Copy();	-- dans les 15 de la ECSL
 	ReplaceTableEnvironnement(tDrawG1, 'DrawG1');
 	tDrawG2 = tDraw:Copy();	-- les 450 - 200 pts
@@ -1926,6 +1928,16 @@ groupe 5 La série interrompue reprend jusqu'à en avoir 30.
 Groupe 6 On poursuit selon les points FIS.
 ]]
 	-- adv.Alert('draw.pts15 = '..draw.pts15);
+	
+	
+	for i = tDrawECSL:GetNbRows() -1, 0, -1 do
+		local pts = tDrawG1:GetCellInt('ECSL_points', i, -1);
+		local ptsOA = tDrawG1:GetCellInt('ECSL_overall_points', i, -1);
+		if pts < 0 and ptsOA < 0 then
+			tDrawECSL:RemoveRowAt(i);
+		end
+	end
+	
 	for i = tDrawG1:GetNbRows() -1, 0, -1 do		-- dans les 15
 		local pts = tDrawG1:GetCellInt('ECSL_points', i, -1);
 		if pts < draw.pts15 then
@@ -1940,7 +1952,7 @@ Groupe 6 On poursuit selon les points FIS.
 		end
 	end
 
-	tDrawG3:OrderBy('ECSL_points, FIS_pts, WCSL_rank');				-- dans les 30 de la WCSL
+	tDrawG3:OrderBy('ECSL_points, FIS_pts, WCSL_rank');	-- dans les 30 de la WCSL
 	for i = tDrawG3:GetNbRows() -1, 0, -1 do
 		local clt = tDrawG3:GetCellInt('WCSL_rank', i, 31);
 		if clt > 30 then
@@ -1956,57 +1968,11 @@ Groupe 6 On poursuit selon les points FIS.
 		end
 	end
 	
-	for i = 0, tDrawG1:GetNbRows() -1 do
-		local code_coureur = tDrawG1:GetCell('Code_coureur', i)
-		local r = tDrawG5:GetIndexRow('Code_coureur', code_coureur);
-		if r >= 0 then		-- on trouve le coureur
-			tDrawG5:RemoveRowAt(r);
-		end
+	local rajouter_pts_fis = 0;
+	if tDrawECSL:GetNbRows() > 0 and tDrawECSL:GetNbRows() < 30 then
+		rajouter_pts_fis = 30 - (tDrawECSL:GetNbRows() + tDrawG3:GetNbRows());
 	end
-	for i = 0, tDrawG2:GetNbRows() -1 do
-		local code_coureur = tDrawG2:GetCell('Code_coureur', i)
-		local r = tDrawG5:GetIndexRow('Code_coureur', code_coureur);
-		if r >= 0 then		-- on trouve le coureur
-			tDrawG5:RemoveRowAt(r);
-		end
-	end
-	for i = 0, tDrawG3:GetNbRows() -1 do
-		local code_coureur = tDrawG3:GetCell('Code_coureur', i)
-		local r = tDrawG5:GetIndexRow('Code_coureur', code_coureur);
-		if r >= 0 then		-- on trouve le coureur
-			tDrawG5:RemoveRowAt(r);
-		end
-	end
-	for i = 0, tDrawG4:GetNbRows() -1 do
-		local code_coureur = tDrawG4:GetCell('Code_coureur', i)
-		local r = tDrawG5:GetIndexRow('Code_coureur', code_coureur);
-		if r >= 0 then		-- on trouve le coureur
-			tDrawG5:RemoveRowAt(r);
-		end
-	end
-	local minimum_dans_tDrawG5 = 30;
-	-- analyse de tDrawG5
-	local pris_ecsl = tDrawG1:GetNbRows() + tDrawG2:GetNbRows();
-	local a_prendre_tDrawG5 = 30 - pris_ecsl;
-	tDrawG5:OrderBy('ECSL_points DESC, FIS_pts');	-- coureurs ayant des points ECSL et FIS éventuellement
-	local ecsl_a_prendre = tDrawG5:GetCellInt('ECSL_points', a_prendre_tDrawG5 - 1)
-	local fis_a_prendre = tDrawG5:GetCellDouble('FIS_pts', a_prendre_tDrawG5 - 1)
-	-- adv.Alert('Nom : '..tDrawG5:GetCell('Nom', a_prendre_tDrawG5 - 1)..', pris_ecsl = '..pris_ecsl..', a_prendre_tDrawG5 = '..a_prendre_tDrawG5..', ecsl_a_prendre = '..ecsl_a_prendre..', fis_a_prendre = '..fis_a_prendre);
-	if draw.bolEstCE then
-		for i = tDrawG5:GetNbRows() -1, 0, -1 do
-			if tDrawG5:GetCellInt('ECSL_points', i) == 0 then
-				if tDrawG5:GetCellDouble('FIS_pts', i) > fis_a_prendre or tDrawG5:GetCellDouble('FIS_pts', i, -1) < 0 then
-					tDrawG5:RemoveRowAt(i);
-				end
-			end
-		end
-	end
-	tDrawG5:OrderBy('ECSL_points DESC, FIS_pts');	-- coureurs ayant des points ECSL et FIS éventuellement
-	-- adv.Alert('tDrawG5:GetNbRows() = '..tDrawG5:GetNbRows());
-	if not draw.bolEstCE then
-		tDrawG5:RemoveAllRows();
-	end
-	
+
 	tDrawG6:OrderBy('FIS_pts');				-- coureurs ayant des points FIS
 	for i = tDrawG6:GetNbRows() -1, 0, -1 do
 		local pts = tDrawG6:GetCellDouble('FIS_pts', i, -1);
@@ -2015,6 +1981,72 @@ Groupe 6 On poursuit selon les points FIS.
 		end
 	end
 
+	for i = 0, tDrawG1:GetNbRows() -1 do
+		local code_coureur = tDrawG1:GetCell('Code_coureur', i)
+		local r = tDrawG5:GetIndexRow('Code_coureur', code_coureur);
+		if r >= 0 then		-- on trouve le coureur
+			tDrawG5:RemoveRowAt(r);
+		end
+		local r = tDrawG6:GetIndexRow('Code_coureur', code_coureur);
+		if r >= 0 then		-- on trouve le coureur
+			tDrawG6:RemoveRowAt(r);
+		end
+	end
+	for i = 0, tDrawG2:GetNbRows() -1 do
+		local code_coureur = tDrawG2:GetCell('Code_coureur', i)
+		local r = tDrawG5:GetIndexRow('Code_coureur', code_coureur);
+		if r >= 0 then		-- on trouve le coureur
+			tDrawG5:RemoveRowAt(r);
+		end
+		local r = tDrawG6:GetIndexRow('Code_coureur', code_coureur);
+		if r >= 0 then		-- on trouve le coureur
+			tDrawG6:RemoveRowAt(r);
+		end
+	end
+	for i = 0, tDrawG3:GetNbRows() -1 do
+		local code_coureur = tDrawG3:GetCell('Code_coureur', i)
+		local r = tDrawG5:GetIndexRow('Code_coureur', code_coureur);
+		if r >= 0 then		-- on trouve le coureur
+			tDrawG5:RemoveRowAt(r);
+		end
+		local r = tDrawG6:GetIndexRow('Code_coureur', code_coureur);
+		if r >= 0 then		-- on trouve le coureur
+			tDrawG6:RemoveRowAt(r);
+		end
+	end
+	for i = 0, tDrawG4:GetNbRows() -1 do
+		local code_coureur = tDrawG4:GetCell('Code_coureur', i)
+		local r = tDrawG5:GetIndexRow('Code_coureur', code_coureur);
+		if r >= 0 then		-- on trouve le coureur
+			tDrawG5:RemoveRowAt(r);
+		end
+		local r = tDrawG6:GetIndexRow('Code_coureur', code_coureur);
+		if r >= 0 then		-- on trouve le coureur
+			tDrawG6:RemoveRowAt(r);
+		end
+	end
+	
+	
+	-- analyse de tDrawG5
+	
+	tDrawG5:OrderBy('ECSL_points DESC, FIS_pts');	-- coureurs ayant des points ECSL
+	local last_rang_ok = 0;
+	local last_pts_fis = 0;
+	for i = 0, tDrawG5:GetNbRows() -1 do
+		if tDrawG5:GetCellInt('ECSL_points', i) > 0 then
+			last_rang_ok = i;
+		else
+			last_pts_fis = tDrawG5:GetCellDouble('FIS_pts', i);
+			break;
+		end
+	end
+	last_rang_ok = last_rang_ok + rajouter_pts_fis;
+	for i = tDrawG5:GetNbRows() -1, last_rang_ok + 1, -1 do
+		if tDrawG5:GetCellInt('ECSL_points', i) == 0 then
+			tDrawG5:RemoveRowAt(i);
+		end
+	end
+	
 	-- les groupes 1 et 2 en technique ou groupe 1 seulement en vitesse
 	draw.rang_tirage = 0;
 	local current_group = 0;
@@ -2081,10 +2113,6 @@ Groupe 6 On poursuit selon les points FIS.
 		r = tDrawG5:GetIndexRow('Code_coureur', code_coureur);
 		if r >= 0 then		-- on trouve le coureur
 			tDrawG5:RemoveRowAt(r);
-		end
-		r = tDrawG6:GetIndexRow('Code_coureur', code_coureur);
-		if r >= 0 then		-- on trouve le coureur
-			tDrawG6:RemoveRowAt(r);
 		end
 	end
 	if nb_exaequo > 0 then
@@ -2265,7 +2293,11 @@ Groupe 6 On poursuit selon les points FIS.
 				end
 			else 
 				-- adv.Alert("tDraw:SetCell('ECSL_30', rtDraw, 99) "..' pour '..tDraw:GetCell('Nom', rtDraw));
-				tDraw:SetCell('ECSL_30', rtDraw, 99);
+				if last_pts_fis == 0 then
+					tDraw:SetCell('ECSL_30', rtDraw, 99);
+				else
+					tDraw:SetCell('ECSL_30', rtDraw, 5);
+				end
 				draw.LastRowECSL = i;
 				draw.LastCurrentGroup = current_group;
 				TraitementtDrawG4(current_group);
@@ -2319,8 +2351,15 @@ Groupe 6 On poursuit selon les points FIS.
 				tDraw:SetCell('Statut', r, 'CF');
 			end
 			-- adv.Alert('coureur de tDrawG6 traité : '..tDrawG6:GetCell('Nom', i)..',  draw.rang_tirage = '.. draw.rang_tirage);
+
 			tDraw:SetCell('Pris', r, 1);
-			tDraw:SetCell('Groupe_tirage', r, current_group);
+			if last_pts_fis > 0 and pts == last_pts_fis then
+				tDraw:SetCell('Groupe_tirage', r, current_group -1);
+				draw.nb_pris_ecsl = draw.nb_pris_ecsl + 1;
+				tDraw:SetCell('ECSL_30', r, 99);
+			else
+				tDraw:SetCell('Groupe_tirage', r, current_group);
+			end
 			tDraw:SetCell('Rang_tirage', r, draw.rang_tirage);
 			tDraw:SetCell('Groupe', r, current_group);
 			tDraw:SetCell('Critere', r, string.format('%03d', tDraw:GetCellInt('Rang_tirage', r)));
@@ -3844,7 +3883,7 @@ function main(params_c)
 	draw.height = display:GetSize().height - 30;
 	draw.x = 0;
 	draw.y = 0;
-	draw.version = "4.4"; -- 4.1 pour 2022-2023
+	draw.version = "4.41"; -- 4.1 pour 2022-2023
 	draw.hostname = 'live.fisski.com';
 	draw.method = 'socket';
 	draw.ajouter_code = '';
