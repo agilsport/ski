@@ -273,6 +273,8 @@
 			<combotable col_start="2" name="texteFiltreSupplementaire" style="CB_READONLY"/>
 			<statictext row="auto" col_start="1" style="ALIGN_RIGHT" label="Nombre de colonnes utilisées pour la présentation des courses en mode horizontal : "/>
 			<combobox col_start="2" name="texteNbColPresCourses" style="ALIGN_CENTER|CB_READONLY"/>
+			<statictext row="auto" col_start="1" style="ALIGN_RIGHT" label="Imprimer le Comité d\'origine pour les coureurs EQ : "/>
+			<combotable col_start="2" name="texteComiteOrigine" style="CB_READONLY"/>
 		</matrix>
 		<row value="15px"/>
 		<!-- <staticbox col_start="1" col_end="2" row_start="1" row_end="0" label="Paramétrage supplémentaire des impressions"/> -->

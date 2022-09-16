@@ -183,11 +183,7 @@ function OnDecodeJsonBibo(code_evenement, groupe)
 end
 
 function OnEncodeJsonBibo(code_evenement, groupe)
-	-- tResultat_Copy contient tous les coureurs du BIBO
-	if not groupe or groupe == 1 then
-		local cmd = 'Delete From Resultat_Info_Bibo Where Code_evenement = '..code_evenement;
-		base:Query(cmd);
-	end
+	-- tDrawG6 contient tous les coureurs du BIBO
 	local cmd = 'Select * From Resultat_Info_Bibo Where Code_evenement = '..code_evenement;
 	base:TableLoad(tResultat_Info_Bibo, cmd);
 	local row_groupe = nil;
@@ -216,7 +212,7 @@ function OnEncodeJsonBibo(code_evenement, groupe)
 		local xTable2 = {Table2 = tTable2};
 		local jsontxt2 = table.ToStringJSON(xTable2, false);
 		local rowsql = tResultat_Info_Bibo:AddRow();
-		tResultat_Info_Bibo:SetCell('Code_evenement', rowsql, params.code_evenement);
+		tResultat_Info_Bibo:SetCell('Code_evenement', rowsql, code_evenement);
 		if not groupe then
 			tResultat_Info_Bibo:SetCell('Groupe', rowsql, 1);
 		else
@@ -335,14 +331,6 @@ function GetDisciplines(Table_critere)
 	return arDiscipline;
 end
 
-
-function ParseCriterex(tableau)
-	adv.Alert('type(tableau) = '..type(tableau));
-	do return tableau; end
-	-- local tableau.NbCombien = TransformeCombienPG(tableau.NbCombien, tableau.Sur);
-	-- return  tableau.Critere, tableau.TypeCritere, tableau.Item, tableau.Bloc, tableau.Discipline, tableau.Prendre, tableau.Combien, tableau.NbCombien, tableau.Sur;
-end
-
 function GetValuePG(cle, defaultValue)	-- Lecture d'une valeur dans la table Evenement_Matrice avec lecture d'une valeur par défaut dans le XML et retour de la valeur lue ou de la valeur par défaut
 	local valretour = defaultValue;
 	local r = tEvenement_Matrice:GetIndexRow('Cle', cle);
@@ -373,11 +361,11 @@ function AnalysePerformances(code_evenement)
 	local faire = nil;
 	local premiers = nil;
 	local discipline = nil;
-	local what = nil;
 	local reg = '([^OU|ET]+)';
 	for i = 1, 10 do
 		local analyseGauche = GetValuePG('analyseGauche'..i, '');	-- 1,30,Technique
 		if analyseGauche:len() > 0 then
+			local what = nil;
 			idxcritere = i;
 			local tcritere = {};
 			if not string.find(analyseGauche, 'ET') and not string.find(analyseGauche, 'OU') then
@@ -392,7 +380,9 @@ function AnalysePerformances(code_evenement)
 				end					
 				table.insert(tcritere, {Faire = faire, Premiers = premiers, Discipline = discipline, Rempli = 0});
 				table.insert(arAnalyse, {idxcritere = idxcritere, Rempli = 0, Etou = nil, Criteres = tcritere, String = what});
+				-- adv.Alert('i = '..i..', critère sans ET ni OU, analyseGauche = '..analyseGauche..', tcritere[#tcritere].Faire = '..tcritere[#tcritere].Faire..' dans les '..tcritere[#tcritere].Premiers..' en '..tcritere[#tcritere].Discipline);
 			else
+				-- adv.Alert('i = '..i..', critère avec ET ou OU, analyseGauche = '..analyseGauche);
 				if string.find(analyseGauche, 'ET') then
 					etou = 'ET';
 				else
@@ -400,8 +390,8 @@ function AnalysePerformances(code_evenement)
 				end
 				table.insert(arAnalyse, {idxcritere = idxcritere, Rempli = 0, Etou = etou, Criteres = {}});
 				local arChaine = analyseGauche:Split(etou);
-				for i = 1, #arChaine do
-					local chaine = arChaine[i];
+				for j = 1, #arChaine do
+					local chaine = arChaine[j];
 					local t = chaine:Split(',');
 					faire = tonumber(t[1]) or 0;
 					premiers = tonumber(t[2]) or 0;
@@ -424,6 +414,7 @@ function AnalysePerformances(code_evenement)
 		end
 	end
 	for row = 0, body:GetNbRows() -1 do
+		-- adv.Alert('passage 2 pour '..body:GetCell('Identite', row));
 		-- on initialise toutes les données des critères à chaque coureur
 		local bolAnalyseFaite = false;
 		for i = 1, #arAnalyse do
@@ -431,71 +422,75 @@ function AnalysePerformances(code_evenement)
 			for j = 1, #arAnalyse[i].Criteres do
 				arAnalyse[i].Criteres[j].Rempli = 0;
 			end
-			-- on trie les courses selon le classement.
-			tData = {};
-			-- if row == 0 then
-				-- tMatrice_Courses:Snapshot('Matrice_Courses_functionPG.db3');
-			-- end
-			for idxcourse = 1, tMatrice_Courses:GetNbRows() do	-- on parcourt toutes les courses
-				local clt = body:GetCellInt('Clt'..idxcourse, row, -1);	-- classement dans la course
-				discipline = tMatrice_Courses:GetCell('Code_discipline',idxcourse-1);
-				table.insert(tData, {Clt = clt, Ordre = idxcourse, Discipline = discipline});
+		end
+		-- on trie les courses selon le classement.
+		tData = {};
+		-- if row == 0 then
+			-- tMatrice_Courses:Snapshot('Matrice_Courses_functionPG.db3');
+		-- end
+		for idxcourse = 1, tMatrice_Courses:GetNbRows() do	-- on parcourt toutes les courses
+			local clt = body:GetCellInt('Clt'..idxcourse, row, -1);	-- classement dans la course
+			discipline = tMatrice_Courses:GetCell('Code_discipline',idxcourse-1);
+			table.insert(tData, {Clt = clt, Ordre = idxcourse, Discipline = discipline});
+		end
+		SortTable2(tData, {'Clt'});	-- les courses sont triées par classement indépendamment de la discipline
+		for idxcritere = 1, #arAnalyse do		-- on parcourt tous les critères et les sous-criteres
+			if bolAnalyseFaite == true then
+				break;
 			end
-			SortTable2(tData, {'Clt'});	-- les courses sont triées par classement indépendamment de la discipline
-			for idxcritere = 1, #arAnalyse do		-- on parcourt tous les critères et les sous-criteres
-				if bolAnalyseFaite == true then
-					break;
-				end
-				local etou = arAnalyse[idxcritere].Etou;	-- etou peut être = nil, ET, OU
-				local tcritere = arAnalyse[idxcritere].Criteres;
-				for idx = 1, #tcritere do
-					criterex = tcritere[idx];
-					criterex.compteur = 0;
-					local faire = criterex.Faire;
-					local premiers = criterex.Premiers;
-					local discipline = criterex.Discipline;
-					for i = 1, #tData do
-						if discipline == 'Vitesse' then
-							if tData[i].Discipline:In('SG','DH') then
-									tData[i].Discipline = 'Vitesse';
-							end
-						end
-						if discipline == 'Technique' then
-							if tData[i].Discipline:In('GS','SL') then
-								tData[i].Discipline = 'Technique';
-							end
-						end
-						if tData[i].Clt > 0 and discipline == tData[i].Discipline and tData[i].Clt <= premiers then
-							if discipline == '*' then
-								criterex.compteur = criterex.compteur + 1;
-							elseif tData[i].Discipline == discipline then
-								criterex.compteur = criterex.compteur + 1;
-							end
-							if criterex.compteur > 0 and criterex.compteur >= faire then
-								body:SetCell('Analyse'..idxcritere, row, criterex.compteur);
-							end
+			local etou = arAnalyse[idxcritere].Etou;	-- etou peut être = nil, ET, OU
+			local tcritere = arAnalyse[idxcritere].Criteres;
+			for idx = 1, #tcritere do
+				criterex = tcritere[idx];
+				criterex.compteur = 0;
+				local faire = criterex.Faire;
+				local premiers = criterex.Premiers;
+				local discipline = criterex.Discipline;
+				-- adv.Alert('passage 3 - '..idx..', critère '..idxcritere..' - faire = '..faire..', dans les '..premiers..', en '..discipline);
+				for i = 1, #tData do
+					if discipline == 'Vitesse' then
+						if tData[i].Discipline:In('SG','DH') then
+								tData[i].Discipline = 'Vitesse';
 						end
 					end
-					if criterex.compteur >= faire then
-						criterex.Rempli = 1;
-						arAnalyse[idxcritere].Rempli = arAnalyse[idxcritere].Rempli + 1;
+					if discipline == 'Technique' then
+						if tData[i].Discipline:In('GS','SL') then
+							tData[i].Discipline = 'Technique';
+						end
+					end
+					if discipline == "*" then
+						tData[i].Discipline = "*";
+					end
+					if tData[i].Clt > 0 and discipline == tData[i].Discipline and tData[i].Clt <= premiers then
+						criterex.compteur = criterex.compteur + 1;
+						if criterex.compteur > 0 and criterex.compteur >= faire then
+							body:SetCell('Analyse'..idxcritere, row, criterex.compteur);
+						end
+						-- adv.Alert('faire = '..faire..', criterex.compteur = '..criterex.compteur);
 					end
 				end
-				if etou and etou == 'ET' then
-					if arAnalyse[idxcritere].Rempli < #tcritere then
-						arAnalyse[idxcritere].Rempli = 0;
-					end
+				if criterex.compteur >= faire then
+					criterex.Rempli = 1;
+					arAnalyse[idxcritere].Rempli = arAnalyse[idxcritere].Rempli + 1;
+					-- adv.Alert('criterex.compteur >= faire, arAnalyse[idxcritere].Rempli = '..arAnalyse[idxcritere].Rempli);
 				end
-				if arAnalyse[idxcritere].Rempli > 0 then
-					body:SetCell('Analyse_groupe', row, idxcritere);
-					bolAnalyseFaite = true;
-					break;
+			end
+			if etou and etou == 'ET' then
+				-- adv.Alert('passage 4 arAnalyse[idxcritere].Rempli < #tcritere');
+				if arAnalyse[idxcritere].Rempli < #tcritere then
+					arAnalyse[idxcritere].Rempli = 0;
 				end
+			end
+			if arAnalyse[idxcritere].Rempli > 0 then
+				body:SetCell('Analyse_groupe', row, idxcritere);
+				bolAnalyseFaite = true;
+				-- adv.Alert('passage 5 arAnalyse[idxcritere].Rempli > 0');
+				break;
 			end
 		end
 	end
 	body:OrderBy('Analyse_groupe, Analyse1 DESC, Analyse2 DESC, Analyse3 DESC, Analyse4 DESC, Analyse5 DESC, Pts_inscription');
-	-- body:Snapshot('body.db3');
+	body:Snapshot('body.db3');
 end
 
 function EvaluateVal(val, tps)
@@ -845,6 +840,7 @@ function InitPrnColonnes()
 	prnColonne.EtapePts.Label = prnBloc1['EtapePts'].Label;
 	local bloc2_existe = false;
 	local etape_ajoutee = false;
+	tMatrice_Courses:Snapshot('tMatrice_Courses.db3');
 	for i = 0, tMatrice_Courses:GetNbRows() -1 do
 		local idxcourse = i + 1;
 		local bloc = tMatrice_Courses:GetCellInt('Bloc', i);
@@ -871,6 +867,11 @@ function InitPrnColonnes()
 		local nbcol_course = 0;
 	-- bloc1 : Clt,1|Tps,1|Diff,1|Pts,1|Cltrun,1|Tpsrun,1|Diffrun,1|Ptsrun,1|Ptstotal,1|EtapeClt,0|EtapePts
 		if discipline ~= 'CS' then
+			if string.find(prendre, '1%.') then
+				prnBlocx.Pts.Imprimer = 1;
+				prnBlocx.Ptstotal.Imprimer = 0;
+				prnBlocx['Ptsrun'].Imprimer = 0;
+			end
 			if string.find(prendre, '2%.') then
 				prnBlocx.Pts.Imprimer = 0;
 				prnBlocx.Ptstotal.Imprimer = 0;
@@ -911,6 +912,10 @@ function InitPrnColonnes()
 					prnColonne.Pts[idxcourse].Imprimer = 1;
 				end
 			end
+			if prendre == 'Classement général' then
+			elseif prendre == 'Classement général' then
+			end
+			
 	-- bloc1 : Clt,0|Tps,0|Diff,0|Pts,1|Cltrun,0|Tpsrun,0|Diffrun,0|Ptsrun,1|Ptstotal,1	/ EtapeClt,0|EtapePts,0
 			nbcol_course = prnColonne.Clt[idxcourse].Imprimer + prnColonne.Tps[idxcourse].Imprimer + prnColonne.Diff[idxcourse].Imprimer + prnColonne.Pts[idxcourse].Imprimer + (prnColonne.Cltrun[idxcourse].Imprimer * nb_run) + (prnColonne.Tpsrun[idxcourse].Imprimer * nb_run) + (prnColonne.Diffrun[idxcourse].Imprimer * nb_run) + (prnColonne.Ptsrun[idxcourse].Imprimer * nb_run) + prnColonne.Ptstotal[idxcourse].Imprimer;
 			tMatrice_Courses:SetCell('Nb_col', i, nbcol_course);
@@ -994,6 +999,19 @@ function ResetDates(code_evenement);
 		end
 	end
 	base:TableBulkUpdate(tResultat);
+end
+
+function GetComiteOrigine(code)
+	if not tCoureur then
+		tCoureur = base:GetTable('Coureur');
+	end
+	local comite = nil;
+	local cmd = "Select * From Coureur Where Code_coureur = '"..code.."'";
+	base:TableLoad(tCoureur, cmd)
+	if tCoureur:GetNbRows() > 0 then
+		comite =  tCoureur:GetCell('Code_comite', 0);
+	end
+	return comite;
 end
 
 function GetOfficiel(code_evenement, fonction, data_complete, return_table)
