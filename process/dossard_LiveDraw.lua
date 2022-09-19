@@ -1043,7 +1043,7 @@ function CommandSendList()
 		if draw.bolEstCE then
 			table.insert(tData, {rank = ecsl_rank, points = ecsl_points, event = draw.discipline, category = 'ECSL'});
 			table.insert(tData, {rank = ecsl_overall_rank, points = ecsl_overall_points, event = 'OA', category = 'EC'});
-			table.insert(tData, {rank = wcsl_points, points = wcsl_rank, event = draw.discipline, category = 'WCSL'});
+			table.insert(tData, {rank = wcsl_rank, points = wcsl_points, event = draw.discipline, category = 'WCSL'});
 			table.insert(tData, {rank = winner_rank, points = winner_points, event = draw.discipline, category = 'CC WINNER'});
 			table.insert(tData, {rank = fis_clt, points = fis_pts, event = draw.discipline, category = 'FIS'});
 		else
@@ -2330,6 +2330,7 @@ Groupe 6 On poursuit selon les points FIS.
 	tDrawG5:OrderBy('ECSL_points DESC, FIS_pts');				-- les 30 ECSL
 	-- nb_exaequo = 0;
 	-- adv.Alert('on a pris '..draw.nb_pris_ecsl..' sur les 30 à prendre, tDrawG4:GetNbRows() = '..tDrawG4:GetNbRows());
+	-- le premier winner sera toujours au rang 30
 	local bolTraitertDrawG4 = true;
 	if tDrawG5:GetNbRows() > 0 then
 		local rtDraw = -1;
@@ -2383,27 +2384,7 @@ Groupe 6 On poursuit selon les points FIS.
 			ptsencours = ptslu;
 			ptsfisencours = ptslufis;
 			draw.LastCurrentGroup = current_group;
-			if i < tDrawG5:GetNbRows() -1 then
-				local ptslu_next = tDrawG5:GetCellInt('ECSL_points', i+1);
-				if ptslu > 0 then 
-					if ptslu ~= ptslu_next then
-						if tDrawG4:GetNbRows() > 0 and draw.rang_tirage >= 30 and bolTraitertDrawG4 == true then
-							-- adv.Alert('On fait TraitementtDrawG4 après '..tDrawG5:GetCell('Nom', i));
-							TraitementtDrawG4(current_group);
-							bolTraitertDrawG4 = false;
-						end
-					end
-				else
-					if ptsfis ~= tDrawG5:GetCellDouble('FIS_pts', i+1) then
-						if tDrawG4:GetNbRows() > 0 and draw.rang_tirage >= 30 and bolTraitertDrawG4 == true then
-							-- adv.Alert('On fait TraitementtDrawG4 après '..tDrawG5:GetCell('Nom', i));
-							TraitementtDrawG4(current_group);
-							bolTraitertDrawG4 = false;
-						end
-					end
-				end
-			else 
-				draw.LastCurrentGroup = current_group;
+			if draw.rang_tirage == 30 and tDrawG4:GetNbRows() > 0 then
 				TraitementtDrawG4(current_group);
 				bolTraitertDrawG4 = false;
 			end
@@ -3506,7 +3487,7 @@ function main(params_c)
 	draw.height = display:GetSize().height - 30;
 	draw.x = 0;
 	draw.y = 0;
-	draw.version = "4.42"; -- 4.1 pour 2022-2023
+	draw.version = "4.43"; -- 4.1 pour 2022-2023
 	draw.hostname = 'live.fisski.com';
 	draw.method = 'socket';
 	draw.ajouter_code = '';
