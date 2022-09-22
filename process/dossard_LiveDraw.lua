@@ -3150,27 +3150,9 @@ function OnAfficheTableau()
 				end
 			else
 				tDraw:OrderBy('Rang_tirage');
-				local row_first = 0;
-				if draw.row_selected then
-					row_first = draw.row_selected;
-				end
-				local groupe_previous = 0;
-				for i = row_first, tDraw:GetNbRows() -1 do
-					if draw.row_selected then
-						groupe_previous = tDraw:GetCellInt('Groupe_tirage', i-1);
-						break;
-					else
-						if tDraw:GetCellInt('Dossard', i) == 0 then
-							break;
-						end
-						groupe_previous = tDraw:GetCellInt('Groupe_tirage', i)
-					end
-				end
-				for i = row_first, tDraw:GetNbRows() -1 do
+				for i = draw.row_selected,, tDraw:GetNbRows() -1 do
 					if tDraw:GetCellDouble('FIS_pts', i) == 0  then
-						if tDraw:GetCellInt('ECSL_points', i) == 0 and tDraw:GetCellInt('WCSL_points', i) == 0 and tDraw:GetCellInt('ECSL_overall_points', i) == 0 and tDraw:GetCell('Winner_CC', i):len() == 0 then
-							break;
-						end
+						break;
 					end
 					if tDraw:GetCellInt('Dossard', i) == 0 and tDraw:GetCellInt('Groupe_tirage', i) > groupe_previous then
 						local rang_tirage = tDraw:GetCellInt('Rang_tirage', i);
@@ -3521,7 +3503,7 @@ function main(params_c)
 	draw.height = display:GetSize().height - 30;
 	draw.x = 0;
 	draw.y = 0;
-	draw.version = "4.44"; -- 4.1 pour 2022-2023
+	draw.version = "4.45"; -- 4.1 pour 2022-2023
 	draw.hostname = 'live.fisski.com';
 	draw.method = 'socket';
 	draw.ajouter_code = '';
