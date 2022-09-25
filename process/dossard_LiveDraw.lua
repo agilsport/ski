@@ -999,7 +999,7 @@ function CommandSendList()
 			winner_points = "1";
 			winner_rank = 1;
 		end
-		local fis_pts = tDraw:GetCellDouble('FIS_pts', i, -1);
+		local fis_pts = string.format(tDraw:GetCellDouble('FIS_pts', i, -1), '%.2f');
 		local fis_clt = tDraw:GetCellInt('FIS_clt', i, -1);
 		local bolExaequo = false;
 		if tLastECSL_30.ECSL_points then
@@ -1957,7 +1957,6 @@ Groupe 6 On poursuit selon les points FIS.
 	-- adv.Alert('draw.pts15 = '..draw.pts15);
 	
 	local rajouter_pts_fis = 0;
-	local ecsl_points_rang_30 = nil;
 	if draw.bolEstCE then
 		tDrawECSL:OrderBy('ECSL_overall_points DESC, ECSL_points DESC, FIS_pts, Nom, Prenom');
 		for i = tDrawECSL:GetNbRows() -1, 0, -1 do
@@ -2018,6 +2017,15 @@ Groupe 6 On poursuit selon les points FIS.
 		local pts =  tDrawG5:GetCellInt('ECSL_points', i, -1);
 		if pts < 0 then
 			tDrawG5:RemoveRowAt(i);
+		end
+	end
+	draw.pts30 = tDraw:GetCellInt('ECSL_points', 29);
+	if draw.finale_ce == 'Non' then
+		for i = tDrawG5:GetNbRows() -1, 0, -1 do
+			local pts =  tDrawG5:GetCellInt('ECSL_points', i, -1);
+			if pts > 0 and pts < draw.pts30 then
+				tDrawG5:RemoveRowAt(i);
+			end
 		end
 	end
 
@@ -2104,6 +2112,7 @@ Groupe 6 On poursuit selon les points FIS.
 			tDrawG6:RemoveRowAt(r);
 		end
 	end
+	
 	for i = 0, tDrawG5:GetNbRows() -1 do
 		local code_coureur = tDrawG5:GetCell('Code_coureur', i)
 		local r = tDrawG6:GetIndexRow('Code_coureur', code_coureur);
@@ -2112,6 +2121,7 @@ Groupe 6 On poursuit selon les points FIS.
 		end
 	end
 	-- adv.Alert('2- tDrawG5:GetNbRows() = '..tDrawG5:GetNbRows()..', tDrawG6:GetNbRows() = '..tDrawG6:GetNbRows())
+	-- adv.Alert('draw.finale_ce = '..draw.finale_ce);
 	if draw.finale_ce == 'Oui' then
 		for i = 0, tDrawG5:GetNbRows() -1 do
 			local code_coureur = tDrawG5:GetCell('Code_coureur', i)
@@ -3423,7 +3433,7 @@ function main(params_c)
 	draw.height = display:GetSize().height - 30;
 	draw.x = 0;
 	draw.y = 0;
-	draw.version = "4.52"; -- 4.1 pour 2022-2023
+	draw.version = "4.53"; -- 4.1 pour 2022-2023
 	draw.hostname = 'live.fisski.com';
 	draw.method = 'socket';
 	draw.ajouter_code = '';
@@ -3551,10 +3561,9 @@ function main(params_c)
 	draw.raz_sequence = false;
 	draw.print_alone = true;
 	
+	draw.CE = 'N';
 	if draw.bolEstCE then
-		draw.CE = 1;
-	else
-		draw.CE = 0;
+		draw.CE = 'O';
 	end
 	dlgConfig = wnd.CreateDialog(
 		{
@@ -3572,9 +3581,8 @@ function main(params_c)
 		node_attr = 'name', 
 		discipline = draw.discipline,
 		node_value = 'config',
-		params = { CE = draw.CE }
-
-	});
+		CE = draw.CE
+		});
 
 	-- Toolbar Principale ...
 	local tbconfig = dlgConfig:GetWindowName('tbconfig');
@@ -3591,7 +3599,7 @@ function main(params_c)
 	dlgConfig:GetWindowName('fis_hostname'):SetValue('live.fisski.com');
 	dlgConfig:GetWindowName('fis_port'):SetValue(draw.port);
 	dlgConfig:GetWindowName('fis_pwd'):SetValue(draw.pwd);
-	if draw.bolEstCE then
+	if draw.CE == 'O' then
 		dlgConfig:GetWindowName('finale_ce'):SetTable(tOuiNon, 'Choix', 'Choix');
 		dlgConfig:GetWindowName('finale_ce'):SetValue('Non');
 	end
@@ -3605,11 +3613,8 @@ function main(params_c)
 			nodelivedraw:ChangeAttribute('ack', 0);
 			draw.doc:SaveFile();
 			draw.finale_ce = 'Non';
-			if draw.bolEstCE then
+			if dlgConfig:GetWindowName('finale_ce') then
 				draw.finale_ce = dlgConfig:GetWindowName('finale_ce'):GetValue();
-				if draw.finale_ce == 'Oui' then
-					draw.bolEstCE = true;
-				end
 			end
 			dlgConfig:EndModal(idButton.OK) 
 		end, btnSave); 
