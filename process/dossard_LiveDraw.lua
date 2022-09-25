@@ -71,75 +71,6 @@ function OnClose()
 	end
 end
 
-function ReadDataFisList()
-	local filename = '';
-	draw.tDataFisList = {};
-	local idxcolFiscode = nil;
-	local idxcolFirstname = nil;
-	local idxcolLastname = nil;
-	local idxcolNationcode = nil;
-	local idxcolSkiclub = nil;
-	local idxcolBirthyear = nil;
-	local idxcolFisPts = nil;
-	local idxcolFisClt = nil;
-	
-	local fileDialog = wnd.CreateFileDialog(dlgScriptLua,
-		"Recherche de la liste FIS csv",
-		app.GetPath(), 
-		"",
-		"*.csv|*.csv",
-		fileDialogStyle.OPEN+fileDialogStyle.FD_FILE_MUST_EXIST
-	);
-	if fileDialog:ShowModal() == idButton.OK then
-		filename = string.gsub(fileDialog:GetPath(), app.GetPathSeparator(), "/");
-	end
-	if filename:len() > 0 then
-		lines = {};
-		for line in io.lines(filename) do 
-			lines[#lines + 1] = line
-		end
-		local cols = lines[1]:Split(',');
-		for i = 1, #cols do
-			if cols[i] == 'Fiscode' then
-				idxcolFiscode = i;
-			elseif cols[i] == 'Lastname' then
-				idxcolLastname = i;
-			elseif cols[i] == 'Firstname' then
-				idxcolFirstname = i;
-			elseif cols[i] == 'Nationcode' then
-				idxcolNationcode = i;
-			elseif cols[i] == 'Skiclub' then
-				idxcolSkiclub = i;
-			elseif cols[i] == 'Birthyear' then
-				idxcolBirthyear = i;
-			elseif cols[i] == draw.discipline..'points' then
-				idxcolFispoints = i;
-			elseif cols[i] == draw.discipline..'pos' then
-				idxcolFispos = i;
-			end
-		end
-		for i = 2, #lines do
-			local cols = lines[i]:Split(',');
-			local fiscode = 'FIS'..cols[idxcolFiscode];
-			draw.tDataFisList[fiscode] = {};
-			local fisskiclub = cols[idxcolSkiclub]:upper();
-			fisskiclub = fisskiclub:gsub('"','');
-			local r = tDraw:GetIndexRow('Code_coureur', fiscode);
-			if r and r >= 0 then
-				tDraw:SetCell('Nom', r, cols[idxcolLastname]);
-				tDraw:SetCell('Prenom', r, cols[idxcolFirstname]);
-				tDraw:SetCell('Nation', r, cols[idxcolNationcode]);
-				tDraw:SetCell('Club', r, fisskiclub);
-				tDraw:SetCell('An', r, tonumber(cols[idxcolBirthyear]));
-				tDraw:SetCell('Fis_pts', r, tonumber(cols[idxcolFispoints]));
-				tDraw:SetCell('Fis_clt', r, tonumber(cols[idxcolFispos]));
-			end
-		end
-		base:TableBulkUpdate(tDraw, 'Club', 'Resultat');
-	end
-end
-
-
 function ReadECSL()
 	draw.tECSL = {};
 	local filename = '';
@@ -2783,8 +2714,6 @@ function OnAfficheTableau()
 	menuOutils:AppendSeparator();
 	btnDecalerGroupeHaut = menuOutils:Append({label="Décaler les groupes de tirage vers le haut", image ="./res/32x32_up.png"});
 	menuOutils:AppendSeparator();
-	btnGetDataFisList = menuOutils:Append({label="Charger les Clubs depuis une liste FIS csv", image ="./res/32x32_startlist.png"});
-	menuOutils:AppendSeparator();
 	btnGetECSL = menuOutils:Append({label="Charger un fichier csv ECSL", image ="./res/32x32_startlist.png"});
 	menuOutils:AppendSeparator();
 	btnGetWCSL = menuOutils:Append({label="Charger un fichier csv WCSL", image ="./res/32x32_startlist.png"});
@@ -3349,11 +3278,6 @@ function OnAfficheTableau()
 
 	dlgTableau:Bind(eventType.MENU, 
 		function(evt)
-			ReadDataFisList();
-		end, btnGetDataFisList);
-
-	dlgTableau:Bind(eventType.MENU, 
-		function(evt)
 			ReadWCSL();
 		end, btnGetWCSL);
 
@@ -3499,7 +3423,7 @@ function main(params_c)
 	draw.height = display:GetSize().height - 30;
 	draw.x = 0;
 	draw.y = 0;
-	draw.version = "4.51"; -- 4.1 pour 2022-2023
+	draw.version = "4.52"; -- 4.1 pour 2022-2023
 	draw.hostname = 'live.fisski.com';
 	draw.method = 'socket';
 	draw.ajouter_code = '';
