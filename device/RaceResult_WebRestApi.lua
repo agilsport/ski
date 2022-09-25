@@ -42,22 +42,44 @@
 -- 09/08/2021 Version   3.6
 	-- Verif des dofile('./interface/interface.lua');
 -- 12/09/2021 Version   3.7
-	-- factorisation RechercheTagId_Rech_Der_Passge_TagID
+	-- factorisation RechercheTagId_Rech_Der_Passage_TagID
 	-- bug marqueur
 -- 21/09/2021 Version   3.8
 	-- mise de la valeur passage par rapport a la valeur ds le skiffs.xml
 	-- bug diff GMT => UTC
 -- 21/09/2021 Version   3.8
-	-- mise en place d'un if recordcount ~= nil else return false (Ligne 1130) pour eviter si si records count == le restapi se blocque
+	-- mise en place d'un if RecordsCount ~= nil else return false (Ligne 1130) pour eviter si si records count == le restapi se blocque
 -- 21/10/2021 Version 4.0
 	-- 1ère version officielles skiffs
+-- 21/10/2021 Version 4.1
+	-- Gestion des trackbox synchoniser sur une memes ligne de detection
+-- 23/05/2022 Version 4.2
+	-- table Evenement_
+-- 24/05/2022 Version 4.3
+	-- Mise en place de la non prise en compte d'une detection < a l heure de depart de l'epreuve du concurent
+-- 24/05/2022 Version 4.4
+	-- Utilisation de app notification pour recuperer l'heure de passage du dos
+-- 30/05/2022 Version 4.5
+	-- corection de bug enregistrement du TagId passing 
+-- 9/06/2022 Version 4.6
+	-- supression du n° de passage ds la boite de config il se gére ds les options
+-- 12/06/2022 Version 4.7
+	-- corection de bug RecordsCount on coupe le timer et on le relance 
+	-- le RecordsCount viens de depassement du nombre de requette pour le mm compte
+-- 12/06/2022 Version 4.8
+	-- enregistrement du N° de fichier ds le skiffs.xml lors de la modification
+-- 12/06/2022 Version 4.9
+	-- Mise a jour du caption de la boite de dialogue du RR lors de la modif du passage ou de numero de fichier
+-- 25/09/2022 Version 5.0
+	-- Correction bug de recupération de l'heure de départ de l'épreuve
+
 dofile('./interface/interface.lua');
 dofile('./interface/adv.lua');
 dofile('./interface/device.lua');
 
 -- Information : Numéro de Version, Nom, Interface
 function device.GetInformation()
-	return { version = 4.0,
+	return { version = 5.0,
 			 code = 'RaceResult_WebRestApi', 
 			 name = 'RaceResult Web RestApi', 
 			class = 'chrono'
@@ -106,13 +128,14 @@ function device.OnConfiguration(node)
 
 	dlg_ConfigRaceResult_WebRestApi:GetWindowName('config_AdrServeurRaceResult'):SetValue(node:GetAttribute('config_AdrServeurRaceResult', 'https://rest.devices.raceresult.com/token'));
 	dlg_ConfigRaceResult_WebRestApi:GetWindowName('config_IdDecodeur'):SetValue(node:GetAttribute('config_IdDecodeur', ''));
+	dlg_ConfigRaceResult_WebRestApi:GetWindowName('config_IdSynchro'):SetValue(node:GetAttribute('config_IdSynchro', ''));
 	dlg_ConfigRaceResult_WebRestApi:GetWindowName('RaceResultTypeBox'):SetValue(node:GetAttribute('RaceResultTypeBox', ''));
 	dlg_ConfigRaceResult_WebRestApi:GetWindowName('config_PortDecodeur'):SetValue(node:GetAttribute('config_PortDecodeur', '3601'));
 	dlg_ConfigRaceResult_WebRestApi:GetWindowName('config_User'):SetValue(node:GetAttribute('config_User', ''));
 	dlg_ConfigRaceResult_WebRestApi:GetWindowName('config_PWD'):SetValue(node:GetAttribute('config_PWD', ''));
 	dlg_ConfigRaceResult_WebRestApi:GetWindowName('config_ApiKey'):SetValue(node:GetAttribute('config_ApiKey', ''));
 	dlg_ConfigRaceResult_WebRestApi:GetWindowName('config_NumFichier'):SetValue(node:GetAttribute('config_NumFichier', ''));	
-	dlg_ConfigRaceResult_WebRestApi:GetWindowName('config_Passage'):SetValue(node:GetAttribute('config_Passage', '-1'));
+	-- dlg_ConfigRaceResult_WebRestApi:GetWindowName('config_Passage'):SetValue(node:GetAttribute('config_Passage', '-1'));
 	if node:GetAttribute('SystemeActif') == "1" then
 		dlg_ConfigRaceResult_WebRestApi:GetWindowName('checkbox_config_Systeme'):SetValue(true);
 	else
@@ -143,12 +166,13 @@ function OnSaveConfig(evt)
 		node:ChangeAttribute('config_AdrServeurRaceResult', dlg_ConfigRaceResult_WebRestApi:GetWindowName('config_AdrServeurRaceResult'):GetValue());
 		node:ChangeAttribute('config_ApiKey', dlg_ConfigRaceResult_WebRestApi:GetWindowName('config_ApiKey'):GetValue());
 		node:ChangeAttribute('config_IdDecodeur', dlg_ConfigRaceResult_WebRestApi:GetWindowName('config_IdDecodeur'):GetValue());
+		node:ChangeAttribute('config_IdSynchro', dlg_ConfigRaceResult_WebRestApi:GetWindowName('config_IdSynchro'):GetValue());
 		node:ChangeAttribute('RaceResultTypeBox', dlg_ConfigRaceResult_WebRestApi:GetWindowName('RaceResultTypeBox'):GetValue());
 		node:ChangeAttribute('config_PortDecodeur', dlg_ConfigRaceResult_WebRestApi:GetWindowName('config_PortDecodeur'):GetValue());
 		node:ChangeAttribute('config_User', dlg_ConfigRaceResult_WebRestApi:GetWindowName('config_User'):GetValue());
 		node:ChangeAttribute('config_PWD', dlg_ConfigRaceResult_WebRestApi:GetWindowName('config_PWD'):GetValue());
 		node:ChangeAttribute('config_NumFichier',  dlg_ConfigRaceResult_WebRestApi:GetWindowName('config_NumFichier'):GetValue());
-		node:ChangeAttribute('config_Passage', dlg_ConfigRaceResult_WebRestApi:GetWindowName('config_Passage'):GetValue());
+		-- node:ChangeAttribute('config_Passage', dlg_ConfigRaceResult_WebRestApi:GetWindowName('config_Passage'):GetValue());
 		if dlg_ConfigRaceResult_WebRestApi:GetWindowName('checkbox_config_Systeme'):GetValue() == true then
 			node:ChangeAttribute('SystemeActif',  "1");
 		else
@@ -159,7 +183,6 @@ function OnSaveConfig(evt)
 		else
 			node:ChangeAttribute('bib',  "0");
 		end
-
 
 		local doc = app.GetXML();
 		doc:SaveFile();
@@ -188,9 +211,8 @@ RaceResult_WebRestApi.timerDelayConnect = 20000;
 -- delay timer apres start ou stop opération
 RaceResult_WebRestApi.timerDelayCmd = 10000;
 
-
 -- delay timer lecture
-RaceResult_WebRestApi.timerDelay = 2000;
+RaceResult_WebRestApi.timerDelay = 900;  --2000
 
 -- delay timer Jeton
 RaceResult_WebRestApi.JetonDelay = 7199000; --1h59'59'
@@ -216,7 +238,6 @@ NbTourRealiser = 0;
 --delai double detection
 DelayDoubleDetect = 1000;
 
-
 -- Fonction de démarrage du device et création de la boite de gestion du raceresult
 function device.OnInit(params, node)
 --	adv.Alert("On OnInit..");
@@ -226,18 +247,19 @@ function device.OnInit(params, node)
 	
 	theParams = params;
 	node = node;
-	
+	RaceResult_WebRestApi.node = node;
 	-- Création des variables pour la gestion en récupérant les valeurs dans config
 	device.url = node:GetAttribute('config_AdrServeurRaceResult');
 	device.url_rest = 'https://rest.devices.raceresult.com/';
 	RaceResult_ApiKey = node:GetAttribute('config_ApiKey');
 	RaceResultTypeBox = node:GetAttribute('RaceResultTypeBox');
 	RaceResultdevice = node:GetAttribute('config_IdDecodeur');
+	RaceResultSynchro = node:GetAttribute('config_IdSynchro');
 	RaceResultuser = node:GetAttribute('config_User');
 	RaceResultpw = node:GetAttribute('config_PWD');
 	RaceResultPort = node:GetAttribute('config_PortDecodeur');
 	RaceResultfile = node:GetAttribute('config_NumFichier');
-	passage = node:GetAttribute('config_Passage');  -- N° de passage 0 depart, -1 arrivée, 1..2..3 N° inter
+	-- passage = node:GetAttribute('config_Passage');  -- N° de passage 0 depart, -1 arrivée, 1..2..3 N° inter
 	
 	-- variables permettant de créer les URL suivant si on appel un fichier de decodeur ou de trackbox
 	if RaceResultTypeBox == 'Decoder' then
@@ -260,6 +282,7 @@ function device.OnInit(params, node)
 	RaceResultshowlaststatus = 'false';
 	-- variable variable permetant la reutilisation des requette du raceresult TCP
 	ActiveID = RaceResultdevice;
+	SynchroID = RaceResultSynchro
 	ActivePort = tonumber(RaceResultPort);
 	
 -- Creation Panel
@@ -273,10 +296,10 @@ function device.OnInit(params, node)
 		
 -- initialisation de la table raceresult
 		RaceResult_WebRestApi.dbSki = sqlBase.Clone();
-		TabletagID_Passings = RaceResult_WebRestApi.dbSki:GetTable('tagID_Passings');
+		TabletagID_Passings = RaceResult_WebRestApi.dbSki:GetTable('Evenement_tagID_Passings');
+		TabletagID_Tour = RaceResult_WebRestApi.dbSki:GetTable('Evenement_tagID_Tour');
 		TabletagID_Correspondance = RaceResult_WebRestApi.dbSki:GetTable('tagID_Correspondance');
 		TableTagID_Finish = RaceResult_WebRestApi.dbSki:GetTable('tagID_Finish');
-		TabletagID_Tour = RaceResult_WebRestApi.dbSki:GetTable('tagID_Tour');
 		TabletagID_TourPena = RaceResult_WebRestApi.dbSki:GetTable('tagID_TourPena');
 		
 		RaceResult_WebRestApi.panel = panel; 
@@ -390,8 +413,8 @@ function device.OnInit(params, node)
 		Alert("DiffGMT = "..RaceResult_WebRestApi.DiffGMT);
 	
 	-- Recherche si un evenement existe dans la table tagID_Passings OK
-		cmd = "Select * From tagID_Passings Where Code = "..RaceResult_WebRestApi.code_competition.." and AdresseIP = '"..ActiveID.."'";
-		TableTagID_Passings = RaceResult_WebRestApi.dbSki:GetTable('tagID_Passings');
+		cmd = "Select * From Evenement_tagID_Passings Where Code_evenement = "..RaceResult_WebRestApi.code_competition.." and AdresseIP = '"..ActiveID.."'";
+		TableTagID_Passings = RaceResult_WebRestApi.dbSki:GetTable('Evenement_tagID_Passings');
 		RaceResult_WebRestApi.dbSki:TableLoad(TableTagID_Passings, cmd);	
 		
 
@@ -401,9 +424,8 @@ function device.OnInit(params, node)
 			RaceResult_WebRestApi.passingCurrent = 0;
 			
 		-- creation de variables TypeTable et CodeTypeTable(permetant de travailler une table générique a tt les evt ou une table spécifique à l'EVT)
-			-- if passage == '' then passage = -1	end
 			-- Alert("RaceResultdevice : "..RaceResultdevice);
-			passage = node:GetAttribute('config_Passage') or -1;
+			passage = -1;
 			LoopID = 'Loop0';
 			LoopCanal = 'LoopCanal0';	
 			ID_1er_Inter = 1;
@@ -437,7 +459,7 @@ function device.OnInit(params, node)
 	
 		-- On recherche si il y a une ou plusieurs lignes de créer ds la table TabletagID_Tour pour l'evt
 		-- Si pas de ligne on inscrit dans latable	
-		cmd = "Select * From tagID_Tour Where Code = '"..RaceResult_WebRestApi.code_competition.."' and AdresseIP = '"..ActiveID.."' Order by bibMini";
+		cmd = "Select * From Evenement_tagID_Tour Where Code_evenement = '"..RaceResult_WebRestApi.code_competition.."' and AdresseIP = '"..ActiveID.."' Order by bibMini";
 		if RaceResult_WebRestApi.dbSki:TableLoad(TabletagID_Tour, cmd):GetNbRows() == 0 then
 			local bibMini = 1;
 			local bibMax = 9999;
@@ -447,7 +469,7 @@ function device.OnInit(params, node)
 			AddTabletagID_Tour(RaceResult_WebRestApi.code_competition,ActiveID,bibMini,bibMax,LoopID,LoopCanal,Tour);
 		end
 	-- Recherche si une table de corespondance existe dans la table tagID_Correspondance
-		cmd = "Select * From tagID_Correspondance Where Code = "..CodeTypeTable.." Order by Dossard";
+		cmd = "Select * From tagID_Correspondance Where Code_evenement = "..CodeTypeTable.." Order by Dossard";
 		if RaceResult_WebRestApi.dbSki:TableLoad(TabletagID_Correspondance, cmd):GetNbRows() == 0 then
 			Alert("pas de Table de correspondance pour cet évènement : "..RaceResult_WebRestApi.code_competition);
 		else
@@ -472,24 +494,24 @@ function device.OnInit(params, node)
 		local caption = '/ '..ActiveID;
 		
 		mgr:AddPane(panel, {
+			name = 'pane_raceresult',
 			icon = './res/Mini-logo-raceresult.png',
-			caption = "RaceResult Web-REST-API / "..ActiveID..", Passage = "..passage.." And N° Files = "..RaceResultfile,
+			caption = "RaceResult Web_Rest-API / "..ActiveID..", Passage = "..passage.." And N° Files = "..RaceResultfile,
 			caption_visible = true,
 			close_button = false,
 			pin_button = true,
 			show = true,
 
 			float = true, 
-			-- position de la fenetre a l'ouverture {horizontal , verticale}
+			-- position de la fenetre a l'ouverture {horizontal, verticale}
 			floating_position = {1000, 40},
-			-- taille de la {fenetre L , H}
+			-- taille de la {fenetre L, H}
 			floating_size = {700, 300},
 			dockable = false
-			
 		});
 
 		mgr:Update();
-		
+				
 		-- Mise en place de la gestion "Asynchrone"
 		curlCommand = { 
 			getSystemStatus = 1,
@@ -526,15 +548,15 @@ function OnClearTableCorres(evt)
 	end
 	-- Alert ("CodeTypeTable = "..CodeTypeTable.."et  TypeTable = ".. TypeTable);
 	if CodeTypeTable ~= "" or  TypeTable ~= "" then
-	cmd = "Delete From tagID_Correspondance Where Code = "..CodeTypeTable.." and TypeTable = '"..TypeTable.."'";
+	cmd = "Delete From tagID_Correspondance Where Code_evenement = "..CodeTypeTable.." and TypeTable = '"..TypeTable.."'";
 	RaceResult_WebRestApi.dbSki:Query(cmd);
 	else
-	cmd = "Delete From tagID_Correspondance Where Code = "..RaceResult_WebRestApi.code_competition;
+	cmd = "Delete From tagID_Correspondance Where Code_evenement = "..RaceResult_WebRestApi.code_competition;
 	RaceResult_WebRestApi.dbSki:Query(cmd);
 	end
 	
 --	TabletagID_Correspondance:RemoveAllRows();
-	cmd = "Select * From tagID_Correspondance where Code = "..CodeTypeTable.." and TypeTable = '"..TypeTable.."'";
+	cmd = "Select * From tagID_Correspondance where Code_evenement = "..CodeTypeTable.." and TypeTable = '"..TypeTable.."'";
 	RaceResult_WebRestApi.dbSki:TableLoad(TabletagID_Correspondance, cmd)
  
  if TabletagID_Correspondance:GetNbRows() >= 1 then
@@ -542,7 +564,7 @@ function OnClearTableCorres(evt)
 end	
 	TypeTable = 'ND'
 	--Alert('je modifi dans la table TagID_Passings'..TypeTable)
-	cmd = "Update tagID_Passings SET TypeTable = '"..TypeTable.."' Where Code = "..RaceResult_WebRestApi.code_competition.." and AdresseIP = '"..ActiveID.."'"
+	cmd = "Update Evenement_tagID_Passings SET TypeTable = '"..TypeTable.."' Where Code_evenement = "..RaceResult_WebRestApi.code_competition.." and AdresseIP = '"..ActiveID.."'"
 	RaceResult_WebRestApi.dbSki:Query(cmd);
 	Warning("Vidage table tagID_Correspondance ok...");
 
@@ -555,7 +577,7 @@ end
 function OnChargeTableCorres(CodeTypeTable, TypeTable)
  if Table.state == true then
 	-- recherche si il y a deja une table de corespondance de charger dans la base
-	cmd = "Select * From tagID_Correspondance where Code = "..CodeTypeTable.." and TypeTable = '"..TypeTable.."'";
+	cmd = "Select * From tagID_Correspondance where Code_evenement = "..CodeTypeTable.." and TypeTable = '"..TypeTable.."'";
 	RaceResult_WebRestApi.dbSki:TableLoad(TabletagID_Correspondance, cmd)
  
 	 if TabletagID_Correspondance:GetNbRows() >= 1 then
@@ -595,9 +617,9 @@ function OnChargeTableCorres(CodeTypeTable, TypeTable)
 					local TagID = arrayResults[2];
 					local Dossard = tonumber(arrayResults[1]);
 						if TypeTable == 'GEN' then 
-						TabletagID_Correspondance:SetCell("Code", r, 0);
+						TabletagID_Correspondance:SetCell("Code_evenement", r, 0);
 						elseif TypeTable == 'EVT' then
-						TabletagID_Correspondance:SetCell("Code", r, RaceResult_WebRestApi.code_competition);
+						TabletagID_Correspondance:SetCell("Code_evenement", r, RaceResult_WebRestApi.code_competition);
 						end
 				TabletagID_Correspondance:SetCell("TagID", r, TagID);		
 				TabletagID_Correspondance:SetCell("Dossard", r, Dossard);
@@ -608,7 +630,7 @@ function OnChargeTableCorres(CodeTypeTable, TypeTable)
 		end
 		csvFile:close();
 	-- Alert('je modifi dans la table TagID_Passings'..TypeTable)
-	cmd = "Update tagID_Passings SET TypeTable = '"..TypeTable.."' Where Code = "..RaceResult_WebRestApi.code_competition.." and AdresseIP = '"..ActiveID.."'"
+	cmd = "Update Evenement_tagID_Passings SET TypeTable = '"..TypeTable.."' Where Code_evenement = "..RaceResult_WebRestApi.code_competition.." and AdresseIP = '"..ActiveID.."'"
 	RaceResult_WebRestApi.dbSki:Query(cmd);
 	--Alert('je modifi dans la table TagID_Passings le type de table utiliser :'..TypeTable)
 	local nbLignes = TabletagID_Correspondance:GetNbRows();
@@ -627,12 +649,12 @@ end
 
 --Pour charger une table générique
 function OnValidTypeTableGen(evt)
-	cmd = "Select * From tagID_Correspondance where Code = '0' and TypeTable = 'GEN' Order by Dossard";
+	cmd = "Select * From tagID_Correspondance where Code_evenement = '0' and TypeTable = 'GEN' Order by Dossard";
 	RaceResult_WebRestApi.dbSki:TableLoad(TabletagID_Correspondance, cmd)
  
 	 if TabletagID_Correspondance:GetNbRows() >= 1 then
 		--Alert('je modifi dans la table TagID_Passings'..TypeTable)
-		cmd = "Update tagID_Passings SET TypeTable	= 'GEN' Where Code = "..RaceResult_WebRestApi.code_competition.." and AdresseIP = '"..ActiveID.."'";
+		cmd = "Update Evenement_tagID_Passings SET TypeTable = 'GEN' Where Code_evenement = "..RaceResult_WebRestApi.code_competition.." and AdresseIP = '"..ActiveID.."'";
 		RaceResult_WebRestApi.dbSki:Query(cmd);
 		TypeTable = 'GEN';	
 		Table.state = true ;
@@ -655,12 +677,12 @@ end
 
 -- Pour charger une table qui ne fonctionne que pour l'evenement
 function OnValidTypeTableEvt(evt)
-	cmd = "Select * From tagID_Correspondance where Code = "..RaceResult_WebRestApi.code_competition.." and TypeTable = 'EVT'";
+	cmd = "Select * From tagID_Correspondance where Code_evenement = "..RaceResult_WebRestApi.code_competition.." and TypeTable = 'EVT'";
 	RaceResult_WebRestApi.dbSki:TableLoad(TabletagID_Correspondance, cmd)
 	
 	if TabletagID_Correspondance:GetNbRows() >= 1 then
 		--Alert('je modifi dans la table TagID_Passings'..TypeTable)
-		cmd = "Update tagID_Passings SET TypeTable	= 'EVT' Where Code = "..RaceResult_WebRestApi.code_competition.." and AdresseIP = '"..ActiveID.."'";
+		cmd = "Update Evenement_tagID_Passings SET TypeTable = 'EVT' Where Code_evenement = "..RaceResult_WebRestApi.code_competition.." and AdresseIP = '"..ActiveID.."'";
 		RaceResult_WebRestApi.dbSki:Query(cmd);
 		TypeTable = 'EVT';	
 		Table.state = true ;
@@ -672,7 +694,7 @@ function OnValidTypeTableEvt(evt)
 		Success('Validation de l\'utisation d\'une table unique à l\'évènement pour cet évènement ! ');
 	else
 		--Alert('je modifi dans la table TagID_Passings'..TypeTable)
-		cmd = "Update tagID_Passings SET TypeTable = 'EVT'  Where Code = "..RaceResult_WebRestApi.code_competition.." and AdresseIP = '"..ActiveID.."'";
+		cmd = "Update Evenement_tagID_Passings SET TypeTable = 'EVT'  Where Code_evenement = "..RaceResult_WebRestApi.code_competition.." and AdresseIP = '"..ActiveID.."'";
 		RaceResult_WebRestApi.dbSki:Query(cmd);
 		TypeTable = 'EVT';	
 		Table.state = true ;
@@ -685,13 +707,13 @@ end
 
 -- fonction qui enregistre le modif de la table de corespondance manuel
 function OnSaveTableCorres()
-	cmd = "Delete From tagID_Correspondance Where Code = "..CodeTypeTable.." and TypeTable = '"..TypeTable.."'";
+	cmd = "Delete From tagID_Correspondance Where Code_evenement = "..CodeTypeTable.." and TypeTable = '"..TypeTable.."'";
 	RaceResult_WebRestApi.dbSki:Query(cmd);
 	
 	local Grid_Ligne = dlgCorespondance:GetWindowName('grid_TableCorrespondance'):GetTable();
 	--Alert("RaceresultWebServeur_option:GetNbRows() = "..Grid_Ligne:GetNbRows());
 	for i=0, Grid_Ligne:GetNbRows()-1 do
-		TabletagID_Correspondance:SetCell("Code", i, Grid_Ligne:GetCellInt('Code', i));
+		TabletagID_Correspondance:SetCell("Code_evenement", i, Grid_Ligne:GetCellInt('Code_evenement', i));
 		TabletagID_Correspondance:SetCell("TagID", i, Grid_Ligne:GetCell('TagID', i));
 		TabletagID_Correspondance:SetCell("Dossard", i, Grid_Ligne:GetCellInt('Dossard', i));
 		TabletagID_Correspondance:SetCell("TypeTable", i, TypeTable);
@@ -740,10 +762,10 @@ function OnOpenTableCorespondance(evt)
 	end
 	
 	-- Grid corespondance
-	cmd = "Select * From tagID_Correspondance Where Code = '"..CodeTypeTable.."' Order by Dossard";
+	cmd = "Select * From tagID_Correspondance Where Code_evenement = '"..CodeTypeTable.."' Order by Dossard";
 	RaceResult_WebRestApi.dbSki:TableLoad(TabletagID_Correspondance, cmd)
 	
-	TabletagID_Correspondance:SetColumn('Code', { label = 'Code-Evt.', width = 12 });
+	TabletagID_Correspondance:SetColumn('Code_evenement', { label = 'Code-Evt.', width = 12 });
 	TabletagID_Correspondance:SetColumn('Dossard', { label = 'Dossard.', width = 12 });
 	TabletagID_Correspondance:SetColumn('TagID', { label = 'TagID.', width = 12 });
 	
@@ -751,7 +773,7 @@ function OnOpenTableCorespondance(evt)
 	local grid = dlgCorespondance:GetWindowName('grid_TableCorrespondance');
 	grid:Set({
 		table_base = TabletagID_Correspondance,
-		columns = 'Code, TagID, Dossard',
+		columns = 'Code_evenement, TagID, Dossard',
 		selection_mode = gridSelectionModes.CELLS,
 		sortable = false,
 		enable_editing = true
@@ -1089,6 +1111,12 @@ end
 
 -- Création d'un timer pour savoir le Nb de passing dans le fichier
 function OnTimerChrono(evt)
+	-- delete timerRecordsCount
+	if RaceResult_WebRestApi.timerRecordsCount ~= nil then
+		RaceResult_WebRestApi.timerRecordsCount:Delete();
+		RaceResult_WebRestApi.timerRecordsCount = nil;
+		Alert("RaceResult_WebRestApi.timerRecordsCount = nil;");
+	end
 -- agrementation de la variable alive (compteur timer)
 	RaceResult_WebRestApi.alive = RaceResult_WebRestApi.alive + 1;
 -- Activation de la fonction OnGetNbDetections() qui permet de savoir le nb de detections dans un fichier donner
@@ -1123,7 +1151,7 @@ function ReadCountDetection(evt)
 	local jsonText = evt:GetString();
 	-- Si le len() du result du Json est superieur a 3 le decodeur est connecter
 	if jsonText:len() > 3 then
-		-- adv.Success('JSON Return='..jsonText);
+		adv.Success('JSON Return='..jsonText);
 		local jsonRes = table.FromStringJSON(jsonText);
 		-- Alert('  => Nb de Detection :'..jsonRes.Count..' dans le fichier N°: '..RaceResultfile);
 		-- adv.Alert('  => Created :'..jsonRes.Created);
@@ -1148,10 +1176,41 @@ function ReadCountDetection(evt)
 			end
 		else
 			Alert("RecordsCount = nil");
-			return false
+			Alert('Alors JSON Return='..jsonText);
+			-- Alert('On suprime les Timer');
+		-- delete timerChrono
+			if RaceResult_WebRestApi.timerChrono ~= nil then
+				RaceResult_WebRestApi.timerChrono:Delete();
+				RaceResult_WebRestApi.timerChrono = nil;
+			end
+		-- delete timerJeton
+			if RaceResult_WebRestApi.timerJeton ~= nil then
+				RaceResult_WebRestApi.timerJeton:Delete();
+				RaceResult_WebRestApi.timerJeton = nil;
+			end
+		-- on delete le jeton
+			RaceResult_WebRestApi.access_token = false;
+			RaceResult_WebRestApi.alive = 0
+
+			-- Creation du Timer pour relance le timer chrono
+			RaceResult_WebRestApi.timerDelayRecordsCount = 20000
+			RaceResult_WebRestApi.timerRecordsCount = timer.Create(RaceResult_WebRestApi.panel);
+			if RaceResult_WebRestApi.timerRecordsCount ~= nil then
+				RaceResult_WebRestApi.timerRecordsCount:Start(RaceResult_WebRestApi.timerDelayRecordsCount);
+			end
+			RaceResult_WebRestApi.panel:Bind(eventType.TIMER, OntimerRecordsCount, RaceResult_WebRestApi.timerRecordsCount);
 		end
 	end	
+end
 
+function OntimerRecordsCount()
+	RaceResult_WebRestApi.timerDelay = 2500;
+	--  Alert("timerDelay = "..RaceResult_WebRestApi.timerDelay);
+	RaceResult_WebRestApi.timerChrono = timer.Create(RaceResult_WebRestApi.panel);
+	if RaceResult_WebRestApi.timerChrono ~= nil then
+		RaceResult_WebRestApi.timerChrono:Start(RaceResult_WebRestApi.timerDelay);
+	end
+	RaceResult_WebRestApi.panel:Bind(eventType.TIMER, OnTimerChrono, RaceResult_WebRestApi.timerChrono);
 end
 
 -- fonction pour recharger un fichier complet de Passings ou Trackpings
@@ -1210,15 +1269,15 @@ function SavePassingCurrent()
 	RaceResult_WebRestApi.passingCurrent = tonumber(RaceResult_WebRestApi.passingCurrent) + 1;
 	-- Enregistrement en MySQL 
 	cmd = 
-		"update tagID_Passings set Passings = "..
+		"update Evenement_tagID_Passings set Passings = "..
 		tostring(RaceResult_WebRestApi.passingCurrent)..
-		" Where Code = "..RaceResult_WebRestApi.code_competition..
+		" Where Code_evenement = "..RaceResult_WebRestApi.code_competition..
 		" And AdresseIP = '"..ActiveID..
 		"'"
 		;
 	RaceResult_WebRestApi.dbSki:Query(cmd);
-	cmd = "Select * From tagID_Passings Where Code = "..RaceResult_WebRestApi.code_competition.." and AdresseIP = '"..ActiveID.."'";
-		TableTagID_Passings = RaceResult_WebRestApi.dbSki:GetTable('tagID_Passings');
+	cmd = "Select * From Evenement_tagID_Passings Where Code_evenement = "..RaceResult_WebRestApi.code_competition.." and AdresseIP = '"..ActiveID.."'";
+		TableTagID_Passings = RaceResult_WebRestApi.dbSki:GetTable('Evenement_tagID_Passings');
 		RaceResult_WebRestApi.dbSki:TableLoad(TableTagID_Passings, cmd);	
 		
 	Alert("Nb de detection enregistrée = "..TableTagID_Passings:GetCellInt('Passings', 0))
@@ -1247,6 +1306,7 @@ function GethourPassage(RealTime)
 	elseif hourPassage:len() == 11 then
 		hourPassage = hourPassage..'0'
 	end
+
 	return hourPassage;
 end
 
@@ -1257,6 +1317,7 @@ function GetChrono(hourPassage)
 	local sec = string.sub(hourPassage,7,8);
 	local milli = string.sub(hourPassage,10,12);
 	--+tonumber(DiffGMT)
+	-- return 3600000*tonumber(hour)+1000*tonumber(RaceResult_WebRestApi.DiffGMT)+60000*tonumber(minute)+1000*tonumber(sec)+tonumber(milli)+700000+700000+700000;
 	return 3600000*tonumber(hour)+1000*tonumber(RaceResult_WebRestApi.DiffGMT)+60000*tonumber(minute)+1000*tonumber(sec)+tonumber(milli);
 end
 
@@ -1280,7 +1341,7 @@ function GetPassage(NbToursAFaire,NbTourRealiser);
 	-- suivant le nombre de tour fait par le concurent et le nombre de tour qu'il a a faire j'acremente la variable passage
 	-- si le concurent n'a pas fait plus le nombre de tour alors passage seras egal NbTourRealiser
 	if NbToursAFaire == 0 then
-		passage = TableTagID_Passings:GetCell('passage', 0);
+		passage = TableTagID_Passings:GetCellInt('passage', 0);
 		-- Alert("if tonumber(NbToursAFaire) == 0 : "..passage);
 	else
 		if NbTourRealiser < NbToursAFaire then 
@@ -1293,7 +1354,7 @@ function GetPassage(NbToursAFaire,NbTourRealiser);
 		--si le concurent a fait plus que le nombre de tour alors passage seras egal a passage 
 		elseif NbTourRealiser > tonumber(NbToursAFaire) then
 			--Alert("tonumber(NbTourRealiser) > tonumber(NbToursAFaire) : "..passage);
-			return TableTagID_Passings:GetCell('passage', 0);
+			return TableTagID_Passings:GetCellInt('passage', 0);
 		end
 	end
 end
@@ -1301,19 +1362,20 @@ end
 -- fonction qui renvoi le Nb de tour réaliser par le concurent
 function GetNbTourRealiser(tagID)
 	-- recherche du nombre de tour fait par le coureur ds la Table TableTagID_Finish 
-	cmd = "select * from TagID_Finish where Code = "..RaceResult_WebRestApi.code_competition..
-			" and AdresseIP = '"..ActiveID..
+	cmd = "select * from TagID_Finish where Code_evenement = "..RaceResult_WebRestApi.code_competition..
+			" and AdresseIP = '"..ActiveID.."' or AdresseIP = '"..SynchroID..
 			"' and LoopID = '"..LoopID..
 			"' and LoopCanal = '"..LoopCanal..
 			"' and TagID = '"..tagID..
 			"'"
 	return RaceResult_WebRestApi.dbSki:TableLoad(TableTagID_Finish, cmd):GetCellInt("Tour", 0);
+	
 end
 
 -- fonction qui renvoi le DelayDoubleDetect 
 function GetDelayDoubleDetect()		
 	-- Chargement de la table TableTagID_Passings pour avoir le DelayDoubleDetect
-	cmd = "Select * From tagID_Passings Where Code = "..RaceResult_WebRestApi.code_competition..
+	cmd = "Select * From Evenement_tagID_Passings Where Code_evenement = "..RaceResult_WebRestApi.code_competition..
 		  " and AdresseIP = '"..ActiveID..
 		  "' and LoopID = '"..LoopID..
 		  "' and LoopCanal = '"..LoopCanal..
@@ -1331,24 +1393,44 @@ function GetDelayDoubleDetect()
 	return TableTagID_Passings:GetCell('DelayDoubleDetect', 0);
 end
 
-		-- fonction recherche si un tagID existe dans la table TableTagID_Finish et di ID du dernier passage
-function RechercheTagId_Rech_Der_Passge_TagID(ActiveID, LoopID, LoopCanal, tagID)
-	cmd = "Select * From tagID_Finish Where Code = '"..RaceResult_WebRestApi.code_competition..
+		-- fonction recherche si un tagID existe dans la table TableTagID_Finish et du ID du dernier passage
+function RechercheTagId_Rech_Der_Passage_TagID(ActiveID, LoopID, LoopCanal, tagID)
+	ImpulSynchro = 0;
+	
+	if SynchroID ~= '' then 
+		cmd = "Select * From tagID_Finish Where Code_evenement = '"..RaceResult_WebRestApi.code_competition..
+			  "' And AdresseIP = '"..SynchroID..
+			  "' And LoopID = '"..LoopID..
+			  "' And LoopCanal = '"..LoopCanal..
+			  "' And TagID = '"..tagID..
+			  "'"
+			  ;	  
+		-- Alert("cmd "..cmd)
+		NbRow = tonumber(RaceResult_WebRestApi.dbSki:TableLoad(TableTagID_Finish, cmd):GetNbRows());
+		-- Alert("NbRow "..NbRow)
+		if tonumber(NbRow) == 1 then
+			ImpulSynchro = 1;
+		else
+			ImpulSynchro = 0;
+		end
+		-- Alert("ImpulSynchro "..ImpulSynchro)
+	end 
+	
+	cmd = "Select * From tagID_Finish Where Code_evenement = '"..RaceResult_WebRestApi.code_competition..
 		  "' And AdresseIP = '"..ActiveID..
 		  "' And LoopID = '"..LoopID..
 		  "' And LoopCanal = '"..LoopCanal..
 		  "' And TagID = '"..tagID..
 		  "'"
-		  ;
-	
+	-- Alert("SynchroID / ImpulSynchro = "..ImpulSynchro)	  
 	Rech_TagID = RaceResult_WebRestApi.dbSki:TableLoad(TableTagID_Finish, cmd):GetCell("TagID", 0);
 	Rech_Der_Passge_TagID = RaceResult_WebRestApi.dbSki:TableLoad(TableTagID_Finish, cmd):GetCellInt("Passage", 0);
-
+		
 end
 
 		-- recherche si un tagID existe dans la table TagID_TourPena
 function rechercheDos_TabletagID_TourPena(ActiveID, LoopID, LoopCanal, bib)
-	cmd = "Select * From TagID_TourPena Where Code = '"..RaceResult_WebRestApi.code_competition..
+	cmd = "Select * From TagID_TourPena Where Code_evenement = '"..RaceResult_WebRestApi.code_competition..
 		  "' And AdresseIP = '"..ActiveID..
 		  "' And LoopID = '"..LoopID..
 		  "' And LoopCanal = '"..LoopCanal..
@@ -1371,7 +1453,7 @@ function OnReadPassings(evt)
 
 		for i=1,nbPassings do
 			-- adv.Alert('PASSING No'..tostring(i));
-			-- adv.Alert('  => Code :'..jsonRes[RaceResulFromFiles][i].Code);
+			-- adv.Alert('  => Code_evenement :'..jsonRes[RaceResulFromFiles][i].Code);
 			-- adv.Alert('  => Customer :'..jsonRes[RaceResulFromFiles][i].Customer);
 			-- adv.Alert('  => RealTime :'..jsonRes[RaceResulFromFiles][i].RealTime);
 			-- adv.Alert('  => DeviceID :'..jsonRes[RaceResulFromFiles][i].DeviceID);
@@ -1432,16 +1514,24 @@ function ReadJsonRes(passingCurrent, tagID, RealTime, LoopID, NumLoopCanal, Syst
 			RecherchetourDos(CodeTypeTable,tagID, LoopID, LoopCanal);
 			Alert("bib = "..bib.." / Nb Tours A Faire = "..NbToursAFaire);		
 			--si bib est différent de nil ou de '' on gere l'impultion						
-			if bib ~= "" then				
-				-- recherche si un tagID existe dans la table TableTagID_Finish et de Rech_Der_Passge_TagID
-				RechercheTagId_Rech_Der_Passge_TagID(ActiveID, LoopID, LoopCanal, tagID)
-				-- Alert("Rech_Der_Passge_TagID = "..Rech_Der_Passge_TagID)
-				-- Alert("Rech_TagID = "..Rech_TagID)			
-								--si Rech_TagID est diff de '' je gere l' impultion
+			if bib ~= "" then
+				-- recherche de l'heure de départ de l'épreuve par rapport au dossard
+				local HeureDepart_Epr = rechercheHeureDepartEpreuve(bib);
+				-- Alert("tostring(HeureDepart_Epr) = "..app.TimeToString(HeureDepart_Epr, "%2h:%2m:%2s.%3f"));
+				-- Alert("tostring(chrono) = "..app.TimeToString(chrono, "%2h:%2m:%2s.%3f"));
+				-- on regarde si la detection n'est pas inferieur a l'heure de départ de l'épreuve
+				if chrono > HeureDepart_Epr then				
+					-- recherche si un tagID existe dans la table TableTagID_Finish et de Rech_Der_Passge_TagID
+					RechercheTagId_Rech_Der_Passge_TagID(ActiveID, LoopID, LoopCanal, tagID)
+					-- Alert("Rech_Der_Passge_TagID = "..Rech_Der_Passge_TagID)
+					-- Alert("Rech_TagID = "..Rech_TagID)
+					-- Alert("ImpulSynchro RechercheTagId_Rech_Der_Passage_TagID = "..ImpulSynchro);
+				
+					--si Rech_TagID est diff de '' je gere l' impultion
 					if Rech_TagID ~= '' then
 						-- recherche du nombre de tour fait par le coureur ds la Table TableTagID_Finish 
 						local NbTourRealiser = GetNbTourRealiser(tagID);
-						-- Alert("NbTourRealiser: "..NbTourRealiser);
+						--Alert("NbTourRealiser: "..NbTourRealiser);
 							
 						-- Recherche du delay de double detection
 						DelayDoubleDetect = GetDelayDoubleDetect();
@@ -1453,69 +1543,93 @@ function ReadJsonRes(passingCurrent, tagID, RealTime, LoopID, NumLoopCanal, Syst
 						-- incrementation de la variable passage suivant le Nb à faire te le Nb de tour réaliser
 						local passage = GetPassage(NbToursAFaire,NbTourRealiser); 
 						-- Alert("passage = "..passage);
-						
-						-- rechercher si une heure de passage est deja inscrite dans la table chrono
-						local TimePassage = GetHeurePassage(bib, Rech_Der_Passge_TagID);
-							--Alert(" chrono = "..chrono.." TimePassage = "..TimePassage);
-							
-						-- Je Calcul de l'heure de passage + delay double detection
-						local TimePassagePlus = tostring(TimePassage)+tostring(DelayDoubleDetect); 
-							--Alert(" TimePassagePlus ="..TimePassagePlus);
-							
-						-- si le l'heure dedetection 'chrono' est inferieur a tps + DelayDoubleDetect c'est une double détection
-						if 	tonumber(chrono) <= tonumber(TimePassagePlus)then
-							local bib = -6666;
-							local tagID = tagID.."(d)";
-							-- j'envoi l'heure de passage dans la table resultatchrono en signalent que c'est une double detection 
-							AddTimePassage(chrono, Rech_Der_Passge_TagID, bib, tagID);
+						if tonumber(ImpulSynchro) == 1 then
+							local tagID = tagID.."(ds)"
+							AddTimePassage(chrono, Rech_Der_Passge_TagID, -5555, tagID);
+							-- AddTimesTagIDFinish(tagID, passage, LoopID, LoopCanal, Tour, bib);
+							-- refreshTagIDFinish(tagID, passage, LoopID, LoopCanal);
+							ImpulSynchro = nil;
+							--Alert("passage = "..passage);
+						else
+							-- rechercher si une heure de passage est deja inscrite dans la table chrono
+							--local TimePassage = GetHeurePassage(bib, Rech_Der_Passge_TagID);
+							local TimePassage = rechercheHeurePassageBib(bib, Rech_Der_Passge_TagID);
+								--Alert(" chrono = "..chrono.." TimePassage = "..TimePassage);
+								
+							-- Je Calcul de l'heure de passage + delay double detection
+							local TimePassagePlus = tostring(TimePassage)+tostring(DelayDoubleDetect); 
+								--Alert(" TimePassagePlus ="..TimePassagePlus);
+								
+							-- si le l'heure dedetection 'chrono' est inferieur a tps + DelayDoubleDetect c'est une double détection
+							if 	tonumber(chrono) <= tonumber(TimePassagePlus)then
+								local bib = -6666;
+								local tagID = tagID;
+								-- j'envoi l'heure de passage dans la table resultatchrono en signalent que c'est une double detection 
+								AddTimePassage(chrono, Rech_Der_Passge_TagID, bib, tagID.."(d)");
 
-						else -- du tonumber(chrono) <= tonumber(TimePassagePlus)
-						-- si le delay de double detection est passer je gere l'impultion normalement	
-							-- Si le nb de tour realiser est < au nb de tour a faire je met l' heure ds la table
-							if NbTourRealiser < NbToursAFaire then 
-								--Alert("LoopID 1 = "..LoopID);
-								AddNbTours(NbTourRealiser+1, tagID, ActiveID, LoopID, LoopCanal);
-								AddTimePassage(chrono, NbTourRealiser+1, bib, tagID);
-								refreshTagIDFinish(tagID, passage, LoopID, LoopCanal);
-							elseif	NbTourRealiser == NbToursAFaire then
-								-- Si le nb de tour realiser est == au nb de tour a faire je met l' heure ds la table
-								AddNbTours(NbTourRealiser+1, tagID, ActiveID, LoopID, LoopCanal);
-								AddTimePassage(chrono, passage, bib, tagID);
-								refreshTagIDFinish(tagID, passage, LoopID, LoopCanal);
-							elseif NbTourRealiser > NbToursAFaire then
-								-- Si le nb de tour realiser est > au nb de tour a faire je met l' heure ds la table et je met -bib dans la table resultat chrono pour indiquer que le bib a deja été détecter
-								AddNbTours(NbTourRealiser+1, tagID, ActiveID, LoopID, LoopCanal);
-								AddTimePassage(chrono, passage, -bib, tagID);
-							end
-						end 
+							else -- du tonumber(chrono) <= tonumber(TimePassagePlus)
+							-- si le delay de double detection est passer je gere l'impultion normalement	
+								-- Si le nb de tour realiser est < au nb de tour a faire je met l' heure ds la table
+								if NbTourRealiser < NbToursAFaire then 
+									--Alert("LoopID 1 = "..LoopID);
+									AddNbTours(NbTourRealiser+1, tagID, ActiveID, LoopID, LoopCanal);
+									AddTimePassage(chrono, NbTourRealiser+1, bib, tagID);
+									refreshTagIDFinish(tagID, passage, LoopID, LoopCanal);
+								elseif	NbTourRealiser == NbToursAFaire then
+									-- Si le nb de tour realiser est == au nb de tour a faire je met l' heure ds la table
+									AddNbTours(NbTourRealiser+1, tagID, ActiveID, LoopID, LoopCanal);
+									AddTimePassage(chrono, passage, bib, tagID);
+									refreshTagIDFinish(tagID, passage, LoopID, LoopCanal);
+								elseif NbTourRealiser > NbToursAFaire then
+									-- Si le nb de tour realiser est > au nb de tour a faire je met l' heure ds la table et je met -bib dans la table resultat chrono pour indiquer que le bib a deja été détecter
+									AddNbTours(NbTourRealiser+1, tagID, ActiveID, LoopID, LoopCanal);
+									AddTimePassage(chrono, passage, -bib, tagID);
+								end
+							end 
+						end
 					--si recherche TagID == '' c'est la premiere detection du tagID j'envoi le temps ds la base					
 					else -- du Rech_TagID ~= ''
 						--Alert('premiere detection: Nb Tour Realiser = '..NbTourRealiser..' Nb Tours A Faire = '..NbToursAFaire)						
 						--Alert('passage = '..passage)
-						if NbToursAFaire == 0 then
-							-- numero de passage a verifier il devrais etre le passage defini
-							local Tour = 1;
-							--Alert('Le concurent n\'a pas de tour à faire j\'ecrit dans la table TableTagID_Finish')
-							AddTimePassage(chrono, passage, bib, tagID);
-							AddTimesTagIDFinish(tagID, passage, LoopID, LoopCanal, Tour, bib)
+						if tonumber(ImpulSynchro) == 1 then
+							local tagID = tagID
+							AddTimePassage(chrono, passage, -5555, tagID.."(s)");
+							AddTimesTagIDFinish(tagID, passage, LoopID, LoopCanal, Tour, bib);
+							Alert("ImpulSynchro = "..ImpulSynchro);
+							ImpulSynchro = nil;
+							--Alert("passage = "..passage);
 						else
-							if NbTourRealiser < NbToursAFaire then
+							if NbToursAFaire == 0 then
 								-- numero de passage a verifier il devrais etre le passage defini
-								local passage = ID_1er_Inter;
 								local Tour = 1;
-								--Alert('Le concurent n\'a pas fait de Nb tour à faire j\'ecrit dans la table TableTagID_Finish')
-								AddTimePassage(chrono, passage, bib, tagID);
-								--Alert('je lui met un Tour dans la table TabletagID_Finish')
-								AddTimesTagIDFinish(tagID, passage, LoopID, LoopCanal, Tour, bib)
-							elseif NbTourRealiser == NbToursAFaire then
-								local Tour = 1;
-								-- Alert('Le concurent a fait le Bon nombre de Tour')
+								--Alert('Le concurent n\'a pas de tour à faire j\'ecrit dans la table TableTagID_Finish')
 								AddTimePassage(chrono, passage, bib, tagID);
 								AddTimesTagIDFinish(tagID, passage, LoopID, LoopCanal, Tour, bib);
+							else
+								if NbTourRealiser < NbToursAFaire then
+									-- numero de passage a verifier il devrais etre le passage defini
+									local passage = ID_1er_Inter;
+									local Tour = 1;
+									--Alert('Le concurent n\'a pas fait de Nb tour à faire j\'ecrit dans la table TableTagID_Finish')
+									AddTimePassage(chrono, passage, bib, tagID);
+									--Alert('je lui met un Tour dans la table TabletagID_Finish')
+									AddTimesTagIDFinish(tagID, passage, LoopID, LoopCanal, Tour, bib)
+								elseif NbTourRealiser == NbToursAFaire then
+									local Tour = 1;
+									-- Alert('Le concurent a fait le Bon nombre de Tour')
+									AddTimePassage(chrono, passage, bib, tagID);
+									AddTimesTagIDFinish(tagID, passage, LoopID, LoopCanal, Tour, bib);
+								end
 							end
 						end
 					end -- du Rech_TagID ~= ''
-					
+				else -- du if chrono > HeureDepart_Epr then
+								--AddTimePassage(chrono, Rech_Der_Passge_TagID, -6666, tagID.."(d)");
+								Alert("Détection avant l\'heure de départ de l\'épreuve:  "..app.TimeToString(HeureDepart_Epr, "%2h:%2m:%2s"))
+								AddTimePassage(chrono, passage, -bib, tagID.."(Und)");
+								-- SavePassingCurrent(tonumber(firstResult));
+								-- return true
+				end -- du if chrono > HeureDepart_Epr then
 			else	-- du if bib ~= nil
 				-- si bib = '' le tagID est inconnu ds la table de corespondance je met un dos -9999 pour le signaler au chrono et ne pas perdre l'impulse
 				Warning("Tag ID inconnu dans la TableCorrespondance:  ")
@@ -1532,7 +1646,7 @@ function ReadJsonRes(passingCurrent, tagID, RealTime, LoopID, NumLoopCanal, Syst
 						--Alert("bib = "..bib)
 	-- à verifier avec pierre si le bib ~= nil fonctionne bien ou si il faut mettre bib ~= ""car ds RecherchetourDos ~= nil ne fonctionne pas	
 						if bib ~= nil then
-							cmd = "Select * From tagID_Passings Where Code = "..RaceResult_WebRestApi.code_competition..
+							cmd = "Select * From Evenement_tagID_Passings Where Code_evenement = "..RaceResult_WebRestApi.code_competition..
 								  " and AdresseIP = '"..ActiveID..
 								  "' and LoopID = '"..LoopID..
 								  "' and LoopCanal = '"..LoopCanal..
@@ -1549,10 +1663,11 @@ function ReadJsonRes(passingCurrent, tagID, RealTime, LoopID, NumLoopCanal, Syst
 							local Rech_Dossard = rechercheDos_TabletagID_TourPena(ActiveID, LoopID, LoopCanal, bib)
 							--Alert("Rech_Dossard = "..Rech_Dossard);
 								if Rech_Dossard == '' then
-									--Alert("Rech_Dossard test2 = "..Rech_Dossard)
+									-- Alert("Rech_Dossard test2 = "..Rech_Dossard)
 									-- Je creer un ligne pour le comptage de tour de pena ds la table tagID_TourPena
-									local Num_Tir = 1;
+									local Num_Tir = GetNumTir(chrono, bib, passage);
 									local NbTour_Fait = 1;
+									Alert("Num_Tir = "..Num_Tir);
 									InsertNbTour_Pena( ActiveID, LoopID, LoopCanal, bib, Num_Tir, NbTour_Fait);
 								else
 									--Alert("bib = "..bib)
@@ -1560,20 +1675,24 @@ function ReadJsonRes(passingCurrent, tagID, RealTime, LoopID, NumLoopCanal, Syst
 									--Alert("DelayDoubleDetect: "..DelayDoubleDetect);
 									local TimePassage = GetHeurePassage(Rech_Dossard, passage);
 									--Alert("TimePassage: "..TimePassage);
-									local Num_Tir = 1;
-									local TimePassagePlus = tonumber(TimePassage)+tonumber(DelayDoubleDetect); 
+									
+									-- delay de double detection 30sec = 30000 mili
+									-- delay de double detection 20sec = 20000 mili
+									
+									local TimePassagePlus = tonumber(TimePassage)+10000; 
 									--Alert("chrono = "..chrono.." TimePassagePlus ="..TimePassagePlus)
 										if 	tonumber(chrono) <= tonumber(TimePassagePlus)then
-										-- si le l'heure dedetection 'chrono' est inferieur a tps + DelayDoubleDetect c'est une boucle de pena du tir actif
-											local Num_Tir = RaceResult_WebRestApi.dbSki:TableLoad(TabletagID_TourPena, cmd):GetCellInt("Num_Tir", 0);
-											--Alert("Num_Tir1 = "..Num_Tir);
-											local NbTour_Fait = RaceResult_WebRestApi.dbSki:TableLoad(TabletagID_TourPena, cmd):GetCellInt("Tir"..Num_Tir, 0)+1;
-											--Alert("NbTour_Fait = "..NbTour_Fait);
-											AddNbTour_Pena( ActiveID, LoopID, LoopCanal, bib, Num_Tir, NbTour_Fait);
+										-- si le l'heure detection 'chrono' est inferieur a tps + 30sec c'est une double detection 
+										bib = -6666;
+										tagID = tagID..'(d)';
+										-- j'envoi l'heure de passage dans la table resultatchrono en signalent que c'est une double detection 
+										-- AddTimePassage(chrono, passage, bib, tagID.."(d)");
 										else
 										-- si le l'heure dedetection 'chrono' est superieur a tps + DelayDoubleDetect c'est une boucle de pena du tir superieur
-											local Num_Tir = RaceResult_WebRestApi.dbSki:TableLoad(TabletagID_TourPena, cmd):GetCellInt("Num_Tir", 0)+1;
+											-- local Num_Tir = RaceResult_WebRestApi.dbSki:TableLoad(TabletagID_TourPena, cmd):GetCellInt("Num_Tir", 0)+1;
 											--Alert("Num_Tir + 1 = "..Num_Tir);
+											local Num_Tir = GetNumTir(chrono, bib, passage);
+											Alert("Num_Tir = "..Num_Tir);
 											local NbTour_Fait = RaceResult_WebRestApi.dbSki:TableLoad(TabletagID_TourPena, cmd):GetCellInt("Tir"..Num_Tir, 0)+1;
 											--Alert("NbTour_Fait = "..NbTour_Fait);
 											-- j' ajoute 1 tour ds la table tagID_TourPena
@@ -1615,7 +1734,7 @@ end
 function OnModifNumFile(node)
 -- Création Dialog 
 config = {};
-node = node
+--node = node
 	dlgNumFichier = wnd.CreateDialog({
 		parent = RaceResult_WebRestApi.panel,
 		icon = "./res/32x32_ffs.png",
@@ -1644,12 +1763,18 @@ node = node
 		RaceResultfile = dlgNumFichier:GetWindowName('NumFichier'):GetValue();
 		-- Alert('test : '..dlgNumFichier:GetWindowName('NumFichier'):GetValue());
 		CreateURL_status(curlCommand.getSystemStatus);
--- il faudrais que je puisse enreistrer la modif dans le fichier skiffs.xml********************************* a demander a pierre
+		
+		-- enregistrement du numero de fichier ds le xml ?????
+		RaceResult_WebRestApi.node:ChangeAttribute('config_NumFichier',  RaceResultfile);
+		local doc = app.GetXML();
+		doc:SaveFile();
+		
+		-- Mise à jour du numero de fichier dans le caption de la boite de dialogue du device race result
+		caption = "RaceResult Web_Rest-API / "..ActiveID..", Passage = "..passage.." And N° Files = "..RaceResultfile;
+		local mgr = app.GetAuiManager();
+		mgr:SetCaption('pane_raceresult', caption);
+		mgr:Update();
 
-		-- node:ChangeAttribute('config_NumFichier', dlgNumFichier:GetWindowName('NumFichier'):GetValue());
-		-- Alert('test2'..dlgNumFichier:GetWindowName('NumFichier'):GetValue());
-		-- local doc = app.GetXML();
-		-- doc:SaveFile();
 		dlgNumFichier:EndModal(idButton.OK);
 	end
 
@@ -1671,6 +1796,16 @@ node = node
 
 end
 
+function OnChangePassage(passage, ActiveID)
+	local cmd = 
+		"Update Evenement_tagID_Passings SET passage = "..passage..
+		" Where Code_evenement = "..RaceResult_WebRestApi.code_competition..
+		" and AdresseIP = '"..ActiveID..
+		"'"
+	RaceResult_WebRestApi.dbSki:Query(cmd);
+	Success("mise a jour de L'ID passage ="..passage.. " dans la Evenement_tagID_Passings");
+end
+
 -- Outil des Mise à jour des Tables Sql
 -- Fonction permetant de vider la table tagid finish de l'evenement
 function OnDeleteTagIdFinish()
@@ -1679,19 +1814,19 @@ function OnDeleteTagIdFinish()
 	end
 
 --recherche du nombre de ligne ds la table tag ID et afichage
-	cmd = "Select * From tagID_Finish Where Code = "..RaceResult_WebRestApi.code_competition.." and AdresseIP = '"..ActiveID.."'";
+	cmd = "Select * From tagID_Finish Where Code_evenement = "..RaceResult_WebRestApi.code_competition.." and AdresseIP = '"..ActiveID.."'";
 	TabletagID_Finish = RaceResult_WebRestApi.dbSki:GetTable('tagID_Finish');
 	RaceResult_WebRestApi.dbSki:TableLoad(TabletagID_Finish,cmd);
 	local nbTagID_Finish = TabletagID_Finish:GetNbRows();
 	--Alert("Nb de tagID Déja inscrit dans la table : "..nbTagID_Finish.." de l'Evt N°"..RaceResult_WebRestApi.code_competition.." du decodeur:"..ActiveID)
 
 --Vidage de la table
-	cmd = "Delete From tagID_Finish Where Code = "..RaceResult_WebRestApi.code_competition.." and AdresseIP = '"..ActiveID.."'";
+	cmd = "Delete From tagID_Finish Where Code_evenement = "..RaceResult_WebRestApi.code_competition.." and AdresseIP = '"..ActiveID.."'";
 	RaceResult_WebRestApi.dbSki:Query(cmd);
 	
 	Warning("Vidage table tagID_Finish ok...");
 --recherche du nombre de ligne ds la table tag ID et afichage pour verication	
-	cmd = "Select * From tagID_Finish Where Code = "..RaceResult_WebRestApi.code_competition.." and AdresseIP = '"..ActiveID.."'";	
+	cmd = "Select * From tagID_Finish Where Code_evenement = "..RaceResult_WebRestApi.code_competition.." and AdresseIP = '"..ActiveID.."'";	
 	-- TabletagID_Finish = RaceResult_WebRestApi.dbSki:GetTable('tagID_Finish');
 	RaceResult_WebRestApi.dbSki:TableLoad(TabletagID_Finish,cmd);
 	local nbTagID_Finish = TabletagID_Finish:GetNbRows();
@@ -1715,7 +1850,7 @@ end
 -- fonction de recherche du dos et du nombre de tour a faire par rapport au tagID
 function RecherchetourDos(CodeTypeTable,tagID,LoopID,LoopCanal)
 -- recherche du dossard par rapport au TagID ds la table tagID_Correspondance
-	cmd = "Select * From tagID_Correspondance where Code = "..CodeTypeTable.." and TagID = '"..tagID.."'";
+	cmd = "Select * From tagID_Correspondance where Code_evenement = "..CodeTypeTable.." and TagID = '"..tagID.."'";
 	bib = RaceResult_WebRestApi.dbSki:TableLoad(TabletagID_Correspondance, cmd):GetCellInt("Dossard", 0);
 	--  Alert('RecherchetourDos bib = '..bib);
 	if bib ~= "" then 
@@ -1725,13 +1860,13 @@ function RecherchetourDos(CodeTypeTable,tagID,LoopID,LoopCanal)
 		-- Alert("LoopID = "..LoopID);
 		-- Alert("LoopCanal = "..LoopCanal);
 		-- on vas chercher le nombre de tour que le dos doit faire 
-		cmd = "Select * From tagID_Tour Where Code = "..RaceResult_WebRestApi.code_competition..
+		cmd = "Select * From Evenement_tagID_Tour Where Code_evenement = "..RaceResult_WebRestApi.code_competition..
 													 " and AdresseIP = '"..ActiveID..
 													 "' and LoopID = '"..LoopID..
 													 "' and LoopCanal = '"..LoopCanal..
 													 "'";
 		-- Alert("cmd = "..cmd);											 
-		TabletagID_Tour = RaceResult_WebRestApi.dbSki:GetTable('tagID_Tour');
+		TabletagID_Tour = RaceResult_WebRestApi.dbSki:GetTable('Evenement_tagID_Tour');
 		RaceResult_WebRestApi.dbSki:TableLoad(TabletagID_Tour, cmd);
 		Testnbtour = RaceResult_WebRestApi.dbSki:TableLoad(TabletagID_Tour, cmd):GetNbRows();
 		-- Alert("Testnbtour = "..Testnbtour);
@@ -1759,7 +1894,7 @@ end
 -- fonction qui renvoi si le count tour est actif ou pas 
 function RechercheCountTourActif(CodeTypeTable,tagID, LoopID, LoopCanal);
 	-- recherche du dossard par rapport au TagID ds la table tagID_Correspondance
-	cmd = "Select * From tagID_Passings Where Code = "..RaceResult_WebRestApi.code_competition..
+	cmd = "Select * From Evenement_tagID_Passings Where Code_evenement = "..RaceResult_WebRestApi.code_competition..
 												 " and AdresseIP = '"..ActiveID..
 												 "' and LoopID = '"..LoopID..
 												 "' and LoopCanal = '"..LoopCanal..
@@ -1774,29 +1909,29 @@ function AddNbTours(NbTours, tagID, ActiveID, LoopID, LoopCanal)
 	--  Alert("AddNbtours LoopID = "..ActiveID);
 	local cmd = 
 		"Update tagID_Finish SET Tour = "..NbTours..
-		" Where Code = "..RaceResult_WebRestApi.code_competition..
+		" Where Code_evenement = "..RaceResult_WebRestApi.code_competition..
 		" and AdresseIP = '"..ActiveID..
 		"' and LoopID = '"..LoopID..
 		"' and LoopCanal = '"..LoopCanal..
 		"' and TagID = '"..tagID..
 		"'"
 	RaceResult_WebRestApi.dbSki:Query(cmd);
-	Success("mise a jour du nb tour au tagID ="..tagID.. " dans la TabletagID_TourPena Donc :"..NbTours);
+	Success("mise a jour du nb tour au tagID ="..tagID.. " dans la TabletagID Donc :"..NbTours);
 end
 
 -- fonction qui insert un tour de pena dans la table tagid pena
 function InsertNbTour_Pena( ActiveID, LoopID, LoopCanal, bib, Num_Tir, NbTour_Fait)
 	 --Alert("Num_Tir = "..Num_Tir);	
  local r = TabletagID_TourPena:AddRow();				
-				TabletagID_TourPena:SetCell("Code", r, tonumber(RaceResult_WebRestApi.code_competition));
+				TabletagID_TourPena:SetCell("Code_evenement", r, tonumber(RaceResult_WebRestApi.code_competition));
 				TabletagID_TourPena:SetCell("AdresseIP", r, ActiveID);
 				TabletagID_TourPena:SetCell("LoopID", r, LoopID);
 				TabletagID_TourPena:SetCell("LoopCanal", r, LoopCanal);
 				TabletagID_TourPena:SetCell("Dossard", r, bib);
-				TabletagID_TourPena:SetCell("Tir1", r, tonumber(NbTour_Fait));	
-				TabletagID_TourPena:SetCell("Tir2", r, 0);
-				TabletagID_TourPena:SetCell("Tir3", r, 0);
-				TabletagID_TourPena:SetCell("Tir4", r, 0);
+				TabletagID_TourPena:SetCell("Tir"..Num_Tir, r, tonumber(NbTour_Fait));	
+				-- TabletagID_TourPena:SetCell("Tir2", r, 0);
+				-- TabletagID_TourPena:SetCell("Tir3", r, 0);
+				-- TabletagID_TourPena:SetCell("Tir4", r, 0);
 				TabletagID_TourPena:SetCell("Num_Tir", r, tonumber(Num_Tir));
 				RaceResult_WebRestApi.dbSki:TableInsert(TabletagID_TourPena, r);
 		Success("Ajout dos ="..bib.. " dans la TabletagID_TourPena");	
@@ -1810,7 +1945,7 @@ function AddNbTour_Pena( ActiveID, LoopID, LoopCanal, bib, Num_Tir, NbTour_Fait)
 	local cmd = 
 		"Update tagID_TourPena SET Tir"..Num_Tir.." = "..NbTour_Fait..
 		", Num_Tir = "..Num_Tir..
-		" Where Code = "..RaceResult_WebRestApi.code_competition..
+		" Where Code_evenement = "..RaceResult_WebRestApi.code_competition..
 		" and AdresseIP = '"..ActiveID..
 		"' and LoopID = '"..LoopID..
 		"' and LoopCanal = '"..LoopCanal..
@@ -1825,7 +1960,7 @@ end
 function AddTimesTagIDFinish(tagID, passage, LoopID, LoopCanal, Tour, bib)
 -- ecriture du TagID dans la table tagID_Finish
 				local r = TableTagID_Finish:AddRow();				
-				TableTagID_Finish:SetCell("Code", r, RaceResult_WebRestApi.code_competition);
+				TableTagID_Finish:SetCell("Code_evenement", r, RaceResult_WebRestApi.code_competition);
 				TableTagID_Finish:SetCell("AdresseIP", r, ActiveID);
 				TableTagID_Finish:SetCell("LoopID", r, LoopID);
 				TableTagID_Finish:SetCell("LoopCanal", r, LoopCanal);
@@ -1882,12 +2017,43 @@ function GetTempsNetInter(dossard, inter)
 	end
 end
 
+function GetNumTir(chrono, bib, passage)
+	heureDep = GetHeurePassage(bib, 0);
+	-- Alert("bib :"..bib);
+	-- HeureTehoriqueTour = tonumber(heureDep)+ tonumber(DelayDoubleDetect)
+	-- Alert("heureDep :"..heureDep);
+	-- Alert("chrono :"..chrono);
+	-- Alert("DelayDoubleDetect :"..tonumber(DelayDoubleDetect));
+	if tonumber(chrono) <= tonumber(heureDep) + tonumber(DelayDoubleDetect) then
+		return 1;
+	elseif tonumber(chrono) <= tonumber(heureDep) + tonumber(DelayDoubleDetect)*2 then
+		return 2;	
+	elseif tonumber(chrono) <= tonumber(heureDep) + tonumber(DelayDoubleDetect)*3 then
+		return 3;	
+	elseif tonumber(chrono) <= tonumber(heureDep) + tonumber(DelayDoubleDetect)*4 then
+		return 4;	
+	elseif tonumber(chrono) <= tonumber(heureDep) + tonumber(DelayDoubleDetect)*5 then
+		return 5;	
+	elseif tonumber(chrono) <= tonumber(heureDep) + tonumber(DelayDoubleDetect)*6 then
+		return 6;
+	elseif tonumber(chrono) <= tonumber(heureDep) + tonumber(DelayDoubleDetect)*7 then
+		return 7;	
+	elseif tonumber(chrono) <= tonumber(heureDep) + tonumber(DelayDoubleDetect)*8 then
+		return 8;	
+	elseif tonumber(chrono) <= tonumber(heureDep) + tonumber(DelayDoubleDetect)*8 then
+		return 9;	
+	else
+		return 10 ;
+	end
+	
+end
+
 -- fonction permetant d'aller chercher le nb de pena
 function GetPenaBiathlon(dossard, passage)
 	local dossard = 1;
 	local Num_Tir = 3;
 	local Code_coureur = GetCodecoureur(dossard);
-	Alert('GetPenaBiathlon Code_coureur = '..Code_coureur);
+	-- Alert('GetPenaBiathlon Code_coureur = '..Code_coureur);
 	local cmd =
 		" select * From Resultat_Manche where Code_evenement = "..RaceResult_WebRestApi.code_competition..
 		" And Code_coureur = '"..Code_coureur..
@@ -1936,7 +2102,7 @@ function GetCodecoureur(dossard)
 	
 	if tResultat == nil then return -1 end
 	if tResultat:GetNbRows() == 0 then return -1 end
-	Alert('GetCodecoureur = '..tResultat:GetCell('Code_coureur',0));
+	-- Alert('GetCodecoureur = '..tResultat:GetCell('Code_coureur',0));
 	-- Heure de passage existe ...	
 	return tResultat:GetCell('Code_coureur',0);
 end
@@ -1944,7 +2110,7 @@ end
 -- insert d'une ligne dans la table TabletagID_Tour
 function AddTabletagID_Tour(Code,AdresseIP,bibMini,bibMax,LoopID,LoopCanal,Tour)
 	local r = TabletagID_Tour:AddRow();
-		TabletagID_Tour:SetCell("Code", r, tonumber(Code));
+		TabletagID_Tour:SetCell("Code_evenement", r, tonumber(Code));
 		TabletagID_Tour:SetCell("AdresseIP", r, AdresseIP);
 		TabletagID_Tour:SetCell("bibMini", r, tonumber(bibMini));		
 		TabletagID_Tour:SetCell("bibMax", r, tonumber(bibMax));
@@ -1958,7 +2124,7 @@ end
 -- insert d'une ligne dans la table TabletagID_Passings
 function AddTabletagID_Passings(Code,AdresseIP,ActivePort,LoopID,LoopCanal,passage,ID_1er_Inter,Passings,TypeTable,DelayDoubleDetect,CountTourActif);			
 	local r = TabletagID_Passings:AddRow();				
-	TabletagID_Passings:SetCell("Code", r, tonumber(Code));
+	TabletagID_Passings:SetCell("Code_evenement", r, tonumber(Code));
 	TabletagID_Passings:SetCell("AdresseIP", r, ActiveID);
 	TabletagID_Passings:SetCell("Port", r, tonumber(ActivePort));
 	TabletagID_Passings:SetCell("LoopID", r, LoopID);
@@ -1977,13 +2143,13 @@ end
 function refreshTagIDFinish(tagID, passage, LoopID, LoopCanal)
 	local cmd = 
 			"update tagID_Finish SET Passage = '"..passage..
-		" 'Where Code = "..RaceResult_WebRestApi.code_competition..
-		" And AdresseIP = '"..ActiveID..
-		"' And LoopID = '"..LoopID..   
-		"' And LoopCanal = '"..LoopCanal.. 
-		"' And tagID = '"..tagID..
-		"' "
-		;
+			" 'Where Code_evenement = "..RaceResult_WebRestApi.code_competition..
+			" And AdresseIP = '"..ActiveID..
+			"' And LoopID = '"..LoopID..   
+			"' And LoopCanal = '"..LoopCanal.. 
+			"' And tagID = '"..tagID..
+			"' "
+			;
 	RaceResult_WebRestApi.dbSki:Query(cmd);
 	Success("Mise a jour du N° de passage :"..passage.." du TagID ="..tagID.. " dans la TableTagID_Finish");
 	
@@ -1993,7 +2159,7 @@ end
 -- fonction de sauvegarde de la grille option		
 function OnSaveOption(evt)
 
-	cmd = "Delete From tagID_Tour Where Code = "..RaceResult_WebRestApi.code_competition.." and AdresseIP = '"..ActiveID.."'";
+	cmd = "Delete From Evenement_tagID_Tour Where Code_evenement = "..RaceResult_WebRestApi.code_competition.." and AdresseIP = '"..ActiveID.."'";
 	RaceResult_WebRestApi.dbSki:Query(cmd);
 	local grid_Ligne = dlgOptionTable:GetWindowName('grid_Option');
 	
@@ -2001,7 +2167,7 @@ function OnSaveOption(evt)
 	--Alert("RaceresultWebServeur_option:GetNbRows() = "..Grid_Ligne:GetNbRows());
 	for i=0, Grid_Ligne:GetNbRows()-1 do
 			--enregistrement de la grid option dans la table TabletagID_Tour			
-			local Code = Grid_Ligne:GetCellInt('Code', i);
+			local Code = Grid_Ligne:GetCellInt('Code_evenement', i);
 			local AdresseIP = Grid_Ligne:GetCell('AdresseIP', i);
 			local bibMini = tonumber(Grid_Ligne:GetCell('bibMini', i));		
 			local bibMax = tonumber(Grid_Ligne:GetCell('bibMax', i));
@@ -2015,14 +2181,14 @@ function OnSaveOption(evt)
 	end
 		Alert("Sauvegarde des lignes ds tagID_Tour éffectuer correctement");
 	
-	cmd = "Delete From tagID_Passings Where Code = "..RaceResult_WebRestApi.code_competition.." and AdresseIP = '"..ActiveID.."'";
+	cmd = "Delete From Evenement_tagID_Passings Where Code_evenement = "..RaceResult_WebRestApi.code_competition.." and AdresseIP = '"..ActiveID.."'";
 	RaceResult_WebRestApi.dbSki:Query(cmd);
 	local grid_Param = dlgOptionTable:GetWindowName('grid_Param');
 	local Grid_Param = grid_Param:GetTable();
 	-- Alert("RaceresultWebServeur_option:GetNbRows() = "..Grid_Param:GetNbRows());
 	for i=0, Grid_Param:GetNbRows()-1 do
 			--enregistrement de la grid option dans la table TabletagID_Passings						
-		local Code = Grid_Param:GetCellInt('Code', i);
+		local Code = Grid_Param:GetCellInt('Code_evenement', i);
 		local AdresseIP = Grid_Param:GetCell('AdresseIP', i);
 		local Port = Grid_Param:GetCell('Port', i);		
 		local LoopID = Grid_Param:GetCell('LoopID', i);
@@ -2035,7 +2201,19 @@ function OnSaveOption(evt)
 		local CountTourActif = Grid_Param:GetCellInt('CountTourActif', i);
 		AddTabletagID_Passings(Code,AdresseIP,Port,LoopID,LoopCanal,passage,ID_1er_Inter,Passings,TypeTable,DelayDoubleDetect,CountTourActif);
 	end
-		Alert("Sauvegarde des lignes ds TabletagID_Passings éffectuer correctement");
+	Alert("Sauvegarde des lignes ds TabletagID_Passings éffectuée correctement");
+	
+	-- Mise à jour du numero de passage dans le caption de la boite de dialogue du device race result
+	passage = Grid_Param:GetCell('passage', 0);
+	local caption = "RaceResult Web_Rest-API / "..ActiveID..", Passage = "..passage.." And N° Files = "..RaceResultfile;
+
+	local mgr = app.GetAuiManager();
+	mgr:SetCaption('pane_raceresult', caption);
+	mgr:Update();
+	
+	-- local verif = mgr:GetCaption('pane_raceresult');
+	-- Alert('verif='..verif);
+	-- local num_inter = wnd.GetNumberFromUser('Choix Inter', 'Selection Choix Inter', 'Inter', 1, 1, 99, app.GetAuiFrame());
 end
 
 -- Insertion d'une Option
@@ -2095,14 +2273,15 @@ function OnOpenOptions(evt)
 	
 	function OnClosedlgOptionTable(evt)
 	dlgOptionTable:EndModal();
+	--device.OnClose();
+	--device.OnInit(theParams, node);
 	end
 	
-	
 -- Grid Options
-	cmd = "Select * From tagID_Tour Where Code = '"..RaceResult_WebRestApi.code_competition.."' and AdresseIP = '"..ActiveID.."' Order by bibMini";
+	cmd = "Select * From Evenement_tagID_Tour Where Code_evenement = '"..RaceResult_WebRestApi.code_competition.."' and AdresseIP = '"..ActiveID.."' Order by bibMini";
 	RaceResult_WebRestApi.dbSki:TableLoad(TabletagID_Tour, cmd)
 	
-	TabletagID_Tour:SetColumn('Code', { label = 'Code-Evt.', width = 9 });
+	TabletagID_Tour:SetColumn('Code_evenement', { label = 'Code-Evt.', width = 9 });
 	TabletagID_Tour:SetColumn('AdresseIP', { label = 'AdresseIP.', width = 12 });
 	TabletagID_Tour:SetColumn('bibMini', { label = 'bibMini.', width = 9 });
 	TabletagID_Tour:SetColumn('bibMax', { label = 'bibMax.', width = 9 });
@@ -2113,7 +2292,7 @@ function OnOpenOptions(evt)
 	local grid = dlgOptionTable:GetWindowName('grid_Option');
 	grid:Set({
 		table_base = TabletagID_Tour,
-		columns = 'Code, AdresseIP, bibMini, bibMax, LoopID, LoopCanal, Tour',
+		columns = 'Code_evenement, AdresseIP, bibMini, bibMax, LoopID, LoopCanal, Tour',
 		selection_mode = gridSelectionModes.CELLS,
 		sortable = false,
 		enable_editing = true
@@ -2129,10 +2308,10 @@ function OnOpenOptions(evt)
 	RaceresultWebServeur_option.tb:Realize();
 -- Grid Parametre
 
-	cmd = "Select * From tagID_Passings Where Code = '"..RaceResult_WebRestApi.code_competition.."' and AdresseIP = '"..ActiveID.."' Order by Code, LoopID, LoopCanal";
+	cmd = "Select * From Evenement_tagID_Passings Where Code_evenement = '"..RaceResult_WebRestApi.code_competition.."' and AdresseIP = '"..ActiveID.."' Order by Code_evenement, LoopID, LoopCanal";
 	RaceResult_WebRestApi.dbSki:TableLoad(TabletagID_Passings, cmd)
 	
-	TabletagID_Passings:SetColumn('Code', { label = 'Code-Evt.', width = 9 });
+	TabletagID_Passings:SetColumn('Code_evenement', { label = 'Code-Evt.', width = 9 });
 	TabletagID_Passings:SetColumn('AdresseIP', { label = 'AdresseIP.', width = 12 });
 	TabletagID_Passings:SetColumn('Port', { label = 'Port.', width = 9 });
 	TabletagID_Passings:SetColumn('LoopID', { label = 'LoopID.', width = 6 });
@@ -2147,7 +2326,7 @@ function OnOpenOptions(evt)
 	local grid = dlgOptionTable:GetWindowName('grid_Param');
 	grid:Set({
 		table_base = TabletagID_Passings,
-		columns = 'Code, AdresseIP, Port, LoopID, LoopCanal, passage, ID_1er_Inter, Passings, TypeTable, DelayDoubleDetect, CountTourActif, SystemeActif',
+		columns = 'Code_evenement, AdresseIP, Port, LoopID, LoopCanal, passage, ID_1er_Inter, Passings, TypeTable, DelayDoubleDetect, CountTourActif, SystemeActif',
 		selection_mode = gridSelectionModes.CELLS,
 		sortable = false,
 		enable_editing = true
@@ -2419,4 +2598,59 @@ function device.OnClose()
 
 end
 
--- end
+-- Recherche du Code_Epreuve du concurent
+function GetCodeEpreuve(bib)
+	-- 1) bibLoad.ranking => sqlTable avec tous les champs de la table Ranking des Editions
+	local rc, bibLoad = app.SendNotify("<bib_load>", { bib = bib });
+	if rc and type(bibLoad) == 'table' then
+		if bibLoad.ranking:GetNbRows() == 1 then
+			return bibLoad.ranking:GetCellInt('Code_epreuve', 0);
+		end
+	end
+	return -1;
+end
+
+-- Recherche de l'HeureDepart de l'épreuve
+function rechercheHeureDepartEpreuve(bib)
+	local CodeEpreuve = GetCodeEpreuve(bib);
+	if CodeEpreuve >= 0 then
+		local rc, raceInfo = app.SendNotify('<race_load>');
+		if rc == true then
+			local tEpreuve = raceInfo.tables.Epreuve;
+			-- Success("l\'HeureDepart de l\'épreuve "..tostring(tEpreuve:GetCell('Heure_depart', CodeEpreuve))..' ok ..');
+			for i=0, tEpreuve:GetNbRows()-1 do
+				if tEpreuve:GetCellInt('Code_epreuve', i) == CodeEpreuve then
+					return tEpreuve:GetCellInt('Heure_depart', i);
+				end
+			end
+			-- Alert(" bib = "..bib);
+			-- Alert(" CodeEpreuve = "..CodeEpreuve);
+			-- Alert("heureDepart de l epreuve "..tostring(tEpreuve:GetCell('Heure_depart', CodeEpreuve-1))..' ok ..');
+			-- return tEpreuve:GetCellInt('Heure_depart', CodeEpreuve-1);
+		end
+	end
+	return -1;
+end
+
+-- Recherche de l'Heure de passage du concurent
+function rechercheHeurePassageBib(bib, Passage)
+	-- 2) bibLoad.passage = sqlTable idem struture Resultat_Chrono
+	if tonumber(Passage) == -1 then
+		Passage = 'A';
+	elseif tonumber(Passage) == 0 then
+		Passage = 'D';
+	else
+		Passage = Passage;
+	end
+	
+	local rc, bibLoad = app.SendNotify("<bib_load>", { bib = bib });
+	if rc and type(bibLoad) == 'table' then
+		if bibLoad.passage:GetNbRows() >= 1 then
+			return bibLoad.passage:GetCellInt('Heure', Passage);
+		end
+	end
+
+	-- 3) bibLoad.bib pour Verif ... 
+		
+	return -1;
+end
