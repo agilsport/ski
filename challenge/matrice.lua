@@ -1994,6 +1994,10 @@ function Calculer(panel_name)		-- fonction de calcul du résultat du Challenge/Co
 	-- parcours de la table pour fixation des points
 	for idxcoureur = 0, tMatrice_Ranking:GetNbRows() -1 do
 		local code_coureur = tMatrice_Ranking:GetCell('Code_coureur', idxcoureur);
+		if matrice.texteComiteOrigine == 'Oui' and tMatrice_Ranking:GetCell('Comite', idxcoureur) == 'EQ' then
+			local comite = GetComiteOrigine(code_coureur);
+			tMatrice_Ranking:SetCell('Comite', idxcoureur, comite); 
+		end
 		tMatrice_Ranking:SetCell('Pts_inscription', idxcoureur, -1); 
 		tMatrice_Ranking:SetCell('Clt_inscription', idxcoureur, -1); 
 		tMatrice_Ranking:SetCell('Analyse_groupe', idxcoureur, 999);
@@ -2918,7 +2922,7 @@ function LitMatrice()	-- lecture des variables et affectation des valeurs dans l
 	matrice.texteMargeHaute2 = matrice.texteMargeHaute2 or 1;
 	matrice.texteNbColPresCourses = matrice.texteNbColPresCourses or GetValue ("texteNbColPresCourses", '3');
 	matrice.texteImageStatCourses = matrice.texteImageStatCourses or GetValue ("texteImageStatCourses", '')
-	
+	matrice.texteComiteOrigine = matrice.texteComiteOrigine or GetValue("texteComiteOrigine", 'Non')
 	BuildRegroupement();
 
 	matrice.scriptLUA = matrice.scriptLUA or GetValue("scriptLUA", "")
@@ -4854,6 +4858,8 @@ function OnSavedlgTexte()
 	AddRowEvenement_Matrice('texteImprimerStatCourses', matrice.texteImprimerStatCourses);
 	matrice.texteNbColPresCourses = dlgTexte:GetWindowName('texteNbColPresCourses'):GetValue();
 	AddRowEvenement_Matrice('texteNbColPresCourses', matrice.texteNbColPresCourses);
+	matrice.texteComiteOrigine = dlgTexte:GetWindowName('texteComiteOrigine'):GetValue();
+	AddRowEvenement_Matrice('texteComiteOrigine', matrice.texteComiteOrigine);
 	matrice.texteLigne2Texte = dlgTexte:GetWindowName('texteLigne2Texte'):GetValue();
 	AddRowEvenement_Matrice('texteLigne2Texte', matrice.texteLigne2Texte);
 	matrice.texteImageStatCourses = dlgTexte:GetWindowName('texteImageStatCourses'):GetValue();
@@ -4951,6 +4957,8 @@ function AffichedlgTexte()		-- boîte de dialogue pour le choix des textes à impr
 	dlgTexte:GetWindowName('texteNbColPresCourses'):Append('4');
 	dlgTexte:GetWindowName('texteNbColPresCourses'):Append('5');
 	dlgTexte:GetWindowName('texteNbColPresCourses'):SetValue(matrice.texteNbColPresCourses);
+	dlgTexte:GetWindowName('texteComiteOrigine'):SetTable(tOuiNon, 'Choix', 'Choix');
+	dlgTexte:GetWindowName('texteComiteOrigine'):SetValue(matrice.texteComiteOrigine);
 
 	dlgTexte:GetWindowName('texteFontSize'):SetValue(matrice.texteFontSize);
 	dlgTexte:GetWindowName('texteImprimerLayer'):Clear();
@@ -4964,7 +4972,6 @@ function AffichedlgTexte()		-- boîte de dialogue pour le choix des textes à impr
 	dlgTexte:GetWindowName('texteLigne2Texte'):SetValue(matrice.texteLigne2Texte);
 	dlgTexte:GetWindowName('texteImageStatCourses'):SetValue(matrice.texteImageStatCourses);
 	
-
 	for i = 1, #matrice.layers do
 		dlgTexte:GetWindowName('texteImprimerLayer'):Append(matrice.layers[i]);
 	end
@@ -5680,7 +5687,7 @@ function BuildTableRanking()
 	tMatrice_Ranking:AddColumn({ name = 'Prenom', label = 'Prenom', type = sqlType.CHAR, width = '30', style = sqlStyle.NULL});
  	tMatrice_Ranking:AddColumn({ name = 'Identite', label = 'Identite', type = sqlType.CHAR, width = '61', style = sqlStyle.NULL});
  	tMatrice_Ranking:AddColumn({ name = 'Sexe', label = 'Sexe', type = sqlType.CHAR, width = '1', style = sqlStyle.NULL});
-    tMatrice_Ranking:AddColumn({ name = 'An', label = 'An', type = sqlType.LONG, style = sqlStyle.NULL});
+      tMatrice_Ranking:AddColumn({ name = 'An', label = 'An', type = sqlType.LONG, style = sqlStyle.NULL});
 	tMatrice_Ranking:AddColumn({ name = 'Categ', label = 'Categ', type = sqlType.CHAR, width = '8', style = sqlStyle.NULL});
 	tMatrice_Ranking:AddColumn({ name = 'Nation', label = 'Nation', type = sqlType.CHAR, width = '3', style = sqlStyle.NULL});
 	tMatrice_Ranking:AddColumn({ name = 'Comite', label = 'Comite', type = sqlType.CHAR, width = '3', style = sqlStyle.NULL});
@@ -7214,6 +7221,7 @@ function OnSavedlgConfiguration()	-- sauvegarde des paramètres de la matrice.
 			matrice.texteLargeurEtroite = '0,8';
 			matrice.texteNbColPresCourses = '4';
 			matrice.texteLigne2Texte = 'Nombre de courses :';
+			matrice.texteComiteOrigine = 'Non';
 		end
 	end
 	matrice.Titre = dlgConfiguration:GetWindowName('Titre'):GetValue();
@@ -7354,6 +7362,7 @@ function OnSavedlgConfiguration()	-- sauvegarde des paramètres de la matrice.
 	AddRowEvenement_Matrice('texteImprimerDeparts', matrice.texteImprimerDeparts);
 	AddRowEvenement_Matrice('texteImprimerStatCourses', matrice.texteImprimerStatCourses);
 	AddRowEvenement_Matrice('texteNbColPresCourses', matrice.texteNbColPresCourses);
+	AddRowEvenement_Matrice('texteComiteOrigine', matrice.texteComiteOrigine);
 	AddRowEvenement_Matrice('texteLigne2Texte', matrice.texteLigne2Texte);
 
 	matrice.ErreurMessage = 'Veuillez renseigner les données manquantes : ';
@@ -7578,7 +7587,7 @@ function OnConfiguration(cparams)
 	else
 		return false;
 	end
-	matrice.version_script = '5.7';
+	matrice.version_script = '5.8';
 	matrice.OS = app.GetOsDescription();
 	-- vérification de l'existence d'une version plus récente du script.
 	local url = 'https://live.ffs.fr/maj_pg/challenge/last_version.txt'

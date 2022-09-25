@@ -4,10 +4,9 @@
 	<menu>
 		<menu title="Listes des Participants" image="./res/32x32_juges.png">
 			<menu title="Par Ordre-Alphabétique" image="./res/16x16_juges.png" id="parti_alpha"/>
-			<menu title="Par Club" image="./res/16x16_juges.png" rupture="Club" id="parti_factorise"/>
-			<menu title="Par Comité" image="./res/16x16_juges.png" label="Comité" rupture="Comite" id="parti_factorise"/>
-			<menu title="Par Nation" image="./res/16x16_juges.png" rupture="Nation" id="parti_factorise"/>
-			<menu title="Par Nation sans saut de pages" image="./res/16x16_juges.png" rupture="Nation" page="0" id="parti_factorise"/>
+			<menu title="Par Club" image="./res/16x16_juges.png" orderby="Club, Sexe, Identite"  rupture="Club" id="parti_factorise"/>
+			<menu title="Par Comité" image="./res/16x16_juges.png" label="Comité" orderby="Comite, Sexe, Identite" rupture="Comite" id="parti_factorise"/>
+			<menu title="Par Nation" image="./res/16x16_juges.png" rupture="Nation" orderby="Nation, Sexe, Identite" id="parti_factorise"/>
 			<menu title="Par Points" image="./res/16x16_juges.png" id="parti_point"/>
 			<menu title="Edition des tickets courses " image="./res/16x16_text.png" lua="./edition/TicketsCourse.lua"  />
 			<menu title="Etiquettes avec Drapeaux des Pays par ordre de points" ecsl="1" orderby="Point, Identite" image="./res/16x16_juges.png" id="parti_etiquette_factorise"/>
@@ -26,7 +25,7 @@
 		<menu title="Résultats" image="./res/32x32_ranking.png">
 			<menu title="D'une Manche" image="./res/16x16_ranking.png" id="res_manche" choix_manche="1"/>
 			<menu title="Résultats Officieux" image="./res/16x16_ranking.png" id="res_officiel" officiel="0"/>
-			<menu title="Calcul de la Pénalité" image="./res/16x16_calc.png" language="en" action="penalite" />
+			<!-- <menu title="Calcul de la Pénalité" image="./res/16x16_calc.png" language="en" action="penalite" /> -->
 			<menu title="Résultats Officiels" image="./res/16x16_official.png" id="res_officiel" officiel="1"/>
 			<menu title="Résultats Par Catégories (filtrage des coureurs apres le calcul des points)" filter="after" image="./res/16x16_ranking.png" id="res_categ" choix_clt_max="1"/>
 			<menu title="Meilleurs Temps" image="./res/16x16_ranking.png" id="res_best" />
@@ -112,14 +111,14 @@
 		<row value="0.05cm" />"
 	
 		<row value="auto" />
-		<text col_start="1" align="left">base:GetOfficielAttribute('TechnicalDelegate', 'label'):upper()..' '..entite</text>
+		<text col_start="1" align="left">base:GetOfficielAttribute('TechnicalDelegate', 'label'):MakeUpper()..' '..entite</text>
 		<text col_start="2" align="left">base:GetOfficiel('TechnicalDelegate', 'Nom')..' '..base:GetOfficiel('TechnicalDelegate', 'Prenom')</text>
 		<text col_start="3" align="right" >base:GetOfficiel('TechnicalDelegate', 'Nation'):Parenthesis()</text>
 		<text col_start="5" col_end="0" align="left" >'PISTE'</text>
 		<text col_start="5" col_end="0" align="right" >$(Pistes.Nom_piste)</text>
 		
 		<row value="auto" />
-		<text col_start="1" align="left">base:GetOfficielAttribute('Referee', 'label'):upper()</text>
+		<text col_start="1" align="left">base:GetOfficielAttribute('Referee', 'label'):MakeUpper()</text>
 		<text col_start="2" align="left">base:GetOfficiel('Referee', 'Nom')..' '..base:GetOfficiel('Referee', 'Prenom')</text>
 		<text col_start="3" align="right">base:GetOfficiel('Referee', 'Nation'):Parenthesis()</text>
 		<text col_start="5" col_end="0" align="left" >'DEPART'</text>
@@ -127,7 +126,7 @@
 
 		<row value="auto" />
 		<lua>if base:GetOfficiel('AssistantReferee', 'Nom'):len() &gt; 0 then</lua>
-			<text col_start="1" align="left">base:GetOfficielAttribute('AssistantReferee', 'label'):upper() </text>
+			<text col_start="1" align="left">base:GetOfficielAttribute('AssistantReferee', 'label'):MakeUpper() </text>
 			<text col_start="2" align="left">base:GetOfficiel('AssistantReferee', 'Nom')..' '..base:GetOfficiel('AssistantReferee', 'Prenom')</text>
 			<text col_start="3" align="right">base:GetOfficiel('AssistantReferee', 'Nation'):Parenthesis()</text>
 		<lua>end</lua>
@@ -135,7 +134,7 @@
 		<text col_start="5" col_end="0" align="right" >$(Epreuve_Alpine_Manche.Altitude_Arrivee):Suffix(' m')</text>
 
 		<row value="auto" />
-		<text col_start="1" align="left">base:GetOfficielAttribute('ChiefRace', 'label'):upper()</text>
+		<text col_start="1" align="left">base:GetOfficielAttribute('ChiefRace', 'label'):MakeUpper()</text>
 		<text col_start="2" align="left">base:GetOfficiel('ChiefRace', 'Nom')..' '..base:GetOfficiel('ChiefRace', 'Prenom')</text>
 		<text col_start="3" align="right">base:GetOfficiel('ChiefRace', 'Nation'):Parenthesis()</text>
 		<text col_start="5" col_end="0" align="left" >'DENIVELEE'</text>
@@ -148,7 +147,7 @@
 		<text col_start="5" col_end="0" align="right" >$(Epreuve_Alpine_Manche.Longueur):Suffix(' m')</text>
 		
 		<row value="auto" />
-		<text col_start="1" align="left" cond="base:GetTable('Epreuve'):GetCell('Code_niveau',0) ~= 'EC'">base:GetOfficielAttribute('StartReferee', 'label'):upper()</text>
+		<text col_start="1" align="left" cond="base:GetTable('Epreuve'):GetCell('Code_niveau',0) ~= 'EC'">base:GetOfficielAttribute('StartReferee', 'label'):MakeUpper()</text>
 		<text col_start="2" align="left" cond="base:GetTable('Epreuve'):GetCell('Code_niveau',0) ~= 'EC'">base:GetOfficiel('StartReferee', 'Nom')..' '..base:GetOfficiel('StartReferee', 'Prenom')</text>
 		<text col_start="3" align="right" cond="base:GetTable('Epreuve'):GetCell('Code_niveau',0) ~= 'EC'">base:GetOfficiel('StartReferee', 'Nation'):Parenthesis()</text>
 		<text col_start="5" col_end="0" align="left" >'HOMOLOGATION PISTE'</text>
@@ -156,14 +155,14 @@
 		<text col_start="6" col_end="0" align="right" cond="entite=='FFS'">$(Pistes.Homologation_ffs)</text>
 
 		<row value="auto" />
-		<text col_start="1" align="left" cond="base:GetTable('Epreuve'):GetCell('Code_niveau',0) ~= 'EC'">base:GetOfficielAttribute('FinishReferee', 'label'):upper()</text>
+		<text col_start="1" align="left" cond="base:GetTable('Epreuve'):GetCell('Code_niveau',0) ~= 'EC'">base:GetOfficielAttribute('FinishReferee', 'label'):MakeUpper()</text>
 		<text col_start="2" align="left" cond="base:GetTable('Epreuve'):GetCell('Code_niveau',0) ~= 'EC'">base:GetOfficiel('FinishReferee', 'Nom')..' '..base:GetOfficiel('FinishReferee', 'Prenom')</text>
 		<text col_start="3" align="right" cond="base:GetTable('Epreuve'):GetCell('Code_niveau',0) ~= 'EC'">base:GetOfficiel('FinishReferee', 'Nation'):Parenthesis()</text>
 		<text col_start="5" col_end="0" align="left" >'HOMOLOGATION CHRONO'</text>
 		<text col_start="6" col_end="0" align="right">$(Epreuve_Alpine.Homologation_chrono)</text>
 
 		<row value="auto" />
-		<text col_start="1" align="left" cond="base:GetTable('Epreuve'):GetCell('Code_niveau',0) ~= 'EC'">base:GetOfficielAttribute('TimingBy', 'label'):upper()</text>
+		<text col_start="1" align="left" cond="base:GetTable('Epreuve'):GetCell('Code_niveau',0) ~= 'EC'">base:GetOfficielAttribute('TimingBy', 'label'):MakeUpper()</text>
 		<text col_start="2" align="left" cond="base:GetTable('Epreuve'):GetCell('Code_niveau',0) ~= 'EC'">base:GetOfficiel('TimingBy', 'Nom')..' '..base:GetOfficiel('TimingBy', 'Prenom')</text>
 		<text col_start="3" align="right" cond="base:GetTable('Epreuve'):GetCell('Code_niveau',0) ~= 'EC'">base:GetOfficiel('TimingBy', 'Nation'):Parenthesis()</text>
 		<line col_start="4" row_start="2" row_end="0" pen_color="dkgray" border="mid_vert" />	
@@ -403,7 +402,7 @@
 			nb_etrangers = 0;
 			comite = {};
 			bolAjouter = false;
-
+			orderby = params.orderby or rupture;
 		</lua>
 		<call option="comite_origine" file="./edition/options.xml" />
 		<order key="(orderby)" />
@@ -552,7 +551,7 @@
 			<text col="4" align="center" label="Dos" font_weight="bold" font_size_step="1">$(Dossard)</text>
 			<text col="7" align="center" label="Code"><font size="8" cond="group =='body'"/>$(Code_coureur):sub(4)</text>
 			<text col="20" align="left" label="Nom - Prénom" font_weight="bold" font_size_step="1">$(Identite)</text> 
-			<text col="4" align="center" label="Gr." cond="body:GetCellInt('Reserve'..manche, row) &gt; 0">body:GetCellInt('Reserve'..manche, row)</text>
+			<text col="4" align="center" label="Gr." cond="$(Reserve):len() &gt; 0">$(Reserve)</text>
 			<text col="2" align="center" label="S.">$(Sexe)</text>
 			<text col="4" align="center" label="An">$(An)</text>
 			<text col="5" align="center" label="Cat.">$(Categ)</text>
@@ -562,7 +561,8 @@
 			<text col="7" align="center" label="Point">$(Point)</text>
 			<lua>if manche == 2 then</lua>
 				<text col="7" align="center" label="Tps.M1" font_weight="bold">$(Tps1)</text>
-				<text col="5" align="center" label="Ec.M1">$(Diff1)</text>
+				<text col="5" align="center" cond="$(Diff1):sub(1,1) == '+'" label="Ec.M1">$(Diff1)</text>
+				<text col="5" align="center" cond="$(Diff1):sub(1,1) ~= '+'" label="Ec.M1">''</text>
 				<text col="4" align="center" label="C.M1" font_weight="bold">$(Clt1)</text>
 			<lua>end</lua>
 			
