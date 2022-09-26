@@ -974,40 +974,52 @@ function CommandSendList()
 	nodeStartlist:AddAttribute("phase", 'D');
 	draw.statut_CF = true;
 	for i = 0, tDraw:GetNbRows()-1 do
+		local racer_info = '';
 		local nom = tDraw:GetCell('Nom', i);
 		local prenom = tDraw:GetCell('Prenom', i);
 		local nation = tDraw:GetCell('Nation', i);
 		if tDraw:GetCell('Statut', i) == 'UF' then
 			draw.statut_CF = false;
 		end
+		local pointsinfo = '';
 		local code = tDraw:GetCell('Code_coureur', i):sub(4);
 		local rang_tirage = tDraw:GetCellInt('Rang_tirage', i);
 		if rang_tirage > 0 then
 			if draw.RangEgal[rang_tirage].Nombre > 1 then
-				prenom = prenom..' '.. string.rep('=',10);
+				pointsinfo = '=';
+				racer_info = '==';
 			end
 		end
 		local wcsl_points = tDraw:GetCell('WCSL_points', i);
+		if wcsl_points:len() > 0 then
+			racer_info = '<= 30';
+		end
 		local wcsl_rank = tDraw:GetCell('WCSL_rank', i);
 		local ecsl_points = tDraw:GetCell('ECSL_points', i);
 		local ecsl_rank = tDraw:GetCell('ECSL_rank', i);
 		local ecsl_overall_points = tDraw:GetCell('ECSL_overall_points', i);
+		if ecsl_overall_points:len() > 0 then
+			pointsinfo = '>';
+			racer_info = '>= 450';
+		end
 		local ecsl_overall_rank = tDraw:GetCell('ECSL_overall_rank', i);
 		local winner_points = tDraw:GetCell('Winner_CC', i);
 		local winner_rank = '';
 		if winner_points:len() > 0 then
 			winner_points = "1";
 			winner_rank = 1;
-		end
-		local fis_pts = string.format(tDraw:GetCellDouble('FIS_pts', i, -1), '%.2f');
-		local fis_clt = tDraw:GetCellInt('FIS_clt', i, -1);
-		local bolExaequo = false;
-		if tLastECSL_30.ECSL_points then
-			if tDraw:GetCellInt('ECSL_points', i) == tLastECSL_30.ECSL_points and fis_pts == tLastECSL_30.FIS_pts then
-				bolExaequo = true;
+			if rang_tirage > 30 then
+				racer_info = 'COC';
 			end
-			if bolExaequo == true then
-				prenom = prenom..' '.. string.rep('=',10);
+		end
+		local fis_pts = tDraw:GetCellDouble('FIS_pts', i, -1);
+		local fis_clt = tDraw:GetCellInt('FIS_clt', i, -1);
+		if tLastECSL_30.ECSL_points > 0 then
+			if tDraw:GetCellInt('ECSL_points', i) == tLastECSL_30.ECSL_points and fis_pts == tLastECSL_30.FIS_pts then
+				if rang_tirage ~= 30 then
+					pointsinfo = '=';
+					racer_info = '==';
+				end
 			end
 		end
 		if fis_pts < 0 then fis_pts = ''; end
@@ -1016,22 +1028,24 @@ function CommandSendList()
 		local tStandings = {};
 		local tData = {};
 		if draw.bolEstCE then
-			table.insert(tData, {rank = ecsl_rank, points = ecsl_points, event = draw.discipline, category = 'ECSL'});
-			table.insert(tData, {rank = ecsl_overall_rank, points = ecsl_overall_points, event = '', category = 'EC OA 450+'});
-			table.insert(tData, {rank = wcsl_rank, points = wcsl_points, event = draw.discipline, category = 'WCSL Top 30'});
-			table.insert(tData, {rank = winner_rank, points = winner_points, event = draw.discipline, category = 'COC WINNER'});
-			table.insert(tData, {rank = fis_clt, points = fis_pts, event = draw.discipline, category = 'FIS pts'});
+			table.insert(tData, {rank = ecsl_rank, points = ecsl_points, event = draw.discipline, category = 'ECSL', pointsinfo = pointsinfo});
+			table.insert(tData, {rank = ecsl_overall_rank, points = ecsl_overall_points, event = '', category = 'EC OA 450+', pointsinfo = pointsinfo});
+			table.insert(tData, {rank = wcsl_rank, points = wcsl_points, event = draw.discipline, category = 'WCSL Top 30', pointsinfo = pointsinfo});
+			table.insert(tData, {rank = winner_rank, points = winner_points, event = draw.discipline, category = 'COC WINNER', pointsinfo = pointsinfo});
+			table.insert(tData, {rank = fis_clt, points = fis_pts, event = draw.discipline, category = 'FIS pts', pointsinfo = pointsinfo});
 		else
 			table.insert(tData, {rank = fis_clt, points = fis_pts, event = draw.discipline, category = 'FIS pts'});
 		end
 		local tCoureur = {standings = tData};
 		local jsontxt = table.ToStringJSON(tCoureur, false);
+		jsontxt = string.sub(jsontxt, 2);
+		jsontxt = '{"racerinfo":"'..racer_info..'",'..jsontxt;
 		local nodeRacer = xmlNode.Create(nodeStartlist, xmlNodeType.ELEMENT_NODE, "racer");
 		local nodeLastname = xmlNode.Create(nodeRacer, xmlType.ELEMENT_NODE, "lastname", nom);
 		local nodeFirstname = xmlNode.Create(nodeRacer, xmlType.ELEMENT_NODE, "firstname", prenom);
 		local nodeNation = xmlNode.Create(nodeRacer, xmlType.ELEMENT_NODE, "nat", nation);
 		local nodeFiscode = xmlNode.Create(nodeRacer, xmlType.ELEMENT_NODE, "fiscode", code);
-		local noderacerinfoJSON = xmlNode.Create(nodeRacer, xmlType.ELEMENT_NODE, "racerinfoJSON");	
+		local noderacerinfoJSON = xmlNode.Create(nodeRacer, xmlType.ELEMENT_NODE, "racerinfoJSON");
 		xmlNode.Create(noderacerinfoJSON, xmlType.CDATA_SECTION_NODE,'', jsontxt);
 	end
 	nodeRoot = xmlNode.Create(nil, xmlType.ELEMENT_NODE, "livetiming");
@@ -1174,7 +1188,7 @@ function CommandRaceInfo()
 	xmlNode.Create(nodeRacedef, xmlType.ELEMENT_NODE, "drawgroup", '');	
 	xmlNode.Create(nodeRacedef, xmlType.ELEMENT_NODE, "drawstatus", '');	
 	xmlNode.Create(nodeRacedef, xmlType.ELEMENT_NODE, "drawbib", '');	
-	local tInfo = {legend = {abbreviation = {{description = 'ECSL', title = 'ECSL'}, {description = '450 Cup Points', title = '400-200'}, {description = 'WCSL top 30', title = 'Top 30'}, {description = 'Ranked by FIS points', title = 'FIS Points'}}}};
+	local tInfo = {legend = {abbreviation = {{description = 'ECSL points in '..draw.discipline, title = 'ECSL'}, {description = 'At least 450 Cup points overall', title = 'EC OA 450+'}, {description = 'Winner of COC in '..draw.discipline, title = 'COC WINNER'}, {description = 'Within the top 30 of the WCSL in '..draw.discipline, title = 'WCSL TOP 30'}, {description = 'Ranked by '..draw.discipline..' FIS points', title = 'FIS Points'}}}};
 	if draw.bolEstCE == false then
 		tInfo = {legend = {abbreviation = {{description = 'Ranked by FIS points', title = 'FIS Points'}}}};
 	end
@@ -2307,35 +2321,50 @@ Groupe 6 On poursuit selon les points FIS.
 			draw.rang_tirage = draw.rang_tirage + 1;
 		end
 	end
-	nb_exaequo = 0;
 	-- on continue avec les ECSL pts (tDrawG5) interrompu par les winners en 31 ème place
 	-- draw.rang_tirage = tDrawG1:GetNbRows() + tDrawG2:GetNbRows() + tDrawG3:GetNbRows() +1;
 	tDrawG4:OrderBy('ECSL_points DESC, FIS_pts');				-- les winners de CC triés par leurs points ECSL et les points FIS
 	tDrawG5:OrderBy('ECSL_points DESC, FIS_pts');				-- les 30 ECSL
 	-- adv.Alert('on a pris '..draw.nb_pris_ecsl..' sur les 30 à prendre, tDrawG4:GetNbRows() = '..tDrawG4:GetNbRows());
 	-- le premier winner sera toujours au rang 30
+	local nb_exaequo = 0;
 	if tDrawG5:GetNbRows() > 0 then
 		local rtDraw = -1;
 		current_group = current_group + 1;
 		tLastECSL_30.groupe_tirage = current_group;
-		local ecsl_pts_next = -2;
-		local fis_pts_next = -2;
+		local ecsl_pts_encours = -2;
+		local fis_pts_encours = -2;
 		for i = 0, tDrawG5:GetNbRows() -1 do		-- on prendra jusqu'à draw.nb_pris_ecsl = 30 étendu si exaequo à la 30 place
-			local ecsl_pts = tDrawG1:GetCellInt('ECSL_points', i);
-			local fis_pts = tDrawG1:GetCellDouble('FIS_pts', i);
 			local code_coureur = tDrawG5:GetCell('Code_coureur', i);
-			if i < tDrawG5:GetNbRows() -1 then
-				ecsl_pts_next = tDrawG5:GetCellInt('ECSL_points', i+1);
-				fis_pts_next = tDrawG5:GetCellDouble('FIS_pts', i+1);
-				if ecsl_pts == ecsl_pts_next and fis_pts == fis_pts_next then
-					nb_exaequo = nb_exaequo + 1;
-				end
+			local ecsl_pts = tDrawG5:GetCellInt('ECSL_points', i);
+			local fis_pts = tDrawG5:GetCellDouble('FIS_pts', i);
+			if ecsl_pts == ecsl_pts_encours and fis_pts == fis_pts_encours then
+				nb_exaequo = nb_exaequo + 1;
+			else
+				ecsl_pts_encours = ecsl_pts;
+				fis_pts_encours = fis_pts;
+				draw.rang_tirage = draw.rang_tirage + 1 + nb_exaequo;
+				nb_exaequo = 0;
 			end
-			draw.rang_tirage = draw.rang_tirage + 1 + nb_exaequo;
+			
+			-- if i < tDrawG5:GetNbRows() -1 then
+				-- ecsl_pts_encours = tDrawG5:GetCellInt('ECSL_points', i+1);
+				-- fis_pts_next = tDrawG5:GetCellDouble('FIS_pts', i+1);
+				-- if ecsl_pts == ecsl_pts_next and fis_pts == fis_pts_next then
+					-- if nb_exaequo == 0 then
+						-- draw.rang_tirage = draw.rang_tirage + 1;
+					-- end
+					-- nb_exaequo = nb_exaequo + 1;
+				-- else
+					-- draw.rang_tirage = draw.rang_tirage + 1 + nb_exaequo;
+					-- nb_exaequo = 0;
+				-- end
+			-- else
+				-- draw.rang_tirage = draw.rang_tirage + 1 + nb_exaequo;
+			-- end
 			rtDraw = tDraw:GetIndexRow('Code_coureur', code_coureur);
 			tDraw:SetCell('ECSL_30', rtDraw, 5);
 			draw.nb_pris_ecsl = draw.nb_pris_ecsl + 1;
-			-- adv.Alert('i = '..i..', on traite '..tDrawG5:GetCell('Nom', i)..' dans tDrawG5, draw.rang_tirage = '..draw.rang_tirage);
 			local rtDrawG6 = tDrawG6:GetIndexRow('Code_coureur', code_coureur);
 			if rtDrawG6 >= 0 then		-- on trouve le coureur
 				tDrawG6:RemoveRowAt(rtDrawG6);
@@ -3433,7 +3462,7 @@ function main(params_c)
 	draw.height = display:GetSize().height - 30;
 	draw.x = 0;
 	draw.y = 0;
-	draw.version = "4.53"; -- 4.1 pour 2022-2023
+	draw.version = "4.6"; -- 4.1 pour 2022-2023
 	draw.hostname = 'live.fisski.com';
 	draw.method = 'socket';
 	draw.ajouter_code = '';
