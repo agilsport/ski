@@ -60,4 +60,22 @@
       </image>
     </matrix>
   </layer>
+  <layer id="FIS-PM">
+    <matrix>
+      <row value="1cm, 1.5cm"/>
+      <col value="1cm, 1.5cm"/>
+      <image adjust="best">'./res/logo_fis.jpg'
+        <background mode="transparent"/>
+      </image>
+    </matrix>
+  </layer>
+ <layer id="FIS-GM">
+    <matrix>
+      <row value="1cm, 2.5cm"/>
+      <col value="1cm, 2.5cm"/>
+      <image adjust="best">'./res/logo_fis.jpg'
+        <background mode="transparent"/>
+      </image>
+    </matrix>
+  </layer>
 </layers>

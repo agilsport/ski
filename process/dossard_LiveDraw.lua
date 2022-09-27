@@ -421,9 +421,6 @@ function OnDecodeJson(groupe)
 end
 
 function OnPrintDoubleTirage(groupe)
-	if report then
-		report = nil;
-	end
 	if draw.print_alone then
 		params.tableDossards1, params.tableDossards2 = OnDecodeJsonBibo(draw.code_evenement, groupe);
 	else
@@ -447,9 +444,8 @@ function OnPrintDoubleTirage(groupe)
 			margin_left = 100, 
 			margin_right = 100,
 			margin_bottom = 100,
-			layers = {file = './edition/layer.xml', id = 'ffs-fis', page = '*'}, 
 			paper_orientation = 'portrait',
-			params = {Nom = params.evenementNom, tableDossards1 = params.tableDossards1, tableDossards2 = params.tableDossards2, Draw = 1, Version = draw.version, NbGroupe1 = 0}
+			params = {Nom = params.evenementNom, tableDossards1 = params.tableDossards1, tableDossards2 = params.tableDossards2, Draw = 1, Version = draw.version, NbGroupe1 = 0, Entite = draw.code_entite }
 		});
 	else
 		if not report then
@@ -459,6 +455,7 @@ function OnPrintDoubleTirage(groupe)
 				node_attr = 'id',
 				node_value = 'print',
 				title = 'Edition du tirage au sort du BIBO (2 pages)',
+				-- layers = {file = './edition/layer.xml', id = 'FIS-PM'}, 
 				base = base,
 				margin_first_top = 150,
 				margin_first_left = 100,
@@ -468,9 +465,8 @@ function OnPrintDoubleTirage(groupe)
 				margin_left = 100, 
 				margin_right = 100,
 				margin_bottom = 100,
-				layers = {file = './edition/layer.xml', id = 'ffs-fis', page = '*'}, 
 				paper_orientation = 'portrait',
-				params = {Nom = params.evenementNom, tableDossards1 = params.tableDossards1, tableDossards2 = params.tableDossards2, Draw = 1, Version = draw.version, NbGroupe1 = 0}
+				params = {Nom = params.evenementNom, tableDossards1 = params.tableDossards1, tableDossards2 = params.tableDossards2, Draw = 1, Version = draw.version, NbGroupe1 = 0, Entite = draw.code_entite}
 			});
 		end
 		local editor = report:GetEditor();
@@ -482,6 +478,7 @@ function OnPrintDoubleTirage(groupe)
 			node_value = 'print',
 			title = 'Edition du tirage au sort du BIBO (2 pages)',
 			report = report,
+			-- layers = {file = './edition/layer.xml', id = 'FIS-GM'}, 
 			base = base,
 			margin_first_top = 150,
 			margin_first_left = 100,
@@ -491,9 +488,8 @@ function OnPrintDoubleTirage(groupe)
 			margin_left = 100, 
 			margin_right = 100,
 			margin_bottom = 100,
-			layers = {file = './edition/layer.xml', id = 'ffs-fis', page = '*'}, 
 			paper_orientation = 'portrait',
-			params = {Nom = params.evenementNom, tableDossards1 = params.tableDossards1, tableDossards2 = params.tableDossards2, Draw = 2, Version = draw.version, NbGroupe1 = params.nb_groupe1}
+			params = {Nom = params.evenementNom, tableDossards1 = params.tableDossards1, tableDossards2 = params.tableDossards2, Draw = 2, Version = draw.version, NbGroupe1 = params.nb_groupe1, Entite = draw.code_entite}
 		});
 	end
 end
@@ -643,7 +639,6 @@ function OnPrintBibo(groupe)
 		title = "Racers' Board - Bib Drawing",
 		base = base,
 		body = tDraw_Copy,
-		layers = {file = './edition/layer.xml', id = 'ffs-fis'}, 
 		margin_first_top = 80,
 		margin_first_left = 80,
 		margin_first_right = 80,
@@ -1036,10 +1031,8 @@ function CommandSendList()
 		else
 			table.insert(tData, {rank = fis_clt, points = fis_pts, event = draw.discipline, category = 'FIS pts'});
 		end
-		local tCoureur = {standings = tData};
+		local tCoureur = {standings = tData, racerinfo = tostring(racer_info)};
 		local jsontxt = table.ToStringJSON(tCoureur, false);
-		jsontxt = string.sub(jsontxt, 2);
-		jsontxt = '{"racerinfo":"'..racer_info..'",'..jsontxt;
 		local nodeRacer = xmlNode.Create(nodeStartlist, xmlNodeType.ELEMENT_NODE, "racer");
 		local nodeLastname = xmlNode.Create(nodeRacer, xmlType.ELEMENT_NODE, "lastname", nom);
 		local nodeFirstname = xmlNode.Create(nodeRacer, xmlType.ELEMENT_NODE, "firstname", prenom);
@@ -1903,6 +1896,7 @@ function SetuptDraw()
 		tDraw:OrderBy('Rang_tirage');
 		return;
 	end
+	base:Query('Delete From Resultat_Info_Bibo Where Code_evenement = '..draw.code_evenement);
 	tLastECSL_30 = tLastECSL_30 or {};
 	local cmd = "Update Resultat Set Dossard = Null Where Code_evenement = "..draw.code_evenement;
 	base:Query(cmd);
@@ -2255,7 +2249,7 @@ Groupe 6 On poursuit selon les points FIS.
 	end
 	nb_exaequo = 0;
 	
-	tDrawG2:OrderBy('ECSL_overall_points DESC, FIS_pts');				-- les + de 450 pts
+	tDrawG2:OrderBy('ECSL_overall_points DESC, ECSL_points DESC, FIS_pts');				-- les + de 450 pts
 	if tDrawG2:GetNbRows() > 0 then
 		current_group = current_group + 1;
 		local pts_overall_next  = nil;
@@ -2347,21 +2341,6 @@ Groupe 6 On poursuit selon les points FIS.
 				nb_exaequo = 0;
 			end
 			
-			-- if i < tDrawG5:GetNbRows() -1 then
-				-- ecsl_pts_encours = tDrawG5:GetCellInt('ECSL_points', i+1);
-				-- fis_pts_next = tDrawG5:GetCellDouble('FIS_pts', i+1);
-				-- if ecsl_pts == ecsl_pts_next and fis_pts == fis_pts_next then
-					-- if nb_exaequo == 0 then
-						-- draw.rang_tirage = draw.rang_tirage + 1;
-					-- end
-					-- nb_exaequo = nb_exaequo + 1;
-				-- else
-					-- draw.rang_tirage = draw.rang_tirage + 1 + nb_exaequo;
-					-- nb_exaequo = 0;
-				-- end
-			-- else
-				-- draw.rang_tirage = draw.rang_tirage + 1 + nb_exaequo;
-			-- end
 			rtDraw = tDraw:GetIndexRow('Code_coureur', code_coureur);
 			tDraw:SetCell('ECSL_30', rtDraw, 5);
 			draw.nb_pris_ecsl = draw.nb_pris_ecsl + 1;
@@ -2943,9 +2922,8 @@ function OnAfficheTableau()
 			ChecktDraw();
 			local msg = "Cliquer sur Oui pour lancer le double tirage du BIBO.\n"..
 					"Les coureurs doivent être validés sur le tableau au préalable.\n\n"..
-					"Vous pourrez retrouver cette impression plus tard\n"..
-					"même si vous sortez du programme.\n"..
-					"Il est conseillé d'en faire une impression au format PDF.";
+					"Vous pourrez retrouver cette édition dans les impressions\n\n"..
+					"S'il existe deux sous-groupes (1-7 et 8-15), les deux tirages sont indépendants.";
 			if dlgTableau:MessageBox(
 				msg, "Attribution des dossards",
 				msgBoxStyle.YES_NO+msgBoxStyle.NO_DEFAULT+msgBoxStyle.ICON_INFORMATION
@@ -3462,7 +3440,7 @@ function main(params_c)
 	draw.height = display:GetSize().height - 30;
 	draw.x = 0;
 	draw.y = 0;
-	draw.version = "4.6"; -- 4.1 pour 2022-2023
+	draw.version = "4.61"; -- 4.1 pour 2022-2023
 	draw.hostname = 'live.fisski.com';
 	draw.method = 'socket';
 	draw.ajouter_code = '';
