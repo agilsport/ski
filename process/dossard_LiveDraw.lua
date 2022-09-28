@@ -1866,7 +1866,7 @@ function BuildTablesDraw()	-- on ajoute ou on supprime des enregistrements dans 
 end
 
 function TraitementtDrawG4()
--- adv.Alert('\nEntrée de TraitementtDrawG4');
+	-- adv.Alert('\nEntrée de TraitementtDrawG4');
 	for j = 0, tDrawG4:GetNbRows() -1 do		-- les winners des CC 
 		draw.rang_tirage = draw.rang_tirage + 1;
 		-- adv.Alert('coureur de tDrawG4 traité : '..tDrawG4:GetCell('Nom', j)..',  draw.rang_tirage = '.. draw.rang_tirage);
@@ -1879,7 +1879,6 @@ function TraitementtDrawG4()
 		tDraw:SetCell('Rang_tirage', r2, draw.rang_tirage);
 		tDraw:SetCell('Dossard', r2, draw.rang_tirage);
 		tDraw:SetCell('Critere', r2, string.format('%03d', draw.rang_tirage));
-		-- tDraw:OrderBy('Rang_Tirage');
 		local rtDrawG6 = tDrawG6:GetIndexRow('Code_coureur', code_coureur);
 		-- adv.Alert('On cherche '..tDrawG4:GetCell('Nom', j)..' dans tDrawG6')
 		if rtDrawG6 >= 0 then		-- on trouve le coureur
@@ -2360,6 +2359,9 @@ Groupe 6 On poursuit selon les points FIS.
 			if draw.rang_tirage == 30 then
 				if tDrawG4:GetNbRows() > 0 then
 					TraitementtDrawG4();
+					if i < tDrawG5:GetNbRows() -1 then
+						draw.rang_tirage = draw.rang_tirage + 1;
+					end
 				end
 			end
 			-- adv.Alert('last tDrawG5 traité = '..tDrawG5:GetCell('Nom', i)..', draw.rang_tirage = '..draw.rang_tirage);
@@ -3440,7 +3442,7 @@ function main(params_c)
 	draw.height = display:GetSize().height - 30;
 	draw.x = 0;
 	draw.y = 0;
-	draw.version = "4.61"; -- 4.1 pour 2022-2023
+	draw.version = "4.62"; -- 4.1 pour 2022-2023
 	draw.hostname = 'live.fisski.com';
 	draw.method = 'socket';
 	draw.ajouter_code = '';
