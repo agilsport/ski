@@ -1016,6 +1016,13 @@ function CommandSendList()
 					racer_info = '==';
 				end
 			end
+		else
+			if fis_pts > 0 and fis_pts == tLastECSL_30.FIS_pts then
+				if rang_tirage >= 30 and winner_points:len() == 0 then
+					pointsinfo = '=';
+					racer_info = '==';
+				end
+			end
 		end
 		if fis_pts < 0 then fis_pts = ''; end
 		if fis_clt < 0 then fis_clt = ''; end
