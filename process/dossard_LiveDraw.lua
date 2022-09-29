@@ -936,10 +936,19 @@ end
 
 function SetRangEgal()
 	draw.RangEgal = {};
+	draw.PtsFis = {};
 	tLastECSL_30 = tLastECSL_30 or {};
 	draw.bolWinner = false;
 	for i = 0, tDraw:GetNbRows()-1 do
 		local rang_tirage = tDraw:GetCellInt('Rang_tirage', i);
+		local fis_pts = tDraw:GetCellDouble('FIS_pts', i, -1);
+		if not draw.PtsFis[fis_pts] then
+			draw.PtsFis[fis_pts] =  {};
+			draw.PtsFis[fis_pts].Nombre = 0;
+		end
+		if tDraw:GetCellInt('Groupe_tirage', i) > 1 then
+			draw.PtsFis[fis_pts].Nombre = draw.PtsFis[fis_pts].Nombre + 1;
+		end
 		if rang_tirage > 0 then
 			if not draw.RangEgal[rang_tirage] then
 				draw.RangEgal[rang_tirage] = {};
@@ -959,6 +968,137 @@ function SetRangEgal()
 		end
 	end
 end
+
+-- envoi de l'heure de départ manche 1
+function CommandSendScheduled(run)
+
+	if tEpreuve:GetCell('Code_activite', 0) == 'ALP' then
+		local heure = ""; local minute = ""; local stringtime = "";
+		if tEpreuveAlpineManche ~= nil then
+			local heure_depart = tEpreuveAlpineManche:GetCell("Heure_depart", run-1);
+			if heure_depart == "" then
+				heure_depart = '00:00';
+			end
+			local x, y = string.find(heure_depart, "%D");  -- tout ce qui n'est pas un chiffre
+			if x == nil then  -- position du séparateur
+				return;
+			else
+				heure = string.sub(heure_depart, 1, x-1);
+				heure = string.format("%02d", tonumber(heure) or 0);
+				minute = string.sub(heure_depart, x+1);
+				minute = string.format("%02d", tonumber(minute) or 0);
+				stringtime = heure..":"..minute;
+			end
+			local nodeCommand = xmlNode.Create(nil, xmlNodeType.ELEMENT_NODE, "command");
+			local nodeScheduled = xmlNode.Create(nodeCommand, xmlNodeType.ELEMENT_NODE, "scheduled");
+			nodeScheduled:AddAttribute("runno", run);
+			-- nodeScheduled Childs ...
+			xmlNode.Create(nodeScheduled, xmlNodeType.ELEMENT_NODE, "year", tEpreuve:GetCell("Date_epreuve", 0, '%4Y'));	
+			xmlNode.Create(nodeScheduled, xmlNodeType.ELEMENT_NODE, "month", tEpreuve:GetCell("Date_epreuve", 0, '%2M'));	
+			xmlNode.Create(nodeScheduled, xmlNodeType.ELEMENT_NODE, "day", tEpreuve:GetCell("Date_epreuve", 0, '%2D'));	
+			xmlNode.Create(nodeScheduled, xmlNodeType.ELEMENT_NODE, "cettime", stringtime);
+			xmlNode.Create(nodeScheduled, xmlNodeType.ELEMENT_NODE, "loctime", stringtime);
+			-- Regroupement <scheduled> et <command>
+			local nodeRoot = xmlNode.Create(nil, xmlNodeType.ELEMENT_NODE, "livetiming");
+			nodeRoot:AddChild(nodeCommand);
+			CreateXML(nodeRoot);
+			dlgTableau:GetWindowName('info'):SetValue("Tag scheduled envoyé pour la manche 1 = "..stringtime);
+		end
+	end
+end
+
+
+
+-- envoi de la startlist 
+function CommandSendStartList()
+	tDraw:OrderBy('Dossard');
+	local activerun = 1;
+	local bolOK = true;
+	for i = 0, tDraw:GetNbRows() -1 do
+		if tDraw:GetCell('Dossard', i):len() == 0 then
+			bolOK = false;
+			dlgTableau:MessageBox(
+				"Tous les dossards n'ont pas été attribués",
+				"Erreur sur les dossards", 
+				msgBoxStyle.OK+msgBoxStyle.ICON_WARNING);
+			break;
+		end
+	end
+
+	if bolOK == false then
+		return;
+	end
+	CommandClear();
+	CommandRaceInfo(false);
+	-- Génération des balises 
+	nodeRoot = xmlNode.Create(nil, xmlType.ELEMENT_NODE, "livetiming");
+	local nodeStartList = nil;
+	nodeStartList = xmlNode.Create(nil, xmlNodeType.ELEMENT_NODE, "startlist");
+	nodeStartList:AddAttribute("runno",activerun);			
+	
+	local countRacer = 0;
+	for row = 0, tDraw:GetNbRows() - 1 do
+		if activerun == 1 then 
+			local bib = tDraw:GetCell("Dossard", row);
+
+			-- Balise "racer"
+			local nodeRacer = xmlNode.Create(nodeStartList, xmlNodeType.ELEMENT_NODE, "racer");			
+			countRacer = countRacer + 1;
+			nodeRacer:AddAttribute("order", countRacer);		
+				
+			-- Balises FIS 
+			xmlNode.Create(nodeRacer, xmlNodeType.ELEMENT_NODE, "bib", tDraw:GetCell("Dossard", row));			
+			xmlNode.Create(nodeRacer, xmlNodeType.ELEMENT_NODE, "lastname", tDraw:GetCell("Nom", row));			
+			xmlNode.Create(nodeRacer, xmlNodeType.ELEMENT_NODE, "firstname", tDraw:GetCell("Prenom", row));			
+			xmlNode.Create(nodeRacer, xmlNodeType.ELEMENT_NODE, "nat", tDraw:GetCell("Nation", row));			
+			xmlNode.Create(nodeRacer, xmlNodeType.ELEMENT_NODE, "fiscode", string.sub(tDraw:GetCell("Code_coureur", row),4));			
+				
+		end
+	end
+	
+	-- command activerun
+	local nodeCommand = xmlNode.Create(nil, xmlNodeType.ELEMENT_NODE, "command");
+	local nodeActiveRun = xmlNode.Create(nodeCommand, xmlNodeType.ELEMENT_NODE, "activerun");
+	nodeActiveRun:AddAttribute("no",activerun);
+	
+	-- Regroupement <startlist> et <command>
+	
+	-- si live.target == 'FIS', le nodeRoot a déjà été créé fans le raceinfo;
+	nodeRoot:AddChild(nodeStartList);
+	nodeRoot:AddChild(nodeCommand);
+	CreateXML(nodeRoot);
+	
+	dlgTableau:GetWindowName('info'):SetValue("Liste de départ manche 1 envoyée");
+	
+	-- dossard de rang 1 au départ
+	local nodeRaceEvent = xmlNode.Create(nil, xmlNodeType.ELEMENT_NODE, "raceevent");
+	local nodeNextStart = xmlNode.Create(nodeRaceEvent, xmlNodeType.ELEMENT_NODE, "nextstart");			
+	nodeNextStart:AddAttribute("bib", 1);
+	local nodeRoot = xmlNode.Create(nil, xmlNodeType.ELEMENT_NODE, "livetiming");
+	nodeRoot:AddChild(nodeRaceEvent);
+	CreateXML(nodeRoot);
+	dlgTableau:GetWindowName('info'):SetValue("dossard 1 au départ envoyé");
+	CommandSendScheduled(1);
+	local msg = 'Start List';
+	if tEpreuve_Alpine_Manche:GetCell("Heure_depart", 0):len() > 0 then
+		local heure = ""; local minute = "";
+		local heure_depart = tEpreuve_Alpine_Manche:GetCell("Heure_depart", 0);
+		local x, y = string.find(heure_depart, "%D");  -- tout ce qui n'est pas un chiffre
+		if x ~= nil then  -- position du séparateur
+			heure = string.sub(heure_depart, 1, x-1);
+			heure = string.format("%02d", tonumber(heure) or 0);
+			minute = string.sub(heure_depart, x+1);
+			minute = string.format("%02d", tonumber(minute) or 0);
+		end
+		msg = 'The race will start at '..heure..':'..minute;
+	end
+	nodeRoot = xmlNode.Create(nil, xmlType.ELEMENT_NODE, "livetiming");
+	local nodeMessage = xmlNode.Create(nodeRoot, xmlNodeType.ELEMENT_NODE, "message");
+	xmlNode.Create(nodeMessage, xmlNodeType.ELEMENT_NODE, "text", msg);	
+	CreateXML(nodeRoot);
+
+end
+
 
 -- Envoi Course
 function CommandSendList()
@@ -995,7 +1135,7 @@ function CommandSendList()
 		local ecsl_overall_points = tDraw:GetCell('ECSL_overall_points', i);
 		if ecsl_overall_points:len() > 0 then
 			pointsinfo = '>';
-			racer_info = '>= 450';
+			racer_info = '450+';
 		end
 		local ecsl_overall_rank = tDraw:GetCell('ECSL_overall_rank', i);
 		local winner_points = tDraw:GetCell('Winner_CC', i);
@@ -1009,21 +1149,29 @@ function CommandSendList()
 		end
 		local fis_pts = tDraw:GetCellDouble('FIS_pts', i, -1);
 		local fis_clt = tDraw:GetCellInt('FIS_clt', i, -1);
-		if tLastECSL_30.ECSL_points > 0 then
-			if tDraw:GetCellInt('ECSL_points', i) == tLastECSL_30.ECSL_points and fis_pts == tLastECSL_30.FIS_pts then
-				if rang_tirage ~= 30 then
-					pointsinfo = '=';
-					racer_info = '==';
-				end
-			end
-		else
-			if fis_pts > 0 and fis_pts == tLastECSL_30.FIS_pts then
-				if rang_tirage >= 30 and winner_points:len() == 0 then
+		if not tLastECSL_30.ECSL_points then
+			tLastECSL_30.ECSL_points = 0;
+		end
+		-- adv.Alert('draw.PtsFis['..fis_pts..'].Nombre = '..draw.PtsFis[fis_pts].Nombre);
+		if wcsl_points:len() == 0 and winner_points:len() == 0 then
+			if fis_pts > 0 then
+				if draw.PtsFis[fis_pts].Nombre > 1 then
 					pointsinfo = '=';
 					racer_info = '==';
 				end
 			end
 		end
+		-- if tLastECSL_30.ECSL_points > 0 then
+			-- if tDraw:GetCellInt('ECSL_points', i) == tLastECSL_30.ECSL_points and fis_pts == tLastECSL_30.FIS_pts then
+				-- if rang_tirage >= 31 then
+					-- if ecsl_points:len() == 0 and  winner_points:len() == 0 then
+						-- -- adv.Alert('passage 1 pour '..tDraw:GetCell('Nom', i));
+						-- pointsinfo = '=';
+						-- racer_info = '==';
+					-- end
+				-- end
+			-- end
+		-- end
 		if fis_pts < 0 then fis_pts = ''; end
 		if fis_clt < 0 then fis_clt = ''; end
 
@@ -1108,9 +1256,14 @@ function CommandPhaseD()
 	dlgTableau:GetWindowName('info'):SetValue("Phase D envoyé");
 end
 
-function CommandRaceInfo()
+function CommandRaceInfo(bolPhased)
+	local phased = false;
+	if bolPhased == true then
+		phased = true;
+	end
 	local run = 1;
 	-- Génération des balises 
+	local nodeRoot = xmlNode.Create(nil, xmlType.ELEMENT_NODE, "livetiming");
 	local nodeRaceinfo = xmlNode.Create(nil, xmlType.ELEMENT_NODE, "raceinfo");
 	
 	xmlNode.Create(nodeRaceinfo, xmlType.ELEMENT_NODE, "event", tEvenement:GetCell('Nom',0));	
@@ -1123,47 +1276,11 @@ function CommandRaceInfo()
 	xmlNode.Create(nodeRaceinfo, xmlType.ELEMENT_NODE, "tempunit", 'C');			
 	xmlNode.Create(nodeRaceinfo, xmlType.ELEMENT_NODE, "longunit", 'm');			
 	xmlNode.Create(nodeRaceinfo, xmlType.ELEMENT_NODE, "speedunit", 'Kmh');	
-				
-	nodePhase = xmlNode.Create(nodeRaceinfo, xmlType.ELEMENT_NODE, "phase");			
-	nodePhase:AddAttribute("no", 'D');			
-	
-	-- nodePhase Childs ...
 		
-	-- discipline
-	xmlNode.Create(nodePhase, xmlType.ELEMENT_NODE, "discipline", tEpreuve:GetCell('Code_discipline', 0));	
-	
-	-- start
-	local start = tonumber(tEpreuve_Alpine_Manche:GetCell("Altitude_Depart",run-1)) or 0;
-	xmlNode.Create(nodePhase, xmlType.ELEMENT_NODE, "start", start);	
-
-	-- finish
-	local finish = tonumber(tEpreuve_Alpine_Manche:GetCell("Altitude_Arrivee",run-1)) or 0;
-	xmlNode.Create(nodePhase, xmlType.ELEMENT_NODE, "finish", finish);	
-	
-	-- height
-	xmlNode.Create(nodePhase, xmlType.ELEMENT_NODE, "height", start - finish);	
-
-	-- length 
-	local length = tonumber(tEpreuve_Alpine_Manche:GetCell("Longueur",run-1)) or 0;
-	if length > 0 then
-		xmlNode.Create(nodePhase, xmlType.ELEMENT_NODE, "length", length);	
-	end
-	-- gates
-	local gates = tEpreuve_Alpine_Manche:GetCellInt("Nombre_de_portes",run-1);
-	xmlNode.Create(nodePhase, xmlType.ELEMENT_NODE, "gates", gates);	
-	
-	-- turninggates
-	local turninggates = tEpreuve_Alpine_Manche:GetCellInt("Changement_de_directions",run-1,0);
-	xmlNode.Create(nodePhase, xmlType.ELEMENT_NODE, "turninggates", turninggates);	
-
-	-- year
-	xmlNode.Create(nodePhase, xmlType.ELEMENT_NODE, "year", tEpreuve:GetCell("Date_epreuve", 0, '%4Y'));	
-	
-	-- month
-	xmlNode.Create(nodePhase, xmlType.ELEMENT_NODE, "month", tEpreuve:GetCell("Date_epreuve", 0, '%2M'));	
-
-	-- day
-	xmlNode.Create(nodePhase, xmlType.ELEMENT_NODE, "day", tEpreuve:GetCell("Date_epreuve", 0, '%2D'));	
+	local start = tonumber(tEpreuve_Alpine_Manche:GetCell("Altitude_Depart",0)) or 0;
+	local finish = tonumber(tEpreuve_Alpine_Manche:GetCell("Altitude_Arrivee",0)) or 0;
+	local length = tonumber(tEpreuve_Alpine_Manche:GetCell("Longueur",0)) or 0;
+	local turninggates = tEpreuve_Alpine_Manche:GetCellInt("Changement_de_directions",0,0);
 	local heure = ""; local minute = "";
 	local heure_depart = tEpreuve_Alpine_Manche:GetCell("Heure_depart", run-1);
 	local x, y = string.find(heure_depart, "%D");  -- tout ce qui n'est pas un chiffre
@@ -1173,31 +1290,96 @@ function CommandRaceInfo()
 		minute = string.sub(heure_depart, x+1);
 		minute = string.format("%02d", tonumber(minute) or 0);
 	end
-	
-	-- hour
-	xmlNode.Create(nodePhase, xmlType.ELEMENT_NODE, "hour", heure);	
-
-	-- minute
-	xmlNode.Create(nodePhase, xmlType.ELEMENT_NODE, "minute", minute);	
-	
-	--racedef  
-	local nodeRacedef = xmlNode.Create(nodePhase, xmlType.ELEMENT_NODE, "racedef");	
+	if phased == true then
+		nodePhase = xmlNode.Create(nodeRaceinfo, xmlType.ELEMENT_NODE, "phase");			
+		nodePhase:AddAttribute("no", 'D');			
 		
-	-- nodeRacedef Childs ...
-	xmlNode.Create(nodeRacedef, xmlType.ELEMENT_NODE, "draworder", '');	
-	xmlNode.Create(nodeRacedef, xmlType.ELEMENT_NODE, "drawgroup", '');	
-	xmlNode.Create(nodeRacedef, xmlType.ELEMENT_NODE, "drawstatus", '');	
-	xmlNode.Create(nodeRacedef, xmlType.ELEMENT_NODE, "drawbib", '');	
-	local tInfo = {legend = {abbreviation = {{description = 'ECSL points in '..draw.discipline, title = 'ECSL'}, {description = 'At least 450 Cup points overall', title = 'EC OA 450+'}, {description = 'Winner of COC in '..draw.discipline, title = 'COC WINNER'}, {description = 'Within the top 30 of the WCSL in '..draw.discipline, title = 'WCSL TOP 30'}, {description = 'Ranked by '..draw.discipline..' FIS points', title = 'FIS Points'}}}};
-	if draw.bolEstCE == false then
-		tInfo = {legend = {abbreviation = {{description = 'Ranked by FIS points', title = 'FIS Points'}}}};
-	end
-	local jsontxt = table.ToStringJSON(tInfo, false);
-	
-	local nodedrawinfoJSON = xmlNode.Create(nodeRaceinfo, xmlType.ELEMENT_NODE, 'drawinfoJSON');	
-	xmlNode.Create(nodedrawinfoJSON, xmlType.CDATA_SECTION_NODE,'', jsontxt);	
+		-- nodePhase Childs ...
+		xmlNode.Create(nodePhase, xmlType.ELEMENT_NODE, "discipline", tEpreuve:GetCell('Code_discipline', 0));	
+		xmlNode.Create(nodePhase, xmlType.ELEMENT_NODE, "start", start);	
+		xmlNode.Create(nodePhase, xmlType.ELEMENT_NODE, "finish", finish);	
+		xmlNode.Create(nodePhase, xmlType.ELEMENT_NODE, "height", start - finish);	
+		if length > 0 then
+			xmlNode.Create(nodePhase, xmlType.ELEMENT_NODE, "length", length);	
+		end
+		local gates = tEpreuve_Alpine_Manche:GetCellInt("Nombre_de_portes",0);
+		xmlNode.Create(nodePhase, xmlType.ELEMENT_NODE, "gates", gates);	
+		xmlNode.Create(nodePhase, xmlType.ELEMENT_NODE, "turninggates", turninggates);	
+		xmlNode.Create(nodePhase, xmlType.ELEMENT_NODE, "year", tEpreuve:GetCell("Date_epreuve", 0, '%4Y'));	
+		xmlNode.Create(nodePhase, xmlType.ELEMENT_NODE, "month", tEpreuve:GetCell("Date_epreuve", 0, '%2M'));	
+		xmlNode.Create(nodePhase, xmlType.ELEMENT_NODE, "day", tEpreuve:GetCell("Date_epreuve", 0, '%2D'));	
+		xmlNode.Create(nodePhase, xmlType.ELEMENT_NODE, "hour", heure);	
+		xmlNode.Create(nodePhase, xmlType.ELEMENT_NODE, "minute", minute);	
+		
+		local nodeRacedef = xmlNode.Create(nodePhase, xmlType.ELEMENT_NODE, "racedef");	
+		xmlNode.Create(nodeRacedef, xmlType.ELEMENT_NODE, "draworder", '');	
+		xmlNode.Create(nodeRacedef, xmlType.ELEMENT_NODE, "drawgroup", '');	
+		xmlNode.Create(nodeRacedef, xmlType.ELEMENT_NODE, "drawstatus", '');	
+		xmlNode.Create(nodeRacedef, xmlType.ELEMENT_NODE, "drawbib", '');	
+		local tInfo = {legend = {abbreviation = {{description = 'ECSL points in '..draw.discipline, title = 'ECSL'}, {description = 'At least 450 Cup points overall', title = 'EC OA 450+'}, {description = 'Winner of COC in '..draw.discipline, title = 'COC WINNER'}, {description = 'Within the top 30 of the WCSL in '..draw.discipline, title = 'WCSL TOP 30'}, {description = 'Ranked by '..draw.discipline..' FIS points', title = 'FIS Points'}}}};
+		if draw.bolEstCE == false then
+			tInfo = {legend = {abbreviation = {{description = 'Ranked by FIS points', title = 'FIS Points'}}}};
+		end
+		local jsontxt = table.ToStringJSON(tInfo, false);
+		
+		local nodedrawinfoJSON = xmlNode.Create(nodeRaceinfo, xmlType.ELEMENT_NODE, 'drawinfoJSON');	
+		xmlNode.Create(nodedrawinfoJSON, xmlType.CDATA_SECTION_NODE,'', jsontxt);	
+	else
+		for run = 1, 1 do
+			-- run x 
+			nodeRun = xmlNode.Create(nodeRaceinfo, xmlNodeType.ELEMENT_NODE, "run");			
+			nodeRun:AddAttribute("no", run);			
+			
+			-- nodeRun Childs ...
+			if tEpreuve:GetCell('Code_activite', 0) == 'ALP' then
+				if tEpreuve_Alpine_Manche:GetNbRows() >= run then
+					xmlNode.Create(nodeRun, xmlNodeType.ELEMENT_NODE, "discipline", tEpreuve:GetCell('Code_discipline', 0));	
+					local start = tonumber(tEpreuve_Alpine_Manche:GetCell("Altitude_Depart",run-1)) or 0;
+					xmlNode.Create(nodeRun, xmlNodeType.ELEMENT_NODE, "start", start);	
+					local finish = tonumber(tEpreuve_Alpine_Manche:GetCell("Altitude_Arrivee",run-1)) or 0;
+					xmlNode.Create(nodeRun, xmlNodeType.ELEMENT_NODE, "finish", finish);	
+					xmlNode.Create(nodeRun, xmlNodeType.ELEMENT_NODE, "height", start-finish);	
+					local length = tonumber(tEpreuve_Alpine_Manche:GetCell("Longueur",run-1)) or 0;
+					xmlNode.Create(nodeRun, xmlNodeType.ELEMENT_NODE, "length", length);	
+					local gates = tEpreuve_Alpine_Manche:GetCellInt("Nombre_de_portes",run-1,0);
+					xmlNode.Create(nodeRun, xmlNodeType.ELEMENT_NODE, "gates", gates);	
+					local turninggates = tEpreuve_Alpine_Manche:GetCellInt("Changement_de_directions",run-1,0);
+					xmlNode.Create(nodeRun, xmlNodeType.ELEMENT_NODE, "turninggates", turninggates);	
+					xmlNode.Create(nodeRun, xmlNodeType.ELEMENT_NODE, "year", tEpreuve:GetCell("Date_epreuve", 0, '%4Y'));	
+					xmlNode.Create(nodeRun, xmlNodeType.ELEMENT_NODE, "month", tEpreuve:GetCell("Date_epreuve", 0, '%2M'));	
+					xmlNode.Create(nodeRun, xmlNodeType.ELEMENT_NODE, "day", tEpreuve:GetCell("Date_epreuve", 0, '%2D'));	
+					local heure = ""; local minute = "";
+					local heure_depart = tEpreuve_Alpine_Manche:GetCell("Heure_depart", run-1);
+					local x, y = string.find(heure_depart, "%D");  -- tout ce qui n'est pas un chiffre
+					if x ~= nil then  -- position du séparateur
+						heure = string.sub(heure_depart, 1, x-1);
+						heure = string.format("%02d", tonumber(heure) or 0);
+						minute = string.sub(heure_depart, x+1);
+						minute = string.format("%02d", tonumber(minute) or 0);
+					end
+					
+					-- hour
+					xmlNode.Create(nodeRun, xmlNodeType.ELEMENT_NODE, "hour", heure);	
 
-	nodeRoot = xmlNode.Create(nil, xmlType.ELEMENT_NODE, "livetiming");
+					-- minute
+					xmlNode.Create(nodeRun, xmlNodeType.ELEMENT_NODE, "minute", minute);	
+					
+					--racedef  
+					local nodeRacedef = xmlNode.Create(nodeRun, xmlNodeType.ELEMENT_NODE, "racedef");	
+						
+					-- nodeRacedef Childs ...
+					local nbInter = tEpreuve_Alpine_Manche:GetCellInt("Nb_temps_inter",run-1, 0);
+					for inter = 1, nbInter do
+
+						local nodeInter = xmlNode.Create(nodeRacedef, xmlNodeType.ELEMENT_NODE, "inter");
+						nodeInter:AddAttribute("i", inter);
+								
+					end
+				end
+			end
+		end
+	end
+
 	nodeRoot:AddChild(nodeRaceinfo);
 	CreateXML(nodeRoot);
 	dlgTableau:GetWindowName('info'):SetValue("Informations de course envoyées");
@@ -1270,7 +1452,7 @@ function OnSendTableau(statut)
 	if draw.bolEstCE == true then
 		-- GetLastECSL30();
 	end
-	CommandRaceInfo();
+	CommandRaceInfo(true);
 	CommandPhaseD();
 	CommandSendList();
 	CommandSendOrder();
@@ -1874,8 +2056,10 @@ end
 
 function TraitementtDrawG4()
 	-- adv.Alert('\nEntrée de TraitementtDrawG4');
+	local next_rang = -1;
 	for j = 0, tDrawG4:GetNbRows() -1 do		-- les winners des CC 
 		draw.rang_tirage = draw.rang_tirage + 1;
+		next_rang = draw.rang_tirage ;
 		-- adv.Alert('coureur de tDrawG4 traité : '..tDrawG4:GetCell('Nom', j)..',  draw.rang_tirage = '.. draw.rang_tirage);
 		local code_coureur = tDrawG4:GetCell('Code_coureur', j);
 		local r2 = tDraw:GetIndexRow('Code_coureur', code_coureur);
@@ -1895,6 +2079,7 @@ function TraitementtDrawG4()
 	end
 	-- adv.Alert('Sortie de TraitementtDrawG4\n');
 	tDrawG4:RemoveAllRows();
+	return next_rang;
 end
 
 function SetuptDraw()
@@ -1933,11 +2118,6 @@ function SetuptDraw()
 		end
 	end
 	-- prise en compte des points de la ligne 15 et écentuellement 7 en technique (EC et NC)
-	-- if draw.bolEstCE then
-		-- tDraw:OrderBy('ECSL_points DESC, FIS_pts');
-	-- else
-		-- tDraw:OrderBy('FIS_pts');
-	-- end
 	tDraw:OrderBy('ECSL_points DESC, FIS_pts');
 	draw.ptsFIS7 = tDraw:GetCellDouble('FIS_pts', 6);
 	draw.ptsFIS15 = tDraw:GetCellDouble('FIS_pts', 14);
@@ -1970,7 +2150,7 @@ Groupe 6 On poursuit selon les points FIS.
 ]]
 	-- adv.Alert('draw.pts15 = '..draw.pts15);
 	
-	local rajouter_pts_fis = 0;
+	rajouter_pts_fis = 0;
 	if draw.bolEstCE then
 		tDrawECSL:OrderBy('ECSL_overall_points DESC, ECSL_points DESC, FIS_pts, Nom, Prenom');
 		for i = tDrawECSL:GetNbRows() -1, 0, -1 do
@@ -1985,7 +2165,7 @@ Groupe 6 On poursuit selon les points FIS.
 			if WCSL_rank <= 30 and i >= 15 then
 				supprimer = true;
 			end
-			if CC_winner:len() > 0 and i >= 30 then
+			if CC_winner:len() > 0 and i < 20 then
 				supprimer = true;
 			end
 			if ptsOA >= 450 then
@@ -2009,7 +2189,6 @@ Groupe 6 On poursuit selon les points FIS.
 			tDrawG1:RemoveRowAt(i);
 		end
 	end
-
 	tDrawG2:OrderBy('ECSL_overall_points DESC');	-- les 450 - 200 pts
 	for i = tDrawG2:GetNbRows() -1, 0, -1 do
 		local pts = tDrawG2:GetCellInt('ECSL_overall_points', i);
@@ -2365,10 +2544,8 @@ Groupe 6 On poursuit selon les points FIS.
 			tDraw:SetCell('Critere', rtDraw, string.format('%03d', draw.rang_tirage));
 			if draw.rang_tirage == 30 then
 				if tDrawG4:GetNbRows() > 0 then
-					TraitementtDrawG4();
-					if i < tDrawG5:GetNbRows() -1 then
-						draw.rang_tirage = draw.rang_tirage + 1;
-					end
+					local next_rang = TraitementtDrawG4();
+					draw.rang_tirage = next_rang + 1;
 				end
 			end
 			-- adv.Alert('last tDrawG5 traité = '..tDrawG5:GetCell('Nom', i)..', draw.rang_tirage = '..draw.rang_tirage);
@@ -2385,14 +2562,19 @@ Groupe 6 On poursuit selon les points FIS.
 		end
 		SetRangEgal();
 		-- adv.Alert('tLastECSL_30.groupe_tirage = '..tostring(tLastECSL_30.groupe_tirage));
+		draw.rang_tirage = draw.rang_tirage  + 1;
 	end
 	-- on continue avec les points FIS
 	nb_exaequo = 0;
+	if tDrawG4:GetNbRows() > 0 then
+		current_group = current_group + 1;
+		local next_rang = TraitementtDrawG4();
+		draw.rang_tirage = next_rang + 1;
+	end
 	tDrawG6:OrderBy('FIS_pts');			-- on continue avec les points FIS
 	local ptsfis_ajoutes = 0;
 	if tDrawG6:GetNbRows() > 0 then
 		current_group = current_group + 1;
-		draw.rang_tirage = draw.rang_tirage + 1;
 		nb_exaequo = 0
 		for i = 0, tDrawG6:GetNbRows() -1 do
 			-- adv.Alert('on traite '..tDrawG6:GetCell('Nom', i).. 'dans tDrawG6');
@@ -2684,6 +2866,8 @@ function OnAfficheTableau()
 	menuSend:AppendSeparator();
 	btnSendDossards = menuSend:Append({label="Renvoi de tous les dossards", image ="./res/32x32_send.png"});
 	menuSend:AppendSeparator();
+	btnSendStartList = menuSend:Append({label="Envoi de la liste de départ", image ="./res/32x32_send.png"});
+	menuSend:AppendSeparator();
 	tbTableau:SetDropdownMenu(btnMenuSend:GetId(), menuSend);
 
 	tbTableau:AddSeparator();
@@ -2891,6 +3075,11 @@ function OnAfficheTableau()
 			SendMessage('Board refreshed');
 		end
 		, btnValiderSelection);
+	dlgTableau:Bind(eventType.MENU, 
+		function(evt)
+			CommandSendStartList();
+		end
+		, btnSendStartList);
 	dlgTableau:Bind(eventType.MENU, 
 		function(evt)
 			local t = grid_tableau:GetTable();
@@ -3449,7 +3638,7 @@ function main(params_c)
 	draw.height = display:GetSize().height - 30;
 	draw.x = 0;
 	draw.y = 0;
-	draw.version = "4.62"; -- 4.1 pour 2022-2023
+	draw.version = "4.63"; -- 4.1 pour 2022-2023
 	draw.hostname = 'live.fisski.com';
 	draw.method = 'socket';
 	draw.ajouter_code = '';
