@@ -12,7 +12,7 @@ end
 -- Information : Numéro de Version, Nom, Interface
 function device.GetInformation()
 	return { 
-		version = 6.8;
+		version = 6.9;
 		name = 'Live Timing Async.', 
 		class = 'network'
 	};
@@ -1489,7 +1489,7 @@ function CommandRaceInfo(activerun, bolPlusStartList)
 	xmlNode.Create(nodeRaceinfo, xmlNodeType.ELEMENT_NODE, "slope", tPistes:GetCell('Nom_piste',0));			
 	xmlNode.Create(nodeRaceinfo, xmlNodeType.ELEMENT_NODE, "discipline", tEpreuve:GetCell("Code_discipline", 0));			
 	xmlNode.Create(nodeRaceinfo, xmlNodeType.ELEMENT_NODE, "gender", tEpreuve:GetCell("Sexe", 0));			
-	xmlNode.Create(nodeRaceinfo, xmlNodeType.ELEMENT_NODE, "category", tEpreuve:GetCell("Code_regroupement", 0));			
+	xmlNode.Create(nodeRaceinfo, xmlNodeType.ELEMENT_NODE, "category", tEpreuve:GetCell("Code_niveau", 0));
 	xmlNode.Create(nodeRaceinfo, xmlNodeType.ELEMENT_NODE, "place", tEvenement:GetCell('Station',0));			
 	xmlNode.Create(nodeRaceinfo, xmlNodeType.ELEMENT_NODE, "tempunit", 'c');			
 	xmlNode.Create(nodeRaceinfo, xmlNodeType.ELEMENT_NODE, "longunit", 'm');			
