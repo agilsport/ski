@@ -12,7 +12,7 @@ end
 -- Information : Numéro de Version, Nom, Interface
 function device.GetInformation()
 	return { 
-		version = 6.9;
+		version = 6.91;
 		name = 'Live Timing Async.', 
 		class = 'network'
 	};
@@ -232,6 +232,7 @@ function device.OnInit(params, node)
 	live.fmt = GetFormatChrono();
 	live.Code_entite = tEvenement:GetCell("Code_entite",0);
 	live.Code_activite = tEvenement:GetCell("Code_activite",0);
+	live.category = tEpreuve:GetCell('Code_regroupement');
 	
 	if live.Code_entite == 'ESF' then
 		local rc, dataForerunner = app.SendNotify('<forerunner_load>');
@@ -360,6 +361,9 @@ function device.OnInit(params, node)
 	end
 	
 	if live.method == 'socket' then
+		if live.category == 'CE' then
+			live.category = 'EC';
+		end
 		if tEpreuve:GetCell("Sexe", 0) == "M" and live.port == "Automatique" then
 			live.port = '1550';
 		end
@@ -1483,13 +1487,12 @@ function CommandRaceInfo(activerun, bolPlusStartList)
 		
 	-- Génération des balises 
 	local nodeRaceinfo = xmlNode.Create(nil, xmlNodeType.ELEMENT_NODE, "raceinfo");
-	
 	xmlNode.Create(nodeRaceinfo, xmlNodeType.ELEMENT_NODE, "event", tEvenement:GetCell('Nom',0));	
 	xmlNode.Create(nodeRaceinfo, xmlNodeType.ELEMENT_NODE, "name", tEpreuve:GetCell("Code_discipline", 0)..' '..tEpreuve:GetCell("Sexe", 0));			
 	xmlNode.Create(nodeRaceinfo, xmlNodeType.ELEMENT_NODE, "slope", tPistes:GetCell('Nom_piste',0));			
 	xmlNode.Create(nodeRaceinfo, xmlNodeType.ELEMENT_NODE, "discipline", tEpreuve:GetCell("Code_discipline", 0));			
 	xmlNode.Create(nodeRaceinfo, xmlNodeType.ELEMENT_NODE, "gender", tEpreuve:GetCell("Sexe", 0));			
-	xmlNode.Create(nodeRaceinfo, xmlNodeType.ELEMENT_NODE, "category", tEpreuve:GetCell("Code_niveau", 0));
+	xmlNode.Create(nodeRaceinfo, xmlNodeType.ELEMENT_NODE, "category", live.category );
 	xmlNode.Create(nodeRaceinfo, xmlNodeType.ELEMENT_NODE, "place", tEvenement:GetCell('Station',0));			
 	xmlNode.Create(nodeRaceinfo, xmlNodeType.ELEMENT_NODE, "tempunit", 'c');			
 	xmlNode.Create(nodeRaceinfo, xmlNodeType.ELEMENT_NODE, "longunit", 'm');			
