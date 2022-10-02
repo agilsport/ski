@@ -12,7 +12,7 @@ end
 -- Information : Numéro de Version, Nom, Interface
 function device.GetInformation()
 	return { 
-		version = 6.91;
+		version = 6.93;
 		name = 'Live Timing Async.', 
 		class = 'network'
 	};
@@ -363,6 +363,9 @@ function device.OnInit(params, node)
 	if live.method == 'socket' then
 		if live.category == 'CE' then
 			live.category = 'EC';
+		end
+		if live.category == 'F' then
+			live.category = 'NC';
 		end
 		if tEpreuve:GetCell("Sexe", 0) == "M" and live.port == "Automatique" then
 			live.port = '1550';
