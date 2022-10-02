@@ -207,13 +207,17 @@
 		<toolbar row="auto" col_start="1" col_end="0" name="tb" style="TB_FLAT,TB_HORIZONTAL,TB_TEXT"/>
 	</panel>
 	<panel id="print">
+		<lua>dofile('./interface/adv.lua'); </lua>
 		<header>
 			<spacing all="0"/>
 			<padding all="0"/>
-			<col value="1"/>
+			<col value="2cm,2cm,1"/>
 			<pen border="none"/>
 			<font name="Calibri" size="13" adjust="width" weight="bold"/>
-			<text row="2cm" align="center">params.Evenement_nom</text>
+			<text row="2cm" col_start="1" col_end="0" align="center">params.Evenement_nom</text>
+			<image col_start="2" adjust="best">'./res/logo_fis.jpg'
+			  <background mode="transparent"/>
+			</image>
 		</header>
 		<first_header>
 			<font name="Calibri" size="11" adjust="width" weight="bold"/>
@@ -273,14 +277,19 @@
 		<lua>rupture = params.Rupture; label = params.Rupture; title = title..label; body:SetCounter(rupture); if rupture ~= 'Nation' then body:SetCounter('Nation'); end orderby = rupture..", Sexe, Point, Nom, Prenom"; somme_rupture = 0; nb_etrangers = 0; bolAjouter = false; comite = {};</lua>
 		<header>
 			<spacing all="0"/>
+			<padding all="0"/>
+			<col value="2cm,1"/>
+			<pen border="none"/>
 			<background mode="transparent"/>
 			<font name="Calibri" size="14" adjust="max" weight="bold"/>
-			<text row="1cm" align="center">$(Evenement.Nom)</text>
+			<text row="2cm" col_start="1" col_end="0" align="center">$(Evenement.Nom)</text>
 			<text align="right" cond="$(Epreuve.Sexe) == 'M'">"Men's"</text>
 			<text align="right" cond="$(Epreuve.Sexe) == 'F'">"Ladies's"</text>
-			<text row="1cm" align="center" cond="title">title</text>
+			<text row="1cm" col_start="1" col_end="0" align="center" cond="title">title</text>
 			<text align="right">$(Epreuve.Code_discipline)..' '</text>
-			<!-- <text row="3cm" align="left"><font orientation="90" origin="left,bottom"/>'HELLO'</text> -->
+			<image row_start="1" col_start="1" adjust="best">'./res/logo_fis.jpg'
+			  <background mode="transparent"/>
+			</image>
 			<row value="0.5cm"/>
 		</header>
 		<first_header/>
