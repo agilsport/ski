@@ -2109,6 +2109,10 @@ function TraitementtDrawG4()
 		tDraw:SetCell('Rang_tirage', r2, draw.rang_tirage);
 		tDraw:SetCell('Dossard', r2, draw.rang_tirage);
 		tDraw:SetCell('Critere', r2, string.format('%03d', draw.rang_tirage));
+		local rtDrawG5 = tDrawG5:GetIndexRow('Code_coureur', code_coureur);
+		if rtDrawG5 >= 0 then		-- on trouve le coureur
+			tDrawG5:RemoveRowAt(rtDrawG5);
+		end
 		local rtDrawG6 = tDrawG6:GetIndexRow('Code_coureur', code_coureur);
 		-- adv.Alert('On cherche '..tDrawG4:GetCell('Nom', j)..' dans tDrawG6')
 		if rtDrawG6 >= 0 then		-- on trouve le coureur
@@ -2585,8 +2589,10 @@ Groupe 6 On poursuit selon les points FIS.
 	tDrawG4:OrderBy('ECSL_points DESC, FIS_pts');				-- les winners de CC triés par leurs points ECSL et les points FIS
 	tDrawG5:OrderBy('ECSL_points DESC, FIS_pts');				-- les 30 ECSL
 	-- adv.Alert('on a pris '..draw.nb_pris_ecsl..' sur les 30 à prendre, tDrawG4:GetNbRows() = '..tDrawG4:GetNbRows());
-	-- le premier winner sera toujours au rang 30
+	-- le premier winner sera toujours au rang 31 = row 30
 	local nb_exaequo = 0;
+	
+	adv.Alert('avant tDrawG5, tDrawG4:GetNbRows() = '..tDrawG4:GetNbRows() );
 	if tDrawG5:GetNbRows() > 0 then
 		local rtDraw = -1;
 		tLastECSL_30.groupe_tirage = current_group;
@@ -2647,7 +2653,7 @@ Groupe 6 On poursuit selon les points FIS.
 		end
 		SetRangEgal();
 		-- adv.Alert('tLastECSL_30.groupe_tirage = '..tostring(tLastECSL_30.groupe_tirage));
-		draw.rang_tirage = draw.rang_tirage  + 1;
+		-- draw.rang_tirage = draw.rang_tirage  + 1;
 	end
 	nb_exaequo = 0;
 	if tDrawG4:GetNbRows() > 0 then
@@ -3751,7 +3757,7 @@ function main(params_c)
 	draw.height = display:GetSize().height - 30;
 	draw.x = 0;
 	draw.y = 0;
-	draw.version = "4.7"; -- 4.1 pour 2022-2023
+	draw.version = "4.71"; -- 4.1 pour 2022-2023
 	draw.hostname = 'live.fisski.com';
 	draw.method = 'socket';
 	draw.ajouter_code = '';
