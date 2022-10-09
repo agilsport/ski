@@ -972,19 +972,39 @@ end
 function SetRangEgal()
 	draw.RangEgal = {};
 	draw.PtsFis = {};
-	tLastECSL_30 = tLastECSL_30 or {};
 	draw.bolWinner = false;
+	draw.bol99 = false;
 	for i = 0, tDraw:GetNbRows()-1 do
 		local rang_tirage = tDraw:GetCellInt('Rang_tirage', i);
+		if not draw.RangEgal[rang_tirage] then
+			draw.RangEgal[rang_tirage] = {};
+			draw.RangEgal[rang_tirage].Nombre = 0;
+		end
+		draw.RangEgal[rang_tirage].Nombre  = draw.RangEgal[rang_tirage].Nombre  + 1;
+		if tDraw:GetCell('Winner_CC', i):len() > 0 then
+			draw.bolWinner = true;
+		end
+	end
+end
+
+function SetRangEgalOld()
+	draw.RangEgal = {};
+	draw.PtsFis = {};
+	draw.bolWinner = false;
+	draw.bol99 = false;
+	for i = 0, tDraw:GetNbRows()-1 do
+		local groupe_tirage = tDraw:GetCellInt('Groupe_tirage', i);
+		local rang_tirage = tDraw:GetCellInt('Rang_tirage', i);
 		local fis_pts = tDraw:GetCellDouble('FIS_pts', i, -1);
-		if not draw.PtsFis[fis_pts] then
-			draw.PtsFis[fis_pts] =  {};
-			draw.PtsFis[fis_pts].Nombre = 0;
+		if tDraw:GetCellInt('ECSL_30', i) == 99 then
+			draw.bol99 = true;
 		end
-		if tDraw:GetCellInt('Groupe_tirage', i) > 1 then
+		if draw.bol99 == true then
+			if not draw.PtsFis[fis_pts] then
+				draw.PtsFis[fis_pts] =  {};
+				draw.PtsFis[fis_pts].Nombre = 0;
+			end
 			draw.PtsFis[fis_pts].Nombre = draw.PtsFis[fis_pts].Nombre + 1;
-		end
-		if rang_tirage > 0 then
 			if not draw.RangEgal[rang_tirage] then
 				draw.RangEgal[rang_tirage] = {};
 				draw.RangEgal[rang_tirage].Nombre = 0;
@@ -993,13 +1013,6 @@ function SetRangEgal()
 		end
 		if tDraw:GetCell('Winner_CC', i):len() > 0 then
 			draw.bolWinner = true;
-		end
-	end
-	for i = tDraw:GetNbRows()-1, 0, -1 do
-		if tDraw:GetCellInt('ECSL_30', i) == 99 then
-			tLastECSL_30.groupe_tirage = tDraw:GetCellInt('Groupe_tirage', i);
-			tLastECSL_30.ECSL_points = tDraw:GetCellInt('ECSL_points', i);
-			tLastECSL_30.FIS_pts = tDraw:GetCellDouble('FIS_pts', i);
 		end
 	end
 end
@@ -1155,7 +1168,7 @@ function CommandSendList()
 		local code = tDraw:GetCell('Code_coureur', i):sub(4);
 		local rang_tirage = tDraw:GetCellInt('Rang_tirage', i);
 		if rang_tirage > 0 then
-			if draw.RangEgal[rang_tirage].Nombre > 1 then
+			if draw.RangEgal[rang_tirage] and draw.RangEgal[rang_tirage].Nombre > 1 then
 				pointsinfo = '=';
 				racer_info = '==';
 			end
@@ -1184,29 +1197,15 @@ function CommandSendList()
 		end
 		local fis_pts = tDraw:GetCellDouble('FIS_pts', i, -1);
 		local fis_clt = tDraw:GetCellInt('FIS_clt', i, -1);
-		if not tLastECSL_30.ECSL_points then
-			tLastECSL_30.ECSL_points = 0;
-		end
 		-- adv.Alert('draw.PtsFis['..fis_pts..'].Nombre = '..draw.PtsFis[fis_pts].Nombre);
 		if wcsl_points:len() == 0 and winner_points:len() == 0 then
 			if fis_pts > 0 then
-				if draw.PtsFis[fis_pts].Nombre > 1 then
+				if draw.PtsFis[fis_pts] and draw.PtsFis[fis_pts].Nombre > 1 then
 					pointsinfo = '=';
 					racer_info = '==';
 				end
 			end
 		end
-		-- if tLastECSL_30.ECSL_points > 0 then
-			-- if tDraw:GetCellInt('ECSL_points', i) == tLastECSL_30.ECSL_points and fis_pts == tLastECSL_30.FIS_pts then
-				-- if rang_tirage >= 31 then
-					-- if ecsl_points:len() == 0 and  winner_points:len() == 0 then
-						-- -- adv.Alert('passage 1 pour '..tDraw:GetCell('Nom', i));
-						-- pointsinfo = '=';
-						-- racer_info = '==';
-					-- end
-				-- end
-			-- end
-		-- end
 		if fis_pts < 0 then fis_pts = ''; end
 		if fis_clt < 0 then fis_clt = ''; end
 
@@ -1465,21 +1464,6 @@ function GetCateg(an)
 	return tCategorie:GetCell('Code', 0);
 end
 
-function GetLastECSL30()
-	tLastECSL_30 = {};
-	draw.bolWinner = false;
-	for i = 0, tDraw:GetNbRows() -1 do
-		if tDraw:GetCellInt('ECSL_30', i) == 99 then
-			tLastECSL_30.ECSL_points = tDraw:GetCellInt('ECSL_points', i);
-			tLastECSL_30.FIS_pts = tDraw:GetCellDouble('FIS_pts', i);
-			-- adv.Alert('ecsl_points = '..ecsl_points..', tLastECSL_30.ECSL_points = '..tLastECSL_30.ECSL_points..', fis_pts = '..fis_pts..', tLastECSL_30.FIS_pts = '..tLastECSL_30.FIS_pts);
-		end
-		if tDraw:GetCell('Winner_CC', i):len() > 0 then
-			draw.bolWinner = true;
-		end
-	end	
-end
-
 function OnSendTableau(statut)
 	local msg = "Confirmation de l'envoi du tableau à la FIS.";
 	if dlgTableau:MessageBox(
@@ -1490,9 +1474,6 @@ function OnSendTableau(statut)
 		return;
 	end
 	-- CommandClear();
-	if draw.bolEstCE == true then
-		-- GetLastECSL30();
-	end
 	CommandRaceInfo(true);
 	CommandPhaseD();
 	CommandSendList();
@@ -1954,6 +1935,33 @@ function OnGridShown(evt)
 	evt:Veto();
 end
 
+function OnTirageRangX(rang)
+	local filter = "$(Rang_tirage):In("..rang..")";
+	tDrawTirageAuto:Filter(filter, true);		
+	tDrawTirageAuto:OrderRandom('Prenom');
+	local tShuffle = {};
+	for row = 0, tDrawTirageAuto:GetNbRows() -1 do
+		table.insert(tShuffle, rang + row);
+	end
+	tShuffle = Shuffle(tShuffle, true);
+	for j = 0, tDrawTirageAuto:GetNbRows() -1 do
+		local valeur_shuffle = tShuffle[j+1];
+		local code_coureur = tDrawTirageAuto:GetCell('Code_coureur', j)
+		local r = tDraw:GetIndexRow('Code_coureur', code_coureur);
+		if r >= 0 then
+			if draw.tirage_auto then
+				tDraw:SetCell('Dossard', r, valeur_shuffle);
+			else
+				tDraw:SetCell('Dossard', r, 1000);
+			end
+			local cmd = "Update Resultat Set Dossard = "..(valeur_shuffle)..", Critere = '"..string.format('%03d', tDraw:GetCellInt('Rang_tirage', r)).."' Where Code_evenement = "..draw.code_evenement.." And Code_coureur = '"..tDraw:GetCell('Code_coureur', r).."'";
+			base:Query(cmd);
+		end
+	end
+	RefreshGrid();
+	grid_tableau:SelectRow(savrowselected);
+end
+
 function OnTirageAuto(savrowselected)
 	-- adv.Alert('entree de OnTirageAuto draw.row_selected = '..tostring(draw.row_selected ));
 	for i = 1, #draw.tRang_tirageauto  do
@@ -2127,6 +2135,43 @@ end
 function SetG5Egalite()
 	draw.LastG5 = {};
 	draw.tRows_jamaistirer = {};
+	if not tDrawG5 then
+		tDrawG5 = tDraw:Copy();
+		tDrawG5:OrderBy('Rang_tirage');
+		local groupe_tirage = tDrawG5:GetCellInt('Groupe_tirage', 29);
+		local filter = "$(Groupe_tirage):In("..groupe_tirage..")";
+		tDrawG5:Filter(filter, true);		
+	end
+	for i = 0, tDrawG5:GetNbRows() -1 do
+		ecsl_pts = tDrawG5:GetCellInt('ECSL_points', i);
+		fis_pts = tDrawG5:GetCellDouble('FIS_pts', i);
+		local rang_tirage = tDrawG5:GetCellInt('Rang_tirage', i);
+		if not draw.LastG5[ecsl_pts] then
+			draw.LastG5[ecsl_pts] = {};
+			draw.LastG5[ecsl_pts].Nombre = 0;
+			draw.LastG5[ecsl_pts].fis_pts = fis_pts;
+			ecsl_pts_encours = ecsl_pts;
+			fis_pts_encours = fis_pts;
+		end
+		if ecsl_pts == ecsl_pts_encours and fis_pts == fis_pts_encours then
+			draw.LastG5[ecsl_pts].Nombre = draw.LastG5[ecsl_pts].Nombre + 1
+		end
+		ecsl_pts_encours = ecsl_pts;
+		fis_pts_encours = fis_pts;
+	end
+	for i = 0, tDrawG5:GetNbRows() -1 do
+		ecsl_pts = tDrawG5:GetCellInt('ECSL_points', i);
+		fis_pts = tDrawG5:GetCellDouble('FIS_pts', i);
+		local rang_tirage = tDrawG5:GetCellInt('Rang_tirage', i);
+		if draw.LastG5[ecsl_pts].Nombre > 1 then
+			draw.tRows_jamaistirer[rang_tirage] = rang_tirage;
+		end
+	end
+end
+
+function SetG5EgaliteOLD()
+	draw.LastG5 = {};
+	draw.tRows_jamaistirer = {};
 	local ecsl_pts_encours = -1;
 	local fis_pts_encours = -1;
 	if not tDrawG5 then
@@ -2169,10 +2214,10 @@ function SetuptDraw()
 		return;
 	end
 	base:Query('Delete From Resultat_Info_Bibo Where Code_evenement = '..draw.code_evenement);
-	tLastECSL_30 = tLastECSL_30 or {};
 	local cmd = "Update Resultat Set Dossard = Null Where Code_evenement = "..draw.code_evenement;
 	base:Query(cmd);
 	for i = 0, tDraw:GetNbRows() -1 do
+		tDraw:SetCell('Pris', i, 0);
 		tDraw:SetCellNull('Critere', i);
 		tDraw:SetCellNull('Groupe', i);
 		tDraw:SetCellNull('ECSL_30', i);
@@ -2205,7 +2250,6 @@ function SetuptDraw()
 	draw.ptsFIS30 = tDraw:GetCellDouble('FIS_pts', 29);
 	draw.pts7 = tDraw:GetCellInt('ECSL_points', 6);
 	draw.pts15 = tDraw:GetCellInt('ECSL_points', 14);
-	draw.pts30 = tDraw:GetCellInt('ECSL_points', 29);
 	tDrawECSL = tDraw:Copy();	-- tous ceux qui ont des points ECSL ou Overall
 	ReplaceTableEnvironnement(tDrawECSL, 'tDrawECSL');
 	tDrawG1 = tDraw:Copy();	-- dans les 15 de la ECSL
@@ -2232,38 +2276,6 @@ Groupe 6 On poursuit selon les points FIS.
 	-- adv.Alert('draw.pts15 = '..draw.pts15);
 	
 	rajouter_pts_fis = 0;
-	if draw.bolEstCE then
-		tDrawECSL:OrderBy('ECSL_overall_points DESC, ECSL_points DESC, FIS_pts, Nom, Prenom');
-		for i = tDrawECSL:GetNbRows() -1, 0, -1 do
-			local supprimer = false;
-			local pts = tDrawECSL:GetCellInt('ECSL_points', i, -1);
-			local ptsOA = tDrawECSL:GetCellInt('ECSL_overall_points', i, -1);
-			local WCSL_rank = tDrawECSL:GetCellInt('WCSL_rank', i, 99);
-			local CC_winner = tDrawECSL:GetCell('CC_winner', i);
-			if pts <= 0 then
-				supprimer = true;
-			end
-			if WCSL_rank <= 30 and i >= 15 then
-				supprimer = true;
-			end
-			if CC_winner:len() > 0 and i < 20 then
-				supprimer = true;
-			end
-			if ptsOA >= 450 then
-				supprimer = false;
-			end				
-			if supprimer == true then
-				-- adv.Alert('i = '..i..', suppression de '..tDrawECSL:GetCell('Nom', i))
-				tDrawECSL:RemoveRowAt(i);
-			end
-		end
-		rajouter_pts_fis = 30 - tDrawECSL:GetNbRows();
-		if rajouter_pts_fis < 0 then
-			rajouter_pts_fis = 0;
-		end
-		-- adv.Alert('tDrawECSL:GetNbRows() = '..tDrawECSL:GetNbRows()..', rajouter_pts_fis = '..rajouter_pts_fis);
-	end
-	
 	for i = tDrawG1:GetNbRows() -1, 0, -1 do		-- dans les 15
 		local pts = tDrawG1:GetCellInt('ECSL_points', i, -1);
 		if pts < draw.pts15 then
@@ -2291,23 +2303,12 @@ Groupe 6 On poursuit selon les points FIS.
 		local pts =  tDrawG5:GetCellInt('ECSL_points', i, -1);
 		if pts < 0 then
 			tDrawG5:RemoveRowAt(i);
-		end
-	end
-	draw.pts30 = tDraw:GetCellInt('ECSL_points', 29);
-	if draw.finale_ce == 'Non' then
-		for i = tDrawG5:GetNbRows() -1, 0, -1 do
-			local pts =  tDrawG5:GetCellInt('ECSL_points', i, -1);
-			if pts > 0 and pts < draw.pts30 then
-				tDrawG5:RemoveRowAt(i);
+		else
+			if draw.finale_ce == 'Oui' then
+				break;
 			end
 		end
 	end
-
-	rajouter_pts_fis = rajouter_pts_fis - tDrawG3:GetNbRows();
-	if rajouter_pts_fis < 0 then
-		rajouter_pts_fis = 0;
-	end
-	-- adv.Alert('rajouter_pts_fis = '..rajouter_pts_fis);
 
 	tDrawG4:OrderBy('FIS_pts');				-- les vainqueurs des autres CC
 	for i = tDrawG4:GetNbRows() -1, 0, -1 do
@@ -2316,11 +2317,6 @@ Groupe 6 On poursuit selon les points FIS.
 			tDrawG4:RemoveRowAt(i);
 		end
 	end
-	if tDrawG4:GetNbRows() > 0 then
-		
-	end
-
-	-- adv.Alert('1- tDrawG6:GetNbRows() = '..tDrawG6:GetNbRows())
 	tDrawG6:OrderBy('FIS_pts');				-- coureurs ayant des points FIS
 	for i = tDrawG6:GetNbRows() -1, 0, -1 do
 		local pts = tDrawG6:GetCellDouble('FIS_pts', i, -1);
@@ -2328,74 +2324,7 @@ Groupe 6 On poursuit selon les points FIS.
 			tDrawG6:RemoveRowAt(i);
 		end
 	end
-
-	for i = 0, tDrawG1:GetNbRows() -1 do
-		local code_coureur = tDrawG1:GetCell('Code_coureur', i)
-		local r = tDrawG2:GetIndexRow('Code_coureur', code_coureur);
-		if r >= 0 then		-- on trouve le coureur
-			tDrawG2:RemoveRowAt(r);
-		end
-		r = tDrawG3:GetIndexRow('Code_coureur', code_coureur);
-		if r >= 0 then		-- on trouve le coureur
-			tDrawG3:RemoveRowAt(r);
-		end
-		r = tDrawG4:GetIndexRow('Code_coureur', code_coureur);
-		if r >= 0 then		-- on trouve le coureur
-			tDrawG4:RemoveRowAt(r);
-		end
-		r = tDrawG5:GetIndexRow('Code_coureur', code_coureur);
-		if r >= 0 then		-- on trouve le coureur
-			tDrawG5:RemoveRowAt(r);
-		end
-		r = tDrawG6:GetIndexRow('Code_coureur', code_coureur);
-		if r >= 0 then		-- on trouve le coureur
-			tDrawG6:RemoveRowAt(r);
-		end
-	end
-	for i = 0, tDrawG2:GetNbRows() -1 do
-		local code_coureur = tDrawG2:GetCell('Code_coureur', i)
-		local r = tDrawG3:GetIndexRow('Code_coureur', code_coureur);
-		if r >= 0 then		-- on trouve le coureur
-			tDrawG3:RemoveRowAt(r);
-		end
-		r = tDrawG4:GetIndexRow('Code_coureur', code_coureur);
-		if r >= 0 then		-- on trouve le coureur
-			tDrawG4:RemoveRowAt(r);
-		end
-		r = tDrawG5:GetIndexRow('Code_coureur', code_coureur);
-		if r >= 0 then		-- on trouve le coureur
-			tDrawG5:RemoveRowAt(r);
-		end
-		r = tDrawG6:GetIndexRow('Code_coureur', code_coureur);
-		if r >= 0 then		-- on trouve le coureur
-			tDrawG6:RemoveRowAt(r);
-		end
-	end
-	for i = 0, tDrawG3:GetNbRows() -1 do
-		local code_coureur = tDrawG3:GetCell('Code_coureur', i)
-		local r = tDrawG4:GetIndexRow('Code_coureur', code_coureur);
-		if r >= 0 then		-- on trouve le coureur
-			tDrawG4:RemoveRowAt(r);
-		end
-		r = tDrawG5:GetIndexRow('Code_coureur', code_coureur);
-		if r >= 0 then		-- on trouve le coureur
-			tDrawG5:RemoveRowAt(r);
-		end
-		r = tDrawG6:GetIndexRow('Code_coureur', code_coureur);
-		if r >= 0 then		-- on trouve le coureur
-			tDrawG6:RemoveRowAt(r);
-		end
-	end
 	
-	for i = 0, tDrawG5:GetNbRows() -1 do
-		local code_coureur = tDrawG5:GetCell('Code_coureur', i)
-		local r = tDrawG6:GetIndexRow('Code_coureur', code_coureur);
-		if r >= 0 then		-- on trouve le coureur
-			tDrawG6:RemoveRowAt(r);
-		end
-	end
-	-- adv.Alert('2- tDrawG5:GetNbRows() = '..tDrawG5:GetNbRows()..', tDrawG6:GetNbRows() = '..tDrawG6:GetNbRows())
-	-- adv.Alert('draw.finale_ce = '..draw.finale_ce);
 	if draw.finale_ce == 'Oui' then
 		for i = 0, tDrawG5:GetNbRows() -1 do
 			local code_coureur = tDrawG5:GetCell('Code_coureur', i)
@@ -2413,44 +2342,7 @@ Groupe 6 On poursuit selon les points FIS.
 	tDrawG6:OrderBy('FIS_pts');
 	-- analyse de tDrawG5
 	local last_pts_fis = 0;
-	if draw.bolEstCE then
-		if rajouter_pts_fis > 0 then
-			local tCodesAjoutes = {};
-			for i = 0, rajouter_pts_fis -1 do
-				last_pts_fis = tDrawG6:GetCellDouble('FIS_pts', i);
-			end
-			-- adv.Alert('avant insert dans tDrawG5, tDrawG5:GetNbRows() = '..tDrawG5:GetNbRows()..', rajouter_pts_fis = '..rajouter_pts_fis..', last_pts_fis = '..last_pts_fis);
-			for i = 0, tDrawG6:GetNbRows() -1 do
-				local pts = tDrawG6:GetCellDouble('FIS_pts', i);
-				if pts <= last_pts_fis then
-					local code_coureur = tDrawG6:GetCell('Code_coureur', i);
-					table.insert(tCodesAjoutes, code_coureur);
-					local clt = tDrawG6:GetCellInt('FIS_clt', i);
-					local row = tDrawG5:AddRow();
-					tDrawG5:SetCell('Code_evenement', row, draw.code_evenement);
-					tDrawG5:SetCell('Code_coureur', row, code_coureur);
-					tDrawG5:SetCell('Nom', row, tDrawG6:GetCell('Nom', i));
-					tDrawG5:SetCell('Prenom', row, tDrawG6:GetCell('Prenom', i));
-					tDrawG5:SetCell('FIS_pts', row, pts);
-					tDrawG5:SetCell('FIS_clt', row, clt);
-					tDrawG5:SetCellNull('ECSL_points', row);
-					-- adv.Alert(tDrawG6:GetCell('Nom', i)..' ajouté dans tDrawG5');
-					tLastECSL_30.ECSL_points = 0;
-					tLastECSL_30.FIS_pts = pts;
-				else
-					break;
-				end
-			end
-			for i = 1, #tCodesAjoutes do
-				local code_coureur = tCodesAjoutes[i];
-				local r = tDrawG6:GetIndexRow('Code_coureur', code_coureur);
-				if r >= 0 then
-					tDrawG6:RemoveRowAt(r);
-				end
-			end
-			-- adv.Alert('après insert dans tDrawG5, tDrawG5:GetNbRows() = '..tDrawG5:GetNbRows());
-		end	
-	else
+	if not draw.bolEstCE then
 		tDrawG5:RemoveAllRows();
 		last_pts_fis = tDrawG6:GetCellDouble('FIS_pts', tDrawG6:GetNbRows() -1);
 	end
@@ -2467,45 +2359,70 @@ Groupe 6 On poursuit selon les points FIS.
 	local fis_pts_encours = nil;
 	draw.rang_tirage = 1;
 	tDrawG1:OrderBy('ECSL_points DESC, FIS_pts');	-- départage des exaequos ECSL par les pts FIS
-	for i = 0, tDrawG1:GetNbRows() -1 do		-- On est forcément en Coupe d'Europe sinon tDrawG1 est vide
-		draw.nb_pris_ecsl = draw.nb_pris_ecsl + 1;
-		local ecsl_pts = tDrawG1:GetCellInt('ECSL_points', i);
-		local fis_pts = tDrawG1:GetCellDouble('FIS_pts', i);
-		if i == 0 then
-			ecsl_pts_encours = ecsl_pts;
-			fis_pts_encours = fis_pts;
-		end
-		local code_coureur = tDrawG1:GetCell('Code_coureur', i);
-		local r = tDraw:GetIndexRow('Code_coureur', code_coureur);
-		if draw.bolVitesse == true then
-			current_group = 1;
-		else
-			if ecsl_pts >= draw.pts7 then
+	if tDrawG1:GetNbRows() > 0 then
+		for i = 0, tDrawG1:GetNbRows() -1 do		-- On est forcément en Coupe d'Europe sinon tDrawG1 est vide
+			local ecsl_pts = tDrawG1:GetCellInt('ECSL_points', i);
+			local fis_pts = tDrawG1:GetCellDouble('FIS_pts', i);
+			if i == 0 then
+				ecsl_pts_encours = ecsl_pts;
+				fis_pts_encours = fis_pts;
+			end
+			local code_coureur = tDrawG1:GetCell('Code_coureur', i);
+			local r = tDraw:GetIndexRow('Code_coureur', code_coureur);
+			if draw.bolVitesse == true then
 				current_group = 1;
 			else
-				current_group = 2;
+				if ecsl_pts >= draw.pts7 then
+					current_group = 1;
+				else
+					current_group = 2;
+				end
+			end
+			tDraw:SetCell('ECSL_30', r, 1);
+			tDraw:SetCell('Groupe_tirage', r, current_group);
+			if i > 0 then
+				if ecsl_pts == ecsl_pts_encours and fis_pts == fis_pts_encours then
+					nb_exaequo = nb_exaequo + 1;
+				else
+					draw.rang_tirage = draw.rang_tirage + nb_exaequo + 1;
+					nb_exaequo = 0;
+				end
+			end
+
+			ecsl_pts_encours = ecsl_pts;
+			fis_pts_encours = fis_pts;
+
+			tDraw:SetCell('TG', r, 'tDrawG1');
+			tDraw:SetCell('Pris', r, 1);
+			tDraw:SetCell('ECSL_30', r, 1);
+			
+			tDraw:SetCell('Rang_tirage', r, draw.rang_tirage);
+			tDraw:SetCell('Critere', r, string.format('%03d', draw.rang_tirage));
+			draw.nb_pris_ecsl = draw.nb_pris_ecsl + 1;
+			local r = tDrawG2:GetIndexRow('Code_coureur', code_coureur);
+			if r >= 0 then		-- on trouve le coureur
+				tDrawG2:RemoveRowAt(r);
+			end
+			r = tDrawG3:GetIndexRow('Code_coureur', code_coureur);
+			if r >= 0 then		-- on trouve le coureur
+				tDrawG3:RemoveRowAt(r);
+			end
+			r = tDrawG4:GetIndexRow('Code_coureur', code_coureur);
+			if r >= 0 then		-- on trouve le coureur
+				tDrawG4:RemoveRowAt(r);
+			end
+			r = tDrawG5:GetIndexRow('Code_coureur', code_coureur);
+			if r >= 0 then		-- on trouve le coureur
+				tDrawG5:RemoveRowAt(r);
+			end
+			r = tDrawG6:GetIndexRow('Code_coureur', code_coureur);
+			if r >= 0 then		-- on trouve le coureur
+				tDrawG6:RemoveRowAt(r);
 			end
 		end
-		tDraw:SetCell('ECSL_30', r, 1);
-		tDraw:SetCell('Groupe_tirage', r, current_group);
-		if i > 0 then
-			if ecsl_pts == ecsl_pts_encours and fis_pts == fis_pts_encours then
-				nb_exaequo = nb_exaequo + 1;
-			else
-				draw.rang_tirage = draw.rang_tirage + nb_exaequo + 1;
-				nb_exaequo = 0;
-			end
+		if draw.bolVitesse == false then
+			current_group = current_group + 1;
 		end
-
-		ecsl_pts_encours = ecsl_pts;
-		fis_pts_encours = fis_pts;
-
-		tDraw:SetCell('TG', r, 'tDrawG1');
-		tDraw:SetCell('Pris', r, 1);
-		tDraw:SetCell('ECSL_30', r, 1);
-		
-		tDraw:SetCell('Rang_tirage', r, draw.rang_tirage);
-		tDraw:SetCell('Critere', r, string.format('%03d', draw.rang_tirage));
 	end
 	if nb_exaequo > 0 then
 		for i = 0, nb_exaequo do	-- traitement des exaequos de rang 15
@@ -2516,9 +2433,6 @@ Groupe 6 On poursuit selon les points FIS.
 	
 	tDrawG2:OrderBy('ECSL_overall_points DESC, ECSL_points DESC, FIS_pts');				-- les + de 450 pts
 	if tDrawG2:GetNbRows() > 0 then
-		if draw.bolVitesse == false then
-			current_group = current_group + 1;
-		end
 		local pts_overall_next  = nil;
 		local pts_fis_next  = nil;
 		for i = 0, tDrawG2:GetNbRows() -1 do		-- les plus de 450 - 200 pts 
@@ -2550,6 +2464,22 @@ Groupe 6 On poursuit selon les points FIS.
 			end
 			tDraw:SetCell('Critere', r, string.format('%03d', draw.rang_tirage));
 			draw.nb_pris_ecsl = draw.nb_pris_ecsl + 1;
+			local r = tDrawG3:GetIndexRow('Code_coureur', code_coureur);
+			if r >= 0 then		-- on trouve le coureur
+				tDrawG3:RemoveRowAt(r);
+			end
+			r = tDrawG4:GetIndexRow('Code_coureur', code_coureur);
+			if r >= 0 then		-- on trouve le coureur
+				tDrawG4:RemoveRowAt(r);
+			end
+			r = tDrawG5:GetIndexRow('Code_coureur', code_coureur);
+			if r >= 0 then		-- on trouve le coureur
+				tDrawG5:RemoveRowAt(r);
+			end
+			r = tDrawG6:GetIndexRow('Code_coureur', code_coureur);
+			if r >= 0 then		-- on trouve le coureur
+				tDrawG6:RemoveRowAt(r);
+			end
 		end
 	end
 	if nb_exaequo > 0 then
@@ -2577,6 +2507,18 @@ Groupe 6 On poursuit selon les points FIS.
 				tDraw:SetCell('Dossard', r, draw.rang_tirage);
 			end
 			tDraw:SetCell('Critere', r, string.format('%03d', draw.rang_tirage));
+			local r = tDrawG4:GetIndexRow('Code_coureur', code_coureur);
+			if r >= 0 then		-- on trouve le coureur
+				tDrawG4:RemoveRowAt(r);
+			end
+			r = tDrawG5:GetIndexRow('Code_coureur', code_coureur);
+			if r >= 0 then		-- on trouve le coureur
+				tDrawG5:RemoveRowAt(r);
+			end
+			r = tDrawG6:GetIndexRow('Code_coureur', code_coureur);
+			if r >= 0 then		-- on trouve le coureur
+				tDrawG6:RemoveRowAt(r);
+			end
 		end
 	end
 	if nb_exaequo > 0 then
@@ -2591,75 +2533,125 @@ Groupe 6 On poursuit selon les points FIS.
 	-- adv.Alert('on a pris '..draw.nb_pris_ecsl..' sur les 30 à prendre, tDrawG4:GetNbRows() = '..tDrawG4:GetNbRows());
 	-- le premier winner sera toujours au rang 31 = row 30
 	local nb_exaequo = 0;
-	
-	adv.Alert('avant tDrawG5, tDrawG4:GetNbRows() = '..tDrawG4:GetNbRows() );
+	draw.bol99done = false;
+	-- adv.Alert('avant traitement de tDrawG5, tDrawG4:GetNbRows() = '..tDrawG4:GetNbRows()..', tDrawG5:GetNbRows() = '..tDrawG5:GetNbRows());
 	if tDrawG5:GetNbRows() > 0 then
 		local rtDraw = -1;
-		tLastECSL_30.groupe_tirage = current_group;
 		local ecsl_pts_encours = -2;
 		local fis_pts_encours = -2;
 		for i = 0, tDrawG5:GetNbRows() -1 do		-- on prendra jusqu'à draw.nb_pris_ecsl = 30 étendu si exaequo à la 30 place
 			local code_coureur = tDrawG5:GetCell('Code_coureur', i);
-			local ecsl_pts = tDrawG5:GetCellInt('ECSL_points', i);
-			local fis_pts = tDrawG5:GetCellDouble('FIS_pts', i);
-			if ecsl_pts == ecsl_pts_encours and fis_pts == fis_pts_encours then
-				nb_exaequo = nb_exaequo + 1;
-			else
-				draw.rang_tirage = draw.rang_tirage + 1 + nb_exaequo;
-				ecsl_pts_encours = ecsl_pts;
-				fis_pts_encours = fis_pts;
-				nb_exaequo = 0;
-			end
-			
-			rtDraw = tDraw:GetIndexRow('Code_coureur', code_coureur);
-			tDraw:SetCell('ECSL_30', rtDraw, 5);
-			draw.nb_pris_ecsl = draw.nb_pris_ecsl + 1;
-			local rtDrawG6 = tDrawG6:GetIndexRow('Code_coureur', code_coureur);
-			if rtDrawG6 >= 0 then		-- on trouve le coureur
-				tDrawG6:RemoveRowAt(rtDrawG6);
-			end
-			local rtDrawG4 = tDrawG4:GetIndexRow('Code_coureur', code_coureur);
-			if rtDrawG4 >= 0 then		-- on trouve le coureur
-				tDrawG4:RemoveRowAt(rtDrawG4);
-			end
-			tDraw:SetCell('TG', rtDraw, 'tDrawG5');
-			tDraw:SetCell('Pris', rtDraw, 1);
-			tDraw:SetCell('Groupe_tirage', rtDraw, current_group);
-			tDraw:SetCell('Rang_tirage', rtDraw, draw.rang_tirage);
-			tDrawG5:SetCell('Rang_tirage', i, draw.rang_tirage);
-			tDraw:SetCell('Critere', rtDraw, string.format('%03d', draw.rang_tirage));
-			local tDrawG4_traite = tDrawG4:GetNbRows();
-			if draw.rang_tirage == 30 then
-				if tDrawG4:GetNbRows() > 0 then
-					-- adv.Alert('Avant Traitement tDrawG4, draw.rang_tirage = '..draw.rang_tirage)
-					TraitementtDrawG4();
+			if code_coureur:len() > 0 then
+				local ecsl_pts = tDrawG5:GetCellInt('ECSL_points', i);
+				local fis_pts = tDrawG5:GetCellDouble('FIS_pts', i);
+				if ecsl_pts == ecsl_pts_encours and fis_pts == fis_pts_encours then
+					nb_exaequo = nb_exaequo + 1;
+				else
+					draw.rang_tirage = draw.rang_tirage + 1 + nb_exaequo;
+					ecsl_pts_encours = ecsl_pts;
+					fis_pts_encours = fis_pts;
 					nb_exaequo = 0;
-					ecsl_pts_encours = -2;
-					fis_pts_encours = -2;
-					-- adv.Alert('Après Traitement tDrawG4, draw.rang_tirage = '..draw.rang_tirage)
 				end
-			end
-			-- adv.Alert('last tDrawG5 traité = '..tDrawG5:GetCell('Nom', i)..', draw.rang_tirage = '..draw.rang_tirage);
-			draw.nb_pris_ecsl = draw.nb_pris_ecsl + 1;
-			draw.LastCurrentGroup = current_group;
-			if i == tDrawG5:GetNbRows() -1 then
-				tDraw:SetCell('ECSL_30', rtDraw, 99);
-			end
-			if code_coureur == draw.last_code_ecsl then
-				if draw.finale_ce == 'Non' then
+				
+				rtDraw = tDraw:GetIndexRow('Code_coureur', code_coureur);
+				tDraw:SetCell('ECSL_30', rtDraw, 5);
+				local rtDrawG6 = tDrawG6:GetIndexRow('Code_coureur', code_coureur);
+				if rtDrawG6 >= 0 then		-- on trouve le coureur
+					tDrawG6:RemoveRowAt(rtDrawG6);
+				end
+				local rtDrawG4 = tDrawG4:GetIndexRow('Code_coureur', code_coureur);
+				if rtDrawG4 >= 0 then		-- on trouve le coureur
+					tDrawG4:RemoveRowAt(rtDrawG4);
+				end
+				tDraw:SetCell('TG', rtDraw, 'tDrawG5');
+				tDraw:SetCell('Pris', rtDraw, 1);
+				tDraw:SetCell('Groupe_tirage', rtDraw, current_group);
+				tDraw:SetCell('Rang_tirage', rtDraw, draw.rang_tirage);
+				tDrawG5:SetCell('Rang_tirage', i, draw.rang_tirage);
+				tDraw:SetCell('Critere', rtDraw, string.format('%03d', draw.rang_tirage));
+				draw.nb_pris_ecsl = draw.nb_pris_ecsl + 1;
+				-- adv.Alert('On traite tDrawG5, on prend '..tDrawG5:GetCell('Nom', i)..', draw.nb_pris_ecsl = '..draw.nb_pris_ecsl..', draw.rang_tirage = '..draw.rang_tirage);
+				local r = tDrawG4:GetIndexRow('Code_coureur', code_coureur);
+				if r >= 0 then		-- on trouve le coureur
+					tDrawG4:RemoveRowAt(r);
+				end
+				r = tDrawG6:GetIndexRow('Code_coureur', code_coureur);
+				if r >= 0 then		-- on trouve le coureur
+					tDrawG6:RemoveRowAt(r);
+				end
+				if draw.nb_pris_ecsl >= 30 and not draw.bol99done and nb_exaequo == 0 then
+					draw.bol99done  = true
+					tDrawG5:SetCell('ECSL_30', i, 99);
+					tDraw:SetCell('ECSL_30', rtDraw, 99);
+				end
+				if draw.rang_tirage == 30 then
+					if tDrawG4:GetNbRows() > 0 then
+						-- adv.Alert('Avant Traitement tDrawG4, draw.rang_tirage = '..draw.rang_tirage)
+						TraitementtDrawG4();
+						nb_exaequo = 0;
+						ecsl_pts_encours = -2;
+						fis_pts_encours = -2;
+						-- adv.Alert('Après Traitement tDrawG4, draw.rang_tirage = '..draw.rang_tirage)
+					end
+				end
+				-- draw.nb_pris_ecsl = draw.nb_pris_ecsl + 1;
+				-- adv.Alert('last tDrawG5 traité = '..tDrawG5:GetCell('Nom', i)..', draw.rang_tirage = '..draw.rang_tirage);
+				draw.LastCurrentGroup = current_group;
+				if draw.bol99done and draw.finale_ce == 'Non' then
 					break;
 				end
 			end
 		end
 		SetRangEgal();
-		-- adv.Alert('tLastECSL_30.groupe_tirage = '..tostring(tLastECSL_30.groupe_tirage));
-		-- draw.rang_tirage = draw.rang_tirage  + 1;
+		rajouter_pts_fis = 30 - draw.nb_pris_ecsl;
+		-- adv.Alert('3 - rajouter_pts_fis = '..rajouter_pts_fis..', current_group = '..current_group);
 	end
-	nb_exaequo = 0;
+	tDrawG6:OrderBy('FIS_pts');
+	if rajouter_pts_fis > 0 then
+		local fis_pts_encours = -1;
+		nb_exaequo = 0;
+		local fis_pts_30 = tDrawG6:GetCellDouble('FIS_pts', rajouter_pts_fis-1);
+		for i = 0, tDrawG6:GetNbRows() - 1 do
+			local code_coureur = tDrawG6:GetCell('Code_coureur', i);
+			local fis_pts = tDrawG6:GetCellDouble('FIS_pts', i);
+			if fis_pts == fis_pts_encours then
+				nb_exaequo = nb_exaequo + 1;
+			else
+				draw.rang_tirage = draw.rang_tirage + 1 + nb_exaequo;
+				fis_pts_encours = fis_pts;
+				nb_exaequo = 0;
+			end
+			draw.nb_pris_ecsl = draw.nb_pris_ecsl + 1;
+			tDrawG6:SetCell('Pris', i, 1);
+			tDrawG6:SetCell('Rang_tirage', i, draw.rang_tirage);
+			local rtDraw = tDraw:GetIndexRow('Code_coureur', code_coureur);
+			if rtDraw >= 0 then		-- on trouve le coureur
+				tDraw:SetCell('Pris', rtDraw, 1);
+				tDraw:SetCell('TG', rtDraw, 'tDrawG5');
+				tDraw:SetCell('Groupe_tirage', rtDraw, current_group);
+				tDraw:SetCell('Rang_tirage', rtDraw, draw.rang_tirage);
+				tDraw:SetCell('Critere', rtDraw, string.format('%03d', draw.rang_tirage));
+			end
+			if draw.rang_tirage == 29 then
+				if tDrawG6:GetCellInt('Rang_tirage', i-1) == 29 then
+					break;
+				end
+			elseif draw.rang_tirage == 30 then
+				break;
+			end
+		end
+		draw.rang_tirage = 30;
+	end
+
 	if tDrawG4:GetNbRows() > 0 then
-		current_group = current_group + 1;
+		if draw.bolVitesse then
+			if current_group < 3 then
+				current_group = 3;
+			end
+		end
 		TraitementtDrawG4();
-		draw.rang_tirage = draw.rang_tirage + 1;
+		nb_exaequo = 0;
+		-- draw.rang_tirage = draw.rang_tirage + 1;
 	end
 	tDrawG6:OrderBy('FIS_pts');			-- on continue avec les points FIS
 	if not draw.bolEstCE then
@@ -2670,63 +2662,67 @@ Groupe 6 On poursuit selon les points FIS.
 		current_group = current_group + 1;
 		nb_exaequo = 0
 		for i = 0, tDrawG6:GetNbRows() -1 do
-			-- adv.Alert('on traite '..tDrawG6:GetCell('Nom', i).. 'dans tDrawG6');
-			local pts = tDrawG6:GetCellDouble('FIS_pts', i);
-			if not draw.bolEstCE then
-				if not draw.bolVitesse then
-					if draw.code_niveau == 'NC' then		-- Championnats de France
-						if pts <= draw.ptsFIS7 then
-							current_group = 1;
-						elseif pts <= draw.ptsFIS15 then
-							current_group = 2;
-						elseif pts > 0 then
-							current_group = 3;
+			if tDrawG6:GetCellInt('Pris', i) == 0 then
+				-- adv.Alert('tDrawG6 - on traite '..tDrawG6:GetCell('Nom', i).. 'dans tDrawG6');
+				local pts = tDrawG6:GetCellDouble('FIS_pts', i);
+				if not draw.bolEstCE then
+					if not draw.bolVitesse then
+						if draw.code_niveau == 'NC' then		-- Championnats de France
+							if pts <= draw.ptsFIS7 then
+								current_group = 1;
+							elseif pts <= draw.ptsFIS15 then
+								current_group = 2;
+							elseif pts > 0 then
+								current_group = 3;
+							else
+								current_group = 4;
+							end
+						else
+							if pts <= draw.ptsFIS15 then
+								current_group = 1;
+							elseif pts > 0 then
+								current_group = 2;
+							else
+								current_group = 3;
+							end
+						end
+					else
+						if pts > 0 then
+							if pts <= draw.ptsFIS15 then
+								current_group = 1;
+							elseif pts <= draw.ptsFIS30 then
+								current_group = 2;
+							else
+								current_group = 3;
+							end
 						else
 							current_group = 4;
 						end
-					else
-						if pts <= draw.ptsFIS15 then
-							current_group = 1;
-						elseif pts > 0 then
-							current_group = 2;
-						else
-							current_group = 3;
-						end
-					end
-				else
-					if pts > 0 then
-						if pts <= draw.ptsFIS15 then
-							current_group = 1;
-						elseif pts <= draw.ptsFIS30 then
-							current_group = 2;
-						else
-							current_group = 3;
-						end
-					else
-						current_group = 4;
 					end
 				end
-			end
-			local code_coureur = tDrawG6:GetCell('Code_coureur', i);
-			if i > 0 then
-				if pts > tDrawG6:GetCellDouble('FIS_pts', i-1) then
-					draw.rang_tirage = draw.rang_tirage + 1 + nb_exaequo;
-					nb_exaequo = 0;
+				local code_coureur = tDrawG6:GetCell('Code_coureur', i);
+				if i > 0 then
+					if pts > tDrawG6:GetCellDouble('FIS_pts', i-1) then
+						draw.rang_tirage = draw.rang_tirage + 1 + nb_exaequo;
+						nb_exaequo = 0;
+					else
+						nb_exaequo = nb_exaequo + 1;
+					end
 				else
-					nb_exaequo = nb_exaequo + 1;
+					draw.rang_tirage = draw.rang_tirage + 1;
 				end
-			end
-			local r = tDraw:GetIndexRow('Code_coureur', code_coureur);
-			if code_coureur == draw.ajouter_code then
-				tDraw:SetCell('Statut', r, 'CF');
-			end
-			-- adv.Alert('coureur de tDrawG6 traité : '..tDrawG6:GetCell('Nom', i)..',  draw.rang_tirage = '.. draw.rang_tirage);
+				local r = tDraw:GetIndexRow('Code_coureur', code_coureur);
+				if code_coureur == draw.ajouter_code then
+					tDraw:SetCell('Statut', r, 'CF');
+				end
+				-- adv.Alert('coureur de tDrawG6 traité : '..tDrawG6:GetCell('Nom', i)..',  draw.rang_tirage = '.. draw.rang_tirage);
 
-			tDraw:SetCell('Pris', r, 1);
-			tDraw:SetCell('Groupe_tirage', r, current_group);
-			tDraw:SetCell('Rang_tirage', r, draw.rang_tirage);
-			tDraw:SetCell('Groupe', r, current_group);
-			tDraw:SetCell('Critere', r, string.format('%03d', tDraw:GetCellInt('Rang_tirage', r)));
+				tDraw:SetCell('Pris', r, 1);
+				tDraw:SetCell('Groupe_tirage', r, current_group);
+				tDraw:SetCell('Rang_tirage', r, draw.rang_tirage);
+				tDraw:SetCell('Groupe', r, current_group);
+				tDraw:SetCell('Critere', r, string.format('%03d', tDraw:GetCellInt('Rang_tirage', r)));
+			end
 		end
 	end
 	draw.rang_tirage = draw.rang_tirage + 1;
@@ -3015,13 +3011,13 @@ function OnAfficheTableau()
 	menuOutils:AppendSeparator();
 	btnWeb = menuOutils:Append({label="Vers la page FIS de la course", image ="./res/32x32_fis.png"});
 	menuOutils:AppendSeparator();
-	btnDecalerBas = menuOutils:Append({label="Décaler les rangs de tirage vers le bas", image ="./res/32x32_list_add.png"});
+	btnDecalerBas = menuOutils:Append({label="Décaler les rangs de tirage de +1", image ="./res/32x32_list_add.png"});
 	menuOutils:AppendSeparator();
-	btnDecalerHaut = menuOutils:Append({label="Décaler les rangs de tirage vers le haut", image ="./res/32x32_list_remove.png"});
+	btnDecalerHaut = menuOutils:Append({label="Décaler les rangs de tirage de -1", image ="./res/32x32_list_remove.png"});
 	menuOutils:AppendSeparator();
-	btnDecalerGroupeBas = menuOutils:Append({label="Décaler les groupes de tirage vers le bas", image ="./res/32x32_down.png"});
+	btnDecalerGroupeBas = menuOutils:Append({label="Décaler les groupes de tirage de +1", image ="./res/32x32_down.png"});
 	menuOutils:AppendSeparator();
-	btnDecalerGroupeHaut = menuOutils:Append({label="Décaler les groupes de tirage vers le haut", image ="./res/32x32_up.png"});
+	btnDecalerGroupeHaut = menuOutils:Append({label="Décaler les groupes de tirage de -1", image ="./res/32x32_up.png"});
 	menuOutils:AppendSeparator();
 	btnGetECSL = menuOutils:Append({label="Charger un fichier csv ECSL", image ="./res/32x32_startlist.png"});
 	menuOutils:AppendSeparator();
@@ -3393,60 +3389,25 @@ function OnAfficheTableau()
 				end
 			else
 				tDraw:OrderBy('Rang_tirage');
-				SetG5Egalite();
+				SetRangEgal();
 				for i = draw.row_selected, tDraw:GetNbRows() -1 do
 					if tDraw:GetCellDouble('FIS_pts', i) == 0  then
 						break;
 					end
-								-- if tDraw:GetCellInt('Dossard', i) == 0 and tDraw:GetCellInt('Groupe_tirage', i) > groupe_previous then
-					if tDraw:GetCellInt('Dossard', i) == 0 then
-						local rang_tirage = tDraw:GetCellInt('Rang_tirage', i);
-						local groupe_tirage = tDraw:GetCellInt('Groupe_tirage', i);
-						if not draw.tRows_nepastirer[rang_tirage] then
-							-- adv.Alert('draw.tRows_nepastirer['..rang_tirage..'] existe pas')
-							local dossard = rang_tirage;
-							if not draw.tRows_jamaistirer[rang_tirage] then
-								-- adv.Alert('draw.tRows_jamaistirer['..rang_tirage..'] existe pas')
-								tDraw:SetCell('Dossard', i, dossard);
-								local cmd = "Update Resultat Set Dossard = "..dossard..", Critere = '"..string.format('%03d', tDraw:GetCellInt('Rang_tirage', i)).."' Where Code_evenement = "..draw.code_evenement.." And Code_coureur = '"..tDraw:GetCell('Code_coureur', i).."'";
-								base:Query(cmd);
-							end
-						else
-							if draw.tirage_auto == true then
-								if draw.tRows_nepastirer[rang_tirage] then
-									draw.tRows_nepastirer[rang_tirage] = nil;
-								end
-							end
-							-- adv.Alert('draw.tRows_nepastirer['..rang_tirage..'] existe')
-							tDrawG6 = tDraw:Copy();
-							ReplaceTableEnvironnement(tDrawG6, 'DrawG6');
-							for i = tDrawG6:GetNbRows() -1, 0, -1 do
-								if tDrawG6:GetCellInt('Rang_tirage', i, -1) ~= rang_tirage then
-									tDrawG6:RemoveRowAt(i);
-								end
-							end
-							tDrawG6:OrderRandom('FIS_pts');
-							local tShuffle = {};
-							for i = 0, tDrawG6:GetNbRows() -1 do
-								table.insert(tShuffle, rang_tirage + i);
-							end
-							tShuffle = Shuffle(tShuffle, true);
-							for i = 0, tDrawG6:GetNbRows() -1 do
-								local rang_tirage = tDrawG6:GetCellInt('Rang_tirage', i)
-								local valeur_shuffle = tShuffle[i+1];
-								local dossard = valeur_shuffle ;
-								local code_coureur = tDrawG6:GetCell('Code_coureur', i);
-								local r = tDraw:GetIndexRow('Code_coureur', code_coureur);
-								if r >= 0 then
-									if draw.tirage_auto then
-										if not draw.tRows_nepastirer[rang_tirage] and not draw.tRows_jamaistirer[rang_tirage] then
-											-- adv.Alert('on a tiré '..dossard..' pour le rang '..rang_tirage);
-											tDraw:SetCell('Dossard', r, dossard);
-										end
-									end
-								end
-							end
+					local dossard = nil;
+					local rang_tirage = tDraw:GetCellInt('Rang_tirage', i);
+					if not draw.RangEgal[rang_tirage] then
+						draw.RangEgal[rang_tirage] = {};
+						draw.RangEgal[rang_tirage].Nombre = 1;
+					end
+					if draw.RangEgal[rang_tirage].Nombre == 1 then
+						if tDraw:GetCell('Dossard', i):len() == 0 then
+							tDraw:SetCell('Dossard', i, rang_tirage);
 						end
+					elseif draw.tirage_auto == true then
+						tDrawTirageAuto = tDraw:Copy();
+						ReplaceTableEnvironnement(tDrawTirageAuto, '_DrawTirageAuto');
+						OnTirageRangX(rang_tirage);
 					end
 				end
 			end
@@ -3507,16 +3468,7 @@ function OnAfficheTableau()
 	dlgTableau:Bind(eventType.MENU, 
 		function(evt)
 			ChecktDraw();
-			if draw.bolExisteDossard then
-				local msg = "Les dossards ont déjà été tirés.\n"..
-						"Vous devez les supprimer avant de faire ce décalage.";
-				dlgTableau:MessageBox(
-					msg, "Attribution des dossards",
-					msgBoxStyle.OK+msgBoxStyle.ICON_WARNING
-				)
-				return;
-			end
-			local msg = "Voulez-vous décaler les rangs de tirage de UN vers le bas\n"..
+			local msg = "Voulez-vous décaler les rangs de tirage de +1\n"..
 						"à partir de la ligne sélectionnée ?";
 			if dlgTableau:MessageBox(
 				msg, "Décalage des rangs de tirage", 
@@ -3532,16 +3484,7 @@ function OnAfficheTableau()
 	dlgTableau:Bind(eventType.MENU, 
 		function(evt)
 			ChecktDraw();
-			if draw.bolExisteDossard then
-				local msg = "Les dossards ont déjà été tirés.\n"..
-						"Vous devez les supprimer avant de faire ce décalage.";
-				dlgTableau:MessageBox(
-					msg, "Attribution des dossards",
-					msgBoxStyle.OK+msgBoxStyle.ICON_WARNING
-				)
-				return;
-			end
-			local msg = "Voulez-vous décaler les rangs de tirage de UN vers le haut\n"..
+			local msg = "Voulez-vous décaler les rangs de tirage de -1\n"..
 						"à partir de la ligne sélectionnée ?";
 			if dlgTableau:MessageBox(
 				msg, "Décalage des rangs de tirage", 
@@ -3558,16 +3501,7 @@ function OnAfficheTableau()
 	dlgTableau:Bind(eventType.MENU, 
 		function(evt)
 			ChecktDraw();
-			if draw.bolExisteDossard then
-				local msg = "Les dossards ont déjà été tirés.\n"..
-						"Vous devez les supprimer avant de faire ce décalage.";
-				dlgTableau:MessageBox(
-					msg, "Attribution des dossards",
-					msgBoxStyle.OK+msgBoxStyle.ICON_WARNING
-				)
-				return;
-			end
-			local msg = "Voulez-vous décaler les groupes de tirage de UN vers le bas\n"..
+			local msg = "Voulez-vous décaler les groupes de tirage de +1\n"..
 						"à partir de la ligne sélectionnée ?";
 			if dlgTableau:MessageBox(
 				msg, "Décalage des groupes de tirage", 
@@ -3583,16 +3517,7 @@ function OnAfficheTableau()
 	dlgTableau:Bind(eventType.MENU, 
 		function(evt)
 			ChecktDraw();
-			if draw.bolExisteDossard then
-				local msg = "Les dossards ont déjà été tirés.\n"..
-						"Vous devez les supprimer avant de faire ce décalage.";
-				dlgTableau:MessageBox(
-					msg, "Attribution des dossards",
-					msgBoxStyle.OK+msgBoxStyle.ICON_WARNING
-				)
-				return;
-			end
-			local msg = "Voulez-vous décaler les groupes de tirage de UN vers le haut\n"..
+			local msg = "Voulez-vous décaler les groupes de tirage de -1\n"..
 						"à partir de la ligne sélectionnée ?";
 			if dlgTableau:MessageBox(
 				msg, "Décalage des groupes de tirage", 
@@ -3757,7 +3682,7 @@ function main(params_c)
 	draw.height = display:GetSize().height - 30;
 	draw.x = 0;
 	draw.y = 0;
-	draw.version = "4.71"; -- 4.1 pour 2022-2023
+	draw.version = "4.8"; -- 4.1 pour 2022-2023
 	draw.hostname = 'live.fisski.com';
 	draw.method = 'socket';
 	draw.ajouter_code = '';
