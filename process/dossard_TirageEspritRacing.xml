@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+	<default abd_dsq="1" bibo_m1="10" bibo_m2="10">
+		<dames groupe1="'C7','C8','C9','C10','C11','C12','C13'" groupe2="'C4','C5','C6'" groupe3="'U21','U30','C1','C2','C3'" />
+		<hommes groupe4="'B9','B10','B11','B12','B13'" groupe5="'B7','B8'" groupe6="'A4','A5','A6'" groupe7="'U21','U30','A1','A2','A3'"/>
+	</default>
+	<config abd_dsq="1" bibo_m1="10" bibo_m2="10">
+		<dames groupe1="'C7','C8','C9','C10','C11','C12','C13'" groupe2="'C4','C5','C6'" groupe3="'U21','U30','C1','C2','C3'" />
+		<hommes groupe4="'B9','B10','B11','B12','B13'" groupe5="'B7','B8'" groupe6="'A4','A5','A6'" groupe7="'U21','U30','A1','A2','A3'"/>
+	</config>
+	<panel name="config">
+		<lua>dofile('./interface/adv.lua'); dofile('./edition/functionPG.lua');</lua>
+		<padding all="5px"/>
+		<col value="1"/>
+		<row value="50px"/>
+		<matrix row="auto">
+			<col value="1,3,5,1"/>
+			<row value="40px"/>
+			<statictext row="auto" col_start="2" style="ALIGN_RIGHT" label="Choix de la manche : "/>
+			<combobox col_start="3" name="manche" style="CB_READONLY"/>
+			<row value="20px"/>
+			<staticbox row_start="1" row_end="0" col_start="2" col_end="3" label="Configuration du tirage"/>
+			<row value="20px"/>
+			<row value="10px"/>
+			<row value="20px"/>
+			<toolbar row="auto" col_start="1" col_end="0" name="tbconfig" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
+		</matrix>
+		<row value="1"/>
+	</panel>
+</root>
