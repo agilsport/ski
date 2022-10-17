@@ -23,20 +23,20 @@ function SetupDefault(evt)
 		dlgSetup:GetWindowName('groupe_dames'..i):SetValue('');
 		dlgSetup:GetWindowName('groupe_hommes'..i):SetValue('');
 	end
-	if params.nodeDefault:GetAttribute('abd_dsq') == 'Oui' then
-		if params.nodeDefault:GetAttribute('bib_abddsq') == 'ASC' then
-			dlgSetup:GetWindowName('abddsq_order'):SetSelection(0);
+	if params.nodeDefault:GetAttribute('abd_dsq_repartent') == 'Oui' then
+		if params.nodeDefault:GetAttribute('bib_abddsq_ordre') == 'ASC' then
+			dlgSetup:GetWindowName('bib_abddsq_ordre'):SetSelection(0);
 		else
-			dlgSetup:GetWindowName('abddsq_order'):SetSelection(1);
+			dlgSetup:GetWindowName('bib_abddsq_ordre'):SetSelection(1);
 		end
-		if params.nodeDefault:GetAttribute('abd_dsq_end') == 'true' then
-			dlgSetup:GetWindowName('abddsq_after'):SetSelection(0);
+		if params.nodeDefault:GetAttribute('abd_dsq_apres_classes') == 'Oui' then
+			dlgSetup:GetWindowName('abd_dsq_apres_classes'):SetSelection(0);
 		else
-			dlgSetup:GetWindowName('abddsq_after'):SetSelection(1);
+			dlgSetup:GetWindowName('abd_dsq_apres_classes'):SetSelection(1);
 		end
 	else
-		dlgSetup:GetWindowName('abddsq_order'):SetSelection(2);
-		dlgSetup:GetWindowName('abddsq_after'):SetSelection(2);
+		dlgSetup:GetWindowName('bib_abddsq_ordre'):SetSelection(2);
+		dlgSetup:GetWindowName('abd_dsq_apres_classes'):SetSelection(2);
 	end
 	local indice_dames = 0;
 	for i = 1, 20 do
@@ -102,23 +102,23 @@ function OnSetup()
 		params.nodeConfig:ChangeAttribute('bibo_m1', params.bibo_m1);
 		params.bibo_m2 = tonumber(dlgSetup:GetWindowName('bibo_m2'):GetValue()) or 10;
 		params.nodeConfig:ChangeAttribute('bibo_m2', params.bibo_m2);
-		if dlgSetup:GetWindowName('abddsq_order'):GetSelection() == 0 then
-			params.bib_abddsq = 'ASC';
-			params.abd_dsq = 'Oui';
-		elseif dlgSetup:GetWindowName('abddsq_order'):GetSelection() == 1 then
-			params.bib_abddsq = 'DESC';
-			params.abd_dsq = 'Oui';
+		if dlgSetup:GetWindowName('bib_abddsq_ordre'):GetSelection() == 0 then
+			params.bib_abddsq_ordre = 'ASC';
+			params.abd_dsq_repartent = 'Oui';
+		elseif dlgSetup:GetWindowName('bib_abddsq_ordre'):GetSelection() == 1 then
+			params.bib_abddsq_ordre = 'DESC';
+			params.abd_dsq_repartent = 'Oui';
 		else
-			params.abd_dsq = 'Non';
+			params.abd_dsq_repartent = 'Non';
 		end
-		params.nodeConfig:ChangeAttribute('abd_dsq', params.abd_dsq);
-		params.nodeConfig:ChangeAttribute('bib_abddsq', params.bib_abddsq);
-		if dlgSetup:GetWindowName('abddsq_after'):GetSelection() == 0 then
-			params.abd_dsq_end = 'true';
+		params.nodeConfig:ChangeAttribute('abd_dsq_repartent', params.abd_dsq_repartent);
+		params.nodeConfig:ChangeAttribute('bib_abddsq_ordre', params.bib_abddsq_ordre);
+		if dlgSetup:GetWindowName('abd_dsq_apres_classes'):GetSelection() == 0 then
+			params.abd_dsq_apres_classes = 'Oui';
 		else
-			params.abd_dsq_end = 'false';
+			params.abd_dsq_apres_classes = 'Non';
 		end
-		params.nodeConfig:ChangeAttribute('abd_dsq_end', params.abd_dsq_end);
+		params.nodeConfig:ChangeAttribute('abd_dsq_apres_classes', params.abd_dsq_apres_classes);
 		local indice_groupe = 0;
 		for i = 1, 10 do
 			local chaine = dlgSetup:GetWindowName('groupe_dames'..i):GetValue();
@@ -172,29 +172,29 @@ function OnSetup()
 		node_attr = 'name', 
 		node_value = 'setup'
 	});
-	dlgSetup:GetWindowName('abddsq_order'):Clear();
-	dlgSetup:GetWindowName('abddsq_order'):Append("Dans l'ordre des dossards");
-	dlgSetup:GetWindowName('abddsq_order'):Append("Dans l'ordre inverse des dossards");
-	dlgSetup:GetWindowName('abddsq_order'):Append("Ne repartent pas en M2");
+	dlgSetup:GetWindowName('bib_abddsq_ordre'):Clear();
+	dlgSetup:GetWindowName('bib_abddsq_ordre'):Append("Dans l'ordre des dossards");
+	dlgSetup:GetWindowName('bib_abddsq_ordre'):Append("Dans l'ordre inverse des dossards");
+	dlgSetup:GetWindowName('bib_abddsq_ordre'):Append("Ne repartent pas en M2");
 
-	dlgSetup:GetWindowName('abddsq_after'):Clear();
-	dlgSetup:GetWindowName('abddsq_after'):Append("A la fin de tous les classés");
-	dlgSetup:GetWindowName('abddsq_after'):Append("A la fin de leur groupe");
-	dlgSetup:GetWindowName('abddsq_after'):Append("Sans objet");
+	dlgSetup:GetWindowName('abd_dsq_apres_classes'):Clear();
+	dlgSetup:GetWindowName('abd_dsq_apres_classes'):Append("A la fin de tous les classés");
+	dlgSetup:GetWindowName('abd_dsq_apres_classes'):Append("A la fin de leur groupe");
+	dlgSetup:GetWindowName('abd_dsq_apres_classes'):Append("Sans objet");
 
-	if params.abd_dsq == 'Non' then
-		dlgSetup:GetWindowName('abddsq_order'):SetSelection(2);
-		dlgSetup:GetWindowName('abddsq_after'):SetSelection(2)
+	if params.abd_dsq_repartent == 'Non' then
+		dlgSetup:GetWindowName('bib_abddsq_ordre'):SetSelection(2);
+		dlgSetup:GetWindowName('abd_dsq_apres_classes'):SetSelection(2)
 	else
-		if params.abd_dsq_end == 'true' then
-			dlgSetup:GetWindowName('abddsq_after'):SetSelection(0);
+		if params.abd_dsq_apres_classes == 'Oui' then
+			dlgSetup:GetWindowName('abd_dsq_apres_classes'):SetSelection(0);
 		else
-			dlgSetup:GetWindowName('abddsq_after'):SetSelection(1);
+			dlgSetup:GetWindowName('abd_dsq_apres_classes'):SetSelection(1);
 		end
-		if params.bib_abddsq == 'ASC' then
-			dlgSetup:GetWindowName('abddsq_order'):SetSelection(0);
+		if params.bib_abddsq_ordre == 'ASC' then
+			dlgSetup:GetWindowName('bib_abddsq_ordre'):SetSelection(0);
 		else
-			dlgSetup:GetWindowName('abddsq_order'):SetSelection(1);
+			dlgSetup:GetWindowName('bib_abddsq_ordre'):SetSelection(1);
 		end
 	end
 	
@@ -241,20 +241,20 @@ function OnSetup()
 	
 	dlgSetup:Bind(eventType.COMBOBOX, 
 			function(evt) 
-				if dlgSetup:GetWindowName('abddsq_order'):GetSelection() < 2 then
-					dlgSetup:GetWindowName('abddsq_after'):SetSelection(0); 
+				if dlgSetup:GetWindowName('bib_abddsq_ordre'):GetSelection() < 2 then
+					dlgSetup:GetWindowName('abd_dsq_apres_classes'):SetSelection(0); 
 				else
-					dlgSetup:GetWindowName('abddsq_after'):SetSelection(2); 
+					dlgSetup:GetWindowName('abd_dsq_apres_classes'):SetSelection(2); 
 				end
 			end, 
-			dlgSetup:GetWindowName('abddsq_order'))
+			dlgSetup:GetWindowName('bib_abddsq_ordre'))
 	dlgSetup:Bind(eventType.COMBOBOX, 
 			function(evt) 
-				if dlgSetup:GetWindowName('abddsq_after'):GetSelection() == 2 then
-					dlgSetup:GetWindowName('abddsq_order'):SetSelection(2); 
+				if dlgSetup:GetWindowName('abd_dsq_apres_classes'):GetSelection() == 2 then
+					dlgSetup:GetWindowName('bib_abddsq_ordre'):SetSelection(2); 
 				end
 			end, 
-			dlgSetup:GetWindowName('abddsq_after'))
+			dlgSetup:GetWindowName('abd_dsq_apres_classes'))
 
 	dlgSetup:Bind(eventType.MENU, 
 		function(evt) 
@@ -327,6 +327,11 @@ function OnTirageManche1()
 		app.GetAuiFrame():MessageBox(msg, "Tirage au sort des exaequos !!!"
 			, msgBoxStyle.OK+msgBoxStyle.ICON_WARNING);
 	end
+	if params.non_tires_message:len() > 0 then
+		local msg = "Certains dossards n'ont pas été attribués. Liste des coureurs concernés ; \n"..params.non_tires_message;
+		app.GetAuiFrame():MessageBox(msg, "Dossards non tirés"
+			, msgBoxStyle.OK+msgBoxStyle.ICON_WARNING);
+	end
 end
 
 function OnTirageManche2()
@@ -371,7 +376,7 @@ function OnTirageManche2()
 		local tablex = tResultat_Manche:Copy();
 		OnTirageRang(tablex, i);
 	end
-	if params.abd_dsq == 'Oui' and params.abd_dsq_end == 'true' then
+	if params.abd_dsq_repartent == 'Oui' and params.abd_dsq_apres_classes == 'Oui' then
 		local cmd = 'Select * From Resultat_Manche Where Code_evenement = '..params.code_evenement..' and (Tps = -500 or Tps = -800) And Code_manche = 1';
 		base:TableLoad(tResultat_Manche, cmd);
 		for i = 0, tResultat_Manche:GetNbRows() -1 do
@@ -381,7 +386,7 @@ function OnTirageManche2()
 			tResultat_Manche:SetCell('Reserve', i, reserve);
 		end
 		local table_abddsq = tResultat_Manche:Copy();
-		local orderby = 'Tps_bonus '..params.bib_abddsq;
+		local orderby = 'Tps_bonus '..params.bib_abddsq_ordre;
 		table_abddsq:OrderBy(orderby);
 		local traite_abddsq = 0;
 		for i = 0, table_abddsq:GetNbRows() -1 do
@@ -560,9 +565,9 @@ function OnTirageRang(tablex, indice)
 			end
 		end
 	end
-	if params.abd_dsq == 'Oui' and params.abd_dsq_end == 'false' then
+	if params.abd_dsq_repartent == 'Oui' and params.abd_dsq_apres_classes == 'Non' then
 		if table_abddsq:GetNbRows() > 0 then
-			local orderby = 'Tps_bonus '..params.bib_abddsq;
+			local orderby = 'Tps_bonus '..params.bib_abddsq_ordre;
 			table_abddsq:OrderBy(orderby);
 			for i = 0, table_abddsq:GetNbRows() -1 do
 				params.rang = params.rang + 1;
@@ -621,8 +626,10 @@ function OnTirageDossard(tablex, nombre, nombre_point)
 	if pts_bibo < 0 then
 		tablex:OrderRandom();
 		for j = 0, tablex:GetNbRows() -1 do
-			tablex:SetCell('Dossard', j , params.dossard);
-			params.dossard = params.dossard + 1;
+			if tablex:GetCellInt('Reserve', j) <=20 then
+				tablex:SetCell('Dossard', j , params.dossard);
+				params.dossard = params.dossard + 1;
+			end
 		end
 		base:TableBulkUpdate(tablex, 'Dossard', 'Resultat');
 	else
@@ -634,69 +641,75 @@ function OnTirageDossard(tablex, nombre, nombre_point)
 		end
 		table_bibo:OrderRandom();
 		for j = 0, table_bibo:GetNbRows() -1 do
-			local code_coureur = table_bibo:GetCell('Code_coureur', j);
-			table_bibo:SetCell('Dossard', j , params.dossard);
-			local r = tResultat:GetIndexRow('Code_coureur', code_coureur);
-			if r >= 0 then
-				tResultat:SetCell('Dossard', r, params.dossard);
-			end
-			params.dossard = params.dossard + 1;
-			local row = table_pts:GetIndexRow('Code_coureur', code_coureur);
-			if row >= 0 then
-				table_pts:RemoveRowAt(row);
+			if table_bibo:GetCellInt('Reserve', j) <=20 then
+				local code_coureur = table_bibo:GetCell('Code_coureur', j);
+				table_bibo:SetCell('Dossard', j , params.dossard);
+				local r = tResultat:GetIndexRow('Code_coureur', code_coureur);
+				if r >= 0 then
+					tResultat:SetCell('Dossard', r, params.dossard);
+				end
+				params.dossard = params.dossard + 1;
+				local row = table_pts:GetIndexRow('Code_coureur', code_coureur);
+				if row >= 0 then
+					table_pts:RemoveRowAt(row);
+				end
 			end
 		end
 		if table_pts:GetNbRows() > 0 then
-			local nb_aexequo = 0;
-			local code_next = "-1";
-			local r_next = -1;
-			local rang_egal = -1;
-			for j = 0, table_pts:GetNbRows() -1 do
-				local code_coureur = table_pts:GetCell('Code_coureur', j);
-				local r = tResultat:GetIndexRow('Code_coureur', code_coureur);
-				local pts = table_pts:GetCellDouble('Point', j);
-				local pts_next = -1;
-				table_pts:SetCell('Dossard', j , params.dossard);
-				if j < tablex:GetNbRows() -1 then
-					pts_next = table_pts:GetCellDouble('Point', j+1);
-					code_next = table_pts:GetCell('Code_coureur', j+1);
-					local r_next = tResultat:GetIndexRow('Code_coureur', code_next);
-					if pts == pts_next then
-						nb_aexequo = nb_aexequo + 1;
-					else
-						nb_aexequo = 0;
-					end	
-					if nb_aexequo > 0 then
-						if nb_aexequo == 1 then
-							rang_egal = params.dossard;
-							if params.tExaequo[#params.tExaequo] ~= rang_egal then
-								table.insert(params.tExaequo, rang_egal);
-							end
-							tResultat:SetCell('Rang', r, rang_egal);
-							tResultat:SetCell('Rang', r_next, rang_egal);
+			if table_pts:GetCellInt('Reserve', j) <=20 then
+				local nb_aexequo = 0;
+				local code_next = "-1";
+				local r_next = -1;
+				local rang_egal = -1;
+				for j = 0, table_pts:GetNbRows() -1 do
+					local code_coureur = table_pts:GetCell('Code_coureur', j);
+					local r = tResultat:GetIndexRow('Code_coureur', code_coureur);
+					local pts = table_pts:GetCellDouble('Point', j);
+					local pts_next = -1;
+					table_pts:SetCell('Dossard', j , params.dossard);
+					if j < tablex:GetNbRows() -1 then
+						pts_next = table_pts:GetCellDouble('Point', j+1);
+						code_next = table_pts:GetCell('Code_coureur', j+1);
+						local r_next = tResultat:GetIndexRow('Code_coureur', code_next);
+						if pts == pts_next then
+							nb_aexequo = nb_aexequo + 1;
 						else
-							tResultat:SetCell('Rang', r_next, rang_egal);
+							nb_aexequo = 0;
+						end	
+						if nb_aexequo > 0 then
+							if nb_aexequo == 1 then
+								rang_egal = params.dossard;
+								if params.tExaequo[#params.tExaequo] ~= rang_egal then
+									table.insert(params.tExaequo, rang_egal);
+								end
+								tResultat:SetCell('Rang', r, rang_egal);
+								tResultat:SetCell('Rang', r_next, rang_egal);
+							else
+								tResultat:SetCell('Rang', r_next, rang_egal);
+							end
 						end
 					end
-				end
-				if r >= 0 then
-					tResultat:SetCell('Dossard', r, params.dossard);
-					if nb_aexequo > 0 then
+					if r >= 0 then
+						tResultat:SetCell('Dossard', r, params.dossard);
+						if nb_aexequo > 0 then
+						end
 					end
+					params.dossard = params.dossard + 1;
 				end
-				params.dossard = params.dossard + 1;
 			end
 		end
 		table_pts0:OrderRandom();
 		if table_pts0:GetNbRows() > 0 then
 			for j = 0, table_pts0:GetNbRows() -1 do
-				local code_coureur = table_pts0:GetCell('Code_coureur', j);
-				table_pts0:SetCell('Dossard', j , params.dossard);
-				local r = tResultat:GetIndexRow('Code_coureur', code_coureur);
-				if r >= 0 then
-					tResultat:SetCell('Dossard', r, params.dossard);
+				if table_pts0:GetCellInt('Reserve', j) <=20 then
+					local code_coureur = table_pts0:GetCell('Code_coureur', j);
+					table_pts0:SetCell('Dossard', j , params.dossard);
+					local r = tResultat:GetIndexRow('Code_coureur', code_coureur);
+					if r >= 0 then
+						tResultat:SetCell('Dossard', r, params.dossard);
+					end
+					params.dossard = params.dossard + 1;
 				end
-				params.dossard = params.dossard + 1;
 			end
 		end
 	end
@@ -714,20 +727,21 @@ function GetNodeXMLData()
 	params.nodeHommes = params.doc:FindFirst('root/config/hommes');
 	params.bibo_m1 = tonumber(params.nodeConfig:GetAttribute('bibo_m1')) or 10;
 	params.bibo_m2 = tonumber(params.nodeConfig:GetAttribute('bibo_m2')) or 10;
-	params.bib_abddsq = params.nodeConfig:GetAttribute('bib_abddsq');
-	if params.bib_abddsq ~= 'ASC' and params.bib_abddsq ~= 'DESC'  then
-		params.bib_abddsq = 'ASC';
+	params.bib_abddsq_ordre = params.nodeConfig:GetAttribute('bib_abddsq_ordre');
+	if params.bib_abddsq_ordre ~= 'ASC' and params.bib_abddsq_ordre ~= 'DESC'  then
+		params.bib_abddsq_ordre = 'ASC';
 	end
-	params.abd_dsq = params.nodeConfig:GetAttribute('abd_dsq');
-	if params.abd_dsq ~= 'Oui' and params.abd_dsq ~= 'Non' then
-		params.abd_dsq = 'Oui'
+	params.abd_dsq_repartent = params.nodeConfig:GetAttribute('abd_dsq_repartent');
+	if params.abd_dsq_repartent ~= 'Oui' and params.abd_dsq_repartent ~= 'Non' then
+		params.abd_dsq_repartent = 'Oui'
 	end
-	params.abd_dsq_end = params.nodeConfig:GetAttribute('abd_dsq_end');
-	if params.abd_dsq_end ~= 'true' and params.abd_dsq_end ~= 'false'  then
-		params.abd_dsq_end = 'true';
+	params.abd_dsq_apres_classes = params.nodeConfig:GetAttribute('abd_dsq_apres_classes');
+	if params.abd_dsq_apres_classes ~= 'Oui' and params.abd_dsq_apres_classes ~= 'Non'  then
+		params.abd_dsq_apres_classes = 'Oui';
 	end
 	tCoureurs = {};
 	tCodes = {};
+	tDossardsNonTires = {};
 	params.reserve_maxi_dames = 0;
 	bolOK = false;
 	params.tGroupesDames = {};
@@ -746,7 +760,6 @@ function GetNodeXMLData()
 		attribute = attribute:GetNext();
 	end
 	
-
 	local attribute = params.nodeHommes:GetAttributes();
 	while attribute ~= nil do
 		local name = attribute:GetName();
@@ -760,14 +773,22 @@ function GetNodeXMLData()
 	end
 	
 	SortTable(tCoureurs);
-	local cmd = "Update Resultat Set Reserve = 20 Where Code_evenement = "..params.code_evenement.." And Sexe = 'F' And Reserve Is Null";
+	local cmd = "Update Resultat Set Reserve = 21 Where Code_evenement = "..params.code_evenement.." And Sexe = 'F' And Reserve Is Null";
 	base:Query(cmd);
 	table.insert(tCoureurs, {Sexe = 'F', Categ = value, Reserve = 20, Nombre = 0, NbPoint = 0, NbClasses = 0, NbABD = 0, NbDSQ = 0});
-	local cmd = "Update Resultat Set Reserve = 21 Where Code_evenement = "..params.code_evenement.." And Sexe = 'M' And Reserve Is Null";
+	local cmd = "Update Resultat Set Reserve = 22 Where Code_evenement = "..params.code_evenement.." And Sexe = 'M' And Reserve Is Null";
 	base:Query(cmd);
 	table.insert(tCoureurs, {Sexe = 'M', Categ = value, Reserve = 21, Nombre = 0, NbPoint = 0, NbClasses = 0, NbABD = 0, NbDSQ = 0});
 	local cmd = "Select * From Resultat Where Code_evenement = "..params.code_evenement.." Order By Reserve, Point";
 	base:TableLoad(tResultat, cmd);
+	params.non_tires_message = '';
+	for i = 0, tResultat:GetNbRows() -1 do
+		if tResultat:GetCellInt('Reserve', i) == 21 or tResultat:GetCellInt('Reserve', i) == 22 then
+			local texte = tResultat:GetCell('Code_coureur', i)..' - '..tResultat:GetCell('Nom', i)..'  '..tResultat:GetCell('Prenom', i)..'  ('..tResultat:GetCell('Sexe', i)..')';
+			table.insert(tDossardsNonTires, texte);
+			params.non_tires_message = params.non_tires_message..texte..'\n';
+		end
+	end
 	GetReserveDossard(false);
 end
 
@@ -781,7 +802,7 @@ function main(params_c)
 	params.height = display:GetSize().height / 2;
 	params.x = (display:GetSize().width - params.width) / 2;
 	params.y = 50;
-	params.version = "1.1";
+	params.version = "1.2";
 	base = base or sqlBase.Clone();
 	tEvenement = base:GetTable('Evenement');
 	base:TableLoad(tEvenement, 'Select * From Evenement Where Code = '..params.code_evenement);
