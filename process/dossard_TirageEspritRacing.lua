@@ -208,6 +208,9 @@ function OnSetup()
 	tCategorieHommes = tCategorie:Copy();
 	dlgSetup:GetWindowName('categ_dames'):SetValue('');
 	for i = 1, #params.tGroupesDames do
+		if params.bolU18 == true and i == #params.tGroupesDames then
+			params.tGroupesDames[i] = "'U18',"..params.tGroupesDames[i];
+		end
 		local groupe = string.gsub(params.tGroupesDames[i], "'", "");
 		dlgSetup:GetWindowName('groupe_dames'..i):SetValue(groupe);
 	end
@@ -219,6 +222,9 @@ function OnSetup()
 	
 	dlgSetup:GetWindowName('categ_hommes'):SetValue('');
 	for i = 1, #params.tGroupesHommes do
+		if params.bolU18 == true and i == #params.tGroupesHommes then
+			params.tGroupesHommes[i] = "'U18',"..params.tGroupesHommes[i];
+		end
 		local groupe = string.gsub(params.tGroupesHommes[i], "'", "");
 		dlgSetup:GetWindowName('groupe_hommes'..i):SetValue(groupe);
 	end
@@ -773,6 +779,7 @@ function GetNodeXMLData()
 	end
 	
 	SortTable(tCoureurs);
+
 	local cmd = "Update Resultat Set Reserve = 21 Where Code_evenement = "..params.code_evenement.." And Sexe = 'F' And Reserve Is Null";
 	base:Query(cmd);
 	table.insert(tCoureurs, {Sexe = 'F', Categ = value, Reserve = 20, Nombre = 0, NbPoint = 0, NbClasses = 0, NbABD = 0, NbDSQ = 0});
@@ -802,7 +809,7 @@ function main(params_c)
 	params.height = display:GetSize().height / 2;
 	params.x = (display:GetSize().width - params.width) / 2;
 	params.y = 50;
-	params.version = "1.2";
+	params.version = "1.3";
 	base = base or sqlBase.Clone();
 	tEvenement = base:GetTable('Evenement');
 	base:TableLoad(tEvenement, 'Select * From Evenement Where Code = '..params.code_evenement);
@@ -823,6 +830,12 @@ function main(params_c)
 	base:TableLoad(tResultat, 'Select * From Resultat Where Code_evenement = '..params.code_evenement);
 	tResultat:OrderBy('Point');
 	tResultat:SetCounter('Sexe');
+	tResultat:SetCounter('Categ');
+	params.bolU18 = false;
+	local nb_U18 = tResultat:GetCounterValue('U18', 'U18');
+	if nb_U18 == 0 then
+		params.bolU18 = true;
+	end
 	GetNodeXMLData();
 	params.nb_dames = tResultat:GetCounterValue('Sexe', 'F');
 	params.nb_hommes = tResultat:GetCounterValue('Sexe', 'M');
