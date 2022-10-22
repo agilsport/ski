@@ -27,6 +27,10 @@
 			<menu title="Résultats Officieux" image="./res/16x16_ranking.png" id="res_officiel" officiel="0"/>
 			<!-- <menu title="Calcul de la Pénalité" image="./res/16x16_calc.png" language="en" action="penalite" /> -->
 			<menu title="Résultats Officiels" image="./res/16x16_official.png" id="res_officiel" officiel="1"/>
+			<menu title="Résultats Officiels Esprit Racing" image="./res/16x16_official.png">
+				<menu title="Présentation traditionnelle du résultat" image="./res/16x16_official.png" id="res_er" officiel="1"/>
+				<menu title="Présentation par Groupes de Catégories à la suite les uns des autres" image="./res/16x16_official.png" filter="after" id="res_er_groupe"/>
+			</menu>
 			<menu title="Résultats Par Catégories (filtrage des coureurs apres le calcul des points)" filter="after" image="./res/16x16_ranking.png" id="res_categ" choix_clt_max="1"/>
 			<menu title="Meilleurs Temps" image="./res/16x16_ranking.png" id="res_best" />
 			<menu title="Multi-Passages" image="./res/16x16_official.png" id="res_passage" choix_manche="1" mode_lap="2" />
@@ -79,11 +83,12 @@
 		<font name="Calibri" size="14" adjust="max" weight="bold"/>
 		<text row="auto" col="1" align="center">$(Evenement.Nom)</text>
 		<text row="auto" align="center">$(Discipline.Libelle)</text>
-		<text row="auto" align="center" cond="title_filter == nil">$(Categorie{$(Epreuve.Code_categorie)}.Libelle)..' - '..$(Sexe{$(Epreuve.Sexe)}.Libelle)</text>
-		<text row="auto" align="center" cond="title_filter ~= nil">title_filter</text>
-		<text row="auto" align="center" cond="title" >title</text>
+		<text row="auto" align="center" cond="id == 'res_er'">groupe</text>
+		<text row="auto" align="center" cond="id ~= 'res_er' and id ~= 'res_er_groupe' and base:GetTable('Epreuve'):GetNbRows() ~= 1">'Résultats Scratch Toutes Catégories'</text>
+		<text row="auto" align="center" cond="id ~= 'res_er' and base:GetTable('Epreuve'):GetNbRows() == 1">$(Categorie{$(Epreuve.Code_categorie)}.Libelle)..' - '..$(Sexe{$(Epreuve.Sexe)}.Libelle)</text>
 
-		<!-- <text row="3cm" align="left"><font orientation="90" origin="left,bottom"/>'HELLO'</text> -->
+		<text row="auto" align="center" cond="title" >title</text>
+		<text row="auto" align="center" cond="title_filter">title_filter</text>
 		<row value="0.5cm"/>
 	</header>
 
@@ -732,6 +737,162 @@
 			<call option="count_partant" file="./edition/options.xml" />
 		</end>
 	</report>
+	
+	<!-- Résultats Officiels Esprit Racing-->
+	<report id="res_er" title="(params.title)">
+		<column name="Tps_status">chrono.Status(body:GetCellInt('Tps', row))</column>
+		<lua>dofile('./interface/adv.lua');</lua>
+		<lua>body:SetCounter('Tps_status')</lua>
+		<lua>entite = $(Evenement.Code_entite)</lua>
+		<lua>nb_manche = nb_manche or 1</lua>
+		<lua>Resultat = base:GetTable('Resultat');
+			Epreuve = base:GetTable('Epreuve');
+			Categorie = base:GetTable('Categorie');
+			params.code_epreuve = tonumber(params.code_epreuve);
+			
+			if Epreuve:GetNbRows() == 1 then
+				groupe = Epreuve:GetCell('Code_categorie', 0);
+				r = Categorie:GetIndexRow('Code', groupe);
+				if r &gt;= 0 then
+					groupe = Categorie:GetCell('Libelle', r);
+				end
+			else
+				if body:GetNbRows() ~= Resultat:GetNbRows() then
+					if body:GetCell('Sexe', 0) == 'F' then
+						groupe = 'Catégories : '..body:GetCell('Groupe', 0):gsub('/',',')..' Dames';
+					else
+						groupe = 'Catégories : '..body:GetCell('Groupe', 0):gsub('/',',')..' Hommes';
+					end
+				else
+					groupe = "Résultat Scratch Toutes Catégories";
+				end
+			end
+			</lua>
+
+		<order key="Tps, Dossard Desc" />
+		
+		<rupture key="Tps_status" label="0">
+			<before cond="$(Tps_status) ~= 'ok'">
+				<font size="14"/>
+				<lua>local status = $(Tps_status)</lua>
+				<row value="0.4cm"/>
+				<text row="auto" col="1" >ranking.Code(status)..' - '..ranking.Label(status)..' ('..body:GetCounterValue('Tps_status', status)..')'</text>
+			</before>
+		</rupture>
+
+		<body>
+			<call option="couleur_alternee" file="./edition/options.xml"/>
+			<font size="8" adjust="ellipsize"/>
+			<padding all="0px" />
+			<spacing all="4" />
+	
+			<row value="auto"/>
+			<text col="4" align="center" label="Clt" font_weight="bold" font_size_step="1">$(Clt)</text>
+			<text col="4" align="center" label="Dos" font_style="italic">$(Dossard)</text>
+			<text col="4" align="center" label="GR." font_style="italic">$(Reserve)</text>
+			<text col="7" align="center" label="Code"><font size="8" cond="group =='body'"/>$(Code_coureur):sub(4)</text>
+			<text col="16" align="left" label="Nom - Prénom" font_weight="bold"><font adjust="ellipsize"/>$(Identite)</text> 
+			<text col="2" align="center" label="S." cond="entite == 'FFS'">$(Sexe)</text>
+			<text col="4" align="center" label="An">$(An)</text>
+			<text col="4" align="center" label="Nat." cond="entite == 'FIS'" font_style="italic">$(Nation)</text>
+			<!-- <image col_start="0" adjust="height" align="right" border="0" cond="entite == 'FIS'"><background mode="transparent"/>app.ImageNation($(Nation))</image>  -->
+			<text col="3" align="center" label="CS" font_style="italic">$(Comite)</text>
+			<text col="10" align="center" label="Club" font_style="italic">$(Club)</text>
+			
+			<lua>if nb_manche &gt; 1 then</lua>
+				<lua>for m=1,nb_manche do</lua>
+					<lua>if body:GetCellInt('Tps'..m, row) > 0 then cltManche = ' ('..body:GetCell('Clt'..m,row)..')' else cltManche = '' end</lua>
+					<lua>if body:GetCellInt('Tps'..m, row) == chrono.DSQ then cltManche = ' ('..body:GetCell('Dsq'..m,row)..')' end</lua>
+					<text col="7" align="right" label="('M.'..m)">''</text> 
+					<matrix col_start="0">
+						<row h="auto" />
+						<col w="3,2"/>
+						<background mode="transparent"/>
+						<pen size="0"/>
+						<spacing top="10" />
+						<text col_start="1" align="right" font_size_step="-1" font_weight="bold" >' '..body:GetCell('Tps'..m,row)</text> 
+						<text col_start="2" align="left" font_size_step="-1" font_style="italic">cltManche</text> 
+					</matrix>
+				
+				<lua>end</lua>
+			<lua>end</lua>
+			<text col="6" align="right" label="Tps.Tot" font_weight="bold" font_size_step="1">$(Tps)</text> 
+			<text col="5" align="right" label="Ecart" font_style="italic">$(Diff)</text> 
+			<text col="5" align="right" label="Note" font_weight="bold" cond="params.officiel=='1'" >$(Note)</text> 
+			<text col="5" align="right" label="Perf." font_weight="bold" cond="params.officiel=='1' and entite == 'FIS'">$(Perf)</text> 
+			<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
+		</body>
+		<end>
+			<lua>sqlBase.FixationTableRanking(body)</lua>
+			<call option="signature_dt" file="./edition/options.xml" />
+			<call option="count_nation" file="./edition/options.xml" />
+			<call option="count_partant" file="./edition/options.xml" />
+		</end>
+	</report>
+	<report id="res_er_groupe" title="Résultats par Groupes de Catégories">
+		<lua>entite = $(Evenement.Code_entite);
+			body:SetRanking('Cltc', 'Tps', 'Reserve');
+		</lua>
+		<lua>nb_manche = base:GetTable('Epreuve'):GetCellInt('Nombre_de_manche', 0, 1)</lua>
+		<lua>clt_max = params.clt_max or 9999;
+			groupe = 'Présentation par Groupes de Catégories';</lua>
+
+		<order key="Reserve, Tps, Dossard Desc" />
+
+		<rupture key="Groupe">
+			<before>
+				<need h="2cm" />
+				<font size="14"/>
+				<row value="0.4cm"/>
+				<lua>if $(Sexe) == 'F' then
+						sexe = '  Dames';
+					else
+						sexe = '  Hommes';
+					end
+					groupe = 'Groupe de catégories : '..$(Groupe)..sexe;
+				</lua>
+				<text row="auto" col="1" >groupe</text>
+				<!-- <text row="auto" col="1" >cat..'- '..$(Categorie{cat}.Libelle)</text> -->
+			</before>
+		</rupture>
+
+		<body>
+			<lua>if group ~= 'body' then clt = 1 else clt = body:GetCellInt('Cltc',row,9999) end</lua>
+			<lua>if clt &lt;= clt_max then</lua>
+				<call option="couleur_alternee" file="./edition/options.xml"/>
+				<font size="8" adjust="ellipsize"/>
+		
+				<row value="auto" />
+				<text col="4" align="center" label="C.Gr." font_weight="bold" font_size_step="1">$(Cltc)</text>
+				<text col="4" align="center" label="C.Tot" font_weight="bold" font_size_step="1">$(Clt)</text>
+				<text col="4" align="center" label="Dos">$(Dossard)</text>
+				<text col="6" align="center" label="Code"><font size="8" cond="group =='body'"/>$(Code_coureur):sub(4)</text>
+				<text col="18" align="left" label="Nom - Prénom" font_weight="bold">$(Identite)</text> 
+				<text col="4" align="center" label="An">$(An)</text>
+				<text col="4" align="center" label="Nat" cond="entite == 'FIS'">$(Nation)</text>
+				<!-- <image col_start="0" adjust="height" align="right" border="0" cond="entite == 'FIS'"><background mode="transparent"/>app.ImageNation($(Nation))</image>  -->
+
+				<text col="3" align="center" label="CS" cond="entite == 'FFS'">$(Comite)</text>
+				<text col="12" align="center" label="Club" cond="entite == 'FFS'">$(Club)</text>
+				<lua>if nb_manche &gt;1 then </lua>
+					<lua>for m=1,nb_manche do</lua>
+						<lua>if group == 'body' then</lua>
+							<lua>if body:GetCellInt('Tps'..m,row) > 0 then cltManche = ' ('..body:GetCell('Cltc'..m,row)..')' else cltManche = '' end </lua>
+							<text col="7" align="right" font_size_step="-1">body:GetCell('Tps'..m,row)..cltManche</text> 
+						<lua>else</lua>
+							<text col="7" align="right" label="('M.'..m)" /> 
+						<lua>end</lua>
+					<lua>end</lua>
+				<lua>end</lua>
+				<text col="6" align="right" label="Tps.Tot" font_weight="bold" font_size_step="1">$(Tps)</text> 
+				<text col="5" align="right" label="Ecart" font_style="italic">$(Diff)</text> 
+				<text col="5" align="right" label="Note" font_weight="bold" >$(Note)</text> 
+				<text col="4" align="right" label="Perf." font_weight="bold" >$(Perf)</text> 
+
+			<lua>end</lua>
+		</body>
+	</report>
+	
 	
 	<!-- Résultats Par Catégories -->
 	<report id="res_categ" title="Résultats par Catégories" first_header="0">
