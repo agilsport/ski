@@ -773,6 +773,12 @@ function GetNodeXMLData()
 	end
 	
 	SortTable(tCoureurs);
+	for i = 1, #tCoureurs do
+		local groupe = tCoureurs[i].Categ:gsub("'", "");
+		groupe = groupe:gsub(",", "/");
+		local cmd = "Update Resultat Set Groupe = '"..groupe.."' Where Code_evenement = "..params.code_evenement.." And Reserve = "..tCoureurs[i].Reserve;
+		base:Query(cmd);
+	end
 	local cmd = "Update Resultat Set Reserve = "..tCoureurs[#params.tGroupesDames].Reserve.." Where Code_evenement = "..params.code_evenement.." And Sexe = 'F' And Categ = 'U18'";
 	base:Query(cmd);
 	local cmd = "Update Resultat Set Reserve = "..tCoureurs[#tCoureurs].Reserve.." Where Code_evenement = "..params.code_evenement.." And Sexe = 'M' And Categ = 'U18'";
@@ -807,7 +813,7 @@ function main(params_c)
 	params.height = display:GetSize().height / 2;
 	params.x = (display:GetSize().width - params.width) / 2;
 	params.y = 50;
-	params.version = "1.3";
+	params.version = "1.4";
 	base = base or sqlBase.Clone();
 	tEvenement = base:GetTable('Evenement');
 	base:TableLoad(tEvenement, 'Select * From Evenement Where Code = '..params.code_evenement);
@@ -823,6 +829,8 @@ function main(params_c)
 	ReplaceTableEnvironnement(tDraw, '_tDraw_Copy');
 	
 	local cmd = "Update Resultat Set Rang = Null, Reserve = Null Where Code_evenement = "..params.code_evenement;
+	base:Query(cmd);
+	local cmd = "Update Resultat_Manche Set Rang = Null, Reserve = Null Where Code_evenement = "..params.code_evenement..' And Code_manche = 1';
 	base:Query(cmd);
 	tCoureur = {};
 	base:TableLoad(tResultat, 'Select * From Resultat Where Code_evenement = '..params.code_evenement);
