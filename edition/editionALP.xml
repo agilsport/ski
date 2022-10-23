@@ -86,7 +86,6 @@
 		<text row="auto" align="center" cond="id == 'res_er'">groupe</text>
 		<text row="auto" align="center" cond="id ~= 'res_er' and id ~= 'res_er_groupe' and base:GetTable('Epreuve'):GetNbRows() ~= 1">'Résultats Scratch Toutes Catégories'</text>
 		<text row="auto" align="center" cond="id ~= 'res_er' and base:GetTable('Epreuve'):GetNbRows() == 1">$(Categorie{$(Epreuve.Code_categorie)}.Libelle)..' - '..$(Sexe{$(Epreuve.Sexe)}.Libelle)</text>
-
 		<text row="auto" align="center" cond="title" >title</text>
 		<text row="auto" align="center" cond="title_filter">title_filter</text>
 		<row value="0.5cm"/>
@@ -265,7 +264,6 @@
 
 	<!-- Pénalité Alpine -->
 	<report id="penalite" title="Calcul de la Pénalité" first_header="0">
-		<lua>dofile('./interface/adv.lua');</lua>
 		<end>
 			<lua>entite = base:GetTable("Evenement"):GetCell("Code_entite", 0)</lua>
 			<lua>best10 = base:GetTable("best10")</lua>
@@ -346,7 +344,6 @@
 	<!-- Participants Par Ordre Alphabétique -->
 	<report id="parti_alpha" title="Liste des Participants par Ordre Alphabétique" first_header="0">
 		<lua>entite = $(Evenement.Code_entite)</lua>
-		
 		<order key="Nom,Prenom" />
 
 		<body>
@@ -364,7 +361,7 @@
 			<text col="7" align="center" label="Point">$(Point)</text>
 			<padding all="10px" />
 			<qrcode col="2cm" cond="entite == 'FIS'" >'https://www.fis-ski.com/DB/alpine-skiing/biographies.html?fiscode='..string.sub($(Code_coureur),4)..'&amp;search=true'</qrcode>
-			<qrcode col="2cm" cond="entite == 'FFS'" >'http://www.ffs.fr/ski-alpin/competitions/fiche-individuelle?licence='..string.sub($(Code_coureur),4)..'&amp;send=Afficher'</qrcode>
+			<qrcode col="2cm" cond="entite == 'FFS'" >'https://ffs.fr/fiche-individuelle/?licence='..string.sub($(Code_coureur),4)..'&amp;discipline=ALPIN'</qrcode>
 			<padding all="0px" />
 			<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
 		</body>
@@ -394,7 +391,6 @@
 	
 	<!-- Participants - code factorisé -->
 	<report id="parti_factorise" title="Liste des Participants par " first_header="0">
-		<lua>dofile('./interface/adv.lua');</lua>
 		<lua>entite = $(Evenement.Code_entite);
 			rupture = params.rupture;
 			label = params.label or params.rupture;
@@ -741,7 +737,6 @@
 	<!-- Résultats Officiels Esprit Racing-->
 	<report id="res_er" title="(params.title)">
 		<column name="Tps_status">chrono.Status(body:GetCellInt('Tps', row))</column>
-		<lua>dofile('./interface/adv.lua');</lua>
 		<lua>body:SetCounter('Tps_status')</lua>
 		<lua>entite = $(Evenement.Code_entite)</lua>
 		<lua>nb_manche = nb_manche or 1</lua>
