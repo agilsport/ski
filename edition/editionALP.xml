@@ -824,6 +824,7 @@
 			<call option="count_partant" file="./edition/options.xml" />
 		</end>
 	</report>
+	
 	<report id="res_er_groupe" title="Résultats par Groupes de Catégories">
 		<lua>entite = $(Evenement.Code_entite);
 			body:SetRanking('Cltc', 'Tps', 'Reserve');
@@ -844,7 +845,11 @@
 					else
 						sexe = '  Hommes';
 					end
-					groupe = 'Groupe de catégories : '..$(Groupe)..sexe;
+					if $(Groupe):len() == 0 then
+						groupe = 'Coureurs hors groupe';
+					else
+						groupe = 'Groupe de catégories : '..$(Groupe)..sexe;
+					end
 				</lua>
 				<text row="auto" col="1" >groupe</text>
 				<!-- <text row="auto" col="1" >cat..'- '..$(Categorie{cat}.Libelle)</text> -->
