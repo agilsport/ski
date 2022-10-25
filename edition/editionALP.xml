@@ -27,9 +27,9 @@
 			<menu title="Résultats Officieux" image="./res/16x16_ranking.png" id="res_officiel" officiel="0"/>
 			<!-- <menu title="Calcul de la Pénalité" image="./res/16x16_calc.png" language="en" action="penalite" /> -->
 			<menu title="Résultats Officiels" image="./res/16x16_official.png" id="res_officiel" officiel="1"/>
-			<menu title="Résultats Officiels Esprit Racing" image="./res/16x16_official.png">
-				<menu title="Présentation traditionnelle du résultat" image="./res/16x16_official.png" id="res_er" officiel="1"/>
-				<menu title="Présentation par Groupes de Catégories à la suite les uns des autres" image="./res/16x16_official.png" filter="after" id="res_er_groupe"/>
+			<menu title="Résultats Esprit Racing" image="./res/16x16_official.png">
+				<menu title="Résultats Officiels" image="./res/16x16_official.png" id="res_er" officiel="1"/>
+				<menu title="Présentation par Groupes de Catégories à la suite les uns des autres" image="./res/16x16_official.png" filter="after" officiel="0" id="res_er_groupe"/>
 			</menu>
 			<menu title="Résultats Par Catégories (filtrage des coureurs apres le calcul des points)" filter="after" image="./res/16x16_ranking.png" id="res_categ" choix_clt_max="1"/>
 			<menu title="Meilleurs Temps" image="./res/16x16_ranking.png" id="res_best" />
@@ -234,7 +234,7 @@
 			<row value="auto" />
 			<line col_start="1" col_end="0" border="top|bottom" pen_color="dkgray"/>
 			<font weight="bold" />
-			<text col_start="1" col_end="0" align="left" cond="officiel=='1' or id=='stat_participation'">'PENALITE DE L\'EPREUVE: '..$(Epreuve.Penalite_appliquee)</text>
+			<text col_start="1" col_end="0" align="left" cond="(officiel=='1' and base:GetTable('Epreuve'):GetNbRows() == 1) or id=='stat_participation'">'PENALITE DE L\'EPREUVE: '..$(Epreuve.Penalite_appliquee)</text>
 			<text col_start="1" col_end="0" align="center">'LISTE: '..$(Evenement.Code_liste)</text>
 			<text col_start="1" col_end="0" align="right">'F: '..$(Discipline.Facteur_f)</text>
 
@@ -550,9 +550,9 @@
 			<row h="auto"/>
 			<text col="4" cond="body:GetCellInt('Rang'..manche, row) &gt; 0" align="right" label="Rang" font_weight="bold">body:GetCellInt('Rang'..manche, row)</text>
 			<text col="4" align="center" label="Dos" font_weight="bold" font_size_step="1">$(Dossard)</text>
+			<text col="4" align="center" label="Gr." cond="$(Reserve):len() &gt; 0">$(Reserve)</text>
 			<text col="7" align="center" label="Code"><font size="8" cond="group =='body'"/>$(Code_coureur):sub(4)</text>
 			<text col="20" align="left" label="Nom - Prénom" font_weight="bold" font_size_step="1">$(Identite)</text> 
-			<text col="4" align="center" label="Gr." cond="$(Reserve):len() &gt; 0">$(Reserve)</text>
 			<text col="2" align="center" label="S.">$(Sexe)</text>
 			<text col="4" align="center" label="An">$(An)</text>
 			<text col="5" align="center" label="Cat.">$(Categ)</text>
@@ -642,6 +642,7 @@
 			<row value="auto"/>
 			<text col="4" align="center" label="Clt" font_weight="bold" font_size_step="1">body:GetCell('Clt'..manche, row)</text>
 			<text col="4" align="center" label="Dos" font_style="italic">$(Dossard)</text>
+			<text col="4" align="center" label="Gr." cond="$(Reserve):len() &gt; 0" font_style="italic">$(Reserve)</text>
 			<text col="7" align="center" label="Code"><font size="8" cond="group =='body'"/>$(Code_coureur):sub(4)</text>
 			<text col="20" align="left" label="Nom - Prénom" font_weight="bold">$(Identite)</text> 
 			<text col="4" align="center" label="An">$(An)</text>
@@ -722,7 +723,7 @@
 			<lua>end</lua>
 			<text col="6" align="right" label="Tps.Tot" font_weight="bold" font_size_step="1">$(Tps)</text> 
 			<text col="5" align="right" label="Ecart" font_style="italic">$(Diff)</text> 
-			<text col="5" align="right" label="Note" font_weight="bold" cond="params.officiel=='1'" >$(Note)</text> 
+			<text col="5" align="right" label="Note" font_weight="bold" cond="params.officiel=='1' and base:GetTable('Epreuve'):GetNbRows() == 1">$(Note)</text> 
 			<text col="5" align="right" label="Perf." font_weight="bold" cond="params.officiel=='1' and entite == 'FIS'">$(Perf)</text> 
 			<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
 		</body>
@@ -784,7 +785,7 @@
 			<row value="auto"/>
 			<text col="4" align="center" label="Clt" font_weight="bold" font_size_step="1">$(Clt)</text>
 			<text col="4" align="center" label="Dos" font_style="italic">$(Dossard)</text>
-			<text col="4" align="center" label="GR." font_style="italic">$(Reserve)</text>
+			<text col="4" align="center" label="GR." cond="$(Reserve):len() &gt; 0" font_style="italic">$(Reserve)</text>
 			<text col="7" align="center" label="Code"><font size="8" cond="group =='body'"/>$(Code_coureur):sub(4)</text>
 			<text col="16" align="left" label="Nom - Prénom" font_weight="bold"><font adjust="ellipsize"/>$(Identite)</text> 
 			<text col="2" align="center" label="S." cond="entite == 'FFS'">$(Sexe)</text>
@@ -813,7 +814,7 @@
 			<lua>end</lua>
 			<text col="6" align="right" label="Tps.Tot" font_weight="bold" font_size_step="1">$(Tps)</text> 
 			<text col="5" align="right" label="Ecart" font_style="italic">$(Diff)</text> 
-			<text col="5" align="right" label="Note" font_weight="bold" cond="params.officiel=='1'" >$(Note)</text> 
+			<text col="5" align="right" label="Note" font_weight="bold" cond="params.officiel=='1' and base:GetTable('Epreuve'):GetNbRows() == 1">$(Note)</text> 
 			<text col="5" align="right" label="Perf." font_weight="bold" cond="params.officiel=='1' and entite == 'FIS'">$(Perf)</text> 
 			<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
 		</body>
@@ -828,8 +829,11 @@
 	<report id="res_er_groupe" title="Résultats par Groupes de Catégories">
 		<lua>entite = $(Evenement.Code_entite);
 			body:SetRanking('Cltc', 'Tps', 'Reserve');
+			if base:GetTable('Epreuve'):GetNbRows() == 1 then
+				params.officiel = '1';
+			end
 		</lua>
-		<lua>nb_manche = base:GetTable('Epreuve'):GetCellInt('Nombre_de_manche', 0, 1)</lua>
+		<lua>nb_manche = nb_manche or 1;</lua>
 		<lua>clt_max = params.clt_max or 9999;
 			groupe = 'Présentation par Groupes de Catégories';</lua>
 
@@ -846,7 +850,7 @@
 						sexe = '  Hommes';
 					end
 					if $(Groupe):len() == 0 then
-						groupe = 'Coureurs hors groupe';
+						groupe = 'Coureurs hors groupes';
 					else
 						groupe = 'Groupe de catégories : '..$(Groupe)..sexe;
 					end
@@ -886,7 +890,7 @@
 				<lua>end</lua>
 				<text col="6" align="right" label="Tps.Tot" font_weight="bold" font_size_step="1">$(Tps)</text> 
 				<text col="5" align="right" label="Ecart" font_style="italic">$(Diff)</text> 
-				<text col="5" align="right" label="Note" font_weight="bold" >$(Note)</text> 
+				<text col="5" align="right" label="Note" font_weight="bold" cond="base:GetTable('Epreuve'):GetNbRows() == 1">$(Note)</text> 
 				<text col="4" align="right" label="Perf." font_weight="bold" >$(Perf)</text> 
 
 			<lua>end</lua>
@@ -943,7 +947,7 @@
 				<lua>end</lua>
 				<text col="6" align="right" label="Tps.Tot" font_weight="bold" font_size_step="1">$(Tps)</text> 
 				<text col="5" align="right" label="Ecart" font_style="italic">$(Diff)</text> 
-				<text col="5" align="right" label="Note" font_weight="bold" >$(Note)</text> 
+				<text col="5" align="right" label="Note" font_weight="bold" cond = "base:GetTable('Epreuve'):GetNbRows() == 1">$(Note)</text> 
 				<text col="4" align="right" label="Perf." font_weight="bold" >$(Perf)</text> 
 
 			<lua>end</lua>
