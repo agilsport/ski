@@ -867,20 +867,20 @@ function InitPrnColonnes()
 		local nbcol_course = 0;
 	-- bloc1 : Clt,1|Tps,1|Diff,1|Pts,1|Cltrun,1|Tpsrun,1|Diffrun,1|Ptsrun,1|Ptstotal,1|EtapeClt,0|EtapePts
 		if discipline ~= 'CS' then
-			if string.find(prendre, '1%.') then
-				prnBlocx.Pts.Imprimer = 1;
-				prnBlocx.Ptstotal.Imprimer = 0;
-				prnBlocx['Ptsrun'].Imprimer = 0;
-			end
-			if string.find(prendre, '2%.') then
-				prnBlocx.Pts.Imprimer = 0;
-				prnBlocx.Ptstotal.Imprimer = 0;
-				prnBlocx['Ptsrun'].Imprimer = 1;
-			end
-			if string.find(prendre, '3%.') then
-				prnBlocx.Ptstotal.Imprimer = 0;
-				prnBlocx.Pts.Imprimer = 1;
-			end
+			-- if string.find(prendre, '1%.') then
+				-- prnBlocx.Pts.Imprimer = 1;
+				-- prnBlocx.Ptstotal.Imprimer = 0;
+				-- prnBlocx['Ptsrun'].Imprimer = 1;
+			-- end
+			-- if string.find(prendre, '2%.') then
+				-- prnBlocx.Pts.Imprimer = 0;
+				-- prnBlocx.Ptstotal.Imprimer = 0;
+				-- prnBlocx['Ptsrun'].Imprimer = 1;
+			-- end
+			-- if string.find(prendre, '3%.') then
+				-- prnBlocx.Ptstotal.Imprimer = 0;
+				-- prnBlocx.Pts.Imprimer = 1;
+			-- end
 
 			prnColonne.Clt[idxcourse].Imprimer = prnBlocx['Clt'].Imprimer;
 			prnColonne.Tps[idxcourse].Imprimer = prnBlocx['Tps'].Imprimer;
