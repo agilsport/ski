@@ -1020,34 +1020,6 @@
 									<lua>sommeSur = sommeSur + tonumber(params.Table_critere[i].Sur);
 										sommeCombien = sommeCombien + tonumber(params.Table_critere[i].NbCombien);
 								end</lua>
-				<!-- if string.find(params.Presentation,'horizontale') then -->
-					<!-- if texteImprimerStatCourses == 'Oui' then -->
-						<!-- sommeSur = 0; sommeCombien = 0; -->
-						<!-- if bolGetDisciplinesFait == false then -->
-							<!-- bolGetDisciplinesFait = true; -->
-							<!-- arDiscipline = GetDisciplines(params.Table_critere); -->
-						<!-- end -->
-						<!-- row_start = -1; col_start = 3 -->
-						<!-- if params.Criteres1 == nil then enlever = 0; else enlever = 1; end</lua> -->
-						<!-- <spacing all="10"/> -->
-						<!-- <matrix row="auto" col_start="1"> -->
-							<!-- <font weight="bold" size="(params.FontSize)"/> -->
-							<!-- <pen border="all" size="5" color="red"/> -->
-							<!-- <text row="auto" col="1" align="right">'Disciplines'</text> -->
-							<!-- <text row="auto" align="right">texteLigne2Texte</text> -->
-							<!-- <text row="auto" align="right" cond="params.Criteres1 ~= nil">'Retenues pour le Clt.'</text> -->
-							<!-- <lua>for i = 1, #arDiscipline do -->
-									<!-- discipline = arDiscipline[i].Discipline; -->
-									<!-- rgbx = colorDiscipline[discipline];</lua> -->
-									<!-- <text row_start="(-2 - enlever)" align="center" col="auto"> -->
-										<!-- <background color="(rgbx)" mode="solid"/>arDiscipline[i].Discipline</text> -->
-									<!-- <text row_start="(0 - enlever)" align="center" > -->
-										<!-- <background color="(rgbx)" mode="solid"/>arDiscipline[i].Sur</text> -->
-									<!-- <text row_start="0" align="center"  cond="params.Criteres1 ~= nil"> -->
-										<!-- <background color="(rgbx)" mode="solid"/>arDiscipline[i].Combien</text> -->
-									<!-- <lua>sommeSur = sommeSur + tonumber(arDiscipline[i].Sur); -->
-										<!-- sommeCombien = sommeCombien + tonumber(arDiscipline[i].Combien); -->
-								<!-- end</lua> -->
 								<text row_start="(-1 - enlever)" col="auto" align="center"  >'Tot'</text>
 								<text row_start="(0 - enlever)" align="center"  >sommeSur</text>
 								<text row_start="0" align="center"  cond="params.Criteres1 ~= nil">sommeCombien</text>
@@ -1058,7 +1030,7 @@
 								<pen border="none"/>
 								<font weight="bold"/>
 								<text row="auto" col_start="1" col_end="0" cond="params.Criteres1:len() &gt; 0">params.Criteres1</text>
-								<text row="auto" col_start="1" col_end="0" cond="params.Criteres1:len() &gt; 0">params.Criteres2</text>
+								<text row="auto" col_start="1" col_end="0" cond="params.Criteres2:len() &gt; 0">params.Criteres2</text>
 								<lua>row_start = row_start -2;</lua>
 						<lua>end</lua>
 					<lua>else</lua>

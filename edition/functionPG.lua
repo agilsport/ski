@@ -910,6 +910,7 @@ function InitPrnColonnes()
 				end
 				if prnBlocx.Ptstotal.Imprimer == 1 then
 					prnColonne.Pts[idxcourse].Imprimer = 1;
+					prnColonne.Ptstotal[idxcourse].Imprimer = 0;
 				end
 			end
 			if prendre == 'Classement général' then
