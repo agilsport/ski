@@ -1872,6 +1872,21 @@ function OnCellSelected(evt)
 	local row = evt:GetRow();
 	local col = evt:GetCol();
 	draw.row_selected = row;
+	if draw.bolEstCE == true or tEpreuve:GetCell("Code_regroupement", 0) == 'F' then
+		if draw.bolVitesse == false then
+			if row > 15 then
+				menuOutils:Enable(btnTirageDossardsRestants:GetId(), true);
+			end
+		else
+			if row > 30 then
+				menuOutils:Enable(btnTirageDossardsRestants:GetId(), true);
+			end
+		end
+	else
+		if row > 15 then
+			menuOutils:Enable(btnTirageDossardsRestants:GetId(), true);
+		end
+	end
 	local t = grid_tableau:GetTable();
 	local colName = t:GetColumnName(t:GetVisibleColumnsIndex(col));
 	grid_tableau:SelectRow(row);
@@ -3013,6 +3028,8 @@ function OnAfficheTableau()
 	menuOutils:AppendSeparator();
 	btnWeb = menuOutils:Append({label="Vers la page FIS de la course", image ="./res/32x32_fis.png"});
 	menuOutils:AppendSeparator();
+	btnDocs = menuOutils:Append({label="Vers la page FIS des documents alpins", image ="./res/32x32_fis.png"});
+	menuOutils:AppendSeparator();
 	btnDecalerBas = menuOutils:Append({label="Décaler les rangs de tirage de +1", image ="./res/32x32_list_add.png"});
 	menuOutils:AppendSeparator();
 	btnDecalerHaut = menuOutils:Append({label="Décaler les rangs de tirage de -1", image ="./res/32x32_list_remove.png"});
@@ -3039,6 +3056,10 @@ function OnAfficheTableau()
 	
 	menuCommande:Enable(btnClear:GetId(), draw.state) ;
 	menuCommande:Enable(btn_reset_socket:GetId(), draw.state) ;
+	
+	if not draw.row_selected or draw.row_selected == 0 then
+		menuOutils:Enable(btnTirageDossardsRestants:GetId(), false);
+	end
 
 	-- tbTableau:EnableTool(btnSendMessage:GetId(), draw.socket_state);
 	-- tbTableau:EnableTool(btnClear:GetId(), draw.socket_state);
@@ -3473,6 +3494,10 @@ function OnAfficheTableau()
 		end, btnWeb);
 	dlgTableau:Bind(eventType.MENU, 
 		function(evt)
+			app.LaunchDefaultBrowser('https://www.fis-ski.com/en/inside-fis/document-library/alpine-documents')
+		end, btnDocs);
+	dlgTableau:Bind(eventType.MENU, 
+		function(evt)
 			ChecktDraw();
 			local msg = "Voulez-vous décaler les rangs de tirage de +1\n"..
 						"à partir de la ligne sélectionnée ?";
@@ -3688,7 +3713,7 @@ function main(params_c)
 	draw.height = display:GetSize().height - 30;
 	draw.x = 0;
 	draw.y = 0;
-	draw.version = "4.9"; -- 4.1 pour 2022-2023
+	draw.version = "4.91"; -- 4.1 pour 2022-2023
 	draw.hostname = 'live.fisski.com';
 	draw.method = 'socket';
 	draw.ajouter_code = '';
