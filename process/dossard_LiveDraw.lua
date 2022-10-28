@@ -253,6 +253,8 @@ function OnLiveState(evt)
 		end
 		tb:EnableTool(btnMenuSend:GetId(), draw.state);
 		tb:EnableTool(btnSendMessage:GetId(), draw.state);
+		menuCommande:Enable(btnClear:GetId(), draw.state) ;
+		menuCommande:Enable(btn_reset_socket:GetId(), draw.state) ;
 	end
 end
 
@@ -357,18 +359,18 @@ function OnAide()
 -- groupe 4 Cette série est interrompue si on a un vainqueur d'une autre Coupe continentale qui par systématiquement en 31 ème position.
 -- groupe 5 La série interrompue reprend jusqu'à en avoir 30.
 -- Groupe 6 On poursuit selon les points FIS.
-	local msg = "le ranking en Coupe d'Europe se fait de la façon suivante :\n"..
+	local msg = "le ranking en Coupe d'Europe (technique) se fait de la façon suivante :\n"..
 				"Groupe 1-2 : les 15 premiers de la dernière European Cup Starting List produite par la FIS dans la discipline courue. "..
 				"Ce groupe 1 sera divisé en deux sous groupe (1 à 7 et 8 à 15). Ces sous groupes sont augmentés en cas d'exaequo.\n"..
 				"Groupe 3 : Ceux qui auront marqué au moins 450 points en EC toutes disciplines confondues dans la saison précédente ou celle en cours.\n"..
 				"Groupe 4 : les coureurs dans les 30 premiers World Cup dans la discipline (au jour j).\n"..
-				"           en cas d'exaequos, ils seront départagés par les Pts ECSL ou les points FIS.\n"..
+				"           en cas d'exaequos, ils seront départagés par les Pts ECSL puis les points FIS.\n"..
 				"Groupe 5 : On continue dans l'ordre de la Starting List jusqu'à avoir 30 coureurs listés.\n"..
-				"           Cette série peut être interrompue au rang 31 (ou avant) par un ou plusieurs vainqueurs des autres\n"..
-				"           Coupes Continentales dans la discipline courue. Vous mettrez un caractère quelquonque dans 'Winner CC'.\n"..
+				"           Cette série peut être interrompue au rang 31 par un ou plusieurs vainqueurs des autres\n"..
+				"           Coupes Continentales dans la discipline courue. Vous mettrez le chiffre 1 dans 'Winner CC'.\n"..
 				"           La série interrompue reprend ensuite pour en avoir 30 sur la ECSL\n"..
 				"           Les coureurs pris au titre des points 'Overall' comptent parmi ces 30.\n"..
-				"           là encore, en cas d'exaequos, ils seront départagés par les Pts ECSL ou les points FIS.\n"..
+				"           là encore, en cas d'exaequos, ils seront départagés par les Pts ECSL et les points FIS.\n"..
 				"           S'il y en a moins de 30, on prendra dans ce groupe les viennent ensuite par ordre de leurs points FIS.\n"..
 				"Groupe 6 : Le ranking se poursuit selon les points FIS.\n"..
 				"			Les exaequos dans les coureurs 'points FIS' sont départagés par double tirage.\n\n"..
@@ -3034,6 +3036,10 @@ function OnAfficheTableau()
  	tbTableau:Realize();
 	tbTableau:EnableTool(btnMenuSend:GetId(), draw.state);
 	tbTableau:EnableTool(btnSendMessage:GetId(), draw.state);
+	
+	menuCommande:Enable(btnClear:GetId(), draw.state) ;
+	menuCommande:Enable(btn_reset_socket:GetId(), draw.state) ;
+
 	-- tbTableau:EnableTool(btnSendMessage:GetId(), draw.socket_state);
 	-- tbTableau:EnableTool(btnClear:GetId(), draw.socket_state);
 	-- tbTableau:EnableTool(btnMenuSend:GetId(), draw.socket_state);
@@ -3682,7 +3688,7 @@ function main(params_c)
 	draw.height = display:GetSize().height - 30;
 	draw.x = 0;
 	draw.y = 0;
-	draw.version = "4.8"; -- 4.1 pour 2022-2023
+	draw.version = "4.9"; -- 4.1 pour 2022-2023
 	draw.hostname = 'live.fisski.com';
 	draw.method = 'socket';
 	draw.ajouter_code = '';
