@@ -2868,6 +2868,10 @@ function LitMatriceCourses(bolcalculer);	-- lecture des courses figurant dans la
 		adv.Alert("LitMatriceCourses - Snapshot('Matrice_Courses.db3')");
 		tMatrice_Courses:Snapshot('Matrice_Courses.db3');
 	end
+	if matrice.bloc2 == true then
+		local tbedit1 = dlgConfiguration:GetWindowName('tbedit1');
+		menuFiltres:Enable(btnFiltreParPoint:GetId(), false) ;
+	end
 end
 
 function RempliTableauMatrice()		-- lescture de toutes les variables de la table Evenement_Matrice et affectation éventuelle des variables dans les contrôles de la boîte de dialogue
@@ -2942,6 +2946,7 @@ end
 
 function LitMatrice()	-- lecture des variables et affectation des valeurs dans les contrôles
 	matrice.configFiltre = 1;
+	matrice.numTypeCritere = 0;
 	-- on charge toutes les lignes de la table Evenement_Matrice pour le matrice.code_evenement donné
 	-- le tableau associatif matrice est vérifié et complété si besoin.
 	RempliTableauMatrice();
@@ -3037,6 +3042,8 @@ function LitMatrice()	-- lecture des variables et affectation des valeurs dans l
 	CreateTableListe();
 	CreateTypeClassement();
 	ChargeDisciplines();  	-- on charge toutes les disciplines de la matrice
+
+
 end
 
 function GetCritere()	-- lecture de toutes les variables des critères de calculs s'ils existent
@@ -6130,7 +6137,11 @@ function AffichedlgConfiguration()
 	tbedit1:SetDropdownMenu(btnVersion:GetId(), menuHelp);
 	tbedit1:AddStretchableSpace();
 	tbedit1:Realize();
-		
+	
+	-- local tbedit1 = dlgConfiguration:GetWindowName('tbedit1');
+	-- menuFiltres:Enable(btnFiltreParPoint:GetId(), false) ;
+
+
 	-- Bind
 	wnd.GetParentFrame():Bind(eventType.CURL, OnCurlReturn);
 	tbedit1:Bind(eventType.MENU, 
@@ -7718,7 +7729,7 @@ function OnConfiguration(cparams)
 	else
 		return false;
 	end
-	matrice.version_script = '5.82';
+	matrice.version_script = '5.83';
 	matrice.OS = app.GetOsDescription();
 	-- vérification de l'existence d'une version plus récente du script.
 	local url = 'https://live.ffs.fr/maj_pg/challenge/last_version.txt'
