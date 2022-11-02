@@ -103,8 +103,8 @@
 			<textctrl col_start="2" name="numMalusAbdDsq"/>
 			<statictext row="auto" col_start="1" label="ABS : malus en points si la valeur \nest &gt;= 10, sinon malus en secondes"/>
 			<textctrl col_start="2" name="numMalusAbs"/>
-			<statictext row="auto" col_start="1" label="Regroupement des courses"/>
-			<statictext col_start="2" style="ALIGN_LEFT" label=" : N.B. ce paramètre se règle maintenant dans les Filtres"/>
+			<statictext row="auto" col_start="1" label="Regroupement des résultats par Catégories"/>
+			<combotable col_start="2" name="comboParCategorie" style="CB_READONLY"/>
 			<statictext row="auto" col_start="1" label="Trier le résultat par"/>
 			<combobox col_start="2" name="comboTriSortie" style="CB_READONLY"/>
 			<statictext row="auto" col_start="1" label="Présentation des courses"/>
@@ -950,7 +950,7 @@
 				<col value="1"/>
 				<pen border="none"/>
 				<font name="Calibri" size="13" adjust="width" weight="bold"/>
-				<text row="3cm" align="center">tEvenement:GetCell('Nom', 0)</text>
+				<text row="3cm" align="center">params.Titre</text>
 			<lua>end</lua>
 		</header>
 		<first_header />

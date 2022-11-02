@@ -850,7 +850,7 @@ function SetPtsTotalMatrice(idxcoureur, courseData);	-- calcul des points totaux
 	local prise = 0;
 	local ptsMatrice = 0;
 	local ajouter = 0;
-	local ptsBloc1 = -1;
+	local ptsBloc1 = 0;
 	local tbolCritere = {};
 		
 	-- 1.Classement général"
@@ -1137,6 +1137,18 @@ function SetPtsTotalMatrice(idxcoureur, courseData);	-- calcul des points totaux
 			for idxcourse = 1, #courseData do
 				local disciplineok = false;
 				local ordrecourse = courseData[idxcourse].Ordre;
+				-- if idxcoureur == 0 then
+					-- for k,v in pairs(courseData) do
+						-- adv.Alert('Key '..k..'='..tostring(v));
+						-- if type(v) == 'table' then
+							-- for i,j in pairs(v) do
+								-- adv.Alert('Key '..i..'='..tostring(j));
+								-- adv.Alert('type de '..i..' = '..type(j));
+							-- end
+						-- end
+						-- adv.Alert('\n');
+					-- end
+				-- end
 				if courseData[idxcourse].Bloc == matrice.table_critere[idxcritere].Bloc then	-- la course appartient au bloc du critère
 					for index = 1, #disciplines_critere do
 						if disciplines_critere[index] == '*' or courseData[idxcourse].Discipline == disciplines_critere[index] then	-- la course est dans la discipline du critère
@@ -1157,6 +1169,11 @@ function SetPtsTotalMatrice(idxcoureur, courseData);	-- calcul des points totaux
 							ajouter = 0;
 						end
 						-- if courseData[idxcourse]Prise == 0 then 			
+						-- 1.Classement général"
+						-- 2.Classement à la manche"
+						-- 3.Idem plus le classement général"
+						-- 4.Général PLUS meilleure manche"
+						-- 5.Général OU meilleure manche"
 						if courseData[idxcourse][item] == 0 then 	-- la course n'a pas encore été prise pour l'item en question
 							if prise < nbcombienx then
 								prise = prise + 1;
@@ -1194,7 +1211,7 @@ function SetPtsTotalMatrice(idxcoureur, courseData);	-- calcul des points totaux
 											selection = 'Pts'..ordrecourse..'_total';
 											ptsMatrice = ptsMatrice + courseData[idxcourse].PtsTotal;
 											if courseData[idxcourse].Pts > courseData[idxcourse].BestPts then
-												selection = selection..',Pts'..ordrecourse;
+												selection = selection..',Pts'..ordrecourse..'G';
 											else
 												selection = selection..',Pts'..ordrecourse..'_run'..courseData[idxcourse].BestRun;
 											end
@@ -1220,7 +1237,7 @@ function SetPtsTotalMatrice(idxcoureur, courseData);	-- calcul des points totaux
 									end
 								end
 								if courseData[idxcourse].Bloc == 1 then
-									ptsBloc1 = ptsBloc1 + courseData[idxcourse][colpts];
+									ptsBloc1 = ptsBloc1 + courseData[idxcourse].PtsTotal;
 								end
 								if string.find(prendrex, 'minimum') and prise >= matrice.table_critere[i].NbCombien then
 									bolcritere = true;
@@ -2605,6 +2622,11 @@ function OnPrint()
 	local separateur = '';
 	matrice.penalisationsaut = matrice.penalisationsaut or '';
 	local nbdepartmini = matrice.numDepartMini or -1;
+	if matrice.TitreAdd then
+		matrice.TitrePrn = matrice.TitrePrn..matrice.TitreAdd;
+	else
+		matrice.TitrePrn = matrice.Titre;
+	end
 	if matrice.next == false then
 		report = wnd.LoadTemplateReportXML({
 			xml = './challenge/matrice.xml',
@@ -2624,7 +2646,7 @@ function OnPrint()
 			margin_right = 100,
 			margin_bottom = 100,
 			paper_orientation = matrice.comboOrientation,
-			params = {Table_critere = matrice.table_critere, PenalisationSaut = matrice.penalisationsaut, FontSize = matrice.texteFontSize, Code_evenement = matrice.code_evenement, Version = matrice.version_script, Bloc2 = matrice.bloc2, ImprimerColonnes = matrice.imprimerColonnes, PrendreBloc1 = matrice.comboPrendreBloc1, ImprimerBloc1 = matrice.imprimerBloc1, ImprimerCombiSaut = matrice.imprimerCombiSaut, PrendreBloc2 = matrice.comboPrendreBloc2, ImprimerBloc2 = matrice.imprimerBloc2, CoursesIn = matrice.Evenement_selection, LastBloc1 = matrice.lastBloc1, Saison = matrice.Saison, Activite = matrice.comboActivite, Entite = matrice.comboEntite, AbdDsq = matrice.comboAbdDsq, TpsDernier = matrice.comboTpsDuDernier, Presentation = matrice.comboPresentationCourses, ImprimerHeader = matrice.texteImprimerHeader, TypePoint = matrice.comboTypePoint, Criteres1 = matrice.criteres_bloc1, Criteres2 = matrice.criteres_bloc2, PtsMaxiBloc1 = matrice.MaxiPtsBloc1, DepartMini = nbdepartmini, ParticipationMini = matrice.numMinimumArrivee, CoefMaxiBlocs = txtcoefmaxi}
+			params = {Titre = matrice.TitrePrn, Table_critere = matrice.table_critere, PenalisationSaut = matrice.penalisationsaut, FontSize = matrice.texteFontSize, Code_evenement = matrice.code_evenement, Version = matrice.version_script, Bloc2 = matrice.bloc2, ImprimerColonnes = matrice.imprimerColonnes, PrendreBloc1 = matrice.comboPrendreBloc1, ImprimerBloc1 = matrice.imprimerBloc1, ImprimerCombiSaut = matrice.imprimerCombiSaut, PrendreBloc2 = matrice.comboPrendreBloc2, ImprimerBloc2 = matrice.imprimerBloc2, CoursesIn = matrice.Evenement_selection, LastBloc1 = matrice.lastBloc1, Saison = matrice.Saison, Activite = matrice.comboActivite, Entite = matrice.comboEntite, AbdDsq = matrice.comboAbdDsq, TpsDernier = matrice.comboTpsDuDernier, Presentation = matrice.comboPresentationCourses, ImprimerHeader = matrice.texteImprimerHeader, TypePoint = matrice.comboTypePoint, Criteres1 = matrice.criteres_bloc1, Criteres2 = matrice.criteres_bloc2, PtsMaxiBloc1 = matrice.MaxiPtsBloc1, DepartMini = nbdepartmini, ParticipationMini = matrice.numMinimumArrivee, CoefMaxiBlocs = txtcoefmaxi}
 		});
 	else
 		if not report then
@@ -2646,7 +2668,7 @@ function OnPrint()
 				margin_right = 100,
 				margin_bottom = 100,
 				paper_orientation = matrice.comboOrientation,
-				params = {Table_critere = matrice.table_critere, PenalisationSaut = matrice.penalisationsaut, FontSize = matrice.texteFontSize, Code_evenement = matrice.code_evenement, Version = matrice.version_script, Bloc2 = matrice.bloc2, ImprimerColonnes = matrice.imprimerColonnes, PrendreBloc1 = matrice.comboPrendreBloc1, ImprimerBloc1 = matrice.imprimerBloc1, ImprimerCombiSaut = matrice.imprimerCombiSaut, PrendreBloc2 = matrice.comboPrendreBloc2, ImprimerBloc2 = matrice.imprimerBloc2, CoursesIn = matrice.Evenement_selection, LastBloc1 = matrice.lastBloc1, Saison = matrice.Saison, Activite = matrice.comboActivite, Entite = matrice.comboEntite, AbdDsq = matrice.comboAbdDsq, TpsDernier = matrice.comboTpsDuDernier, Presentation = matrice.comboPresentationCourses, ImprimerHeader = matrice.texteImprimerHeader, TypePoint = matrice.comboTypePoint, Criteres1 = matrice.criteres_bloc1, Criteres2 = matrice.criteres_bloc2, PtsMaxiBloc1 = matrice.MaxiPtsBloc1, DepartMini = nbdepartmini, ParticipationMini = matrice.numMinimumArrivee, CoefMaxiBlocs = txtcoefmaxi}
+				params = {Titre = matrice.TitrePrn, Table_critere = matrice.table_critere, PenalisationSaut = matrice.penalisationsaut, FontSize = matrice.texteFontSize, Code_evenement = matrice.code_evenement, Version = matrice.version_script, Bloc2 = matrice.bloc2, ImprimerColonnes = matrice.imprimerColonnes, PrendreBloc1 = matrice.comboPrendreBloc1, ImprimerBloc1 = matrice.imprimerBloc1, ImprimerCombiSaut = matrice.imprimerCombiSaut, PrendreBloc2 = matrice.comboPrendreBloc2, ImprimerBloc2 = matrice.imprimerBloc2, CoursesIn = matrice.Evenement_selection, LastBloc1 = matrice.lastBloc1, Saison = matrice.Saison, Activite = matrice.comboActivite, Entite = matrice.comboEntite, AbdDsq = matrice.comboAbdDsq, TpsDernier = matrice.comboTpsDuDernier, Presentation = matrice.comboPresentationCourses, ImprimerHeader = matrice.texteImprimerHeader, TypePoint = matrice.comboTypePoint, Criteres1 = matrice.criteres_bloc1, Criteres2 = matrice.criteres_bloc2, PtsMaxiBloc1 = matrice.MaxiPtsBloc1, DepartMini = nbdepartmini, ParticipationMini = matrice.numMinimumArrivee, CoefMaxiBlocs = txtcoefmaxi}
 			});
 		end
 		editor = report:GetEditor();
@@ -2670,7 +2692,7 @@ function OnPrint()
 			margin_right = 100,
 			margin_bottom = 100,
 			paper_orientation = matrice.comboOrientation,
-			params = {Table_critere = matrice.table_critere, PenalisationSaut = matrice.penalisationsaut, FontSize = matrice.texteFontSize, Code_evenement = matrice.code_evenement, Version = matrice.version_script, Bloc2 = matrice.bloc2, ImprimerColonnes = matrice.imprimerColonnes, PrendreBloc1 = matrice.comboPrendreBloc1, ImprimerBloc1 = matrice.imprimerBloc1, ImprimerCombiSaut = matrice.imprimerCombiSaut, PrendreBloc2 = matrice.comboPrendreBloc2, ImprimerBloc2 = matrice.imprimerBloc2, CoursesIn = matrice.Evenement_selection, LastBloc1 = matrice.lastBloc1, Saison = matrice.Saison, Activite = matrice.comboActivite, Entite = matrice.comboEntite, AbdDsq = matrice.comboAbdDsq, TpsDernier = matrice.comboTpsDuDernier, Presentation = matrice.comboPresentationCourses, ImprimerHeader = matrice.texteImprimerHeader, TypePoint = matrice.comboTypePoint, Criteres1 = matrice.criteres_bloc1, Criteres2 = matrice.criteres_bloc2, PtsMaxiBloc1 = matrice.MaxiPtsBloc1, DepartMini = nbdepartmini, ParticipationMini = matrice.numMinimumArrivee, CoefMaxiBlocs = txtcoefmaxi}
+			params = {Titre = matrice.TitrePrn, Table_critere = matrice.table_critere, PenalisationSaut = matrice.penalisationsaut, FontSize = matrice.texteFontSize, Code_evenement = matrice.code_evenement, Version = matrice.version_script, Bloc2 = matrice.bloc2, ImprimerColonnes = matrice.imprimerColonnes, PrendreBloc1 = matrice.comboPrendreBloc1, ImprimerBloc1 = matrice.imprimerBloc1, ImprimerCombiSaut = matrice.imprimerCombiSaut, PrendreBloc2 = matrice.comboPrendreBloc2, ImprimerBloc2 = matrice.imprimerBloc2, CoursesIn = matrice.Evenement_selection, LastBloc1 = matrice.lastBloc1, Saison = matrice.Saison, Activite = matrice.comboActivite, Entite = matrice.comboEntite, AbdDsq = matrice.comboAbdDsq, TpsDernier = matrice.comboTpsDuDernier, Presentation = matrice.comboPresentationCourses, ImprimerHeader = matrice.texteImprimerHeader, TypePoint = matrice.comboTypePoint, Criteres1 = matrice.criteres_bloc1, Criteres2 = matrice.criteres_bloc2, PtsMaxiBloc1 = matrice.MaxiPtsBloc1, DepartMini = nbdepartmini, ParticipationMini = matrice.numMinimumArrivee, CoefMaxiBlocs = txtcoefmaxi}
 		});
 	end
 	-- report:SetZoom(10)
@@ -2997,7 +3019,7 @@ function LitMatrice()	-- lecture des variables et affectation des valeurs dans l
 	-- le tableau associatif matrice est vérifié et complété si besoin.
 	RempliTableauMatrice();
 	-- matrice.analyseGaucheClassement = matrice.analyseGaucheClassement or 'Listes';
-
+	
 	matrice.analyseGaucheListe = matrice.analyseGaucheListe or '';
 	matrice.analyseGaucheDiscipline = matrice.analyseGaucheDiscipline or '';
 	matrice.coefDefautCourseBloc1 = matrice.coefDefautCourseBloc1 or GetValueNumber("coefDefautCourseBloc1", 100);
@@ -3010,6 +3032,7 @@ function LitMatrice()	-- lecture des variables et affectation des valeurs dans l
 	matrice.comboAbdDsq = matrice.comboAbdDsq or GetValue("comboAbdDsq", "Non");
 	matrice.comboActivite = matrice.comboActivite or GetValue("comboActivite", "ALP");
 	matrice.comboEntite = matrice.comboEntite or GetValue("comboEntite", "FFS");
+	matrice.comboParCategorie = matrice.comboParCategorie or GetValue("comboParCategorie", "Non");
 	matrice.comboGarderInfQuota = matrice.comboGarderInfQuota or GetValue("comboGarderInfQuota", "Non");
 	matrice.comboListe1 = matrice.comboListe1 or GetValue('comboListe1', nil);
 	matrice.comboListe2 = matrice.comboListe2 or GetValue('comboListe2', nil);
@@ -3021,18 +3044,35 @@ function LitMatrice()	-- lecture des variables et affectation des valeurs dans l
 	matrice.comboPrendreBloc2 = matrice.comboPrendreBloc2 or GetValue("comboPrendreBloc2", "Classement général");
 	matrice.comboPresentationCourses = matrice.comboPresentationCourses or GetValue("comboPresentationCourses", "Présentation horizontale type Ski Chrono Tour (par défaut)");
 	matrice.comboSexe = matrice.comboSexe or GetValue("comboSexe", '');
-	matrice.Cle_filtrage = matrice.Cle_filtrage or GetValue("Cle_filtrage", nil);
+	local chaine = "$(Sexe):In('"..matrice.comboSexe.."')";
+	matrice.Cle_filtrage = matrice.Cle_filtrage or GetValue("Cle_filtrage", chaine);
 	matrice.tGroupesTout = {};
-	local chaine = "and %$%(Groupe%):In%('TOUS'%)";
-	if matrice.Cle_filtrage and string.find(matrice.Cle_filtrage, chaine) then
-		local a, b = string.find(matrice.Cle_filtrage, chaine);
-		matrice.Cle_filtrage = string.sub(matrice.Cle_filtrage,1, (a-1))..string.sub(matrice.Cle_filtrage,(b+1));
+	matrice.tGroupesCateg = {};
+	
+	-- local chaine_er = "and %$%(Groupe%):In%('TOUS'%)";
+	-- local chaine_categ = "and %$%(Categ%):In%('TOUS'%)";
+	local regroupement_er = '-ER';
+	if matrice.Cle_filtrage and string.find(matrice.Evenement_filtre, regroupement_er) then
+		matrice.comboParCategorie  = 'Non';
 		local cmd = "Select Code_coureur, Groupe From Resultat Where Code_evenement in ("..matrice.Evenement_selection..") And Sexe = '"..matrice.comboSexe.."' Group By Code_coureur, Groupe";
 		local tGroupes = base:TableLoad(cmd)
 		tGroupes:SetCounter('Groupe');
-		matrice.tGroupesTout = {};
 		for i = 0, tGroupes:GetCounter('Groupe'):GetNbRows() -1 do
 			table.insert(matrice.tGroupesTout, {Groupe = tGroupes:GetCounter('Groupe'):GetCell(0,i), Nombre = tGroupes:GetCounter('Groupe'):GetCellInt(1,i), Filtre = matrice.Cle_filtrage.." and $(Groupe):In('"..tGroupes:GetCounter('Groupe'):GetCell(0,i).."')"});
+		end
+	end
+	if matrice.comboParCategorie == 'Oui' then
+		local cmd = "Select Code_coureur, Categ From Resultat Where Code_evenement in ("..matrice.Evenement_selection..") And Sexe = '"..matrice.comboSexe.."' Group By Code_coureur, Categ";
+		local tGroupes = base:TableLoad(cmd)
+		tGroupes:SetCounter('Categ');
+		for i = 0, tGroupes:GetCounter('Categ'):GetNbRows() -1 do
+			table.insert
+				(matrice.tGroupesCateg, 
+					{Categ = tGroupes:GetCounter('Categ'):GetCell(0,i), 
+					Nombre = tGroupes:GetCounter('Categ'):GetCellInt(1,i), 
+					Filtre = matrice.Cle_filtrage.." and $(Categ):In('"..tGroupes:GetCounter('Categ'):GetCell(0,i).."')"
+					}
+				);
 		end
 	end
 
@@ -3101,6 +3141,10 @@ function LitMatrice()	-- lecture des variables et affectation des valeurs dans l
 		end
 		matrice.grille = placevaleur;
 	end
+	if matrice.comboParCategorie == 'Oui' then
+		menuPrint:Enable(btnAnalyse:GetId(), false) ;
+	end
+
 	CreateTableListe();
 	CreateTypeClassement();
 	ChargeDisciplines();  	-- on charge toutes les disciplines de la matrice
@@ -5854,6 +5898,8 @@ function AffichedlgColonne3()		-- boîte de dialogue pour les alignements spécifi
 end
 
 function BuildTableRanking(indice_filtrage)
+	matrice.TitrePrn = matrice.Titre;
+	matrice.TitreAdd = nil;
 	indice_filtrage = indice_filtrage or 0;
 	if indice_filtrage == 0 then
 		if not matrice.cle_filtrage then
@@ -5882,11 +5928,34 @@ function BuildTableRanking(indice_filtrage)
 			end
 		end
 	end
-	cmd = 'Select Code_coureur, Groupe From Resultat Where Code_evenement in('..matrice.Evenement_selection..') Group By Code_coureur, Groupe';
+	local cmd = '';
+	if matrice.comboParCategorie == 'Non' then
+		if indice_filtrage == 0 then
+			cmd = 'Select Code_coureur, Sexe From Resultat Where Code_evenement in('..matrice.Evenement_selection..') Group By Code_coureur, Sexe';
+		else
+			cmd = 'Select Code_coureur, Sexe, Categ, Groupe From Resultat Where Code_evenement in('..matrice.Evenement_selection..') Group By Code_coureur, Sexe, Categ, Groupe';
+		end
+	else
+		cmd = 'Select Code_coureur, Sexe, Categ, Groupe  From Resultat Where Code_evenement in('..matrice.Evenement_selection..') Group By Code_coureur, Sexe, Categ, Groupe';
+	end
 	tMatrice_Ranking = base:TableLoad(cmd);
+	tMatrice_Ranking:OrderBy('Code_coureur');
+	local filter = "$(Sexe):In('"..matrice.comboSexe.."')";
+	tMatrice_Ranking:Filter(filter, true);
+	local sexe = ' Hommes';
+	if matrice.Sexe == 'F' then
+		sexe = ' Dames';
+	end
 	if indice_filtrage > 0 then
-		local filter = "$(Groupe):In('"..matrice.tGroupesTout[indice_filtrage].Groupe.."')";
-		tMatrice_Ranking:Filter(filter, true);
+		if matrice.comboParCategorie == 'Non' then
+			local filter = "$(Groupe):In('"..matrice.tGroupesTout[indice_filtrage].Groupe.."')";
+			tMatrice_Ranking:Filter(filter, true);
+			matrice.TitreAdd = '\nClassement '..matrice.tGroupesTout[indice_filtrage].Groupe..sexe;
+		else
+			local filter = "$(Categ):In('"..matrice.tGroupesCateg[indice_filtrage].Categ.."')";
+			tMatrice_Ranking:Filter(filter, true);
+			matrice.TitreAdd = '\nClassement '..matrice.tGroupesCateg[indice_filtrage].Categ..sexe;
+		end
 	end
 	ReplaceTableEnvironnement(tMatrice_Ranking, '_tMatrice_Ranking');
 	if matrice.comboEntite == 'FIS' then
@@ -5898,13 +5967,23 @@ function BuildTableRanking(indice_filtrage)
 	tMatrice_Ranking:AddColumn({ name = 'Nom', label = 'Nom', type = sqlType.CHAR, width = '30', style = sqlStyle.NULL});
 	tMatrice_Ranking:AddColumn({ name = 'Prenom', label = 'Prenom', type = sqlType.CHAR, width = '30', style = sqlStyle.NULL});
  	tMatrice_Ranking:AddColumn({ name = 'Identite', label = 'Identite', type = sqlType.CHAR, width = '61', style = sqlStyle.NULL});
- 	tMatrice_Ranking:AddColumn({ name = 'Sexe', label = 'Sexe', type = sqlType.CHAR, width = '1', style = sqlStyle.NULL});
-      tMatrice_Ranking:AddColumn({ name = 'An', label = 'An', type = sqlType.LONG, style = sqlStyle.NULL});
-	tMatrice_Ranking:AddColumn({ name = 'Categ', label = 'Categ', type = sqlType.CHAR, width = '8', style = sqlStyle.NULL});
+	local colindex = tMatrice_Ranking:GetIndexColumn('Sexe');
+	if colindex < 0 then
+		tMatrice_Ranking:AddColumn({ name = 'Sexe', label = 'Sexe', type = sqlType.CHAR, width = '1', style = sqlStyle.NULL});
+      end
+	tMatrice_Ranking:AddColumn({ name = 'An', label = 'An', type = sqlType.LONG, style = sqlStyle.NULL});
+	colindex = tMatrice_Ranking:GetIndexColumn('Categ');
+	if colindex < 0 then
+		tMatrice_Ranking:AddColumn({ name = 'Categ', label = 'Categ', type = sqlType.CHAR, width = '8', style = sqlStyle.NULL});
+      end
 	tMatrice_Ranking:AddColumn({ name = 'Nation', label = 'Nation', type = sqlType.CHAR, width = '3', style = sqlStyle.NULL});
 	tMatrice_Ranking:AddColumn({ name = 'Comite', label = 'Comite', type = sqlType.CHAR, width = '3', style = sqlStyle.NULL});
 	tMatrice_Ranking:AddColumn({ name = 'Club', label = 'Club', type = sqlType.CHAR, width = '30', style = sqlStyle.NULL});
 	tMatrice_Ranking:AddColumn({ name = 'Club_long', label = 'Club', type = sqlType.CHAR, width = '75', style = sqlStyle.NULL});
+	colindex = tMatrice_Ranking:GetIndexColumn('Groupe');
+	if colindex < 0 then
+		tMatrice_Ranking:AddColumn({ name = 'Groupe', label = 'Groupe', type = sqlType.CHAR, width = '30', style = sqlStyle.NULL});
+      end
 	tMatrice_Ranking:AddColumn({ name = 'Equipe', label = 'Equipe', type = sqlType.CHAR, width = '30', style = sqlStyle.NULL});
 	tMatrice_Ranking:AddColumn({ name = 'Critere', label = 'Critere', type = sqlType.CHAR, width = '30', style = sqlStyle.NULL});
  	tMatrice_Ranking:AddColumn({ name = 'Point', label = 'Point', type = sqlType.DOUBLE, style = sqlStyle.NULL});
@@ -5992,7 +6071,6 @@ function BuildTableRanking(indice_filtrage)
 		local cmd = 'Select * From Resultat Where Code_evenement = '..code_evenement..' Order By Code_coureur';
 		base:TableLoad(tResultat, cmd);
 		if indice_filtrage == 0 and matrice.Cle_filtrage then
-			adv.Alert('matrice.Cle_filtrage = '..matrice.Cle_filtrage);
 			tResultat:Filter(matrice.Cle_filtrage, true);
 		end
 		for row = 0, tMatrice_Ranking:GetNbRows() -1 do
@@ -6112,6 +6190,7 @@ function AffichedlgConfiguration()
 	dlgConfiguration:GetWindowName('comboTypePoint'):Append("Points course");
 	dlgConfiguration:GetWindowName('comboAbdDsq'):SetTable(tOuiNon, 'Choix', 'Choix');
 	dlgConfiguration:GetWindowName('comboTpsDuDernier'):SetTable(tOuiNon, 'Choix', 'Choix');
+	dlgConfiguration:GetWindowName('comboParCategorie'):SetTable(tOuiNon, 'Choix', 'Choix');
 	dlgConfiguration:GetWindowName('comboTriSortie'):Append("Classement");
 	dlgConfiguration:GetWindowName('comboTriSortie'):Append("Année et classement");
 	dlgConfiguration:GetWindowName('comboTriSortie'):Append("Catégorie et classement");
@@ -6193,10 +6272,10 @@ function AffichedlgConfiguration()
 	local btnRAZCritere = menuCritere:Append({label="Effacer tous les critères de calcul", image ="./res/32x32_configuration.png"});
 	tbedit1:SetDropdownMenu(btn_parametrage:GetId(), menuCritere);
 	local btnPrint = tbedit1:AddTool("Calculer", "./res/32x32_ranking.png", "Calculer", itemKind.DROPDOWN);
-	local menuPrint =  menu.Create();
+	menuPrint =  menu.Create();
 	local btnCalculer = menuPrint:Append({label="Calculer", image="./res/32x32_ranking.png"});
 	menuPrint:AppendSeparator();
-	local btnAnalyse = menuPrint:Append({label="Analyse des performances", image ="./res/32x32_ranking.png"});
+	btnAnalyse = menuPrint:Append({label="Analyse des performances", image ="./res/32x32_ranking.png"});
 	tbedit1:SetDropdownMenu(btnPrint:GetId(), menuPrint);
 	tbedit1:AddSeparator();
 	local btnRetour = tbedit1:AddTool("Sortie", "./res/32x32_exit.png");
@@ -6274,10 +6353,6 @@ function AffichedlgConfiguration()
 			end
 			local cmd = 'Select * From Resultat Where Code_evenement In(-1,'..matrice.Evenement_selection..") And Sexe = '"..matrice.comboSexe.."'";
 			base:TableLoad(tResultat, cmd);
-			local row = tResultat:AddRow();
-			tResultat:SetCell('Code_evenement', row, matrice.code_evenement);
-			tResultat:SetCell('Code_coureur', row, 'TOUS');
-			tResultat:SetCell('Groupe', row, 'TOUS');
 			if tResultat:GetNbRows() > 0 then
 				local filterCmd = wnd.FilterConcurrentDialog({ 
 					sqlTable = tResultat,
@@ -6315,7 +6390,6 @@ function AffichedlgConfiguration()
 		function(evt)
 			LitMatrice();
 			LitMatriceCourses(true);
-			adv.Alert('Bouton Calculer - matrice.Cle_filtrage = '..tostring(matrice.Cle_filtrage)..', taille de matrice.tGroupesTout = '..#matrice.tGroupesTout);
 			matrice.findescalculs = false;
 			matrice.panel_name = 'print';
 			if #matrice.tGroupesTout == 0 then
@@ -6347,19 +6421,37 @@ function AffichedlgConfiguration()
 			LitMatriceCourses(true);
 			matrice.findescalculs = false;
 			matrice.panel_name = 'print';
-			if #matrice.tGroupesTout == 0 then
-				Calculer('print', 0);
-				if not matrice.findescalculs == true then
-					dlgConfiguration:MessageBox(
-						"Une erreur est intervenue durant les calculs !!!",
-						"Calcul de la matrice "..matrice.Titre, 
-						msgBoxStyle.OK + msgBoxStyle.ICON_WARNING
-						);
-					return;
+			if matrice.comboParCategorie == 'Non' then
+				if #matrice.tGroupesTout == 0 then
+					Calculer('print', 0);
+					if not matrice.findescalculs == true then
+						dlgConfiguration:MessageBox(
+							"Une erreur est intervenue durant les calculs !!!",
+							"Calcul de la matrice "..matrice.Titre, 
+							msgBoxStyle.OK + msgBoxStyle.ICON_WARNING
+							);
+						return;
+					end
+					OnPrint();
+				else
+					for i = 1, #matrice.tGroupesTout do
+						if i > 1 then
+							matrice.next = true;
+						end
+						Calculer('print', i);
+						if not matrice.findescalculs == true then
+							dlgConfiguration:MessageBox(
+								"Une erreur est intervenue durant les calculs !!!",
+								"Calcul de la matrice "..matrice.Titre, 
+								msgBoxStyle.OK + msgBoxStyle.ICON_WARNING
+								);
+							return;
+						end
+						OnPrint();
+					end
 				end
-				OnPrint();
 			else
-				for i = 1, #matrice.tGroupesTout do
+				for i = 1, #matrice.tGroupesCateg do
 					if i > 1 then
 						matrice.next = true;
 					end
@@ -6390,14 +6482,35 @@ function AffichedlgConfiguration()
 					) 
 				return;
 			end
-			Calculer('printanalyse');
-			if not matrice.findescalculs == true then
-				dlgConfiguration:MessageBox(
-					"Une erreur est intervenue durant les calculs !!!",
-					"Calcul de la matrice "..matrice.Titre, 
-					msgBoxStyle.OK + msgBoxStyle.ICON_WARNING
-					) ;
-				return;
+			if matrice.comboParCategorie == 'Non' then
+				if #matrice.tGroupesTout == 0 then
+					Calculer('printanalyse', 0);
+					if not matrice.findescalculs == true then
+						dlgConfiguration:MessageBox(
+							"Une erreur est intervenue durant les calculs !!!",
+							"Calcul de la matrice "..matrice.Titre, 
+							msgBoxStyle.OK + msgBoxStyle.ICON_WARNING
+							);
+						return;
+					end
+					OnPrintAnalyse();
+				else
+					for i = 1, #matrice.tGroupesTout do
+						if i > 1 then
+							matrice.next = true;
+						end
+						Calculer('printanalyse', i);
+						if not matrice.findescalculs == true then
+							dlgConfiguration:MessageBox(
+								"Une erreur est intervenue durant les calculs !!!",
+								"Calcul de la matrice "..matrice.Titre, 
+								msgBoxStyle.OK + msgBoxStyle.ICON_WARNING
+								);
+							return;
+						end
+						OnPrintAnalyse();
+					end
+				end
 			end
 			dlgConfiguration:EndModal(idButton.OK);
 		end
@@ -6469,13 +6582,6 @@ function AffichedlgConfiguration()
 	SetDatadlgConfiguration();
 	SetEnableControldlgConfiguration();
 	if dlgConfiguration:ShowModal() == idButton.OK then
-		-- if matrice.findescalculs == true then
-			-- if matrice.panel_name == 'print' then
-				-- OnPrint();
-			-- elseif matrice.panel_name == 'printanalyse' then
-				-- OnPrintAnalyse();
-			-- end
-		-- end
 		do return end
 	end
 	-- dlgConfiguration:ShowModal();
@@ -7454,6 +7560,7 @@ function OnSavedlgConfiguration()	-- sauvegarde des paramètres de la matrice.
 				base:Query(cmd);
 			end
 			dlgConfiguration:GetWindowName('comboGrille'):SetValue('Point Place Coupe du Monde FIS');
+			dlgConfiguration:GetWindowName('comboParCategorie'):SetValue('Non');
 			dlgConfiguration:GetWindowName('comboAbdDsq'):SetValue('Non');
 			dlgConfiguration:GetWindowName('comboOrientation'):SetValue('Paysage');
 			dlgConfiguration:GetWindowName('comboPrendreBloc1'):SetValue('Classement général');
@@ -7493,6 +7600,7 @@ function OnSavedlgConfiguration()	-- sauvegarde des paramètres de la matrice.
 	matrice.comboGarderInfQuota = dlgConfiguration:GetWindowName('comboGarderInfQuota'):GetValue();
 	matrice.comboTypePoint = dlgConfiguration:GetWindowName('comboTypePoint'):GetValue();
 	matrice.comboPrendreBloc1 = dlgConfiguration:GetWindowName('comboPrendreBloc1'):GetValue();
+	matrice.comboParCategorie = dlgConfiguration:GetWindowName('comboParCategorie'):GetValue();
 	if matrice.bloc2 then
 		matrice.comboPrendreBloc2 = dlgConfiguration:GetWindowName('comboPrendreBloc2'):GetValue();
 	end
@@ -7537,6 +7645,7 @@ function OnSavedlgConfiguration()	-- sauvegarde des paramètres de la matrice.
 	AddRowEvenement_Matrice('Saison', matrice.Saison);
 	AddRowEvenement_Matrice('comboSexe', matrice.comboSexe);
 	AddRowEvenement_Matrice('comboAbdDsq', matrice.comboAbdDsq);
+	AddRowEvenement_Matrice('comboParCategorie', matrice.comboParCategorie);
 	AddRowEvenement_Matrice('comboGarderInfQuota', matrice.comboGarderInfQuota);
 	AddRowEvenement_Matrice('comboTypePoint', matrice.comboTypePoint);
 	AddRowEvenement_Matrice('comboPrendreBloc1', matrice.comboPrendreBloc1);
@@ -7764,6 +7873,7 @@ function SetDatadlgConfiguration()
 	else
 		dlgConfiguration:GetWindowName('numMalusAbs'):SetValue('');
 	end
+	dlgConfiguration:GetWindowName('comboParCategorie'):SetValue(matrice.comboParCategorie);
 	dlgConfiguration:GetWindowName('comboTriSortie'):SetValue(matrice.comboTriSortie);
 	dlgConfiguration:GetWindowName('comboPresentationCourses'):SetValue(matrice.comboPresentationCourses);
 	dlgConfiguration:GetWindowName('comboOrientation'):SetValue(matrice.comboOrientation);
@@ -7809,22 +7919,15 @@ end
 
 function OnCurlReturn(evt)
 	if evt:GetInt() == 1 then
+		local disponible2 = string.gsub(evt:GetString(),'%.','-');
 		if evt:GetString() > matrice.version_script then
-			local disponible2 = string.gsub(evt:GetString(),'%.','-');
 			if app.GetAuiFrame():MessageBox(
 				"Vous utilisez la version "..matrice.version_script.." du script et la version "..evt:GetString().." plus récente est disponible.\nVoulez-vous la télécharger ?", 
 				"Téléchargement du script",
 				msgBoxStyle.YES_NO + msgBoxStyle.NO_DEFAULT + msgBoxStyle.ICON_INFORMATION
 				) == msgBoxStyle.YES then
 				local url = 'http://188.165.236.85/maj_pg/challenge/challenge'..disponible2..'.exe';
-				if app.GetVersion() >= '2.4' then
-					Telechargement(url, disponible2);
-				else
-					app.GetAuiFrame():MessageBox(
-						"Vous devez mettre à jour le logiciel avant !!", 
-						"mise à jour",
-						msgBoxStyle.OK + msgBoxStyle.ICON_WARNING);
-				end
+				Telechargement(url, disponible2);
 			end
 		end
 	end
@@ -7838,7 +7941,7 @@ function OnConfiguration(cparams)
 	else
 		return false;
 	end
-	matrice.version_script = '5.9';
+	matrice.version_script = '5.91';
 	matrice.OS = app.GetOsDescription();
 	-- vérification de l'existence d'une version plus récente du script.
 	local url = 'https://live.ffs.fr/maj_pg/challenge/last_version.txt'
@@ -7897,7 +8000,6 @@ function OnConfiguration(cparams)
 	base:TableLoad(tSaison, 'Select * From Saison Where Code > 0 Order By Code DESC');
 	base:TableLoad(tEntite, "Select * From Entite Where Code In('FFS', 'FIS') Order By Code DESC");
 	base:TableLoad(tActivite, "Select * From Activite Where Code In('ALP')");
-	
 	CreateTablesCombo();
 	AffichedlgConfiguration()
 end
