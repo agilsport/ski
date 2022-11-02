@@ -51,6 +51,31 @@ function OnTimerRunning(evt);
 	dlgTableau:GetWindowName('sequence'):SetValue('Demande de maintien de la connexion');
 end
 
+function OnExport()
+	tDraw:OrderBy('Dossard, Rang_tirage');
+	-- local filename = './tpm/'..string.sub(tEpreuve:GetCell('Fichier_transfert',0), 4)..'_racers.csv';
+	local filename = app.GetPath()..app.GetPathSeparator()..'tmp'..app.GetPathSeparator()..string.sub(tEpreuve:GetCell('Fichier_transfert',0), 4)..'_racers.csv';
+	local f = io.open(filename, 'w')
+	if f == nil then 
+		return
+	end
+	local chaine = 'Code;Bib;Name;Surname;Nation;Club;FIS Points\n'
+	f:write(chaine);
+	for i = 0, tDraw:GetNbRows() -1 do
+		chaine = string.sub(tDraw:GetCell('Code_coureur', i), 4);
+		chaine = chaine..';'..tDraw:GetCell('Dossard', i);
+		chaine = chaine..';'..tDraw:GetCell('Nom', i);
+		chaine = chaine..';'..tDraw:GetCell('Prenom', i);
+		chaine = chaine..';'..tDraw:GetCell('Nation', i);
+		chaine = chaine..';'..tDraw:GetCell('Club', i);
+		chaine = chaine..';'..tDraw:GetCell('FIS_pts', i)..'\n';
+		f:write(chaine);
+	end
+	f:close();
+	local msg = 'Les coureurs ont été exportés dans le fichier\n'..filename..' qui se trouve dans\nle répertoire tmp de skiFFS.';
+	app.GetAuiFrame():MessageBox(msg, "Exportation des coureurs ", msgBoxStyle.OK+msgBoxStyle.ICON_INFORMATION);
+end
+
 function OnClose()
 
 	if draw.socket ~= nil then
@@ -85,6 +110,36 @@ function SortTable(array, colnom, sens)	-- tri des tables
 	end
 end
 
+function Telechargement(url, disponible2)
+	local localFile = string.format("%s/tmp/LiveDraw"..disponible2..".exe", app:GetPath());
+	localFile = string.gsub(localFile, app.GetPathSeparator(), "/");
+	if curl.DownloadFile(url, localFile) ~= true then
+		return;
+	end
+	-- lancement  
+	if dlgConfig then
+		dlgConfig:EndModal(idButton.CANCEL);
+	end
+	if app.FileExists(localFile) then
+		app.Execute(localFile);
+	end
+end
+
+function OnCurlReturn(evt)
+	if evt:GetInt() == 1 then
+		local disponible2 = string.gsub(evt:GetString(),'%.','-');
+		if evt:GetString() > draw.version then
+			if app.GetAuiFrame():MessageBox(
+				"Vous utilisez la version "..draw.version.." du script et la version "..evt:GetString().." plus récente est disponible.\nVoulez-vous la télécharger ?", 
+				"Téléchargement du script",
+				msgBoxStyle.YES_NO + msgBoxStyle.NO_DEFAULT + msgBoxStyle.ICON_INFORMATION
+				) == msgBoxStyle.YES then
+				local url = 'http://188.165.236.85/maj_pg/livedraw/liveDraw'..disponible2..'.exe';
+				Telechargement(url, disponible2);
+			end
+		end
+	end
+end
 
 function ReadECSL()
 	draw.tECSL = {};
@@ -2868,6 +2923,8 @@ function OnAfficheTableau()
 	menuOutils:AppendSeparator();
 	btnDecalerGroupeHaut = menuOutils:Append({label="Décaler les groupes de tirage de -1", image ="./res/32x32_up.png"});
 	menuOutils:AppendSeparator();
+	btnExporter = menuOutils:Append({label="Exporter le tableau (fichier csv)", image ="./res/32x32_export.png"});
+	menuOutils:AppendSeparator();
 	btnGetECSL = menuOutils:Append({label="Charger un fichier csv ECSL", image ="./res/32x32_startlist.png"});
 	menuOutils:AppendSeparator();
 	btnGetWCSL = menuOutils:Append({label="Charger un fichier csv WCSL", image ="./res/32x32_startlist.png"});
@@ -3346,6 +3403,13 @@ function OnAfficheTableau()
 		end, btnDecalerGroupeHaut);
 	dlgTableau:Bind(eventType.MENU, 
 		function(evt)
+			if tDraw:GetNbRows() > 0 then
+				OnExport();
+			end
+		end, btnExporter);
+
+	dlgTableau:Bind(eventType.MENU, 
+		function(evt)
 			ReadECSL();
 		end, btnGetECSL);
 
@@ -3496,7 +3560,9 @@ function main(params_c)
 	draw.height = display:GetSize().height - 30;
 	draw.x = 0;
 	draw.y = 0;
-	draw.version = "4.92"; -- 4.1 pour 2022-2023
+	draw.version = "4.92"; -- 4.92 pour 2022-2023
+	local url = 'https://live.ffs.fr/maj_pg/livedraw/liveDraw_last_version.txt'
+	local version = curl.AsyncGET(wnd.GetParentFrame(), url);
 	draw.hostname = 'live.fisski.com';
 	draw.method = 'socket';
 	draw.ajouter_code = '';
@@ -3638,7 +3704,7 @@ function main(params_c)
 		height = draw.height,
 		x = draw.x,
 		y = draw.y,
-		label='Informations de connexion', 
+		label='Informations de connexion - version du script : '..draw.version , 
 		icon='./res/32x32_fis.png'
 		});
 	
@@ -3666,7 +3732,7 @@ function main(params_c)
 	dlgConfig:GetWindowName('fis_hostname'):SetValue('live.fisski.com');
 	dlgConfig:GetWindowName('fis_port'):SetValue(draw.port);
 	dlgConfig:GetWindowName('fis_pwd'):SetValue(draw.pwd);
-	if draw.CE == 'O' then
+	if draw.bolEstCE then
 		dlgConfig:GetWindowName('finale_ce'):SetTable(tOuiNon, 'Choix', 'Choix');
 		dlgConfig:GetWindowName('finale_ce'):SetValue('Non');
 	end
@@ -3685,6 +3751,7 @@ function main(params_c)
 			end
 			dlgConfig:EndModal(idButton.OK) 
 		end, btnSave); 
+	wnd.GetParentFrame():Bind(eventType.CURL, OnCurlReturn);
 	dlgConfig:Bind(eventType.MENU, 
 		function(evt) 
 			if draw.doc then
