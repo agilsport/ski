@@ -113,8 +113,7 @@ function SortTable(array, colnom, sens)	-- tri des tables
 end
 
 function Telechargement(url, disponible2)
-	local localFile = string.format("%s/tmp/LiveDraw"..disponible2..".exe", app:GetPath());
-	localFile = string.gsub(localFile, app.GetPathSeparator(), "/");
+	local localFile = app:GetPath()..app.GetPathSeparator..'tmp'..app.GetPathSeparator..disponible2);
 	if curl.DownloadFile(url, localFile) ~= true then
 		return;
 	end
