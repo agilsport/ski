@@ -52,23 +52,25 @@ function OnTimerRunning(evt);
 end
 
 function OnExport()
+	adv.Alert('OnExport');
 	tDraw:OrderBy('Dossard, Rang_tirage');
-	-- local filename = './tpm/'..string.sub(tEpreuve:GetCell('Fichier_transfert',0), 4)..'_racers.csv';
 	local filename = app.GetPath()..app.GetPathSeparator()..'tmp'..app.GetPathSeparator()..string.sub(tEpreuve:GetCell('Fichier_transfert',0), 4)..'_racers.csv';
 	local f = io.open(filename, 'w')
 	if f == nil then 
 		return
 	end
-	local chaine = 'Code;Bib;Name;Surname;Nation;Club;FIS Points\n'
+	local chaine = 'Code1;Code2;Bib;Name;Surname;Nation;Club;FIS Points\n'
 	f:write(chaine);
 	for i = 0, tDraw:GetNbRows() -1 do
+		local pts = string.gsub(tDraw:GetCell('FIS_pts', i),"%.",",");
 		chaine = string.sub(tDraw:GetCell('Code_coureur', i), 4);
+		chaine = chaine..';'..tDraw:GetCell('Code_coureur', i);
 		chaine = chaine..';'..tDraw:GetCell('Dossard', i);
 		chaine = chaine..';'..tDraw:GetCell('Nom', i);
 		chaine = chaine..';'..tDraw:GetCell('Prenom', i);
 		chaine = chaine..';'..tDraw:GetCell('Nation', i);
 		chaine = chaine..';'..tDraw:GetCell('Club', i);
-		chaine = chaine..';'..tDraw:GetCell('FIS_pts', i)..'\n';
+		chaine = chaine..';'..pts..'\n';
 		f:write(chaine);
 	end
 	f:close();
@@ -977,17 +979,23 @@ end
 function ChecktDraw()
 	tDraw:OrderBy('Dossard');
 	draw.bolExisteDossard = false;
-	-- draw.tRang_tirageauto = draw.tRang_tirageauto or {};
-	draw.tRang_tirageauto = {};
+	draw.bolTirageBiboFait = false;
+	draw.bolTirageAvecPointFait = false;
+	draw.bolTirageSansPointFait = false;
+	draw.bolExisteSansPoint = false;
 	draw.statut = 'CF';
 	tDraw:OrderBy('Rang_tirage');
 	for i = 0, tDraw:GetNbRows() -1 do
-		if tDraw:GetCell('Winner_CC', i):len() > 0 then
-			tDraw:SetCell('Winner_CC', i, '1')
-		end
+		tDraw:SetCell('Dossard_bibo', i, 0);
 		local dossard = tDraw:GetCellInt('Dossard', i);
 		if dossard > 0 then
 			draw.bolExisteDossard = true;
+		end
+		if tDraw:GetCellInt('Groupe_tirage', i) == 1 then
+			tDraw:SetCell('Dossard_bibo', i, 1);
+		end
+		if tDraw:GetCell('Winner_CC', i):len() > 0 then
+			tDraw:SetCell('Winner_CC', i, '1')
 		end
 		local pts, rank, pts_SG, rank_SG = GetRank(tDraw:GetCell('Code_coureur', i));
 		if pts and pts >= 0 then
@@ -998,21 +1006,42 @@ function ChecktDraw()
 				tDraw:SetCell('FIS_SG_clt', i, rank_SG);
 			end
 		end
+		if tDraw:GetCellDouble('FIS_pts', i, -1) < 0 then
+			draw.bolExisteSansPoint = true
+		end
 		local rang_tirage = tDraw:GetCellInt('Rang_tirage', i);
 		if tDraw:GetCell('Statut', i) ~= 'CF' then
 			draw.statut = 'UF';
 		end
-		if pts and pts >= 0 then
-			if i < tDraw:GetNbRows() -1 then
-				if rang_tirage == tDraw:GetCellInt('Rang_tirage', i+1) then
-					draw.tRows_nepastirer[rang_tirage] = {};
-					if not draw.tRang_tirageauto[rang_tirage] then
-						table.insert(draw.tRang_tirageauto, rang_tirage);
-					end
+		if draw.bolEstCE or draw.code_niveau == 'NC' then
+			if not draw.bolVitesse then
+				if tDraw:GetCellInt('Groupe_tirage', i) == 2 then
+					tDraw:SetCell('Dossard_bibo', i, 1);
 				end
 			end
 		end
+		if dossard > 0 then
+			if tDraw:GetCellInt('Dossard_bibo', i) == 1 then
+				draw.bolTirageBiboFait = true;
+			end
+			if tDraw:GetCell('TG', i) == 'tDrawG6' then
+				draw.bolTirageAvecPointFait = true;
+			end
+			if tDraw:GetCell('TG', i) == 'PtsFISNull' then
+				draw.bolTirageSansPointFait = true;
+			end
+		end
 	end
+	if draw.bolExisteSansPoint == false then
+		bolTirageSansPointFait = true;
+	end
+	menuOutils:Enable(btnTirageDossardsBIBO:GetId(), not draw.bolTirageBiboFait);
+	menuOutils:Enable(btnTirageDossardsRestants:GetId(), not draw.bolTirageAvecPointFait);
+	menuOutils:Enable(btnTirageDossardsBIBO:GetId(), not draw.bolTirageSansPointFait);
+	if not draw.row_selected or draw.row_selected < 15 then
+		menuOutils:Enable(btnTirageDossardsRestants:GetId(), false);
+	end
+
 end
 
 function CommandSendOrder()
@@ -2180,6 +2209,10 @@ function SetuptDraw()
 		tDraw:OrderBy('Rang_tirage');
 		return;
 	end
+	draw.bolExisteDossard = false;
+	draw.bolTirageBiboFait = false;
+	draw.bolTirageAvecPointFait = false;
+	draw.bolTirageSansPointFait = false;
 	base:Query('Delete From Resultat_Info_Bibo Where Code_evenement = '..draw.code_evenement);
 	local cmd = "Update Resultat Set Dossard = Null Where Code_evenement = "..draw.code_evenement;
 	base:Query(cmd);
@@ -2737,7 +2770,7 @@ function OnAfficheTableau()
 	grid_tableau = dlgTableau:GetWindowName('tableau');
 	BuildTablesDraw();
 
-	local cmd ='Select r.*, rit.* , Repeat(" ",10) Action, Concat(Prenom, Nom) Identite, Repeat(" ",7) TG, 0 Pris ';
+	local cmd ='Select r.*, rit.* , Repeat(" ",10) Action, Concat(Prenom, Nom) Identite, Repeat(" ",7) TG, 0 Pris, 0 Dossard_bibo ';
 	cmd = cmd..'From Resultat r ';
 	cmd = cmd..'Left Join Resultat_Info_Tirage rit On r.Code_evenement = rit.Code_evenement And r.Code_coureur = rit.Code_coureur ';
 	cmd = cmd..'Where r.Code_evenement = '..draw.code_evenement;
@@ -2938,25 +2971,27 @@ function OnAfficheTableau()
 	tbTableau:AddStretchableSpace();
 	
  	tbTableau:Realize();
+
 	tbTableau:EnableTool(btnMenuSend:GetId(), draw.state);
 	tbTableau:EnableTool(btnSendMessage:GetId(), draw.state);
 	
 	menuCommande:Enable(btnClear:GetId(), draw.state) ;
 	menuCommande:Enable(btn_reset_socket:GetId(), draw.state) ;
 	
-	if not draw.row_selected or draw.row_selected == 0 then
-		menuOutils:Enable(btnTirageDossardsRestants:GetId(), false);
-		menuOutils:Enable(btnDecalerBas:GetId(), false);
-		menuOutils:Enable(btnDecalerHaut:GetId(), false);
-		menuOutils:Enable(btnDecalerGroupeBas:GetId(), false);
-		menuOutils:Enable(btnDecalerGroupeHaut:GetId(), false);
-	end
+	-- if not draw.row_selected or draw.row_selected == 0 then
+		-- menuOutils:Enable(btnTirageDossardsRestants:GetId(), false);
+		-- menuOutils:Enable(btnDecalerBas:GetId(), false);
+		-- menuOutils:Enable(btnDecalerHaut:GetId(), false);
+		-- menuOutils:Enable(btnDecalerGroupeBas:GetId(), false);
+		-- menuOutils:Enable(btnDecalerGroupeHaut:GetId(), false);
+	-- end
 	menuOutils:Enable(btnTirageVitesse1530:GetId(), false);
 	if draw.bolVitesse then
 		if draw.bolEstCE or draw.bolEstNC == true then
 			menuOutils:Enable(btnTirageVitesse1530:GetId(), true);
 		end
 	end
+	ChecktDraw();
 	-- tbTableau:EnableTool(btnSendMessage:GetId(), draw.socket_state);
 	-- tbTableau:EnableTool(btnClear:GetId(), draw.socket_state);
 	-- tbTableau:EnableTool(btnMenuSend:GetId(), draw.socket_state);
@@ -3010,12 +3045,11 @@ function OnAfficheTableau()
 		function(evt)
 			ChecktDraw();
 			tDraw:OrderBy('Rang_tirage');
-			local groupe1 = tDraw:GetCellInt('Groupe_tirage', 0);
-			OnPrintDoubleTirage(groupe1);
+			draw.print_alone = true;
+			OnPrintDoubleTirage(1);
 			if not draw.bolVitesse then
 				if draw.bolEstCE or draw.code_niveau == 'NC' then
-					local groupe2 = tDraw:GetCellInt('Groupe_tirage', 14);
-					OnPrintDoubleTirage(groupe2);
+					OnPrintDoubleTirage(2);
 				end
 			end
 			report = nil;
@@ -3137,6 +3171,11 @@ function OnAfficheTableau()
 		function(evt)
 			-- les coureurs sont du groupe de tirage 1
 			ChecktDraw();
+			if draw.bolTirageBiboFait == true then
+				local msg = "Les dossards du BIBO ont déjà été tirés !!!";
+				dlgTableau:MessageBox(msg, "Erreur", msgBoxStyle.OK+msgBoxStyle.ICON_WARNING)
+				return;
+			end
 			local msg = "Cliquer sur Oui pour lancer le double tirage du BIBO.\n"..
 					"Les coureurs doivent être validés sur le tableau au préalable.\n\n"..
 					"Vous pourrez retrouver cette édition dans les impressions\n\n"..
@@ -3147,7 +3186,6 @@ function OnAfficheTableau()
 			) ~= msgBoxStyle.YES then
 				return;
 			end
-			draw.print_alone = false;
 			if draw.statut == 'UF' then
 				local msg = "Tous les coureurs n'on pas été Validés !!!";
 				dlgTableau:MessageBox(msg, "Erreur", msgBoxStyle.OK+msgBoxStyle.ICON_WARNING)
@@ -3158,30 +3196,30 @@ function OnAfficheTableau()
 			tDrawG6 = tDraw:Copy();
 			tDrawG6:OrderBy('Rang_tirage');
 			ReplaceTableEnvironnement(tDrawG6, '_DrawG6');
-			local groupe1 = tDrawG6:GetCellInt('Groupe_tirage', 0);
 			for i = tDrawG6:GetNbRows() -1, 0, -1 do -- traitement du groupe 1
-				if tDrawG6:GetCellInt('Groupe_tirage', i) ~= groupe1 then
+				if tDrawG6:GetCellInt('Groupe_tirage', i) ~= 1 then
 					tDrawG6:RemoveRowAt(i);
 				end
 			end
 			params.nb_groupe1 = tDrawG6:GetNbRows();
 			BuildTableTirage(1, tDrawG6:GetNbRows() - 1);
-			OnPrintDoubleTirage(groupe1);
+			OnPrintDoubleTirage(1);
 			if not draw.bolVitesse then
 				if draw.bolEstCE or draw.code_niveau == 'NC' then
 					tDrawG6 = tDraw:Copy();
 					ReplaceTableEnvironnement(tDrawG6, '_DrawG6');
 					tDrawG6:OrderBy('Rang_tirage');
-					local groupe2 = tDrawG6:GetCellInt('Groupe_tirage', 14)
 					for i = tDrawG6:GetNbRows() -1, 0, -1 do
-						if tDrawG6:GetCellInt('Groupe_tirage', i) ~= groupe2 then
+						if tDrawG6:GetCellInt('Groupe_tirage', i) ~= 2 then
 							tDrawG6:RemoveRowAt(i);
 						end
 					end
 					BuildTableTirage(params.nb_groupe1 + 1, tDrawG6:GetNbRows() -1);
-					OnPrintDoubleTirage(groupe2);
+					OnPrintDoubleTirage(2);
 				end
 			end
+			draw.print_alone = true;
+			ChecktDraw()
 		end
 		, btnTirageDossardsBIBO);
 	dlgTableau:Bind(eventType.MENU, 
@@ -3189,6 +3227,11 @@ function OnAfficheTableau()
 			ChecktDraw();
 			if draw.statut == 'UF' then
 				local msg = "Tous les coureurs n'on pas été Validés !!!";
+				dlgTableau:MessageBox(msg, "Erreur", msgBoxStyle.OK+msgBoxStyle.ICON_WARNING)
+				return;
+			end
+			if not draw.row_selected then
+				local msg = "Veuillez selectionner la ligne à partir de laquelle\nvous allez tirer les dossards.";
 				dlgTableau:MessageBox(msg, "Erreur", msgBoxStyle.OK+msgBoxStyle.ICON_WARNING)
 				return;
 			end
@@ -3235,7 +3278,7 @@ function OnAfficheTableau()
 			if draw.tirage_auto == true then
 				if #draw.tRangsEgalite > 0 then	-- il y a des rangs de depart à tirer
 					for indice = 1, #draw.tRangsEgalite do
-						adv.Alert('draw.tRangsEgalite[indice].PtsFis = '..tostring(draw.tRangsEgalite[indice].PtsFis));
+						-- adv.Alert('draw.tRangsEgalite[indice].PtsFis = '..tostring(draw.tRangsEgalite[indice].PtsFis));
 						if draw.tRangsEgalite[indice].PtsFis > 0 then
 							local rang1 = draw.tRangsEgalite[indice].Rang1;
 							if rang1 > draw.row_selected then
@@ -3247,6 +3290,7 @@ function OnAfficheTableau()
 			end
 			RefreshGrid()
 			-- CommandRenvoyerDossards(false);
+			ChecktDraw()
 		end
 		, btnTirageDossardsRestants);
 
@@ -3306,6 +3350,7 @@ function OnAfficheTableau()
 					base:Query(cmd);
 				end
 			end
+			ChecktDraw()
 		end
 		, btnTirageVitesse1530);		
 
@@ -3332,6 +3377,7 @@ function OnAfficheTableau()
 					OnTirageRangEgal(draw.tRangsEgalite[#draw.tRangsEgalite]);
 				end
 			end
+			ChecktDraw()
 		end
 		, btnTirageDossardsSansPoints);		
 	dlgTableau:Bind(eventType.MENU, 
@@ -3560,7 +3606,7 @@ function main(params_c)
 	draw.height = display:GetSize().height - 30;
 	draw.x = 0;
 	draw.y = 0;
-	draw.version = "4.92"; -- 4.92 pour 2022-2023
+	draw.version = "4.93"; -- 4.92 pour 2022-2023
 	local url = 'https://live.ffs.fr/maj_pg/livedraw/liveDraw_last_version.txt'
 	local version = curl.AsyncGET(wnd.GetParentFrame(), url);
 	draw.hostname = 'live.fisski.com';
@@ -3688,11 +3734,8 @@ function main(params_c)
 	draw.web = 'live.fis-ski.com/lv-'..string.lower(string.sub(draw.code_activite,1,2))..draw.codex..'.htm';
 	draw.state = false;
 	draw.double_tirage_bibo = false;
-	draw.tRows_nepastirer = {};
-	draw.tRang_tirageauto = {};
 	draw.tModifs_tableau = {};
 	draw.raz_sequence = false;
-	draw.print_alone = true;
 	
 	draw.CE = 'N';
 	if draw.bolEstCE then
