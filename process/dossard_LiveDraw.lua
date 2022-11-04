@@ -112,12 +112,11 @@ function SortTable(array, colnom, sens)	-- tri des tables
 	end
 end
 
-function Telechargement(url, disponible2)
-	local localFile = app:GetPath()..app.GetPathSeparator..'tmp'..app.GetPathSeparator..disponible2);
+function Telechargement(url, disponible)
+	local localFile = app:GetPath()..app.GetPathSeparator()..'tmp'..app.GetPathSeparator()..disponible;
 	if curl.DownloadFile(url, localFile) ~= true then
 		return;
 	end
-	-- lancement  
 	if dlgConfig then
 		dlgConfig:EndModal(idButton.CANCEL);
 	end
@@ -127,16 +126,22 @@ function Telechargement(url, disponible2)
 end
 
 function OnCurlReturn(evt)
+	-- Ex de retour : LiveDraw=5.94,Matrices=5.91,TimingReport=4.2
 	if evt:GetInt() == 1 then
-		local disponible2 = string.gsub(evt:GetString(),'%.','-');
-		if evt:GetString() > draw.version then
+		local chaine = evt:GetString();
+		local tChaine = chaine:Split(',');
+		local tVersions = {};
+		table.insert(tVersions, tChaine);
+		local tversionScript = tVersions[1][1]:Split'=';
+		draw.last_version = tversionScript[2];
+		if draw.last_version > draw.version then
 			if app.GetAuiFrame():MessageBox(
-				"Vous utilisez la version "..draw.version.." du script et la version "..evt:GetString().." plus récente est disponible.\nVoulez-vous la télécharger ?", 
+				"Vous utilisez la version "..draw.version.." du script et la version "..draw.last_version.." plus récente est disponible.\nVoulez-vous la télécharger ?", 
 				"Téléchargement du script",
 				msgBoxStyle.YES_NO + msgBoxStyle.NO_DEFAULT + msgBoxStyle.ICON_INFORMATION
 				) == msgBoxStyle.YES then
-				local url = 'http://188.165.236.85/maj_pg/livedraw/liveDraw'..disponible2..'.exe';
-				Telechargement(url, disponible2);
+				local url = 'http://188.165.236.85/maj_pg/ScriptPG.exe';
+				Telechargement(url, 'ScriptPG.exe');
 			end
 		end
 	end
@@ -3605,8 +3610,9 @@ function main(params_c)
 	draw.height = display:GetSize().height - 30;
 	draw.x = 0;
 	draw.y = 0;
-	draw.version = "4.93"; -- 4.92 pour 2022-2023
-	local url = 'https://live.ffs.fr/maj_pg/livedraw/liveDraw_last_version.txt'
+	draw.version = "4.94"; -- 4.92 pour 2022-2023
+	local url = 'https://live.ffs.fr/maj_pg/versionsPG.txt'
+	-- local url = 'https://live.ffs.fr/maj_pg/livedraw/liveDraw_last_version.txt'
 	local version = curl.AsyncGET(wnd.GetParentFrame(), url);
 	draw.hostname = 'live.fisski.com';
 	draw.method = 'socket';
