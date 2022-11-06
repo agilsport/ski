@@ -49,9 +49,9 @@ end
 function OnTimer()
 	if matrice.action == 'close' then
 		matrice.dialog:EndModal();
-		matrice.timer:Stop();
-		dlgOK:Close();
 	end
+	matrice.timer:Stop();
+	dlgOK:Close();
 end	
 
 function TimerDialogInit()
@@ -581,9 +581,9 @@ function SetPtsTotalCourse(idxcourse, idxcoureur);	-- calcule et enregistre les 
 	-- if matrice.course[idxcourse].Nombre_de_manche == 1 then
 		-- raceData.Bestpts = 0;
 	-- end
-	local ptscourse = -1;
-	if matrice.comboTypePoint == 'Points place' then
-		ptscourse = 0;
+	ptscourse = 0;
+	if matrice.course[idxcourse].Bloc < 2 then 
+		ptscourse = ptscourse + matrice.numPtsPresence;
 	end
 	local bloc = matrice.course[idxcourse].Bloc;
 	-- 1.Classement général"
@@ -662,6 +662,12 @@ function SetPtsTotalCourse(idxcourse, idxcoureur);	-- calcule et enregistre les 
 			end
 		end
 	end
+	if raceData.Tps > 0 or raceData.Tps == -500 or raceData.Tps == -800 then
+		if not string.find(matrice.course[idxcourse].Prendre, '2') then
+			ptscourse = ptscourse + matrice.numPtsPresence;
+		end
+	end
+
 	return ptscourse;
 end
 
@@ -1444,9 +1450,6 @@ function CorrectionPtsPlace(idxcourse, coef, pts)	-- selon qu'un minimum de part
 		if matrice.course[idxcourse].participation < matrice.numMinimumArrivee then
 			pts = pts * (matrice.coefReduction / 100);
 		end
-		if bloc == -1 then
-			pts = pts + matrice.numPtsPresence;
-		end
 	end
 	return pts;
 end
@@ -2170,9 +2173,6 @@ function Calculer(panel_name, indice_filtrage)		-- fonction de calcul du résulta
 							
 							raceData.Pts = raceData.Pts * matrice.course[idxcourse].Coef_course / 100;
 							raceData.Pts  = CorrectionPtsPlace(idxcourse, matrice.coefReduction, raceData.Pts) 
-							if matrice.numPtsPresence and not string.find(matrice.course[idxcourse].Prendre, '2') then
-								raceData.Pts = raceData.Pts + matrice.numPtsPresence;
-							end
 						else
 							raceData.Pts = GetPtsCourse(idxcourse, raceData.Tps, matrice.course[idxcourse].Best_time, matrice.course[idxcourse].Facteur_f);
 						end
@@ -3052,7 +3052,8 @@ function LitMatrice()	-- lecture des variables et affectation des valeurs dans l
 	-- local chaine_er = "and %$%(Groupe%):In%('TOUS'%)";
 	-- local chaine_categ = "and %$%(Categ%):In%('TOUS'%)";
 	local regroupement_er = '-ER';
-	if matrice.Cle_filtrage and string.find(matrice.Evenement_filtre, regroupement_er) then
+	if matrice.Cle_filtrage and matrice.Evenement_filtre and string.find(matrice.Evenement_filtre, regroupement_er) then
+		menuPrint:Enable(btnAnalyse:GetId(), false) ;
 		matrice.comboParCategorie  = 'Non';
 		local cmd = "Select Code_coureur, Groupe From Resultat Where Code_evenement in ("..matrice.Evenement_selection..") And Sexe = '"..matrice.comboSexe.."' Group By Code_coureur, Groupe";
 		local tGroupes = base:TableLoad(cmd)
@@ -3062,6 +3063,7 @@ function LitMatrice()	-- lecture des variables et affectation des valeurs dans l
 		end
 	end
 	if matrice.comboParCategorie == 'Oui' then
+		menuPrint:Enable(btnAnalyse:GetId(), false) ;
 		local cmd = "Select Code_coureur, Categ From Resultat Where Code_evenement in ("..matrice.Evenement_selection..") And Sexe = '"..matrice.comboSexe.."' Group By Code_coureur, Categ";
 		local tGroupes = base:TableLoad(cmd)
 		tGroupes:SetCounter('Categ');
@@ -3377,7 +3379,7 @@ function AffichedlgRegroupement()
 	dlgRegroupement:Bind(eventType.MENU, 
 		function(evt)
 			matrice.dialog = dlgRegroupement;
-			matrice.timer:Start(500);	-- Temps de scrutation de 1,5 secondes
+			matrice.timer:Start(600);	-- Temps de scrutation de 1,5 secondes
 			matrice.action = 'nada';
 			dlgRegroupement:Bind(eventType.TIMER, OnTimer, matrice.timer);
 			TimerDialogInit();
@@ -3504,7 +3506,7 @@ function AffichedlgCritere1()	-- boîte de dialogue pour un critère de type 1
 	tbcriteretype1:Bind(eventType.MENU, 
 		function(evt)
 			matrice.dialog = dlgCritere1;
-			matrice.timer:Start(500);	-- Temps de scrutation de 1,5 secondes
+			matrice.timer:Start(600);	-- Temps de scrutation de 1,5 secondes
 			matrice.action = 'nada';
 			dlgCritere1:Bind(eventType.TIMER, OnTimer, matrice.timer);
 			TimerDialogInit();
@@ -3818,7 +3820,7 @@ function AffichedlgCritere2()	-- boîte de dialogue pour un critère de type 2
 	tbcriteretype2:Bind(eventType.MENU, 
 		function(evt)
 			matrice.dialog = dlgCritere2;
-			matrice.timer:Start(500);	-- Temps de scrutation de 1,5 secondes
+			matrice.timer:Start(600);	-- Temps de scrutation de 1,5 secondes
 			matrice.action = 'nada';
 			dlgCritere2:Bind(eventType.TIMER, OnTimer, matrice.timer);
 			TimerDialogInit();
@@ -4243,7 +4245,7 @@ function AffichedlgCritere4()	-- boîte de dialogue pour un critère de type 3 ou 
 	tbdlgCritere4:Bind(eventType.MENU, 
 		function(evt)
 			matrice.dialog = dlgCritere4;
-			matrice.timer:Start(500);	-- Temps de scrutation de 1,5 secondes
+			matrice.timer:Start(600);	-- Temps de scrutation de 1,5 secondes
 			matrice.action = 'nada';
 			dlgCritere4:Bind(eventType.TIMER, OnTimer, matrice.timer);
 			TimerDialogInit();
@@ -4467,7 +4469,7 @@ function AffichedlgConfigurationSupport()	-- boîte de dialogue des paramètres de
 	dlgConfigurationSupport:Bind(eventType.MENU, 
 		function(evt)
 			matrice.dialog = dlgConfigurationSupport;
-			matrice.timer:Start(500);	-- Temps de scrutation de 1,5 secondes
+			matrice.timer:Start(600);	-- Temps de scrutation de 1,5 secondes
 			matrice.action = 'nada';
 			dlgConfigurationSupport:Bind(eventType.TIMER, OnTimer, matrice.timer);
 			TimerDialogInit();
@@ -4613,7 +4615,7 @@ function AffichedlgCopycolonnes()	-- affiche la boîte de dialogue pour la copie 
 	dlgCopycolonnes:Bind(eventType.MENU, 
 		function(evt)
 			matrice.dialog = dlgCopycolonnes;
-			matrice.timer:Start(500);	-- Temps de scrutation de 1,5 secondes
+			matrice.timer:Start(600);	-- Temps de scrutation de 1,5 secondes
 			matrice.action = 'nada';
 			dlgCopycolonnes:Bind(eventType.TIMER, OnTimer, matrice.timer);
 			TimerDialogInit();
@@ -4860,7 +4862,7 @@ function AffichedlgInscription()	-- boîte de dialogue pour la création d'une nou
 	dlgInscription:Bind(eventType.MENU, 
 		function(evt) 
 			matrice.dialog = dlgAnalyse;
-			matrice.timer:Start(500);	-- Temps de scrutation de 1,5 secondes
+			matrice.timer:Start(600);	-- Temps de scrutation de 1,5 secondes
 			matrice.action = 'nada';
 			dlgAnalyse:Bind(eventType.TIMER, OnTimer, matrice.timer);
 			TimerDialogInit();
@@ -4971,7 +4973,7 @@ function AffichedlgVisuFiltrexPoints()		-- boîte de dialogue de filtrage des cou
 	tbconfigplagepoints:Bind(eventType.MENU, 
 		function(evt) 
 			matrice.dialog = dlgFiltrePoint;
-			matrice.timer:Start(500);	-- Temps de scrutation de 1,5 secondes
+			matrice.timer:Start(600);	-- Temps de scrutation de 1,5 secondes
 			matrice.action = 'nada';
 			dlgFiltrePoint:Bind(eventType.TIMER, OnTimer, matrice.timer);
 			TimerDialogInit();
@@ -5248,7 +5250,7 @@ function AffichedlgTexte()		-- boîte de dialogue pour le choix des textes à impr
 				dlgTexte:GetWindowName('texteImprimerStatCourses'):SetValue('Non');
 			end
 			matrice.dialog = dlgTexte;
-			matrice.timer:Start(500);	-- Temps de scrutation de 1,5 secondes
+			matrice.timer:Start(600);	-- Temps de scrutation de 1,5 secondes
 			matrice.action = 'nada';
 			-- dlgTexte:Bind(eventType.TIMER, OnTimer, matrice.timer);
 			TimerDialogInit();
@@ -5444,7 +5446,7 @@ function AffichedlgAnalyse()
 	tbanalyse:Bind(eventType.MENU, 
 			function(evt) 
 				matrice.dialog = dlgAnalyse;
-				matrice.timer:Start(500);	-- Temps de scrutation de 1,5 secondes
+				matrice.timer:Start(600);	-- Temps de scrutation de 1,5 secondes
 				matrice.action = 'nada';
 				dlgAnalyse:Bind(eventType.TIMER, OnTimer, matrice.timer);
 				TimerDialogInit();
@@ -5454,7 +5456,7 @@ function AffichedlgAnalyse()
 	tbanalyse:Bind(eventType.MENU, 
 			function(evt) 
 				matrice.dialog = dlgAnalyse;
-				matrice.timer:Start(500);	-- Temps de scrutation de 1,5 secondes
+				matrice.timer:Start(600);	-- Temps de scrutation de 1,5 secondes
 				matrice.action = 'nada';
 				dlgAnalyse:Bind(eventType.TIMER, OnTimer, matrice.timer);
 				TimerDialogInit();
@@ -5530,7 +5532,7 @@ function AffichedlgFiltre()	-- boîte de dialogue pour le filtrage des concurrent
 	tbconfigcolonnes:Bind(eventType.MENU, 
 		function(evt) 
 			matrice.dialog = dlgFiltre;
-			matrice.timer:Start(500);	-- Temps de scrutation de 1,5 secondes
+			matrice.timer:Start(600);	-- Temps de scrutation de 1,5 secondes
 			matrice.action = 'nada';
 			dlgFiltre:Bind(eventType.TIMER, OnTimer, matrice.timer);
 			TimerDialogInit();
@@ -5622,7 +5624,7 @@ function AffichedlgColonne()	-- boîte de dialogue pour la sélection des colonnes
 	tbconfigcolonnes:Bind(eventType.MENU, 
 		function(evt) 
 			matrice.dialog = dlgColonne;
-			matrice.timer:Start(500);	-- Temps de scrutation de 1,5 secondes
+			matrice.timer:Start(600);	-- Temps de scrutation de 1,5 secondes
 			matrice.action = 'nada';
 			dlgColonne:Bind(eventType.TIMER, OnTimer, matrice.timer);
 			TimerDialogInit();
@@ -5743,7 +5745,7 @@ function AffichedlgColonne2()		-- boîte de dialogue pour le choix des colonnes à
 	tbconfigcolonnes2:Bind(eventType.MENU, 
 		function(evt) 
 			matrice.dialog = dlgColonne2;
-			matrice.timer:Start(500);	-- Temps de scrutation de 1,5 secondes
+			matrice.timer:Start(600);	-- Temps de scrutation de 1,5 secondes
 			matrice.action = 'nada';
 			dlgColonne2:Bind(eventType.TIMER, OnTimer, matrice.timer);
 			TimerDialogInit();
@@ -5872,7 +5874,7 @@ function AffichedlgColonne3()		-- boîte de dialogue pour les alignements spécifi
 	tbconfigcolonnes3:Bind(eventType.MENU, 
 		function(evt) 
 			matrice.dialog = dlgColonne3;
-			matrice.timer:Start(500);	-- Temps de scrutation de 1,5 secondes
+			matrice.timer:Start(600);	-- Temps de scrutation de 1,5 secondes
 			matrice.action = 'nada';
 			dlgColonne3:Bind(eventType.TIMER, OnTimer, matrice.timer);
 			TimerDialogInit();
@@ -5883,7 +5885,7 @@ function AffichedlgColonne3()		-- boîte de dialogue pour les alignements spécifi
 	tbconfigcolonnes3:Bind(eventType.MENU, 
 		function(evt) 
 			matrice.dialog = dlgColonne3;
-			matrice.timer:Start(500);	-- Temps de scrutation de 1,5 secondes
+			matrice.timer:Start(600);	-- Temps de scrutation de 1,5 secondes
 			matrice.action = 'nada';
 			dlgColonne3:Bind(eventType.TIMER, OnTimer, matrice.timer);
 			TimerDialogInit();
@@ -6302,7 +6304,15 @@ function AffichedlgConfiguration()
 			matrice.findescalculs = false;
 			dlgConfiguration:EndModal(idButton.CANCEL) 
 		end, btnRetour);
-	tbedit1:Bind(eventType.MENU, OnSavedlgConfiguration, btnSaveEdit);
+	tbedit1:Bind(eventType.MENU, 
+		function(evt)
+			matrice.dialog = 'dlgConfiguration';
+			matrice.timer:Start(600);	-- Temps de scrutation de 1,5 secondes
+			matrice.action = 'nada';
+			dlgConfiguration:Bind(eventType.TIMER, OnTimer, matrice.timer);
+			TimerDialogInit();
+			OnSavedlgConfiguration();
+		end, btnSaveEdit);
 	tbedit1:Bind(eventType.MENU, AffichedlgAnalyse, btnParam);
 	tbedit1:Bind(eventType.MENU, AffichedlgAnalyse, btnParamAnalyse);
 	tbedit1:Bind(eventType.MENU, AffichedlgTexte, btnTxtLogo);
@@ -7343,7 +7353,7 @@ function OnAjouterCoureur(rowcourse)							-- boîte de dialogue pour donner des 
 					local cmd = "Delete From Evenement_Matrice Where Code_evenement = "..matrice.code_evenement..' And Cle Like '..racine;
 					base:Query(cmd);
 				matrice.dialog = dlgAjouterCoureur;
-				matrice.timer:Start(500);	-- Temps de scrutation de 0,5 secondes
+				matrice.timer:Start(600);	-- Temps de scrutation de 0,5 secondes
 				TimerDialogInit();
 				matrice.action = 'close';
 			end
@@ -7352,7 +7362,7 @@ function OnAjouterCoureur(rowcourse)							-- boîte de dialogue pour donner des 
 	tbajoutercoureurs:Bind(eventType.MENU, 
 		function(evt)
 			matrice.dialog = dlgAjouterCoureur;
-			matrice.timer:Start(500);	-- Temps de scrutation de 0,5 secondes
+			matrice.timer:Start(600);	-- Temps de scrutation de 0,5 secondes
 			matrice.action = 'nada';
 			dlgAjouterCoureur:Bind(eventType.TIMER, OnTimer, matrice.timer);
 			TimerDialogInit();
@@ -7478,7 +7488,7 @@ function AffichedlgVisuCoursex(rowcourse)	-- affichage du paramétrage de la cour
 	tbcoursex:Bind(eventType.MENU, 
 			function(evt)
 				matrice.dialog = dlgVisuCoursex;
-				matrice.timer:Start(500);	-- Temps de scrutation de 1,5 secondes
+				matrice.timer:Start(600);	-- Temps de scrutation de 1,5 secondes
 				matrice.action = 'nada';
 				dlgVisuCoursex:Bind(eventType.TIMER, OnTimer, matrice.timer);
 				if dlgVisuCoursex:MessageBox(
@@ -7540,59 +7550,66 @@ function OnSavedlgConfiguration()	-- sauvegarde des paramètres de la matrice.
 	-- suppression de tous les enregistrements présents dans la table Evenement_Matrice sauf les [code et critere;
 	-- récupération de la valeur de Evenement_selection, suppression de toutes les valeurs et création de la totalité des valeurs
 	-- relecture des variables de Evenement_Matrice pour recréer les variables du tableau associatif matrice{}
-	if string.find(dlgConfiguration:GetWindowName('comboPresentationCourses'):GetValue(), 'Chrono') then
+	if matrice.comboEntite == 'FIS' and string.find(dlgConfiguration:GetWindowName('comboPresentationCourses'):GetValue(), 'Chrono') then
 		if dlgConfiguration:MessageBox(
 				"Voulez-vous revenir aux paramètres par défaut\nde la présentation horizontale ?",
 				"Paramétrage par défaut", 
 				msgBoxStyle.YES_NO + msgBoxStyle.NO_DEFAULT+ msgBoxStyle.ICON_INFORMATION
 				) == msgBoxStyle.YES then
-			local apostrophe = "'"; local virgule = ',';
-			for i = 0, tMatrice_Courses:GetNbRows() -1 do
-				code_course = tMatrice_Courses:GetCell('Code',i);
-				local racine = '['..code_course..']_';
-				local strin = apostrophe..racine.."numBloc"..apostrophe..
-							virgule..apostrophe..racine.."comboObligatoire"..apostrophe..
-							virgule..apostrophe..racine.."comboSkip"..apostrophe..
-							virgule..apostrophe..racine.."coefCourse"..apostrophe..
-							virgule..apostrophe..racine.."coefManche"..apostrophe..
-							virgule..apostrophe..racine.."comboGrille"..apostrophe
-				local cmd = "Delete From Evenement_Matrice Where Code_evenement = "..matrice.code_evenement..' And Cle In('..strin..") Or Cle Like 'imprimer%'";
-				base:Query(cmd);
+			if dlgConfiguration:MessageBox(
+					"Confirmez-vous l'opération ?",
+					"Paramétrage par défaut", 
+					msgBoxStyle.YES_NO + msgBoxStyle.NO_DEFAULT+ msgBoxStyle.ICON_INFORMATION
+					) == msgBoxStyle.YES then
+				local apostrophe = "'"; local virgule = ',';
+				for i = 0, tMatrice_Courses:GetNbRows() -1 do
+					code_course = tMatrice_Courses:GetCell('Code',i);
+					local racine = '['..code_course..']_';
+					local strin = apostrophe..racine.."numBloc"..apostrophe..
+								virgule..apostrophe..racine.."comboObligatoire"..apostrophe..
+								virgule..apostrophe..racine.."comboSkip"..apostrophe..
+								virgule..apostrophe..racine.."coefCourse"..apostrophe..
+								virgule..apostrophe..racine.."coefManche"..apostrophe..
+								virgule..apostrophe..racine.."comboGrille"..apostrophe
+					local cmd = "Delete From Evenement_Matrice Where Code_evenement = "..matrice.code_evenement..' And Cle In('..strin..") Or Cle Like 'imprimer%'";
+					base:Query(cmd);
+				end
+				dlgConfiguration:GetWindowName('comboGrille'):SetValue('Point Place Coupe du Monde FIS');
+				dlgConfiguration:GetWindowName('comboParCategorie'):SetValue('Non');
+				dlgConfiguration:GetWindowName('comboAbdDsq'):SetValue('Non');
+				dlgConfiguration:GetWindowName('comboOrientation'):SetValue('Paysage');
+				dlgConfiguration:GetWindowName('comboPrendreBloc1'):SetValue('Classement général');
+				dlgConfiguration:GetWindowName('coefDefautCourseBloc1'):SetValue('100');
+				dlgConfiguration:GetWindowName('coefDefautMancheBloc1'):SetValue('0');
+				dlgConfiguration:GetWindowName('coefPourcentageMaxiBloc1'):SetValue('0');
+				dlgConfiguration:GetWindowName('coefReduction'):SetValue('0');
+				dlgConfiguration:GetWindowName('comboGarderInfQuota'):SetValue('Oui');
+				matrice.imprimerBloc1 = 'Clt,0|Tps,0|Diff,0|Pts,1|Cltrun,0|Tpsrun,0|Diffrun,0|Ptsrun,0|Ptstotal,0|EtapeClt,0|EtapePts,0';
+				matrice.imprimerBloc2 = 'Clt,0|Tps,0|Diff,0|Pts,1|Cltrun,0|Tpsrun,0|Diffrun,0|Ptsrun,0|Ptstotal,0';
+				matrice.imprimerColonnes = 'Code_coureur,Code,center,1|Identite,Identité,left,1|Sexe,S.,center,0|An,An,center,1|Categ,Cat.,center,1|Nation,Nat.,center,0|Comite,CR,center,1|Club,Club,left,1|Groupe,Groupe,left,0|Equipe,Equipe,left,0|Critere,Critère,left,0|Liste1,Liste,center,0|Liste2,Liste,center,0|Delta,Delta,center,0';
+				matrice.Bloc2 = false;
+				matrice.texteImprimerHeader = 'Non';
+				matrice.texteMargeHaute1 = '4,5';
+				matrice.texteMargeHaute2 = '4,5';
+				matrice.texteImprimerClubLong = 'Oui';
+				matrice.texteFiltreSupplementaire = 'Non';
+				matrice.texteCodeComplet = 'Non';
+				matrice.texteFontSize = '8';
+				matrice.texteImprimerDeparts = 'Non';
+				matrice.texteImprimerStatCourses ='Oui';
+				matrice.texteImprimerLayerPage = 'Toutes les pages';
+				matrice.texteLargeurEtroite = '0,8';
+				matrice.texteNbColPresCourses = '4';
+				matrice.texteLigne2Texte = 'Nombre de courses :';
+				matrice.texteComiteOrigine = 'Non';
 			end
-			dlgConfiguration:GetWindowName('comboGrille'):SetValue('Point Place Coupe du Monde FIS');
-			dlgConfiguration:GetWindowName('comboParCategorie'):SetValue('Non');
-			dlgConfiguration:GetWindowName('comboAbdDsq'):SetValue('Non');
-			dlgConfiguration:GetWindowName('comboOrientation'):SetValue('Paysage');
-			dlgConfiguration:GetWindowName('comboPrendreBloc1'):SetValue('Classement général');
-			dlgConfiguration:GetWindowName('coefDefautCourseBloc1'):SetValue('100');
-			dlgConfiguration:GetWindowName('coefDefautMancheBloc1'):SetValue('0');
-			dlgConfiguration:GetWindowName('coefPourcentageMaxiBloc1'):SetValue('0');
-			dlgConfiguration:GetWindowName('coefReduction'):SetValue('0');
-			dlgConfiguration:GetWindowName('comboGarderInfQuota'):SetValue('Oui');
-			matrice.imprimerBloc1 = 'Clt,0|Tps,0|Diff,0|Pts,1|Cltrun,0|Tpsrun,0|Diffrun,0|Ptsrun,0|Ptstotal,0|EtapeClt,0|EtapePts,0';
-			matrice.imprimerBloc2 = 'Clt,0|Tps,0|Diff,0|Pts,1|Cltrun,0|Tpsrun,0|Diffrun,0|Ptsrun,0|Ptstotal,0';
-			matrice.imprimerColonnes = 'Code_coureur,Code,center,1|Identite,Identité,left,1|Sexe,S.,center,0|An,An,center,1|Categ,Cat.,center,1|Nation,Nat.,center,0|Comite,CR,center,1|Club,Club,left,1|Groupe,Groupe,left,0|Equipe,Equipe,left,0|Critere,Critère,left,0|Liste1,Liste,center,0|Liste2,Liste,center,0|Delta,Delta,center,0';
-			matrice.Bloc2 = false;
-			matrice.texteImprimerHeader = 'Non';
-			matrice.texteMargeHaute1 = '4,5';
-			matrice.texteMargeHaute2 = '4,5';
-			matrice.texteImprimerClubLong = 'Oui';
-			matrice.texteFiltreSupplementaire = 'Non';
-			matrice.texteCodeComplet = 'Non';
-			matrice.texteFontSize = '8';
-			matrice.texteImprimerDeparts = 'Non';
-			matrice.texteImprimerStatCourses ='Oui';
-			matrice.texteImprimerLayerPage = 'Toutes les pages';
-			matrice.texteLargeurEtroite = '0,8';
-			matrice.texteNbColPresCourses = '4';
-			matrice.texteLigne2Texte = 'Nombre de courses :';
-			matrice.texteComiteOrigine = 'Non';
 		end
 	end
 	matrice.Titre = dlgConfiguration:GetWindowName('Titre'):GetValue();
 	matrice.Saison = dlgConfiguration:GetWindowName('Saison'):GetValue();
 	matrice.comboEntite = dlgConfiguration:GetWindowName('comboEntite'):GetValue();
 	matrice.comboActivite = dlgConfiguration:GetWindowName('comboActivite'):GetValue();
+	matrice.comboGrille = dlgConfiguration:GetWindowName('comboGrille'):GetValue();
 	matrice.numArretCalculApres = dlgConfiguration:GetWindowName('numArretCalculApres'):GetSelection();
 	matrice.comboOrientation = dlgConfiguration:GetWindowName('comboOrientation'):GetValue();
 	matrice.comboSexe = dlgConfiguration:GetWindowName('comboSexe'):GetValue();
@@ -7649,6 +7666,10 @@ function OnSavedlgConfiguration()	-- sauvegarde des paramètres de la matrice.
 	AddRowEvenement_Matrice('comboGarderInfQuota', matrice.comboGarderInfQuota);
 	AddRowEvenement_Matrice('comboTypePoint', matrice.comboTypePoint);
 	AddRowEvenement_Matrice('comboPrendreBloc1', matrice.comboPrendreBloc1);
+	if matrice.selectionRegroupement then
+		AddRowEvenement_Matrice('selectionRegroupement', matrice.selectionRegroupement);
+		
+	end
 	if matrice.bloc2 then
 		AddRowEvenement_Matrice('comboPrendreBloc2', matrice.comboPrendreBloc2);
 	end
@@ -7657,7 +7678,7 @@ function OnSavedlgConfiguration()	-- sauvegarde des paramètres de la matrice.
 		AddRowEvenement_Matrice('comboGrille', matrice.comboGrille);
 		local cmd = "Update Epreuve Set Code_discipline = 'CHA' Where Code_evenement = "..matrice.code_evenement.." And Code_epreuve = 1";
 		base:Query(cmd);
-		matrice.numPtsPresence = dlgConfiguration:GetWindowName('numPtsPresence'):GetValue();
+		matrice.numPtsPresence = tonumber(dlgConfiguration:GetWindowName('numPtsPresence'):GetValue());
 		AddRowEvenement_Matrice('numPtsPresence', matrice.numPtsPresence);
 		matrice.coefDefautCourseBloc1 = tonumber(dlgConfiguration:GetWindowName('coefDefautCourseBloc1'):GetValue()) or 0;
 		matrice.coefDefautMancheBloc1 = tonumber(dlgConfiguration:GetWindowName('coefDefautMancheBloc1'):GetValue()) or 0;
@@ -7941,7 +7962,7 @@ function OnConfiguration(cparams)
 	else
 		return false;
 	end
-	matrice.version_script = '5.91';
+	matrice.version_script = '5.92';
 	matrice.OS = app.GetOsDescription();
 	-- vérification de l'existence d'une version plus récente du script.
 	local url = 'https://live.ffs.fr/maj_pg/challenge/last_version.txt'
