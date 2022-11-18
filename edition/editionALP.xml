@@ -84,10 +84,10 @@
 		<text row="auto" col="1" align="center">$(Evenement.Nom)</text>
 		<text row="auto" align="center">$(Discipline.Libelle)</text>
 		<text row="auto" align="center" cond="id == 'res_er'">groupe</text>
-		<text row="auto" align="center" cond="id ~= 'res_er' and id ~= 'res_er_groupe' and base:GetTable('Epreuve'):GetNbRows() ~= 1">'Résultats Scratch Toutes Catégories'</text>
-		<text row="auto" align="center" cond="id ~= 'res_er' and base:GetTable('Epreuve'):GetNbRows() == 1">$(Categorie{$(Epreuve.Code_categorie)}.Libelle)..' - '..$(Sexe{$(Epreuve.Sexe)}.Libelle)</text>
 		<text row="auto" align="center" cond="title" >title</text>
 		<text row="auto" align="center" cond="title_filter">title_filter</text>
+		<text row="auto" align="center" cond="not title_filter and string.find(id,'res_') and base:GetTable('Epreuve'):GetNbRows() &gt; 1">'Résultats Scratch Toutes Catégories'</text>
+		<text row="auto" align="center" cond="id ~= 'res_er' and base:GetTable('Epreuve'):GetNbRows() == 1">$(Categorie{$(Epreuve.Code_categorie)}.Libelle)..' - '..$(Sexe{$(Epreuve.Sexe)}.Libelle)</text>
 		<row value="0.5cm"/>
 	</header>
 
@@ -534,20 +534,29 @@
 			<line row_start="4" col_start="1" col_end="0" pen_size="1" border="bottom" cond="x &lt; 5 and not _context_border"/>
 			<lua>if x == 5 then x = 0; end</lua>
 		</body>
+				<!-- for i = 0, body:GetNbRows() -1 do -->
+					<!-- tps1 = body:GetCellInt('Tps1', i); -->
+					<!-- tps2 = body:GetCellInt('Tps2', i); -->
+					<!-- tps_min = math.min(tps1, tps2); -->
+					<!-- if tps_min &lt; 0 then -->
+					<!-- else -->
+					<!-- end -->
+				<!-- end -->
 	</report>
 
 	
 	<!-- Liste de départ Officielle -->
 	<report id="lst_officiel" title="('Liste de Départ Officielle Manche '..manche)">
+		<lua>dofile('./interface/adv.lua')</lua>
+		<lua>dofile('./interface/interface.lua')</lua>
+		<lua>bolM1M2 = 0; if manche == 3 and body:GetCell('Info3', 0) == 'M1_M2' then bolM1M2 = 1; end</lua>
 		<lua>entite = $(Evenement.Code_entite)</lua>
-		
 		<order key="('Rang'..manche..', Dossard')" />
-
+		
 		<body>
 			<call option="couleur_alternee" file="./edition/options.xml" />
 			<font size="9" adjust="ellipsize"/>
-
-			<row h="auto"/>
+			<row h="auto" />
 			<text col="4" cond="body:GetCellInt('Rang'..manche, row) &gt; 0" align="right" label="Rang" font_weight="bold">body:GetCellInt('Rang'..manche, row)</text>
 			<text col="4" align="center" label="Dos" font_weight="bold" font_size_step="1">$(Dossard)</text>
 			<text col="4" align="center" label="Gr." cond="$(Reserve):len() &gt; 0">$(Reserve)</text>
@@ -566,7 +575,14 @@
 				<text col="5" align="center" cond="$(Diff1):sub(1,1) ~= '+'" label="Ec.M1">''</text>
 				<text col="4" align="center" label="C.M1" font_weight="bold">$(Clt1)</text>
 			<lua>end</lua>
-			
+			<lua>if bolM1M2 == 1 then</lua>
+				<text col="7" align="center" label="Tps M1+M2" font_weight="bold">$(Tps_bonus3)</text>
+				<text col="5" align="center" cond="$(Tps_penalite):sub(1,1) ~= '0'" label="Ecart">$(Tps_penalite3)</text>
+				<text col="5" align="center" cond="$(Tps_penalite):sub(1,1) == '-' or $(Tps_penalite):sub(1,1) == '0'" label="Ecart">''</text>
+				<text col="4" align="center" cond="$(Medaille3) ~= '0'" label="Clt" font_weight="bold">$(Medaille3)</text>
+				<text col="4" align="center" cond="$(Medaille3) == '0'" label="Clt" font_weight="bold">''</text>
+			<lua>end</lua>
+			<text row="auto" col_start="1" col_end="0" cond="row &lt; body:GetNbRows() -1 and body:GetCell('Sexe',row) ~= body:GetCell('Sexe',row +1)"><background color="white" mode="solid"/>''</text>
 			<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
 		</body>
 	</report>
