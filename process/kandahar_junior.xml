@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Kandahar junior -->
+<!-- <background mode="gradient_line_vert" color_start="white" color_end="ltgray" /> -->
+<root title="Kandahar Junior">
+  <config coursef1_filtre="$(Sexe):In('F') and $(Categ):In('U16')" coursef1="127" courseg1="128" coursef2="130" courseg2="129" coursef3="0" courseg3="0" titre="Kandahar Junior" comboColEquipe="4" comboPrendre="0" comboPtsTps="0" comboAbdDsq="1" coefManche="100" nb_filles="2" nb_garcons="2"/>
+  <panel name="config">
+    <lua>dofile('./interface/adv.lua');
+		dofile('./edition/functionPG.lua');
+		</lua>
+    <padding all="5px"/>
+    <col value="1"/>
+    <row value="10px"/>
+    <textctrl row="100px" style="ALIGN_CENTER|TE_MULTILINE|" font_size_step="2" name="titre"/>
+    <row value="10px"/>
+    <matrix row="auto">
+      <col value="1,4,6,1"/>
+      <row value="20px"/>
+      <row value="10px"/>
+      <matrix row="auto" col_start="2" col_end="3">
+        <col value="1,1,3,100px"/>
+        <statictext row="auto" col_start="1" style="ALIGN_RIGHT" label="Course n° 1"/>
+        <textctrl col_start="2" name="coursef1"/>
+        <textctrl col_start="3" name="coursef1_nom"/>
+        <statictext row="auto" col_start="1" style="ALIGN_RIGHT" label="Course n° 2 "/>
+        <textctrl col_start="2" name="coursef2"/>
+        <textctrl col_start="3" name="coursef2_nom"/>
+        <statictext row="auto" col_start="1" style="ALIGN_RIGHT" label="Course n° 3 "/>
+        <textctrl col_start="2" name="coursef3"/>
+        <textctrl col_start="3" name="coursef3_nom"/>
+        <lua>for i = 1, 3 do</lua>
+        <button row_start="(i)" col_start="4" align="left" name="('filtragef'..i)" label="Filtrage"/>
+        <lua>end</lua>
+      </matrix>
+      <row value="20px"/>
+      <staticbox row_start="-3" row_end="0" col_start="2" col_end="3" label="Courses Filles"/>
+      <row value="10px"/>
+      <matrix row="auto" col_start="2" col_end="3">
+        <col value="1,1,3,100px"/>
+        <statictext row="auto" col_start="1" style="ALIGN_RIGHT" label="Course n° 1"/>
+        <textctrl col_start="2" name="courseg1"/>
+        <textctrl col_start="3" name="courseg1_nom"/>
+        <statictext row="auto" col_start="1" style="ALIGN_RIGHT" label="Course n° 2 "/>
+        <textctrl col_start="2" name="courseg2"/>
+        <textctrl col_start="3" name="courseg2_nom"/>
+        <statictext row="auto" col_start="1" style="ALIGN_RIGHT" label="Course n° 3 "/>
+        <textctrl col_start="2" name="courseg3"/>
+        <textctrl col_start="3" name="courseg3_nom"/>
+        <lua>for i = 1, 3 do</lua>
+        <button row_start="(i)" col_start="4" align="left" name="('filtrageg'..i)" label="Filtrage"/>
+        <lua>end</lua>
+      </matrix>
+      <row value="20px"/>
+      <staticbox row_start="-3" row_end="0" col_start="2" col_end="3" label="Courses Garçons"/>
+      <row value="20px"/>
+      <matrix row="auto" col_start="2" col_end="3">
+        <col value="1,1,1"/>
+        <statictext row="auto" col_start="1" style="ALIGN_RIGHT" label="Colonne cloisie pour l\'équipe"/>
+        <combobox col_start="2" name="comboColEquipe" style="CB_READONLY"/>
+        <statictext row="auto" col_start="1" style="ALIGN_RIGHT" label="Calcul des points sur "/>
+        <combobox col_start="2" name="comboPrendre" style="CB_READONLY"/>
+        <statictext row="auto" col_start="1" style="ALIGN_RIGHT" label="Les Abd Dsq prènent le temps du dernier "/>
+        <combobox col_start="2" name="comboAbdDsq" style="CB_READONLY"/>
+        <statictext row="auto" col_start="1" style="ALIGN_RIGHT" label="Classements par addition des "/>
+        <combobox col_start="2" name="comboPtsTps" style="CB_READONLY"/>
+        <statictext row="auto" col_start="1" style="ALIGN_RIGHT" label="Coef sur les manches "/>
+        <textctrl col_start="2" name="coefManche"/>
+        <statictext row="auto" col_start="1" style="ALIGN_RIGHT" label="Nombre de filles à prendre "/>
+        <textctrl col_start="2" name="nb_filles"/>
+        <statictext row="auto" col_start="1" style="ALIGN_RIGHT" label="Nombre de garçons à prendre "/>
+        <textctrl col_start="2" name="nb_garcons"/>
+      </matrix>
+      <row value="20px"/>
+      <staticbox row_start="-3" row_end="0" col_start="2" col_end="3" label="Paramétrage des calculs"/>
+      <row value="20px"/>
+      <toolbar row="auto" col_start="1" col_end="0" name="tbconfig" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
+    </matrix>
+    <row value="1"/>
+  </panel>
+  <panel id="print">
+    <lua>dofile('./interface/adv.lua');
+    dofile('./edition/functionPG.lua');
+	nb_courses = params.NbCourses;
+	nb_ligne_course = math.max(params.NbFilles, params.NbGarcons);
+	pts_tps = 'Points place';
+	if params.PtsTps == 1 then
+		pts_tps = 'Points course';
+	elseif params.PtsTps == 2 then
+		pts_tps = 'Temps';
+	end
+    function GetDetail(chaine);
+			tDetail = chaine:Split('|');
+			tTableDetail = {};
+			for j = 1, #tDetail do
+				local jsontxt = tDetail[j];
+				local xDetail = table.FromStringJSON(jsontxt);
+				table.insert(tTableDetail,
+								{CodeEvenement = xDetail.Detail[1].CodeEvenement, 
+								CodeCoureur = xDetail.Detail[1].CodeCoureur, 
+								Clt = xDetail.Detail[1].Clt, 
+								TpsTotal = xDetail.Detail[1].TpsTotal, 
+								BestTps = xDetail.Detail[1].BestTps, 
+								BestPts = xDetail.Detail[1].BestPts, 
+								Dossard = xDetail.Detail[1].Dossard, 
+								PtsTotal = xDetail.Detail[1].PtsTotal,
+								Course = xDetail.Detail[1].Course,
+								BestClt = xDetail.Detail[1].BestClt, 
+								BestRun = xDetail.Detail[1].BestRun, 
+								PtsCourse = xDetail.Detail[1].PtsCourse, 
+								Sexe = xDetail.Detail[1].Sexe, 
+								Nom = xDetail.Detail[1].Nom 
+								});
+			end
+			return tTableDetail;
+		end
+		</lua>
+    <header>
+      <col value="1"/>
+      <spacing all="0"/>
+      <padding all="0"/>
+      <pen border="none"/>
+      <font name="Calibri" size="13" adjust="width" weight="bold"/>
+      <text row="1cm" col_start="1" align="center">params.Titre..'\nEdition des résultats'</text>
+      <text row="1cm" col_start="1" align="center">'Résultats par équipe en '..pts_tps</text>
+    </header>
+    <first_header/>
+    <footer>
+      <background mode="transparent"/>
+      <font name="Calibri" size="8" adjust="width" weight="normal"/>
+      <pen border="none"/>
+      <text row="auto" col="1" align="left"/>
+      <line col_start="1" col_end="0" pen_size="2" pen_color="dkgray" border="bottom"/>
+      <row value="auto"/>
+      <matrix col_start="1">
+        <row value="auto"/>
+        <text col="auto" align="left">app.GetName()..' Version '..app.GetVersion()..' / FFS'</text>
+        <image col="0.4cm" adjust="width" align="left">'./res/32x32_ffs.png'</image>
+        <text col="auto" align="left">' / Agil Informatique'</text>
+        <image col="0.4cm" adjust="width" align="left">'./res/32x32_agil.png'</image>
+        <text col="auto" align="left">'/ Ph.Guérindon (v '..params.Version..')'..os.date(' / Edition du %d-%m-%Y à %H:%M:%S')</text>
+      </matrix>
+    </footer>
+    <label>
+      <matrix>
+        <font name="Calibri" size="9" adjust="width" weight="bold"/>
+        <pen border="all"/>
+        <col value="3cm,8cm,8cm"/>
+        <row value="1.5cm"/>
+        <text col_start="1" align="center">'Clt\nEquipe\n'..pts_tps</text>
+        <text col_start="2">'Dossard     Nom'</text>
+        <text col_start="2" align="center" font_size_step="4">'Filles'</text>
+        <text col_start="2" align="right">pts_tps</text>
+        <text col_start="3">'Dossard     Nom'</text>
+        <text col_start="3" align="center" font_size_step="4">'Garçons'</text>
+        <text col_start="3" align="right">pts_tps</text>
+      </matrix>
+    </label>
+    <body>
+      <font name="Calibri" size="8" adjust="width" weight="bold"/>
+      <lua>tFillesEquipe = GetDetail(body:GetCell('Detail_filles', row));
+			tGarconsEquipe = GetDetail(body:GetCell('Detail_garcons', row));
+			maxligne = math.max(#tFillesEquipe, #tGarconsEquipe);
+			</lua>
+      <matrix>
+        <col value="3cm, 8cm, 8cm"/>
+        <pen border="all"/>
+        <row value="0.5cm" count="(maxligne)"/>
+        <matrix row_start="1" row_end="0" col_start="1">
+          <col value="1"/>
+          <text col_start="1" align="center" label="Clt - Equipe : Points totaux" row_start="1" row_end="0" cond="params.PtsTps &lt; 2">(row+1)..'\n'..body:GetCell(0,row)..'\n'..$(Pts_total)</text>
+          <text col_start="1" align="center" label="Clt - Equipe : Temps total" row_start="1" row_end="0" cond="params.PtsTps == 2">(row+1)..'\n'..body:GetCell(0,row)..'\n'..body:GetCell('Tps_total', row, '%-1h%-1m%2s.%2f')</text>
+        </matrix>
+        <matrix row_start="1" row_end="0" col_start="2">
+          <col value="1"/>
+          <row value="1" count="(params.NbCoursesFilles)"/>
+          <lua>for course = 1, params.NbCoursesFilles do</lua>
+          <matrix row_start="(course)">
+            <padding left="0.1cm" right="0.1cm"/>
+            <col value="1"/>
+            <row value="1" count="(params.NbFilles)"/>
+            <lua>for i = 1, params.NbFilles do</lua>
+            <text row_start="(i)">
+              <background mode="solid" color="ltgray" cond="course % 2 ~= 0 "/>''</text>
+            <lua>end</lua>
+            <lua>row_start = 1;
+						for i = 1, #tFillesEquipe do
+							if tFillesEquipe[i].Course == course then</lua>
+            <text row_start="(row_start)">
+              <background mode="transparent"/>'C.'..tFillesEquipe[i].Course..' - '..tFillesEquipe[i].Dossard..' . '..tFillesEquipe[i].Nom</text>
+            <lua>if params.PtsTps == 0 then</lua>
+            <text row_start="(row_start)" align="right">
+              <background mode="transparent"/>tFillesEquipe[i].PtsTotal</text>
+            <lua>elseif params.PtsTps == 1 then</lua>
+            <text row_start="(row_start)" align="right">
+              <background mode="transparent"/>tFillesEquipe[i].PtsCourse</text>
+            <lua>elseif params.PtsTps == 2 then</lua>
+            <text row_start="(row_start)" align="right">
+              <background mode="transparent"/>app.TimeToString(tFillesEquipe[i].TpsTotal, '%-1h%-1m%2s.%2f')</text>
+            <lua>end</lua>
+            <lua>row_start = row_start + 1</lua>
+            <lua>end</lua>
+            <lua>end</lua>
+          </matrix>
+          <lua>end</lua>
+        </matrix>
+        <matrix row_start="1" row_end="0" col_start="3">
+          <col value="1"/>
+          <row value="1" count="(params.NbCoursesGarcons)"/>
+          <lua>for course = 1, params.NbCoursesGarcons do</lua>
+          <matrix row_start="(course)">
+            <col value="1"/>
+            <row value="1" count="(params.NbGarcons)"/>
+            <lua>for i = 1, params.NbGarcons do</lua>
+            <text row_start="(i)">
+              <background mode="solid" color="ltgray" cond="course % 2 ~= 0 "/>''</text>
+            <lua>end</lua>
+            <lua>row_start = 1;
+						for i = 1, #tGarconsEquipe do
+							if tGarconsEquipe[i].Course == course then</lua>
+            <text row_start="(row_start)">
+              <background mode="transparent"/>'C.'..tGarconsEquipe[i].Course..' - '..tGarconsEquipe[i].Dossard..' . '..tGarconsEquipe[i].Nom</text>
+            <lua>if params.PtsTps == 0 then</lua>
+            <text row_start="(row_start)" align="right">
+              <background mode="transparent"/>tGarconsEquipe[i].PtsTotal</text>
+            <lua>elseif params.PtsTps == 1 then</lua>
+            <text row_start="(row_start)" align="right">
+              <background mode="transparent"/>tGarconsEquipe[i].PtsCourse</text>
+            <lua>elseif params.PtsTps == 2 then</lua>
+            <text row_start="(row_start)" align="right">
+              <background mode="transparent"/>app.TimeToString(tGarconsEquipe[i].TpsTotal, '%-1h%-1m%2s.%2f')</text>
+            <lua>end</lua>
+            <lua>row_start = row_start + 1</lua>
+            <lua>end</lua>
+            <lua>end</lua>
+          </matrix>
+          <lua>end</lua>
+        </matrix>
+      </matrix>
+      <row value="0.2cm"/>
+    </body>
+  </panel>
+</root>

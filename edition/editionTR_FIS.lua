@@ -853,7 +853,7 @@ function AfficheDevice(ab, model)
 end
 
 function AfficheDialog0()
-	dlgPage0 = wnd.CreateDialog(
+	dlgConfig = wnd.CreateDialog(
 		{
 		width = TR.width,
 		height = TR.height,
@@ -863,7 +863,7 @@ function AfficheDialog0()
 		icon='./res/32x32_fis.png'
 		});
 	
-	dlgPage0:LoadTemplateXML({ 
+	dlgConfig:LoadTemplateXML({ 
 		xml = './edition/editionTR_FIS.xml',
 		node_name = 'root/panel', 
 		node_attr = 'name', 	
@@ -871,7 +871,7 @@ function AfficheDialog0()
 	});
 
 	-- Toolbar Principale ...
-	local tbpage0 = dlgPage0:GetWindowName('tbpage0');
+	local tbpage0 = dlgConfig:GetWindowName('tbpage0');
 	tbpage0:AddStretchableSpace();
 	local btnNext = tbpage0:AddTool("Suite", "./res/vpe32x32_page_next.png");
 	tbpage0:AddSeparator();
@@ -888,7 +888,7 @@ function AfficheDialog0()
 	local message = app.GetAuiMessage();
 	
 	if string.find(TR.OS, "Windows") then
-		dlgPage0:Bind(eventType.MENU, 
+		dlgConfig:Bind(eventType.MENU, 
 			function(evt) 
 				local urlFile = "https://member.fis-ski.com/software/timingreport/TimingReport_Install.exe";
 				local localFile = string.format("%s/tmp/TimingReport_Install.exe", app:GetPath());
@@ -901,7 +901,7 @@ function AfficheDialog0()
 				InstalleTimingReport(localFile);
 			end, btnVersionWindows); 
 	else
-		dlgPage0:Bind(eventType.MENU, 
+		dlgConfig:Bind(eventType.MENU, 
 			function(evt) 
 				local urlFile = "https://member.fis-ski.com/software/timingreport/TimingReport_Install.dmg";
 				local localFile = string.format("%s/tmp/TimingReport_Install.dmg", app:GetPath());
@@ -914,13 +914,13 @@ function AfficheDialog0()
 				InstalleTimingReport(localFile);
 			end, btnVersionMac); 
 	end
-	dlgPage0:Bind(eventType.MENU, 
+	dlgConfig:Bind(eventType.MENU, 
 		function(evt) 
 			AfficheDialog1() 
 		end, btnNext); 
-	dlgPage0:Bind(eventType.MENU, 
+	dlgConfig:Bind(eventType.MENU, 
 		function(evt) 
-			dlgPage0:EndModal(idButton.CANCEL) 
+			dlgConfig:EndModal(idButton.CANCEL) 
 		 end,  btnClose);
 	wnd.GetParentFrame():Bind(eventType.CURL, OnCurlReturn);
 				
@@ -934,21 +934,10 @@ function AfficheDialog0()
 		"pour une utilisation ultérieure dans un autre Timing Report.\n\n";
 		txt = txt.."(votre système d'exploitation est "..TR.OS..")";
 
-	dlgPage0:GetWindowName('page0Text'):SetValue(txt);
+	dlgConfig:GetWindowName('page0Text'):SetValue(txt);
 
-	dlgPage0:Fit(); -- (true) pour afficher le wndDialog en pleine page ou pas
-	dlgPage0:ShowModal();
-end
-
-function Telechargement(url, disponible2)
-	local localFile = string.format("%s/tmp/"..disponible2..".exe", app:GetPath());
-	localFile = string.gsub(localFile, app.GetPathSeparator(), "/");
-	if curl.DownloadFile(url, localFile) ~= true then
-		return;
-	end
-	-- lancement  
-	dlgPage0:EndModal(idButton.CANCEL);
-	os.execute(localFile);
+	dlgConfig:Fit(); -- (true) pour afficher le wndDialog en pleine page ou pas
+	dlgConfig:ShowModal();
 end
 
 function TelechargementImages(url)
@@ -958,27 +947,9 @@ function TelechargementImages(url)
 		return;
 	end
 	-- lancement  
-	dlgPage0:EndModal(idButton.CANCEL);
+	dlgConfig:EndModal(idButton.CANCEL);
 	os.execute(localFile);
 end
-
-function OnCurlReturn(evt)
-	if evt:GetInt() == 1 then
-		if evt:GetString() > TR.version then
-			local disponible2 = string.gsub(evt:GetString(),'%.','-');
-			if app.GetAuiFrame():MessageBox(
-				"Vous utilisez la version "..TR.version.." du Timing Report et la version "..evt:GetString().." plus récente est disponible.\nVoulez-vous la télécharger ?", 
-				"Téléchargement du script",
-				msgBoxStyle.YES_NO + msgBoxStyle.ICON_INFORMATION
-				) == msgBoxStyle.YES then
-				disponible2 = 'TimingReport'..disponible2;
-				local url = 'http://188.165.236.85/maj_pg/tr/'..disponible2..'.exe';
-				Telechargement(url, disponible2);
-			end
-		end
-	end
-end
-
 
 -- Point Entree Principal
 function main(params)
@@ -993,7 +964,27 @@ function main(params)
 	TR.height = display:GetSize().height;
 	TR.x = 0;
 	TR.y = 0;
-	TR.version = "4.2";
+
+	scrip_version = "4.3"; 
+	-- vérification de l'existence d'une version plus récente du script.
+-- Ex de retour : LiveDraw=5.94,Matrices=5.92,TimingReport=4.3,DoubleTirage=3.2,TirageOptions=3.3,TirageER=1.7,ListeMinisterielle=2.3,KandaHarJunior=2.0
+	if app.GetVersion() >= '4.4c' then 
+		indice_return = 3;
+		local url = 'https://agilsport.fr/bta_alpin/versionsPG.txt'
+		version = curl.AsyncGET(wnd.GetParentFrame(), url);
+	end
+
+	local updatefile = './tmp/updatesPG.txt';
+	if app.FileExists(updatefile) then
+		local f = io.open(updatefile, 'r')
+		for lines in f:lines() do
+			alire = lines;
+		end
+		io.close(f);
+		app.RemoveFile(updatefile);
+		app.LaunchDefaultEditor('./'..alire);
+	end
+	
 	TR.OK = true;
 	TR.errormessage = "";
 	TR.code_evenement = params.code_evenement or -1;
@@ -1063,7 +1054,7 @@ function AfficheDialog2()
 		height = TR.height,
 		x = TR.x,
 		y = TR.y,
-		label='Page 2 : données de chronométrage  - Timing Report version '..TR.version; 
+		label='Page 2 : données de chronométrage  - Timing Report version '..scrip_version; 
 		icon='./res/32x32_fis.png'
 		});
 	dlgPage2:LoadTemplateXML({ 
@@ -1206,7 +1197,7 @@ end
 
 function SetValuesPage1()
 	
-	TR.software_Version = app.GetVersion().."_TR_"..TR.version;
+	TR.software_Version = app.GetVersion().."_TR_"..scrip_version;
 	dlgPage1:GetWindowName('software'):SetValue(app.GetName());
 	dlgPage1:GetWindowName('software_version'):SetValue(TR.software_Version);
 	
@@ -1277,14 +1268,14 @@ function SetValuesPage1()
 end
 
 function AfficheDialog1()
-	dlgPage0:EndModal(idButton.CANCEL) 
+	dlgConfig:EndModal(idButton.CANCEL) 
 	dlgPage1 = wnd.CreateDialog(
 		{
 		width = TR.width,
 		height = TR.height,
 		x = TR.x,
 		y = TR.y,
-		label='Page 1 des données à saisir - Timing Report version '..TR.version;
+		label='Page 1 des données à saisir - Timing Report version '..scrip_version;
 		icon='./res/32x32_fis.png'
 		});
 	dlgPage1:LoadTemplateXML({ 

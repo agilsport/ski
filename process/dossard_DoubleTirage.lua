@@ -49,7 +49,7 @@ function OnPrintDoubleTirage(groupe)
 			margin_bottom = 100,
 			layers = {file = './edition/layer.xml', id = 'ffs-fis', page = '*'}, 
 			paper_orientation = 'portrait',
-			params = {Nom = params.evenementNom, tableDossards1 = params.tableDossards1, tableDossards2 = params.tableDossards2, Draw = 1, Version = params.version, NbGroupe1 = 0, NC = 1}
+			params = {Nom = params.evenementNom, tableDossards1 = params.tableDossards1, tableDossards2 = params.tableDossards2, Draw = 1, Version = scrip_version, NbGroupe1 = 0, NC = 1}
 		});
 	elseif groupe == 2 then
 		local editor = report:GetEditor();
@@ -73,7 +73,7 @@ function OnPrintDoubleTirage(groupe)
 			margin_bottom = 100,
 			layers = {file = './edition/layer.xml', id = 'ffs-fis', page = '*'}, 
 			paper_orientation = 'portrait',
-			params = {Nom = params.evenementNom, tableDossards1 = params.tableDossards1, tableDossards2 = params.tableDossards2, Draw = 2, Version = params.version, NbGroupe1 = params.nb_groupe_1, NC = 1}
+			params = {Nom = params.evenementNom, tableDossards1 = params.tableDossards1, tableDossards2 = params.tableDossards2, Draw = 2, Version = scrip_version, NbGroupe1 = params.nb_groupe_1, NC = 1}
 		});
 	end
 end
@@ -234,7 +234,26 @@ function main(params_c)
 		return false;
 	end
 	params = params_c;
-	params.version = '3.0';
+	
+	scrip_version = "3.2"; 
+	-- vérification de l'existence d'une version plus récente du script.
+	-- Ex de retour : LiveDraw=5.94,Matrices=5.92,TimingReport=4.2,DoubleTirage=3.2,TirageOptions=3.3,TirageER=1.7,ListeMinisterielle=2.3,KandaHarJunior=2.0
+	if app.GetVersion() >= '4.4c' then 
+		indice_return = 4;
+		local url = 'https://agilsport.fr/bta_alpin/versionsPG.txt'
+		version = curl.AsyncGET(wnd.GetParentFrame(), url);
+	end
+
+	local updatefile = './tmp/updatesPG.txt';
+	if app.FileExists(updatefile) then
+		local f = io.open(updatefile, 'r')
+		for lines in f:lines() do
+			alire = lines;
+		end
+		io.close(f);
+		app.RemoveFile(updatefile);
+		app.LaunchDefaultEditor('./'..alire);
+	end
 	params.code_evenement = params.code_evenement or -1;
 	if params.code_evenement < 0 then
 		return;
@@ -247,6 +266,16 @@ function main(params_c)
 	base = base or sqlBase.Clone();
 	tResultat = base:GetTable('Resultat');
 	base:TableLoad(tResultat, 'Select * From Resultat Where Code_evenement = '..params.code_evenement..' Order By Dossard');
+	tResultat:SetCounter('Sexe');
+	if tResultat:GetCounterCount('Sexe') > 1 then
+		msg = 'Scénario incompatible avec des courses mixtes.\n\n'..
+			'Choisissez le scénario : Tirage des dossards ou des rangs de départ avec options de tirage';
+		local reponse =  app.GetAuiFrame():MessageBox(msg,
+						"Lancer le tirage", 
+						msgBoxStyle.OK+msgBoxStyle.ICON_WARNING
+						);
+		return;
+	end
 	params.bolDossardExiste = false;
 	if tResultat:GetCellInt('Dossard', 0) > 0 then
 		params.bolDossardExiste = true;;
@@ -286,7 +315,9 @@ function main(params_c)
 		if not params.skip_question then
 			local msg = "Le double tirage au sort des dossards a déjà été réalisé. \n"..
 						"Voulez-vous rééditer la feuille du tirage fait précédemment? \n"..
-						"ATTENTION, si vous cliquez sur Non, tous les dossards seront alors effacés et remplacés par ceux du nouveau tirage.";
+						"ATTENTION, si vous cliquez sur Non, tous les dossards seront alors effacés et remplacés par ceux du nouveau tirage.\n\n"..
+						"OUI = réédition des dossards\n"..
+						"Non = retirage des dossards\n";
 			local reponse =  app.GetAuiFrame():MessageBox(msg,
 							"Lancer le tirage", 
 							msgBoxStyle.YES+msgBoxStyle.NO+msgBoxStyle.CANCEL+msgBoxStyle.CANCEL_DEFAULT+msgBoxStyle.ICON_WARNING
@@ -312,45 +343,6 @@ function main(params_c)
 			end
 		end
 	end
-	if params.code_niveau:In('N_U14', 'N_U16') then
-		-- Ouverture Document XML 
-		local XML = "./process/dossard_DoubleTirage.xml";
-		dlgConfig = wnd.CreateDialog(
-			{
-			width = params.width,
-			height = params.height,
-			x = params.x,
-			y = params.y,
-			label='Configuration du tirage', 
-			icon='./res/32x32_ffs.png'
-			});
-		
-		dlgConfig:LoadTemplateXML({ 
-			xml = XML,
-			node_name = 'root/panel', 
-			node_attr = 'name', 
-			discipline = params.discipline,
-			node_value = 'bibo',
-			params = {Niveau = params.code_niveau}
-		});
-
-		-- Toolbar Principale ...
-		local tbconfig = dlgConfig:GetWindowName('tbconfig');
-		tbconfig:AddStretchableSpace();
-		local btnSave = tbconfig:AddTool("Valider", "./res/vpe32x32_save.png");
-		tbconfig:AddStretchableSpace();
-		tbconfig:Realize();
-		local message = app.GetAuiMessage();
-		
-		dlgConfig:GetWindowName('bibo'):SetValue(15);
-		dlgConfig:Bind(eventType.MENU, 
-			function(evt) 
-				params.bibo = tonumber(dlgConfig:GetWindowName('bibo'):GetValue()) or 15;
-				dlgConfig:EndModal(idButton.OK);
-			end, btnSave); 
-		dlgConfig:Fit();
-		dlgConfig:ShowModal();
-	end
 	
 	bolSplitBibo = false;
 	if tEpreuve:GetCell('Code_entite', 0) == 'FIS' then
@@ -358,7 +350,7 @@ function main(params_c)
 			if tEpreuve:GetCell('Code_discipline', 0):In('SL','GS') then
 				bolSplitBibo = true;
 			else
-				local msg = "ATTENTION, ce script n'est valable que pour les FIS en GS et en SL.";
+				local msg = "ATTENTION, ce script n'est valable que pour les épreuves techniques.";
 				app.GetAuiFrame():MessageBox(msg,
 							"ATTENTION", 
 						msgBoxStyle.OK+msgBoxStyle.ICON_WARNING
@@ -367,6 +359,7 @@ function main(params_c)
 			end
 		end
 	end
+	
 	tResultat:OrderBy('Point');
 	params.pts_7 = tResultat:GetCellDouble('Point', 6);
 	params.pts_15 = tResultat:GetCellDouble('Point', 14);
@@ -375,7 +368,6 @@ function main(params_c)
 	end
 	params.last_row_bibo = nil; params.row_pts7 = nil;
 	GetBibo();
-
 	if not params.print_alone then
 		local cmd = 'Delete From Resultat_Info_Bibo Where Code_evenement = '..params.code_evenement;
 		base:Query(cmd);

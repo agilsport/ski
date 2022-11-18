@@ -9,6 +9,7 @@ dofile('./interface/interface.lua');
 -- tTxtCtrlbutton:SetSelectionMode(2);	-- 1=Selection Unique, 2 = Selection Multiples 
 
 -- toto = tTxtCtrlbutton:GetValue();  dans toto on a une chaine du style 'FRA, BEL'
+--app.Unzip(fichier zip, destination, makelower false ou true , onlyfullname : false ou true false --> hierarchie);
 
 function CreateTableRapport_accident();
 	tResultat_Info_Tirage = sqlTable.Create("Rapport_accident");
@@ -104,6 +105,66 @@ function ReplaceTableEnvironnement(t, name)		-- replace la table créée dans l'en
 		base:RemoveTable(name);
 	end
 	base:AddTable(t);
+end
+
+function OnCurlReturn(evt)
+	-- Ex de retour : LiveDraw=5.94,Matrices=5.92,TimingReport=4.2,DoubleTirage=3.2,TirageOptions=3.3,TirageER=1.7,ListeMinisterielle=2.3,KandaHarJunior=2.0,MarquageEquipe=2.0
+	local tNomSVersionDoc = {};
+	table.insert(tNomSVersionDoc, 'process/LiveDraw_versions.rtf');
+	table.insert(tNomSVersionDoc, 'challenge/Matrice_versions.rtf');
+	table.insert(tNomSVersionDoc, '');
+	table.insert(tNomSVersionDoc, '');
+	table.insert(tNomSVersionDoc, '');
+	table.insert(tNomSVersionDoc, '');
+	table.insert(tNomSVersionDoc, '');
+	table.insert(tNomSVersionDoc, '');
+	table.insert(tNomSVersionDoc, '');
+	if evt:GetInt() == 1 then
+		local chaine = evt:GetString();
+		local tChaine = chaine:Split(',');
+		local tVersions = tChaine[indice_return];	-- Matrices=5.92
+		local tversionScript = tVersions:Split('=');
+		local last_version = tversionScript[2];
+		if last_version > scrip_version then
+			if app.GetAuiFrame():MessageBox(
+				"Vous utilisez la version "..scrip_version.." du script et la version "..last_version.." plus récente est disponible.\nVoulez-vous la télécharger ?", 
+				"Téléchargement du script",
+				msgBoxStyle.YES_NO + msgBoxStyle.NO_DEFAULT + msgBoxStyle.ICON_INFORMATION
+				) == msgBoxStyle.YES then
+				if tNomSVersionDoc[indice_return]:len() > 0 then
+					local filename = './tmp/updatesPG.txt';
+					local f = io.open(filename, 'w')
+					local chaine = '.'..app.GetPathSeparator()..tNomSVersionDoc[indice_return];
+					f:write(chaine);
+					f:close();
+				end
+				local reponse = app.AutoUpdateResource('https://agilsport.fr/bta_alpin/UpdateScript.zip');
+				-- local url = ' https://agilsport.fr/bta_alpin/UpdateScript.zip';
+				-- Telechargement(url, 'UpdateScript.zip');
+				if dlgConfig then
+					dlgConfig:EndModal(idButton.CANCEL);
+				end
+				return false;
+			end
+		end
+	end
+end
+
+function Telechargement(url, disponible)
+	do return end
+	local localFile = './tmp/'..disponible;
+	if curl.DownloadFile(url, localFile) ~= true then
+		return;
+	end
+	if dlgConfig then
+		dlgConfig:EndModal(idButton.CANCEL);
+	end
+	if dlgConfiguration then
+		dlgConfiguration:EndModal(idButton.CANCEL);
+	end
+	if app.FileExists(localFile) then
+		app.Unzip(localFile);
+	end
 end
 
 function VerifNodePodium()

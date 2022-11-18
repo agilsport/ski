@@ -33,8 +33,8 @@ function CreatetEquipe_Club();
 	tEquipe_club = base:GetTable('Equipe_Club');
 end
 
-function OnMarquage();
-	local col_equipe = dlgConfig:GetWindowName('comboColEquipe'):GetValue();
+function OnMarquage(colonne);
+	local col_equipe = colonne;
 	local courses = dlgConfig:GetWindowName('courses'):GetValue();
 	local type_equipe = dlgConfig:GetWindowName('comboTypeEquipe'):GetValue();
 
@@ -112,7 +112,7 @@ function AfficheConfig()
 	tbconfig:AddSeparator();
 	local btnClear = tbconfig:AddTool("Effacer la sélection", "./res/32x32_clear.png");
 	tbconfig:AddSeparator();
-	local btnRAZ = tbconfig:AddTool("RAZ Equipe", "./res/32x32_clear.png");
+	local btnRAZ = tbconfig:AddTool("RAZ de la colonne", "./res/32x32_clear.png");
 	tbconfig:AddSeparator();
 	local btnClose = tbconfig:AddTool("Quitter", "./res/32x32_exit.png");
 	tbconfig:AddStretchableSpace();
@@ -135,18 +135,24 @@ function AfficheConfig()
 	dlgConfig:GetWindowName('comboColEquipe'):SetSelection(0);
 	dlgConfig:GetWindowName('comboColEquipe'):SetSelection(0);
 	
-	local texte = 'Si votre base de données a été préparée, vous pourrez'..
+	local texte = 'Si votre base de données a été préparée pour ce script, vous pourrez'..
 					'\nmarquer les colonnes Groupe, Equipe et Critere des concurrents'..
 					"\nde façon à constituer des équipes avec un contenu préparé à l'avance."..
-					"\nPour le Comité Mont-Blanc, Il est possible de constituer les équipes"..
-					"\navec le nom des districts ou ceux des Conseillers Généraux"..
-					"\ncorrespontants aux Clubs."
+					"\nAfin de créer les fichiers nécessaires, les BTR peuvent s'inspirer"..
+					"\ndes 3 fichiers préparés pour le Comité MB qui sont dans le répertoire process :"..
+					'\nImportEquipesMB.xml qui sera "Importé" à l\'identique d\'une course,'..
+					'\nTable_EquipeMB.csv et Table_Equipe_Club.csv';
 	dlgConfig:GetWindowName('texte'):SetLabel(texte);
 	dlgConfig:Bind(eventType.TEXT, OnGetCourse, dlgConfig:GetWindowName('coursex'));
 	dlgConfig:Bind(eventType.MENU, 
-		function(evt) 
-			OnMarquage();
-			dlgConfig:EndModal();
+		function(evt)
+			local colonne = dlgConfig:GetWindowName('comboColEquipe'):GetValue();
+			if dlgConfig:GetWindowName('courses'):GetValue():len() > 0 then
+				OnMarquage(colonne);
+				dlgConfig:EndModal();
+			else
+				app.GetAuiFrame():MessageBox('Veuillez selectionner une ou plusieurs courses avant... ', "MAJ "..colonne, msgBoxStyle.OK+msgBoxStyle.ICON_INFORMATION); 
+			end
 		end, btnSave); 
 	dlgConfig:Bind(eventType.MENU, 
 		function(evt) 
@@ -212,13 +218,30 @@ end
 
 function main(params_c)
 	params = {};
-	params.code_evenement = params_c.code_evenement;
 	params.width = (display:GetSize().width * 2) / 3;
 	params.height = display:GetSize().height / 2;
 	params.x = (display:GetSize().width - params.width) / 2;
 	params.y = 0;
 	params.debug = false;
-	params.version = "1.0";
+	scrip_version = "2.0";
+	if app.GetVersion() >= '4.4c' then 
+		-- vérification de l'existence d'une version plus récente du script.
+		-- Ex de retour : LiveDraw=5.94,Matrices=5.92,TimingReport=4.2
+		indice_return = 9;
+		local url = 'https://agilsport.fr/bta_alpin/versionsPG.txt'
+		version = curl.AsyncGET(wnd.GetParentFrame(), url);
+	end
+
+	local updatefile = './tmp/updatesPG.txt';
+	if app.FileExists(updatefile) then
+		local f = io.open(updatefile, 'r')
+		for lines in f:lines() do
+			alire = lines;
+		end
+		io.close(f);
+		app.RemoveFile(updatefile);
+		app.LaunchDefaultEditor('./'..alire);
+	end
 	base = base or sqlBase.Clone();
 	tEvenement = base:GetTable('Evenement');
 	tResultat = base:GetTable('Resultat');
@@ -230,12 +253,14 @@ function main(params_c)
 	if not tEquipe_Club then
 		CreatetEquipe_Club();
 	end
+	base = base or sqlBase.Clone();
 	-- Ouverture Document XML 
 	XML = "./process/marquageEquipe.xml";
 	params.doc = xmlDocument.Create(XML);
 	AfficheConfig();
+	return;
 end
 
-
+main()
 
 

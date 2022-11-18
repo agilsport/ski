@@ -86,19 +86,19 @@ end
 function SetCriteres()
 	-- Classement_Coureur est construit
 	-- étude du critère 1 : discipline technique
-	local c1 = dlgConfiguration:GetWindowName('gxpremiers1'):GetValue();
+	local c1 = dlgConfig:GetWindowName('gxpremiers1'):GetValue();
 	c1 = tonumber(c1) or 0;
-	local c2 = dlgConfiguration:GetWindowName('gxpremiers2'):GetValue();
+	local c2 = dlgConfig:GetWindowName('gxpremiers2'):GetValue();
 	c2 = tonumber(c2) or 0;
 		
 	-- étude du critère 2 : discipline vitesse
-	local c3 = dlgConfiguration:GetWindowName('gxpremiers3'):GetValue();
+	local c3 = dlgConfig:GetWindowName('gxpremiers3'):GetValue();
 	c3 = tonumber(c3) or 0;
 	
 	-- étude du critère 3 : 1 discipline technique + 1 discipline vitesse
-	local c4 = dlgConfiguration:GetWindowName('gxpremiers4'):GetValue();
+	local c4 = dlgConfig:GetWindowName('gxpremiers4'):GetValue();
 	c4 = tonumber(c4) or 0;
-	local c5 = dlgConfiguration:GetWindowName('gxpremiers5'):GetValue();
+	local c5 = dlgConfig:GetWindowName('gxpremiers5'):GetValue();
 	c5 = tonumber(c5) or 0;
 	
 	-- Col1 = les Pts Techniques sont sélectionnés
@@ -119,7 +119,7 @@ function SetCriteres()
 		local critere = 0;
 		-- technique
 		if c1 > 0 then
-			if dlgConfiguration:GetWindowName('chk1'):GetValue() == true then	-- la première ligne est par année 
+			if dlgConfig:GetWindowName('chk1'):GetValue() == true then	-- la première ligne est par année 
 				if clt_tech_annee > 0 and clt_tech_annee  <= c1 then
 					critere = critere + 1;
 					Classement_Coureur:SetCell('Col3', row, 1);
@@ -132,7 +132,7 @@ function SetCriteres()
 			end
 		end
 		if c2 > 0 then
-			if dlgConfiguration:GetWindowName('chk2'):GetValue() == true then	-- la deuxième ligne est par année on mettra 
+			if dlgConfig:GetWindowName('chk2'):GetValue() == true then	-- la deuxième ligne est par année on mettra 
 				if clt_tech_annee > 0 and clt_tech_annee <= c2 then
 					critere = critere + 1;
 					Classement_Coureur:SetCell('Col3', row, 1);
@@ -154,7 +154,7 @@ function SetCriteres()
 		
 		if c4 > 0 and c5 > 0 then	-- 1 discipline vitesse ET 1 discipline technique
 			local est_critere = 1;
-			if dlgConfiguration:GetWindowName('chk4'):GetValue() == true and dlgConfiguration:GetWindowName('chk5'):GetValue() == true then
+			if dlgConfig:GetWindowName('chk4'):GetValue() == true and dlgConfig:GetWindowName('chk5'):GetValue() == true then
 				if clt_vitesse_annee > c4 then
 					est_critere = 0;
 				end
@@ -249,8 +249,8 @@ function BuildClassementCoureur()	-- construction de la table des classements
 	end
 
 	listeMinisterielle.filter_annees = "'-1'";
-	num_annee_debut = tonumber(dlgConfiguration:GetWindowName('comboAnneeDebut'):GetValue()) or 0;
-	num_annee_fin = tonumber(dlgConfiguration:GetWindowName('comboAnneeFin'):GetValue()) or 0;
+	num_annee_debut = tonumber(dlgConfig:GetWindowName('comboAnneeDebut'):GetValue()) or 0;
+	num_annee_fin = tonumber(dlgConfig:GetWindowName('comboAnneeFin'):GetValue()) or 0;
 	for i = num_annee_debut, num_annee_fin do
 		listeMinisterielle.filter_annees = listeMinisterielle.filter_annees..",'"..tostring(i).."'";
 	end
@@ -331,14 +331,14 @@ function OnPrintAnalyse()
 	listeMinisterielle.Critere1  = 'Néant';
 	listeMinisterielle.Critere2  = 'Néant';
 	listeMinisterielle.Critere3  = 'Néant';
-	local x1 = dlgConfiguration:GetWindowName('gxpremiers1'):GetValue();
-	local x2 = dlgConfiguration:GetWindowName('gxpremiers2'):GetValue();
-	local x3 = dlgConfiguration:GetWindowName('gxpremiers3'):GetValue();
-	local x4 = dlgConfiguration:GetWindowName('gxpremiers4'):GetValue();
-	local x5 = dlgConfiguration:GetWindowName('gxpremiers5'):GetValue();
+	local x1 = dlgConfig:GetWindowName('gxpremiers1'):GetValue();
+	local x2 = dlgConfig:GetWindowName('gxpremiers2'):GetValue();
+	local x3 = dlgConfig:GetWindowName('gxpremiers3'):GetValue();
+	local x4 = dlgConfig:GetWindowName('gxpremiers4'):GetValue();
+	local x5 = dlgConfig:GetWindowName('gxpremiers5'):GetValue();
 	if x1 ~= '' then
 		listeMinisterielle.Critere1 = "être dans les "..x1..' mondiaux';
-		if dlgConfiguration:GetWindowName('chk1'):GetValue() == true then
+		if dlgConfig:GetWindowName('chk1'):GetValue() == true then
 			listeMinisterielle.Critere1 = listeMinisterielle.Critere1.." de son année ";
 		end
 	end
@@ -350,14 +350,14 @@ function OnPrintAnalyse()
 	end
 	if x4 ~= '' then
 		listeMinisterielle.Critere3 = "être dans les "..x4..' mondiaux';
-		if dlgConfiguration:GetWindowName('chk4'):GetValue() == true then
+		if dlgConfig:GetWindowName('chk4'):GetValue() == true then
 			listeMinisterielle.Critere3 = listeMinisterielle.Critere3.." de son année en Vitesse";
 		else
 			listeMinisterielle.Critere3 = listeMinisterielle.Critere3.." en Vitesse";
 		end
 		listeMinisterielle.Critere3 = listeMinisterielle.Critere3.." ET être dans les ";
 		listeMinisterielle.Critere3 = listeMinisterielle.Critere3..x5..' mondiaux';
-		if dlgConfiguration:GetWindowName('chk5'):GetValue() == true then
+		if dlgConfig:GetWindowName('chk5'):GetValue() == true then
 			listeMinisterielle.Critere3 = listeMinisterielle.Critere3.." de son année en Technique";
 		else
 			listeMinisterielle.Critere3 = listeMinisterielle.Critere3.." en Technique";
@@ -382,7 +382,7 @@ function OnPrintAnalyse()
 		margin_right = 100,
 		margin_bottom = 100,
 		paper_orientation = 'landscape',
-		params = {Niveau = ' - Pour le niveau : '..listeMinisterielle.comboNiveau, Liste = listeMinisterielle.comboListe, Version = listeMinisterielle.version_script, Critere1 = listeMinisterielle.Critere1, Critere2 = listeMinisterielle.Critere2, Critere3 = listeMinisterielle.Critere3, X1 = x1, X2 = x2, X3 = x3, X4 = x4, X5 = x5, AnneeDebut = num_annee_debut, AnneeFin = num_annee_fin}
+		params = {Niveau = ' - Pour le niveau : '..listeMinisterielle.comboNiveau, Liste = listeMinisterielle.comboListe, Version = scrip_version, Critere1 = listeMinisterielle.Critere1, Critere2 = listeMinisterielle.Critere2, Critere3 = listeMinisterielle.Critere3, X1 = x1, X2 = x2, X3 = x3, X4 = x4, X5 = x5, AnneeDebut = num_annee_debut, AnneeFin = num_annee_fin}
 	});
 	-- report:SetZoom(10)
 end
@@ -508,60 +508,60 @@ function OnSavedlgBackofficeOLD()
 end
 
 function SetAnalyseGauche(c1,c2,c3)	-- c1, c2 et c3 sont des valeurs de critères
-	dlgConfiguration:GetWindowName('chk1'):SetValue(false);
-	dlgConfiguration:GetWindowName('chk2'):SetValue(false);
-	dlgConfiguration:GetWindowName('chk3'):SetValue(false);
-	dlgConfiguration:GetWindowName('chk4'):SetValue(false);
-	dlgConfiguration:GetWindowName('chk5'):SetValue(false);
+	dlgConfig:GetWindowName('chk1'):SetValue(false);
+	dlgConfig:GetWindowName('chk2'):SetValue(false);
+	dlgConfig:GetWindowName('chk3'):SetValue(false);
+	dlgConfig:GetWindowName('chk4'):SetValue(false);
+	dlgConfig:GetWindowName('chk5'):SetValue(false);
 	local tc1 = c1:Split(',');
 	listeMinisterielle.par_annee = false;
 	for i = 1, #tc1 do
 		if string.find(tc1[i], 'a') then	-- on est par année d'âge
 			listeMinisterielle.par_annee = true;
 			tc1[i] = string.gsub(tc1[i], "%D", "");
-			dlgConfiguration:GetWindowName('chk1'):SetValue(true);
+			dlgConfig:GetWindowName('chk1'):SetValue(true);
 		end
 		if tc1[i] ~= '-1' then
-			dlgConfiguration:GetWindowName('gxpremiers'..i):SetValue(tc1[i]);
+			dlgConfig:GetWindowName('gxpremiers'..i):SetValue(tc1[i]);
 		end
 	end
 	local tc2 = c2:Split(',');
 	for i = 1, #tc2 do
 		if tc2[i] ~= '-1' then
-			dlgConfiguration:GetWindowName('gxpremiers'..i+2):SetValue(tc2[i]);
+			dlgConfig:GetWindowName('gxpremiers'..i+2):SetValue(tc2[i]);
 		end
 	end
 	local tc3 = c3:Split(',');
 	if tc3[1] ~= '-1' then
 		if string.find(tc3[1], 'a') then	-- on est par année d'âge
 			listeMinisterielle.par_annee = true;
-			dlgConfiguration:GetWindowName('chk4'):SetValue(true);
+			dlgConfig:GetWindowName('chk4'):SetValue(true);
 		end
 		tc3[1] = string.gsub(tc3[1], "%D", "");
 		if tc3[1] ~= '-1' then
-			dlgConfiguration:GetWindowName('gxpremiers4'):SetValue(tc3[1]);
+			dlgConfig:GetWindowName('gxpremiers4'):SetValue(tc3[1]);
 		end
 	end
 	if tc3[2] and tc3[2] ~= '-1' then
 		if string.find(tc3[2], 'a') then	-- on est par année d'âge
 			listeMinisterielle.par_annee = true;
-			dlgConfiguration:GetWindowName('chk5'):SetValue(true);
+			dlgConfig:GetWindowName('chk5'):SetValue(true);
 		end
 		tc3[2] = string.gsub(tc3[2], "%D", "");
 		if tc3[2] ~= -1 then
-			dlgConfiguration:GetWindowName('gxpremiers5'):SetValue(tc3[2]);
+			dlgConfig:GetWindowName('gxpremiers5'):SetValue(tc3[2]);
 		end
 	end
 end
 
 function SetDataAnalyse()
-	dlgConfiguration:GetWindowName('chk1'):SetValue(false);
-	dlgConfiguration:GetWindowName('chk4'):SetValue(false);
-	dlgConfiguration:GetWindowName('gxpremiers1'):SetValue('');
-	dlgConfiguration:GetWindowName('gxpremiers2'):SetValue('');
-	dlgConfiguration:GetWindowName('gxpremiers3'):SetValue('');
-	dlgConfiguration:GetWindowName('gxpremiers4'):SetValue('');
-	dlgConfiguration:GetWindowName('gxpremiers5'):SetValue('');
+	dlgConfig:GetWindowName('chk1'):SetValue(false);
+	dlgConfig:GetWindowName('chk4'):SetValue(false);
+	dlgConfig:GetWindowName('gxpremiers1'):SetValue('');
+	dlgConfig:GetWindowName('gxpremiers2'):SetValue('');
+	dlgConfig:GetWindowName('gxpremiers3'):SetValue('');
+	dlgConfig:GetWindowName('gxpremiers4'):SetValue('');
+	dlgConfig:GetWindowName('gxpremiers5'):SetValue('');
 	
 	listeMinisterielle.node = GetNode();
 	assert(listeMinisterielle.node ~= nil)
@@ -572,8 +572,8 @@ function SetDataAnalyse()
 end
 
 function OnChangeComboAnneeDebut()
-	listeMinisterielle.comboAnneeDebut = dlgConfiguration:GetWindowName('comboAnneeDebut'):GetValue();
-	listeMinisterielle.indexAnneeDebut = dlgConfiguration:GetWindowName('comboAnneeDebut'):GetSelection();
+	listeMinisterielle.comboAnneeDebut = dlgConfig:GetWindowName('comboAnneeDebut'):GetValue();
+	listeMinisterielle.indexAnneeDebut = dlgConfig:GetWindowName('comboAnneeDebut'):GetSelection();
 	SetDataAnalyse();
 end
 
@@ -736,7 +736,7 @@ end
 
 function AffichagedlgConfiguration()
 	-- Creation de la boîte de dialogue
-	dlgConfiguration = wnd.CreateDialog(
+	dlgConfig = wnd.CreateDialog(
 		{
 		width = listeMinisterielle.dlgPosit.width,
 		height = listeMinisterielle.dlgPosit.height,
@@ -747,7 +747,7 @@ function AffichagedlgConfiguration()
 		});
 
 	-- Creation des Controles et Placement des controles par le Template XML ...
-	dlgConfiguration:LoadTemplateXML({ 
+	dlgConfig:LoadTemplateXML({ 
 		xml = './process/liste_ministerielle.xml', 	-- Obligatoire
 		node_name = 'root/panel', 			-- Obligatoire
 		node_attr = 'name', 				-- Facultatif si le node_name est unique ...
@@ -756,33 +756,33 @@ function AffichagedlgConfiguration()
 	});
 
 	-- remplissage des Combo
-	dlgConfiguration:GetWindowName('comboNiveau'):Append("Relève");
-	dlgConfiguration:GetWindowName('comboNiveau'):Append("Espoirs");
-	dlgConfiguration:GetWindowName('comboNiveau'):Append("Accès CNE");
-	dlgConfiguration:GetWindowName('comboNiveau'):Append("Accès CIE");
-	dlgConfiguration:GetWindowName('comboSexe'):Append("Dames");
-	dlgConfiguration:GetWindowName('comboSexe'):Append("Hommes");
-	dlgConfiguration:GetWindowName('comboListe'):Clear();
+	dlgConfig:GetWindowName('comboNiveau'):Append("Relève");
+	dlgConfig:GetWindowName('comboNiveau'):Append("Espoirs");
+	dlgConfig:GetWindowName('comboNiveau'):Append("Accès CNE");
+	dlgConfig:GetWindowName('comboNiveau'):Append("Accès CIE");
+	dlgConfig:GetWindowName('comboSexe'):Append("Dames");
+	dlgConfig:GetWindowName('comboSexe'):Append("Hommes");
+	dlgConfig:GetWindowName('comboListe'):Clear();
 	local debut = tonumber(listeMinisterielle.Saison) - 27;
 	for i = 1, 10 do
 		debut = debut + 1;
-		dlgConfiguration:GetWindowName('comboAnneeDebut'):Append(debut);
-		dlgConfiguration:GetWindowName('comboAnneeFin'):Append(debut);
+		dlgConfig:GetWindowName('comboAnneeDebut'):Append(debut);
+		dlgConfig:GetWindowName('comboAnneeFin'):Append(debut);
 	end
 	for row = 0, Liste:GetNbRows() -1 do
-		dlgConfiguration:GetWindowName('comboListe'):Append(Liste:GetCell('Code_liste', row));
+		dlgConfig:GetWindowName('comboListe'):Append(Liste:GetCell('Code_liste', row));
 	end
-	dlgConfiguration:GetWindowName('comboListe'):SetValue(listeMinisterielle.comboListe);
-	dlgConfiguration:GetWindowName('comboNiveau'):SetValue(listeMinisterielle.comboNiveau);
-	dlgConfiguration:GetWindowName('comboSexe'):SetValue(listeMinisterielle.comboSexe);
-	dlgConfiguration:GetWindowName('comboAnneeDebut'):SetValue(listeMinisterielle.comboAnneeDebut);
-	dlgConfiguration:GetWindowName('comboAnneeFin'):SetValue(listeMinisterielle.comboAnneeFin);
+	dlgConfig:GetWindowName('comboListe'):SetValue(listeMinisterielle.comboListe);
+	dlgConfig:GetWindowName('comboNiveau'):SetValue(listeMinisterielle.comboNiveau);
+	dlgConfig:GetWindowName('comboSexe'):SetValue(listeMinisterielle.comboSexe);
+	dlgConfig:GetWindowName('comboAnneeDebut'):SetValue(listeMinisterielle.comboAnneeDebut);
+	dlgConfig:GetWindowName('comboAnneeFin'):SetValue(listeMinisterielle.comboAnneeFin);
 	-- lecture des nodes
 	SetDataAnalyse();
 	
 	local cmd = '';
 	-- Toolbar 
-	local tbedit1 = dlgConfiguration:GetWindowName('tbedit1');
+	local tbedit1 = dlgConfig:GetWindowName('tbedit1');
 	tbedit1:AddSeparator();
 	local btnAnalyse = tbedit1:AddTool("Lancer l'analyse", "./res/32x32_ranking.png");
 	tbedit1:AddSeparator();
@@ -801,43 +801,43 @@ function AffichagedlgConfiguration()
 		function(evt) 
 			AfficheBackOffice();
 		end, btnGestion);
-	tbedit1:Bind(eventType.MENU, function(evt) dlgConfiguration:EndModal(idButton.CANCEL) end, btnRetour);
-	dlgConfiguration:Bind(eventType.COMBOBOX, 
+	tbedit1:Bind(eventType.MENU, function(evt) dlgConfig:EndModal(idButton.CANCEL) end, btnRetour);
+	dlgConfig:Bind(eventType.COMBOBOX, 
 		function(evt)
-			listeMinisterielle.comboListe = tonumber(dlgConfiguration:GetWindowName('comboListe'):GetValue()) or 0;
+			listeMinisterielle.comboListe = tonumber(dlgConfig:GetWindowName('comboListe'):GetValue()) or 0;
 			SetDataAnalyse();
 		end, 
-		dlgConfiguration:GetWindowName('comboListe'))
-	dlgConfiguration:Bind(eventType.COMBOBOX, 
+		dlgConfig:GetWindowName('comboListe'))
+	dlgConfig:Bind(eventType.COMBOBOX, 
 		function(evt)
-			listeMinisterielle.comboNiveau = dlgConfiguration:GetWindowName('comboNiveau'):GetValue();
+			listeMinisterielle.comboNiveau = dlgConfig:GetWindowName('comboNiveau'):GetValue();
 			SetDataAnalyse();
 		end, 
-		dlgConfiguration:GetWindowName('comboNiveau'))
-	dlgConfiguration:Bind(eventType.COMBOBOX, 
+		dlgConfig:GetWindowName('comboNiveau'))
+	dlgConfig:Bind(eventType.COMBOBOX, 
 		function(evt) 
-			listeMinisterielle.comboSexe = dlgConfiguration:GetWindowName('comboSexe'):GetValue();
+			listeMinisterielle.comboSexe = dlgConfig:GetWindowName('comboSexe'):GetValue();
 			SetDataAnalyse();
 		end, 
-		dlgConfiguration:GetWindowName('comboSexe'))
-	dlgConfiguration:Bind(eventType.COMBOBOX, 
+		dlgConfig:GetWindowName('comboSexe'))
+	dlgConfig:Bind(eventType.COMBOBOX, 
 		function(evt) 
-			listeMinisterielle.comboAnneeDebut = dlgConfiguration:GetWindowName('comboAnneeDebut'):GetValue();
-			listeMinisterielle.indexAnneeDebut = dlgConfiguration:GetWindowName('comboAnneeDebut'):GetSelection();
+			listeMinisterielle.comboAnneeDebut = dlgConfig:GetWindowName('comboAnneeDebut'):GetValue();
+			listeMinisterielle.indexAnneeDebut = dlgConfig:GetWindowName('comboAnneeDebut'):GetSelection();
 			SetDataAnalyse();
 		end, 
-		dlgConfiguration:GetWindowName('comboAnneeDebut'))
+		dlgConfig:GetWindowName('comboAnneeDebut'))
 		
-	dlgConfiguration:Bind(eventType.TEXT, 
+	dlgConfig:Bind(eventType.TEXT, 
 		function(evt) 
 		end, 
-		dlgConfiguration:GetWindowName('gxpremiers1'))
-	dlgConfiguration:Bind(eventType.TEXT, 
+		dlgConfig:GetWindowName('gxpremiers1'))
+	dlgConfig:Bind(eventType.TEXT, 
 		function(evt) 
 		end, 
-		dlgConfiguration:GetWindowName('gxpremiers2'))
-	dlgConfiguration:Fit();
-	dlgConfiguration:ShowModal();
+		dlgConfig:GetWindowName('gxpremiers2'))
+	dlgConfig:Fit();
+	dlgConfig:ShowModal();
 	if base then
 		base:Delete()
 	end
@@ -846,12 +846,34 @@ function AffichagedlgConfiguration()
 	end
 end
 
-function Main(cparams)
+function main(cparams)
 	XML = app.GetPath().."/process/liste_ministerielle.xml";
 	doc = xmlDocument.Create(XML);
 	listeMinisterielle = {};
 	listeMinisterielle.affichage = false;	
-	listeMinisterielle.version_script = '2.2';
+	
+	
+	
+	scrip_version = "2.3"; 
+	-- vérification de l'existence d'une version plus récente du script.
+	-- Ex de retour : LiveDraw=5.94,Matrices=5.92,TimingReport=4.2,DoubleTirage=3.2,TirageOptions=3.3,TirageER=1.7,ListeMinisterielle=2.3,KandaHarJunior=2.0
+	if app.GetVersion() >= '4.4c' then 
+		indice_return = 7;
+		local url = 'https://agilsport.fr/bta_alpin/versionsPG.txt'
+		version = curl.AsyncGET(wnd.GetParentFrame(), url);
+	end
+
+	local updatefile = './tmp/updatesPG.txt';
+	if app.FileExists(updatefile) then
+		local f = io.open(updatefile, 'r')
+		for lines in f:lines() do
+			alire = lines;
+		end
+		io.close(f);
+		app.RemoveFile(updatefile);
+		app.LaunchDefaultEditor('./'..alire);
+	end
+
 	listeMinisterielle.dlgPosit = {};
 	listeMinisterielle.dlgPosit.width = display:GetSize().width * .7;
 	listeMinisterielle.dlgPosit.height = display:GetSize().height * .9;

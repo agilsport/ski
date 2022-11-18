@@ -3,6 +3,8 @@
 <!-- <background mode="gradient_line_vert" color_start="white" color_end="ltgray" /> -->
 <root title="Tirage des dossards avec options">
   <panel name="bibo">
+    <lua>dofile('./interface/adv.lua');</lua>
+   <lua>Sexe = params.Sexe or '*';</lua>
     <padding all="10px"/>
     <col value="1"/>
     <row value="50px"/>
@@ -11,10 +13,12 @@
       <row value="40px"/>
       <statictext row="auto" col_start="2" style="ALIGN_RIGHT" label="Nombre de coureurs du BIBO (0 = à la mêlée): "/>
       <textctrl col_start="3" name="bibo"/>
-      <statictext row="auto" col_start="2" style="ALIGN_RIGHT" label="Indiquer le numéro du premier dossard : "/>
+      <statictext row="auto" col_start="2" style="ALIGN_RIGHT" label="Indiquer le numéro du premier dossard/rang : "/>
       <textctrl col_start="3" name="dossard"/>
       <row value="20px"/>
-      <staticbox row_start="1" row_end="0" col_start="2" col_end="3" label="Configuration du nombre de coureurs du BIBO"/>
+       <staticbox row_start="1" row_end="0" col_start="2" col_end="3" cond="Sexe == '*'" label="Configuration du nombre de coureurs du BIBO"/>
+       <staticbox row_start="1" row_end="0" col_start="2" col_end="3" cond="Sexe == 'F'" label="Configuration du nombre de coureurs du BIBO pour les Dames"/>
+       <staticbox row_start="1" row_end="0" col_start="2" col_end="3" cond="Sexe == 'M'" label="Configuration du nombre de coureurs du BIBO pour les Hommes"/>
       <row value="20px"/>
       <toolbar row="auto" col_start="1" col_end="0" name="tbbibo" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
     </matrix>

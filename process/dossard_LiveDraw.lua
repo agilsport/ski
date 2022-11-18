@@ -52,14 +52,13 @@ function OnTimerRunning(evt);
 end
 
 function OnExport()
-	adv.Alert('OnExport');
 	tDraw:OrderBy('Dossard, Rang_tirage');
 	local filename = app.GetPath()..app.GetPathSeparator()..'tmp'..app.GetPathSeparator()..string.sub(tEpreuve:GetCell('Fichier_transfert',0), 4)..'_racers.csv';
 	local f = io.open(filename, 'w')
 	if f == nil then 
 		return
 	end
-	local chaine = 'Code1;Code2;Bib;Name;Surname;Nation;Club;FIS Points\n'
+	local chaine = 'Code;CodeFIS;Bib;Name;Surname;Identity;Nation;Club;FIS Points\n'
 	f:write(chaine);
 	for i = 0, tDraw:GetNbRows() -1 do
 		local pts = string.gsub(tDraw:GetCell('FIS_pts', i),"%.",",");
@@ -68,6 +67,7 @@ function OnExport()
 		chaine = chaine..';'..tDraw:GetCell('Dossard', i);
 		chaine = chaine..';'..tDraw:GetCell('Nom', i);
 		chaine = chaine..';'..tDraw:GetCell('Prenom', i);
+		chaine = chaine..';'..tDraw:GetCell('Nom', i)..' '..tDraw:GetCell('Prenom', i);
 		chaine = chaine..';'..tDraw:GetCell('Nation', i);
 		chaine = chaine..';'..tDraw:GetCell('Club', i);
 		chaine = chaine..';'..pts..'\n';
@@ -109,41 +109,6 @@ function SortTable(array, colnom, sens)	-- tri des tables
 		table.sort(array, function (u,v)
 			return u[colnom] > v[colnom];
 		end)
-	end
-end
-
-function Telechargement(url, disponible)
-	local localFile = app:GetPath()..app.GetPathSeparator()..'tmp'..app.GetPathSeparator()..disponible;
-	if curl.DownloadFile(url, localFile) ~= true then
-		return;
-	end
-	if dlgConfig then
-		dlgConfig:EndModal(idButton.CANCEL);
-	end
-	if app.FileExists(localFile) then
-		app.Execute(localFile);
-	end
-end
-
-function OnCurlReturn(evt)
-	-- Ex de retour : LiveDraw=5.94,Matrices=5.91,TimingReport=4.2
-	if evt:GetInt() == 1 then
-		local chaine = evt:GetString();
-		local tChaine = chaine:Split(',');
-		local tVersions = {};
-		table.insert(tVersions, tChaine);
-		local tversionScript = tVersions[1][1]:Split'=';
-		draw.last_version = tversionScript[2];
-		if draw.last_version > draw.version then
-			if app.GetAuiFrame():MessageBox(
-				"Vous utilisez la version "..draw.version.." du script et la version "..draw.last_version.." plus récente est disponible.\nVoulez-vous la télécharger ?", 
-				"Téléchargement du script",
-				msgBoxStyle.YES_NO + msgBoxStyle.NO_DEFAULT + msgBoxStyle.ICON_INFORMATION
-				) == msgBoxStyle.YES then
-				local url = 'http://188.165.236.85/maj_pg/ScriptPG.exe';
-				Telechargement(url, 'ScriptPG.exe');
-			end
-		end
 	end
 end
 
@@ -556,7 +521,7 @@ function OnPrintDoubleTirage(groupe)
 			margin_right = 100,
 			margin_bottom = 100,
 			paper_orientation = 'portrait',
-			params = {Nom = params.evenementNom, tableDossards1 = params.tableDossards1, tableDossards2 = params.tableDossards2, Draw = 1, Version = draw.version, NbGroupe1 = 0, Entite = draw.code_entite }
+			params = {Nom = params.evenementNom, tableDossards1 = params.tableDossards1, tableDossards2 = params.tableDossards2, Draw = 1, Version = scrip_version, NbGroupe1 = 0, Entite = draw.code_entite }
 		});
 	else
 		if not report then
@@ -577,7 +542,7 @@ function OnPrintDoubleTirage(groupe)
 				margin_right = 100,
 				margin_bottom = 100,
 				paper_orientation = 'portrait',
-				params = {Nom = params.evenementNom, tableDossards1 = params.tableDossards1, tableDossards2 = params.tableDossards2, Draw = 1, Version = draw.version, NbGroupe1 = 0, Entite = draw.code_entite}
+				params = {Nom = params.evenementNom, tableDossards1 = params.tableDossards1, tableDossards2 = params.tableDossards2, Draw = 1, Version = scrip_version, NbGroupe1 = 0, Entite = draw.code_entite}
 			});
 		end
 		editor = report:GetEditor();
@@ -600,7 +565,7 @@ function OnPrintDoubleTirage(groupe)
 			margin_right = 100,
 			margin_bottom = 100,
 			paper_orientation = 'portrait',
-			params = {Nom = params.evenementNom, tableDossards1 = params.tableDossards1, tableDossards2 = params.tableDossards2, Draw = 2, Version = draw.version, NbGroupe1 = params.nb_groupe1, Entite = draw.code_entite}
+			params = {Nom = params.evenementNom, tableDossards1 = params.tableDossards1, tableDossards2 = params.tableDossards2, Draw = 2, Version = scrip_version, NbGroupe1 = params.nb_groupe1, Entite = draw.code_entite}
 		});
 	end
 end
@@ -759,7 +724,7 @@ function OnPrintBibo(groupe)
 		margin_right = 80,
 		margin_bottom = 80,
 		paper_orientation = 'portrait',
-		params = {Evenement_nom = tEvenement:GetCell('Nom', 0), Version = draw.version, NbGroupe1 = draw.nb_groupe_1, EstCE = estCE}
+		params = {Evenement_nom = tEvenement:GetCell('Nom', 0), Version = scrip_version, NbGroupe1 = draw.nb_groupe_1, EstCE = estCE}
 	});
 end
 
@@ -2692,7 +2657,7 @@ function OnRowSelected(evt)
 end
 
 function CreatePanelCoureur()
-	local xlabel = 'Recherche des coureurs - discipline de la course : '..draw.discipline..' - version '..draw.version..' du script  -  course n° '..draw.code_evenement..' - CODEX : '..tEvenement:GetCell('Codex', 0);
+	local xlabel = 'Recherche des coureurs - discipline de la course : '..draw.discipline..' - version '..scrip_version..' du script  -  course n° '..draw.code_evenement..' - CODEX : '..tEvenement:GetCell('Codex', 0);
 	panel_coureur = wnd.CreatePanel({ parent = app.GetAuiFrame() });
 	panel_coureur:LoadTemplateXML({ 
 		xml = './process/dossard_LiveDraw.xml',
@@ -2741,7 +2706,7 @@ function OnAfficheTableau()
 		parentFrame:Bind(eventType.SOCKET, OnSocketLive, draw.socket);
 	end
 -- Création Dialog 
-	draw.label_dialog = 'Tableau des coureurs - discipline de la course : '..draw.discipline..' - version '..draw.version..' du script  -  course n° '..draw.code_evenement..' - CODEX : '..tEvenement:GetCell('Codex', 0);
+	draw.label_dialog = 'Tableau des coureurs - discipline de la course : '..draw.discipline..' - version '..scrip_version..' du script  -  course n° '..draw.code_evenement..' - CODEX : '..tEvenement:GetCell('Codex', 0);
 	dlgTableau = wnd.CreateDialog(
 		{
 		width = draw.width,
@@ -3610,10 +3575,25 @@ function main(params_c)
 	draw.height = display:GetSize().height - 30;
 	draw.x = 0;
 	draw.y = 0;
-	draw.version = "4.94"; -- 4.92 pour 2022-2023
-	local url = 'https://live.ffs.fr/maj_pg/versionsPG.txt'
-	-- local url = 'https://live.ffs.fr/maj_pg/livedraw/liveDraw_last_version.txt'
-	local version = curl.AsyncGET(wnd.GetParentFrame(), url);
+	scrip_version = "4.96"; -- 4.92 pour 2022-2023
+	if app.GetVersion() >= '4.4c' then 
+		-- vérification de l'existence d'une version plus récente du script.
+		-- Ex de retour : LiveDraw=5.94,Matrices=5.92,TimingReport=4.2
+		indice_return = 1;
+		local url = 'https://agilsport.fr/bta_alpin/versionsPG.txt'
+		version = curl.AsyncGET(wnd.GetParentFrame(), url);
+	end
+
+	local updatefile = './tmp/updatesPG.txt';
+	if app.FileExists(updatefile) then
+		local f = io.open(updatefile, 'r')
+		for lines in f:lines() do
+			alire = lines;
+		end
+		io.close(f);
+		app.RemoveFile(updatefile);
+		app.LaunchDefaultEditor('./'..alire);
+	end
 	draw.hostname = 'live.fisski.com';
 	draw.method = 'socket';
 	draw.ajouter_code = '';
@@ -3728,11 +3708,19 @@ function main(params_c)
 		nodelivedraw:ChangeAttribute('port', draw.port);
 		nodelivedraw:ChangeAttribute('pwd', '');
 	else
-		draw.pwd = nodelivedraw:GetAttribute('pwd', 'toto');
 		draw.sequence_send = tonumber(nodelivedraw:GetAttribute('send', 0)) or 0;;
 		draw.sequence_ack = tonumber(nodelivedraw:GetAttribute('ack', 0)) or 0;
 		draw.sequence_last_send = draw.sequence_send;
 	end
+	local pwdfile = './process/liveDrawPwd.txt';
+	if app.FileExists(pwdfile) then
+		local f = io.open(pwdfile, 'r')
+		for lines in f:lines() do
+			draw.pwd = lines;
+		end
+		io.close(f);
+	end
+
 	draw.sequence_ack = draw.sequence_ack or 0;
 	draw.sequence_send = draw.sequence_send or 0;
 	draw.targetName = draw.hostname..':'..draw.port;
@@ -3752,7 +3740,7 @@ function main(params_c)
 		height = draw.height,
 		x = draw.x,
 		y = draw.y,
-		label='Informations de connexion - version du script : '..draw.version , 
+		label='Informations de connexion - version du script : '..scrip_version , 
 		icon='./res/32x32_fis.png'
 		});
 	
@@ -3788,8 +3776,11 @@ function main(params_c)
 	dlgConfig:Bind(eventType.MENU, 
 		function(evt) 
 			draw.pwd = dlgConfig:GetWindowName('fis_pwd'):GetValue();
+			local filename = './process/liveDrawPwd.txt';
+			local f = io.open(filename, 'w')
+			f:write(draw.pwd);
+			f:close();
 			nodelivedraw:ChangeAttribute('port', dlgConfig:GetWindowName('fis_port'):GetValue());
-			nodelivedraw:ChangeAttribute('pwd', draw.pwd);
 			nodelivedraw:ChangeAttribute('send', 0);
 			nodelivedraw:ChangeAttribute('ack', 0);
 			draw.doc:SaveFile();
