@@ -2454,29 +2454,84 @@ function OnPrintAnalyse()
 		adv.Alert("OnPrintAnalyse - Snapshot('Matrice_Ranking_avant_print.db3')");
 		tMatrice_Ranking:Snapshot('Matrice_Ranking_avant_print.db3');
 	end
+	
 	ligne_titre = 'Analyse des performances du circuit sur les classements obtenus.\nLes points de la liste '..matrice.analyseGaucheListe..' obtenus en discipline "'..matrice.analyseGaucheDiscipline..'"\n'..
 				'ainsi que le classement mondial sont affichés à titre d\'information.';
-	report = wnd.LoadTemplateReportXML({
-		xml = './challenge/matrice.xml',
-		node_name = 'root/panel',
-		node_attr = 'id',
-		node_value = 'printanalyse',
-		title = 'Edition du Challenge',
-		base = base,
-		body = tMatrice_Ranking,
-		layers = {file = './edition/layer.xml', id = 'FFS_FIS', page = '*'}, 
-		margin_first_top = 100,
-		margin_first_left = 100,
-		margin_first_right = 100,
-		margin_first_bottom = 100,
-		margin_top = 100,
-		margin_left = 100,
-		margin_right = 100,
-		margin_bottom = 100,
-		paper_orientation = 'landscape',
-		params = {Titre = matrice.Titre, Version = scrip_version, Code_evenement = matrice.code_evenement, Liste = matrice.analyseGaucheListe, Discipline = matrice.last_discipline, LigneTitre = ligne_titre}
-	});
-	-- report:SetZoom(10)
+
+	if matrice.TitreAdd then
+		matrice.TitreAdd = string.gsub(matrice.TitreAdd, 'Classement', 'Analyse du circuit');
+		ligne_titre = ligne_titre..matrice.TitreAdd;
+	else
+		ligne_titre = ligne_titre;
+	end
+	if matrice.next == false then
+		report = wnd.LoadTemplateReportXML({
+			xml = './challenge/matrice.xml',
+			node_name = 'root/panel',
+			node_attr = 'id',
+			node_value = 'printanalyse',
+			title = 'Analyse du circuit',
+			base = base,
+			body = tMatrice_Ranking,
+			layers = {file = './edition/layer.perso.xml', id = matrice.texteImprimerLayer, page = pagelayer}, 
+			margin_first_top = math.floor(matrice.texteMargeHaute1 * 100),
+			margin_first_left = 100,
+			margin_first_right = 100,
+			margin_first_bottom = 100,
+			margin_top = math.floor(matrice.texteMargeHaute2 * 100),
+			margin_left = 100, 
+			margin_right = 100,
+			margin_bottom = 100,
+			paper_orientation = 'landscape',
+			params = {Titre = matrice.Titre, Version = scrip_version, Code_evenement = matrice.code_evenement, Liste = matrice.analyseGaucheListe, Discipline = matrice.last_discipline, LigneTitre = ligne_titre}
+		});
+	else
+		if not report then
+			report = wnd.LoadTemplateReportXML({
+				xml = './challenge/matrice.xml',
+				node_name = 'root/panel',
+				node_attr = 'id',
+				node_value = 'printanalyse',
+				title = 'Analyse du circuit',
+				base = base,
+				body = tMatrice_Ranking,
+				layers = {file = './edition/layer.perso.xml', id = matrice.texteImprimerLayer, page = pagelayer}, 
+				margin_first_top = math.floor(matrice.texteMargeHaute1 * 100),
+				margin_first_left = 100,
+				margin_first_right = 100,
+				margin_first_bottom = 100,
+				margin_top = math.floor(matrice.texteMargeHaute2 * 100),
+				margin_left = 100, 
+				margin_right = 100,
+				margin_bottom = 100,
+				paper_orientation = 'landscape',
+				params = {Titre = matrice.Titre, Version = scrip_version, Code_evenement = matrice.code_evenement, Liste = matrice.analyseGaucheListe, Discipline = matrice.last_discipline, LigneTitre = ligne_titre}
+			});
+		end
+		editor = report:GetEditor();
+		editor:PageBreak(); -- Saut de Page entre les 2 éditions ...
+		wnd.LoadTemplateReportXML({
+			xml = './challenge/matrice.xml',
+			node_name = 'root/panel',
+			node_attr = 'id',
+			node_value = 'printanalyse',
+			title = 'Analyse du circuit',
+			report = report,
+			base = base,
+			body = tMatrice_Ranking,
+			layers = {file = './edition/layer.perso.xml', id = matrice.texteImprimerLayer, page = pagelayer}, 
+			margin_first_top = math.floor(matrice.texteMargeHaute1 * 100),
+			margin_first_left = 100,
+			margin_first_right = 100,
+			margin_first_bottom = 100,
+			margin_top = math.floor(matrice.texteMargeHaute2 * 100),
+			margin_left = 100, 
+			margin_right = 100,
+			margin_bottom = 100,
+			paper_orientation = 'landscape',
+			params = {Titre = matrice.Titre, Version = scrip_version, Code_evenement = matrice.code_evenement, Liste = matrice.analyseGaucheListe, Discipline = matrice.last_discipline, LigneTitre = ligne_titre}
+		});
+	end
 end
 
 function OnPrint()
@@ -3060,7 +3115,6 @@ function LitMatrice()	-- lecture des variables et affectation des valeurs dans l
 		end
 	end
 	if selectionresultatpar > 0 then
-		menuPrint:Enable(btnAnalyse:GetId(), false) ;
 		matrice.col_resultat_par = tColResultatPar[selectionresultatpar];
 		local parcol = tColResultatPar[selectionresultatpar];
 		 cmd = "Select Code_coureur, "..parcol.." From Resultat Where Code_evenement in ("..matrice.Evenement_selection..") And Sexe = '"..matrice.comboSexe.."' Group By Code_coureur, "..parcol;
@@ -3147,9 +3201,6 @@ function LitMatrice()	-- lecture des variables et affectation des valeurs dans l
 			table.insert(placevaleur, { Place = tPlace_Valeur:GetCellInt('Place', i), Point = tPlace_Valeur:GetCellDouble('Point', i) });
 		end
 		matrice.grille = placevaleur;
-	end
-	if matrice.comboResultatPar ~= 'Sans objet' then
-		menuPrint:Enable(btnAnalyse:GetId(), false) ;
 	end
 
 	CreateTableListe();
@@ -6193,6 +6244,44 @@ function BuildTableRanking(indice_filtrage)
 	end
 end
 
+function BtnPrintAnalyse()
+	matrice.next = false;
+	matrice.findescalculs = false;
+	matrice.panel_name = 'printanalyse';
+	LitMatrice();
+	LitMatriceCourses(true);
+	matrice.findescalculs = false;
+	matrice.panel_name = 'print';
+	if matrice.comboResultatPar == 'Sans objet' then
+		Calculer('printanalyse', 0);
+		if not matrice.findescalculs == true then
+			dlgConfig:MessageBox(
+				"Une erreur est intervenue durant les calculs !!!",
+				"Calcul de la matrice "..matrice.Titre, 
+				msgBoxStyle.OK + msgBoxStyle.ICON_WARNING
+				);
+			return;
+		end
+		OnPrintAnalyse();
+	else
+		for i = 1, #matrice.tResultatsGroupes do
+			if i > 1 then
+				matrice.next = true;
+			end
+			Calculer('printanalyse', i);
+			if not matrice.findescalculs == true then
+				dlgConfig:MessageBox(
+					"Une erreur est intervenue durant les calculs !!!",
+					"Calcul de la matrice "..matrice.Titre, 
+					msgBoxStyle.OK + msgBoxStyle.ICON_WARNING
+					);
+				return;
+			end
+			OnPrintAnalyse();
+		end
+	end
+end
+
 function BtnPrint()
 	matrice.next = false;
 	matrice.findescalculs = false;
@@ -6484,46 +6573,7 @@ function AffichedlgConfiguration()
 		, btnCalculer);
 	tbedit1:Bind(eventType.MENU,
 		function(evt)
-			matrice.findescalculs = false;
-			matrice.panel_name = 'printanalyse';
-			if not matrice.analyseGauche1 then
-				dlgConfig:MessageBox(
-					"Veuillez définir les critères de l'analyse !!!",
-					"Analyse des performances", 
-					msgBoxStyle.OK + msgBoxStyle.ICON_WARNING
-					) 
-				return;
-			end
-			if matrice.comboResultatPar == 'Non' then
-				if #matrice.tGroupesCalcul == 0 then
-					Calculer('printanalyse', 0);
-					if not matrice.findescalculs == true then
-						dlgConfig:MessageBox(
-							"Une erreur est intervenue durant les calculs !!!",
-							"Calcul de la matrice "..matrice.Titre, 
-							msgBoxStyle.OK + msgBoxStyle.ICON_WARNING
-							);
-						return;
-					end
-					OnPrintAnalyse();
-				else
-					for i = 1, #matrice.tGroupesCalcul do
-						if i > 1 then
-							matrice.next = true;
-						end
-						Calculer('printanalyse', i);
-						if not matrice.findescalculs == true then
-							dlgConfig:MessageBox(
-								"Une erreur est intervenue durant les calculs !!!",
-								"Calcul de la matrice "..matrice.Titre, 
-								msgBoxStyle.OK + msgBoxStyle.ICON_WARNING
-								);
-							return;
-						end
-						OnPrintAnalyse();
-					end
-				end
-			end
+			BtnPrintAnalyse()
 			dlgConfig:EndModal(idButton.OK);
 		end
 		, btnAnalyse);
@@ -6596,16 +6646,6 @@ function AffichedlgConfiguration()
 	if dlgConfig:ShowModal() == idButton.OK then
 		do return end
 	end
-	-- dlgConfig:ShowModal();
-	-- if matrice.timer then matrice.timer:Delete(); end
-	-- if matrice.findescalculs == true then
-		-- if matrice.panel_name == 'print' then
-			-- OnPrint();
-		-- elseif matrice.panel_name == 'printanalyse' then
-			-- OnPrintAnalyse();
-		-- end
-	-- end
-	-- do return end
 end
 
 function OnGetColorDiscipline(ligne)
@@ -7942,7 +7982,7 @@ function OnConfiguration(cparams)
 	else
 		return false;
 	end
-	scrip_version = '5.93';
+	scrip_version = '5.94';
 	-- vérification de l'existence d'une version plus récente du script.
 	-- Ex de retour : LiveDraw=5.94,Matrices=5.92,TimingReport=4.2
 	if app.GetVersion() >= '4.4c' then 		-- début d'implementation de la fonction UpdateRessource
