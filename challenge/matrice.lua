@@ -3089,7 +3089,7 @@ function LitMatrice()	-- lecture des variables et affectation des valeurs dans l
 	matrice.comboPrendreBloc1 = matrice.comboPrendreBloc1 or GetValue("comboPrendreBloc1", "Classement général");
 	matrice.comboPrendreBloc2 = matrice.comboPrendreBloc2 or GetValue("comboPrendreBloc2", "Classement général");
 	matrice.comboPresentationCourses = matrice.comboPresentationCourses or GetValue("comboPresentationCourses", "Présentation horizontale type Ski Chrono Tour (par défaut)");
-	matrice.comboSexe = matrice.comboSexe or GetValue("comboSexe", '');
+	matrice.comboSexe = matrice.comboSexe or GetValue("comboSexe", 'M');
 	matrice.comboResultatPar = matrice.comboResultatPar or GetValue("comboResultatPar", 'Sans objet');
 	local chaine = "$(Sexe):In('"..matrice.comboSexe.."')";
 	matrice.Cle_filtrage = matrice.Cle_filtrage or GetValue("Cle_filtrage", chaine);
@@ -5435,7 +5435,6 @@ function SetAnalyseGauche(param, etou)
 	if etou then
 		local arChaine = param:Split(etou);		-- 2,10,SLOU2,10,GS
 		for i = 1, #arChaine do
-			adv.Alert('arChaine[i] = '..arChaine[i]);
 			matrice.lignegauche = matrice.lignegauche + 1;
 			local t = arChaine[i]:Split(',');
 			for j = 1, #t do
@@ -7982,7 +7981,7 @@ function OnConfiguration(cparams)
 	else
 		return false;
 	end
-	scrip_version = '5.94';
+	scrip_version = '5.95';
 	-- vérification de l'existence d'une version plus récente du script.
 	-- Ex de retour : LiveDraw=5.94,Matrices=5.92,TimingReport=4.2
 	if app.GetVersion() >= '4.4c' then 		-- début d'implementation de la fonction UpdateRessource
