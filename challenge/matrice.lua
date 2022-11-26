@@ -2726,7 +2726,9 @@ end
 
 function LitMatriceCourses(bolcalculer);	-- lecture des courses figurant dans la valeur Evenement_selection de la table Evenement_Matrice
 	matrice.prendre_manche = false;
-	if not matrice.Evenement_selection or matrice.Evenement_selection:len() == 0 then
+	if not matrice.Evenement_selection then
+		return false;
+	elseif matrice.Evenement_selection:len() == 0 then
 		return false;
 	end
 	RempliTableauMatrice();
@@ -3098,6 +3100,10 @@ function LitMatrice()	-- lecture des variables et affectation des valeurs dans l
 	
 	-- local chaine_er = "and %$%(Groupe%):In%('TOUS'%)";
 	-- local chaine_categ = "and %$%(Categ%):In%('TOUS'%)";
+	if matrice.Evenement_selection:len() == 0 then
+		matrice.Evenement_selection = '-1';
+	end
+	matrice.Evenement_selection = matrice.Evenement_selection or -1;
 	local cmd = "Select Distinct Categ From Resultat Where Code_evenement in ("..matrice.Evenement_selection..") And Sexe = '"..matrice.comboSexe.."'";
 	tCategPresentes = base:TableLoad(cmd);
 	tCategPresentes:SetCounter('Categ');
@@ -4569,29 +4575,11 @@ function OnSavedlgCopycolonnes();	-- lecture et modification des colonnes pour c
 			base:Query(cmd);
 		end
 	end
-	local valeur = dlgCopycolonnes:GetWindowName('copydata'):GetValue();
-	if string.len(valeur) > 0 then
-		cmd = 'Update Resultat Set '..coldestination.." = '"..valeur.."' "..
-			' Where Code_evenement In('..matrice.Evenement_selection..') ';
-		if matrice.debug == true then
-			adv.Alert(cmd);
-		end
-		base:Query(cmd);
-	else
-		if app.GetAuiFrame():MessageBox(
-			"Voulez-vous remettre à blanc le contenu de la colonne "..coldestination..'\npour toutes les courses incluses dans la matrice ?', 
-			"Attention !!!",
-			msgBoxStyle.YES_NO + msgBoxStyle.NO_DEFAULT + msgBoxStyle.ICON_WARNING
-			) == msgBoxStyle.YES then
-			local cmd = 'Update Resultat Set '..coldestination.." = NULL "..
-				' Where Code_evenement In('..matrice.Evenement_selection..') ';
-			base:Query(cmd);
-		end
-	end
-	valeur = dlgCopycolonnes:GetWindowName('mettre'):GetValue();
-	if string.len(valeur) > 0 then
-		local destination = dlgCopycolonnes:GetWindowName('destination'):GetValue();
-		local mettre = dlgCopycolonnes:GetWindowName('mettre'):GetValue();
+	local copydata = dlgCopycolonnes:GetWindowName('copydata'):GetValue();
+	local copycoldestination = dlgCopycolonnes:GetWindowName('copycoldestination'):GetValue();
+	local mettre = dlgCopycolonnes:GetWindowName('mettre'):GetValue();
+	local destination = dlgCopycolonnes:GetWindowName('destination'):GetValue();
+	if mettre:len() > 0 and destination:len() > 0 then
 		local virgule = '';
 		local chaine = '';
 		for i = 1, tCategPresentes:GetNbRows() do
@@ -4603,6 +4591,26 @@ function OnSavedlgCopycolonnes();	-- lecture et modification des colonnes pour c
 		if chaine:len() > 0 then
 			cmd = 'Update Resultat Set '..destination.." = '"..mettre.."' "..
 				' Where Code_evenement In('..matrice.Evenement_selection..") and categ In('"..chaine.."')";
+			base:Query(cmd);
+		end
+		return;
+	end
+
+	if string.len(copydata) > 0 then
+		cmd = 'Update Resultat Set '..coldestination.." = '"..copydata.."' "..
+			' Where Code_evenement In('..matrice.Evenement_selection..') ';
+		if matrice.debug == true then
+			adv.Alert(cmd);
+		end
+		base:Query(cmd);
+	elseif (copycoldestination ~= destination) or (copydata:len() == 0 and mettre:len() == 0) then
+		if app.GetAuiFrame():MessageBox(
+			"Voulez-vous remettre à blanc le contenu de la colonne "..coldestination..'\npour toutes les courses incluses dans la matrice ?', 
+			"Attention !!!",
+			msgBoxStyle.YES_NO + msgBoxStyle.NO_DEFAULT + msgBoxStyle.ICON_WARNING
+			) == msgBoxStyle.YES then
+			local cmd = 'Update Resultat Set '..coldestination.." = NULL "..
+				' Where Code_evenement In('..matrice.Evenement_selection..') ';
 			base:Query(cmd);
 		end
 	end
@@ -6040,7 +6048,7 @@ function BuildTableRanking(indice_filtrage)
 	local filter = "$(Sexe):In('"..matrice.comboSexe.."')";
 	tMatrice_Ranking:Filter(filter, true);
 	local sexe = ' Hommes';
-	if matrice.Sexe == 'F' then
+	if matrice.comboSexe == 'F' then
 		sexe = ' Dames';
 	end
 	if indice_filtrage > 0 then
@@ -6642,9 +6650,8 @@ function AffichedlgConfiguration()
 	
 	SetDatadlgConfiguration();
 	SetEnableControldlgConfiguration();
-	if dlgConfig:ShowModal() == idButton.OK then
-		do return end
-	end
+	dlgConfig:ShowModal();
+	do return end
 end
 
 function OnGetColorDiscipline(ligne)
@@ -7981,7 +7988,7 @@ function OnConfiguration(cparams)
 	else
 		return false;
 	end
-	scrip_version = '5.95';
+	scrip_version = '5.96';
 	-- vérification de l'existence d'une version plus récente du script.
 	-- Ex de retour : LiveDraw=5.94,Matrices=5.92,TimingReport=4.2
 	if app.GetVersion() >= '4.4c' then 		-- début d'implementation de la fonction UpdateRessource
@@ -8001,9 +8008,6 @@ function OnConfiguration(cparams)
 	end
 
 
-	local url = 'https://agilsport.fr/bta_alpin/versionsPG.txt'
-	local version = curl.AsyncGET(wnd.GetParentFrame(), url);
-	indice_return = 2;
 	matrice.dlgPosit = {};
 	matrice.dlgPosit.width = display:GetSize().width;
 	matrice.dlgPosit.height = display:GetSize().height -30;

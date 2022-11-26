@@ -131,6 +131,11 @@ function OnCurlReturn(evt)
 				"Téléchargement du script",
 				msgBoxStyle.YES_NO + msgBoxStyle.NO_DEFAULT + msgBoxStyle.ICON_INFORMATION
 				) == msgBoxStyle.YES then
+				app.GetAuiFrame():MessageBox(
+					"Le script va être fermé pour validation de la mise à jour.", 
+					"Information !!!",
+					msgBoxStyle.OK + msgBoxStyle.ICON_INFORMATION
+					);
 				if tNomSVersionDoc[indice_return]:len() > 0 then
 					local filename = './tmp/updatesPG.txt';
 					local f = io.open(filename, 'w')
@@ -141,10 +146,11 @@ function OnCurlReturn(evt)
 				local reponse = app.AutoUpdateResource('https://agilsport.fr/bta_alpin/UpdateScript.zip');
 				-- local url = ' https://agilsport.fr/bta_alpin/UpdateScript.zip';
 				-- Telechargement(url, 'UpdateScript.zip');
+				scrip_version = last_version;
 				if dlgConfig then
 					dlgConfig:EndModal(idButton.CANCEL);
 				end
-				return false;
+				return true;
 			end
 		end
 	end
