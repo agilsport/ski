@@ -4,14 +4,7 @@
 <!-- version="2.1" !-->
 	<!-- reste a finir le calcul de points challenge FS -->
 <edition>
-	<menu>
-		<menu title="Matrice LUA " image="./res/24x24_login.png">
-			<menu title="Génération de Matrices" image="./res/16x16_text.png" lua="./process/matrices.lua"  />
-			<menu title="N.B. Les éditions anciennes ne marchent que sous Windows." image="./res/32x32_param.png" />
-			<menu title="Pour celles-ci, vous devez choisir les éditions de FFSSKI." image="./res/32x32_param.png" />
-			
-		</menu>
-		
+	<menu>		
 		<menu title="Résultats Challenge " image="./res/32x32_ranking.png">
 			<menu title="Résultats Officiels Challenge Scrath" image="./res/16x16_ranking.png" header="Résultats Officiels" id="res_Cha"/>
 			<menu title="Résultats Challenge Scrath Freestyle" image="./res/16x16_ranking.png" header="Résultats Officiels" id="res_Cha_FS"/>
