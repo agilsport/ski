@@ -1013,7 +1013,7 @@ function ChecktDraw()
 
 end
 
-function CommandSendOrder()
+function CommandSendOrder(bolSendParticipants)
 	ChecktDraw();
 	-- Génération des balises 
 	local nodeRaceEvent = xmlNode.Create(nil, xmlType.ELEMENT_NODE, "raceevent");
@@ -1026,10 +1026,11 @@ function CommandSendOrder()
  		local nodeDrawGroup = xmlNode.Create(nodeRaceEvent, xmlType.ELEMENT_NODE, "drawgroup");
 		nodeDrawGroup:AddAttribute('fiscode', code_coureur);
 		local nodeGroup = xmlNode.Create(nodeDrawGroup, xmlType.ELEMENT_NODE, "group", math.abs(tDraw:GetCellInt('Groupe_tirage', i)));
-
-		local nodeDrawOrder = xmlNode.Create(nodeRaceEvent, xmlType.ELEMENT_NODE, "draworder");
-		nodeDrawOrder:AddAttribute('fiscode', code_coureur);
-		local nodeOrder = xmlNode.Create(nodeDrawOrder, xmlType.ELEMENT_NODE, "order", tDraw:GetCellInt('Rang_tirage', i));
+		if bolSendParticipants then
+			local nodeDrawOrder = xmlNode.Create(nodeRaceEvent, xmlType.ELEMENT_NODE, "draworder");
+			nodeDrawOrder:AddAttribute('fiscode', code_coureur);
+			local nodeOrder = xmlNode.Create(nodeDrawOrder, xmlType.ELEMENT_NODE, "order", tDraw:GetCellInt('Rang_tirage', i));
+		end
 	end
 	nodeRoot = xmlNode.Create(nil, xmlType.ELEMENT_NODE, "livetiming");
 	local nodeCommand = xmlNode.Create(nil, xmlType.ELEMENT_NODE, "command");
@@ -1536,7 +1537,7 @@ function GetCateg(an)
 	return tCategorie:GetCell('Code', 0);
 end
 
-function OnSendTableau(statut)
+function OnSendTableau(bolSendParticipants)
 	local msg = "Confirmation de l'envoi du tableau à la FIS.";
 	if dlgTableau:MessageBox(
 		msg, 
@@ -1550,7 +1551,7 @@ function OnSendTableau(statut)
 	CommandRaceInfo(true);
 	CommandPhaseD();
 	CommandSendList();
-	CommandSendOrder();
+	CommandSendOrder(bolSendParticipants);
 	-- CommandRenvoyerDossards(false);
 end
 
@@ -2858,6 +2859,8 @@ function OnAfficheTableau()
 	btnMenuSend = tbTableau:AddTool("Envois", "./res/32x32_send.png",'', itemKind.DROPDOWN);
 
 	menuSend = menu.Create();
+	btnSendParticipants = menuSend:Append({label="Envoi des participants", image ="./res/32x32_send.png"});
+	menuSend:AppendSeparator();
 	btnSendTableau = menuSend:Append({label="Envoi du tableau à la FIS", image ="./res/32x32_send.png"});
 	menuSend:AppendSeparator();
 	btnSendDossards = menuSend:Append({label="Envoi de tous les dossards", image ="./res/32x32_send.png"});
@@ -3119,10 +3122,16 @@ function OnAfficheTableau()
 		, btnInValiderSelection);
 	dlgTableau:Bind(eventType.MENU, 
 		function(evt)
-			OnSendTableau()
+			OnSendTableau(true)
 			SendMessage('Draw available');
 		end
 		, btnSendTableau);
+	dlgTableau:Bind(eventType.MENU, 
+		function(evt)
+			OnSendTableau(false)
+			SendMessage('Participants list');
+		end
+		, btnSendParticipants);
 	dlgTableau:Bind(eventType.MENU, 
 		function(evt)
 			local msg = "Cliquer sur Oui pour Renvoyer tous les dossards à la FIS.";
@@ -3575,7 +3584,7 @@ function main(params_c)
 	draw.height = display:GetSize().height - 30;
 	draw.x = 0;
 	draw.y = 0;
-	scrip_version = "4.96"; -- 4.92 pour 2022-2023
+	scrip_version = "4.97"; -- 4.92 pour 2022-2023
 	if app.GetVersion() >= '4.4c' then 
 		-- vérification de l'existence d'une version plus récente du script.
 		-- Ex de retour : LiveDraw=5.94,Matrices=5.92,TimingReport=4.2
