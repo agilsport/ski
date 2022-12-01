@@ -254,7 +254,11 @@
   </panel>
   <!-- Participants - par nations -->
   <report id="parti_factorise" title="Entry List By " first_header="0">
-    <lua>dofile('./interface/adv.lua');</lua>
+    <lua>dofile('./interface/adv.lua');
+		if params.Title then
+			title = params.Title;
+		end
+	</lua>
     <lua>rupture = params.Rupture; label = params.Rupture; title = title..label; body:SetCounter(rupture); if rupture ~= 'Nation' then body:SetCounter('Nation'); end orderby = rupture..", Sexe, Point, Nom, Prenom"; somme_rupture = 0; nb_etrangers = 0; bolAjouter = false; comite = {};</lua>
     <header>
       <spacing all="0"/>
