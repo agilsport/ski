@@ -728,6 +728,44 @@ function OnPrintBibo(groupe)
 	});
 end
 
+function OnPrintTop75()
+	local tDraw_Copy = tDraw:Copy();
+	tDraw_Copy:OrderBy('Nation, FIS_pts');
+	local fis_pts = -1;
+	local fis_clt = 10000;
+	for i = tDraw_Copy:GetNbRows() -1, 0, -1 do
+		local fis_pts = tDraw_Copy:GetCellDouble('FIS_pts', i, -1);
+		if fis_pts >= 0 then
+			fis_clt = tDraw_Copy:GetCellInt('FIS_clt', i, -1);
+			if fis_clt > 75 then
+				tDraw_Copy:RemoveRowAt(i);
+			end
+		else
+			tDraw_Copy:RemoveRowAt(i);
+		end
+	end
+	local title = "TOP 75 / "..draw.discipline.." FIS Points ordered by ";
+	report = wnd.LoadTemplateReportXML({
+		xml = './process/dossard_LiveDraw.xml',
+		node_name = 'root/report',
+		node_attr = 'id',
+		node_value = 'parti_factorise',
+		base = base,
+		body = tDraw_Copy,
+		margin_first_top = 80,
+		margin_first_left = 80,
+		margin_first_right = 80,
+		margin_first_bottom = 80,
+		margin_top = 80,
+		margin_left = 80, 
+		margin_right = 80,
+		margin_bottom = 80,
+		paper_orientation = 'portrait',
+		params = {Title = title ,Evenement_nom = tEvenement:GetCell('Nom', 0), EstCE = estce, EstVitesse = vitesse, Rupture = 'Nation', Version = scrip_version}
+	});
+	
+end
+
 function OnOrder()
 	if draw.bolInit then
 		draw.build_table = true;
@@ -2854,10 +2892,9 @@ function OnAfficheTableau()
 	menuRAZ:AppendSeparator();
 	btnRAZDossardBibo = menuRAZ:Append({label="RAZ des dossards du BIBO", image ="./res/32x32_clear.png"});
 	tbTableau:SetDropdownMenu(btnMenuRAZ:GetId(), menuRAZ);
-	
 	tbTableau:AddSeparator();
-	btnMenuSend = tbTableau:AddTool("Envois", "./res/32x32_send.png",'', itemKind.DROPDOWN);
 
+	btnMenuSend = tbTableau:AddTool("Envois", "./res/32x32_send.png",'', itemKind.DROPDOWN);
 	menuSend = menu.Create();
 	btnSendParticipants = menuSend:Append({label="Envoi des participants", image ="./res/32x32_send.png"});
 	menuSend:AppendSeparator();
@@ -2868,8 +2905,8 @@ function OnAfficheTableau()
 	btnSendStartList = menuSend:Append({label="Envoi de la liste de départ", image ="./res/32x32_send.png"});
 	menuSend:AppendSeparator();
 	tbTableau:SetDropdownMenu(btnMenuSend:GetId(), menuSend);
-
 	tbTableau:AddSeparator();
+
 	btnValider = tbTableau:AddTool("Validations", "./res/32x32_send.png",'', itemKind.DROPDOWN);
 	menuValider = menu.Create();
 	btnValiderSelection = menuValider:Append({label="Validation des coureurs filtrés", image ="./res/32x32_down.png"});
@@ -2881,8 +2918,8 @@ function OnAfficheTableau()
 	btnInvaliderCoureurs = menuValider:Append({label="Revenir au statut Non Validé", image ="./res/32x32_dialog_ko.png"});
 	menuValider:AppendSeparator();
 	tbTableau:SetDropdownMenu(btnValider:GetId(), menuValider);
-		
 	tbTableau:AddSeparator();
+
 	btnMenuPrint = tbTableau:AddTool("Impressions", "./res/32x32_printer.png",'', itemKind.DROPDOWN);
 	menuPrint = menu.Create();
 	menuPrint:AppendSeparator();
@@ -2902,9 +2939,11 @@ function OnAfficheTableau()
 	menuPrint:AppendSeparator();
 	btnPrintFeuilleTirage = menuPrint:Append({label="Impression de la feuille de tirage", image ="./res/32x32_printer.png"});
 	menuPrint:AppendSeparator();
+	btnPrintTop75 = menuPrint:Append({label="Impression du TOP 75 en points FIS", image ="./res/32x32_printer.png"});
+	menuPrint:AppendSeparator();
 	tbTableau:SetDropdownMenu(btnMenuPrint:GetId(), menuPrint);
-
 	tbTableau:AddSeparator();
+
 	btnOutils = tbTableau:AddTool("Outils", "./res/32x32_tools.png",'', itemKind.DROPDOWN);
 	menuOutils = menu.Create();
 	menuOutils:AppendSeparator();
@@ -2940,8 +2979,8 @@ function OnAfficheTableau()
 
 	tbTableau:AddSeparator();
 	btnClose = tbTableau:AddTool("Quitter", "./res/32x32_exit.png");
+
 	tbTableau:AddStretchableSpace();
-	
  	tbTableau:Realize();
 
 	tbTableau:EnableTool(btnMenuSend:GetId(), draw.state);
@@ -2961,6 +3000,11 @@ function OnAfficheTableau()
 	if draw.bolVitesse then
 		if draw.bolEstCE or draw.bolEstNC == true then
 			menuOutils:Enable(btnTirageVitesse1530:GetId(), true);
+		end
+	end
+	if not draw.bolEstCE then
+		if draw.bolEstCE or draw.bolEstNC == true then
+			menuPrint:Enable(btnPrintTop75:GetId(), false);
 		end
 	end
 	ChecktDraw();
@@ -3013,6 +3057,7 @@ function OnAfficheTableau()
 			OnRAZData('All')
 		end, btnRAZAll);
 	dlgTableau:Bind(eventType.MENU, OnPrintBibo, btnPrintFeuilleTirage);
+	dlgTableau:Bind(eventType.MENU, OnPrintTop75, btnPrintTop75);
 	dlgTableau:Bind(eventType.MENU, 
 		function(evt)
 			ChecktDraw();
@@ -3584,7 +3629,7 @@ function main(params_c)
 	draw.height = display:GetSize().height - 30;
 	draw.x = 0;
 	draw.y = 0;
-	scrip_version = "4.97"; -- 4.92 pour 2022-2023
+	scrip_version = "4.98"; -- 4.92 pour 2022-2023
 	if app.GetVersion() >= '4.4c' then 
 		-- vérification de l'existence d'une version plus récente du script.
 		-- Ex de retour : LiveDraw=5.94,Matrices=5.92,TimingReport=4.2
