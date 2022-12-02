@@ -29,9 +29,13 @@ end
 
 
 function CreateDeviceFis()
-	if not app.FileExists('./res/tr/xmlHomologatedDevices.xml') then
+	local csvfile = './res/tr/FIS-Timing-Devices.csv'
+	if not app.FileExists(csvfile) then
 		return;
 	end
+	-- if not app.FileExists('./res/tr/xmlHomologatedDevices.xml') then
+		-- return;
+	-- end
 
 	-- OK au 12/11/2019
 	Device_FIS = sqlTable.Create('Device_FIS');
@@ -46,18 +50,50 @@ function CreateDeviceFis()
 	AddRowDeviceFIS('-', 'Timer', '', '', '', '');
 	AddRowDeviceFIS('-', 'Photocell', '', '', '', '');
 	AddRowDeviceFIS('-', 'Start', '', '', '', '');
+	local updatefile = './tmp/updatesPG.txt';
+	local ligne = 0;
+	-- Companyname;Codex;untilseason;Devicemodel;Comments;Description;valid	if app.FileExists(updatefile) then
+	-- AddRowDeviceFIS(brand, device, model, homologationnumber, validuntil, comment)					
+	-- AGIL;AGI.078T.09;2027;IMHP 870;With external printer;Timer;1
+		local f = io.open(csvfile, 'r')
+		for lines in f:lines() do
+			ligne = ligne + 1;
+			alire = lines;
+			if ligne > 0 then
+				tData = alire:Split(';');
+				local brand = tData[1];
+				local homologation = tData[2];
+				local valid = tonumber(tData[3]) or 0;
+				local model = tData[4];
+				local comment = tData[5];
+				local device = tData[6];
+				device = string.gsub(device, ' cell', '');
+				device = string.gsub(device, ' door', '');
+				device = string.gsub(device, ' gate', '');
+				local ok = tonumber(tData[7]) or 0;
+				if ok == 1 then
+					AddRowDeviceFIS(brand, device, model, homologation, valid, comment);
+				end
+			end
+			
+		end
+		io.close(f);
+
+	
 	
 --lecture du fichier XML des devices et transformation en table MySQL
-	local xml_devices = './res/tr/xmlHomologatedDevices.xml';
-	local doc = xmlDocument.Create(xml_devices);
-	local xmlDevices = doc:SaveString();
-	local root = doc:GetRoot();
-	TR.Device_FIS = {};
-	if root ~= nil then
-		Device.Commentaire = nil;
-		LectureDeviceFIS(root);	-- lecture des devices depuis le xml des devices FIS
-	end
-	doc:Delete();
+
+	-- local xml_devices = './res/tr/xmlHomologatedDevices.xml';
+	-- local doc = xmlDocument.Create(xml_devices);
+	-- local xmlDevices = doc:SaveString();
+	-- local root = doc:GetRoot();
+	-- TR.Device_FIS = {};
+	-- if root ~= nil then
+		-- Device.Commentaire = nil;
+		-- LectureDeviceFIS(root);	-- lecture des devices depuis le xml des devices FIS
+	-- end
+	-- doc:Delete();
+	
 	Device_FIS:OrderBy('Brand','Model');
 	
 	Brand_Timer = Device_FIS:Copy();
@@ -66,7 +102,7 @@ function CreateDeviceFis()
 	
 	Brand_Photocell = Device_FIS:Copy();
 	ReplaceTableEnvironnement(Brand_Photocell, 'Brand_Photocell');
-	Brand_Photocell:Filter("$(Device):In('Photocell')", true)
+	Brand_Photocell:Filter("$(Device):In('Photo')", true)
 
 	Brand_Start = Device_FIS:Copy();
 	ReplaceTableEnvironnement(Brand_Start, 'Brand_Start');
@@ -457,7 +493,7 @@ function ControlData();
 	return bolOK;
 end
 
-function PopulateCombo()
+function PopulateCombo(lectureXML)
 	OnChangeComboBrand('timersystemA_Brand', 'Timer')
 	OnChangeComboBrand('timersystemB_Brand', 'Timer')
 	OnChangeComboBrand('timer_startsystemA_Brand', 'Timer')
@@ -465,6 +501,9 @@ function PopulateCombo()
 	OnChangeComboBrand('finishcellssystemA_Brand', 'Photocell')
 	OnChangeComboBrand('finishcellssystemB_Brand', 'Photocell')
 	OnChangeComboBrand('startdevice_Brand', 'Start')
+	if lectureXML then
+		SetValuesPage1();
+	end
 end
 
 
@@ -491,19 +530,21 @@ function LectureDeviceFIS(node)
 	LectureDeviceFIS(node:GetNext());
 end
 
+function LectureDevicesFisXML()
+end
+
 function LectureXML(node)
 	if node == nil then
 		return
 	end
 	racine = racine or "";
-	-- adv.Alert('node:GetName() = '..node:GetName());
 	if node:GetName() == "Jury" then
-		if node:GetAttribute("Function") == "Technicaldelegate" then
-			-- adv.Alert('node:GetAttribute("Function") = '..node:GetAttribute("Function"));
+		if string.lower(node:GetAttribute("Function")) == "technicaldelegate" then
 			racine = "technicaldelegate_";
-		elseif node:GetAttribute("Function") == "Chiefoftiming" then
+		elseif string.lower(node:GetAttribute("Function")) == "chiefoftiming" then
 			racine = "chiefoftiming_";
 		end
+		-- adv.Alert('racine jury = '..racine);
 	elseif node:GetName() == "Timekeeper" then
 		racine = "timekeeper_";
 	elseif node:GetName() == "Software" then
@@ -559,7 +600,7 @@ function LectureXML(node)
 				col = racine..child:GetParent():GetName();
 				-- adv.Alert("TR."..col.." = TR."..col.." or '';");
 				TR[col] = child:GetContent();
-				-- adv.Alert("TR["..col.."] = "..TR[col].." = "..child:GetContent());
+				-- adv.Alert('racine = '..racine..", child:GetType() == 3, TR["..col.."] = "..TR[col]);
 			else
 				if node:GetName() ~= "Net" and node:GetName() ~= "Hand"  then
 					col = racine..child:GetParent():GetName();
@@ -568,7 +609,7 @@ function LectureXML(node)
 					col = racine..node:GetParent():GetName().."_"..node:GetName();
 					TR[run][col] = child:GetContent();
 				end
-				-- adv.Alert("TR["..run.."]["..col.."] = "..child:GetContent());
+				-- adv.Alert('racine = '..racine..", on est dans un run, child:GetType() == 3, TR["..run.."]["..col.."]");
 				-- adv.Alert("TR["..run.."]."..col.." = TR["..run.."]."..col.." or '';");
 			end
 		end
@@ -631,6 +672,7 @@ end
 
 function GetCartouche();
 	if Epreuve:GetCell("Code_entite", 0) ~= "FIS" or TR.code_activite ~= "ALP" then
+		TR.errormessage = TR.errormessage or '';
 		TR.errormessage = TR.errormessage.."La course n'a pas une entité FIS ou n'est pas Alpine !!\n";
 		TR.OK = false
 		return;
@@ -794,18 +836,21 @@ function GetDataPage2()
 		
 end
 
-function OnChangeComboBrand(combobrand, device)
+function OnChangeComboBrand(ctrlComboBrand, device)
 	-- timersystemA_Brand  
 	-- timersystemA_Homologation
-	local brand = dlgPage1:GetWindowName(combobrand):GetValue();
+	if TR[ctrlComboBrand] then
+		dlgPage1:GetWindowName(ctrlComboBrand):SetValue(TR[ctrlComboBrand]);
+	end
+	local brand = dlgPage1:GetWindowName(ctrlComboBrand):GetValue();
 	if brand:len() == 0 then
 		return;
 	end
 	local filter = "$(Brand):In('"..brand.."') and $(Device):In('"..device.."')";
 	local Device_FIS_Filtre = Device_FIS:Copy();
 	Device_FIS_Filtre:Filter(filter, true);
-	local cmodel = string.gsub(combobrand,'Brand', 'Model');
-	local chomologation = string.gsub(combobrand,'Brand', 'Homologation');
+	local cmodel = string.gsub(ctrlComboBrand,'Brand', 'Model');
+	local chomologation = string.gsub(ctrlComboBrand,'Brand', 'Homologation');
 	dlgPage1:GetWindowName(cmodel):Clear();
 	for i = 0, Device_FIS_Filtre:GetNbRows() -1 do
 		dlgPage1:GetWindowName(cmodel):Append(Device_FIS_Filtre:GetCell("Model", i));
@@ -965,7 +1010,7 @@ function main(params)
 	TR.x = 0;
 	TR.y = 0;
 
-	scrip_version = "4.3"; 
+	scrip_version = "4.5"; 
 	-- vérification de l'existence d'une version plus récente du script.
 -- Ex de retour : LiveDraw=5.94,Matrices=5.92,TimingReport=4.3,DoubleTirage=3.2,TirageOptions=3.3,TirageER=1.7,ListeMinisterielle=2.3,KandaHarJunior=2.0
 	if app.GetVersion() >= '4.4c' then 
@@ -995,6 +1040,7 @@ function main(params)
 	-- en FIS, il n'y a qu'une seule épreuve
 	OpenTables(TR.code_evenement);
 	TR.nombre_de_manche = Epreuve:GetCellInt("Nombre_de_manche", 0);
+	-- adv.Alert('TR.nombre_de_manche  = '..TR.nombre_de_manche);
 	TR.saison = tonumber(Epreuve:GetCell("Code_saison", 0)) or 0;
 	
 	base:TableLoad(Resultat_Chrono, "Select * From Resultat_Chrono Where Code_evenement = "..TR.code_evenement);
@@ -1221,7 +1267,6 @@ function SetValuesPage1()
 	dlgPage1:GetWindowName('technicaldelegate_Nation'):SetValue(TR.technicaldelegate_Nation);
 	dlgPage1:GetWindowName('technicaldelegate_Number'):SetValue(TR.technicaldelegate_Number);
 	dlgPage1:GetWindowName('technicaldelegate_Email'):SetValue(TR.technicaldelegate_Email);
-
 	dlgPage1:GetWindowName('timersystemA_Brand'):SetValue(TR.timersystemA_Brand);
 	dlgPage1:GetWindowName('timersystemA_Model'):SetValue(TR.timersystemA_Model);
 	dlgPage1:GetWindowName('timersystemA_Serial'):SetValue(TR.timersystemA_Serial);
@@ -1332,17 +1377,20 @@ function AfficheDialog1()
 		
 	-- local TR.doc = xmlDocument.Create("./edition/2019AL1245TR.xml");
 	if app.FileExists('./edition/TRini.xml') then
+		-- adv.Alert('----------------- lecture de TRini.xml\n')
 		TR.XML = app.GetPath().."/edition/TRini.xml";
 		TR.doc = xmlDocument.Create(TR.XML);
 		if TR.doc ~= nil then
 			local root = TR.doc:GetRoot();
 			if root ~= nil then
+				racine = '';
 				LectureXML(root);	-- lecture du TRini.xml
 				GetCartouche();
 				ControlData();				
 			end
 			TR.doc.Delete();
 		end
+		-- adv.Alert('\n----------------- fin de lecture de TRini.xml\n')
 	end
 	if not app.FileExists('./res/tr/ETS2.jpg') then
 		local msg = "Voulez-vous télécharger les images manquantes des appareils homologués ?";
@@ -1355,7 +1403,7 @@ function AfficheDialog1()
 	GetCartouche();
 	ControlData();  
 	SetValuesPage1();
-	PopulateCombo();
+	PopulateCombo(false);
 	
 	-- Toolbar Principale ...
 	local tbpage1 = dlgPage1:GetWindowName('tbpage1');
@@ -1398,8 +1446,10 @@ function AfficheDialog1()
 				if TR.doc ~= nil then
 					local root = TR.doc:GetRoot();
 					if root ~= nil then
+						-- adv.Alert('\n-------------- lecture de '..TR.XML..'\n');
+						racine = '';
 						LectureXML(root);	-- lecture du TRini.xml
-						PopulateCombo();
+						PopulateCombo(true);
 						GetCartouche();
 						ControlData();  
 						SetValuesPage1();

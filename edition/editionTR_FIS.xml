@@ -6,7 +6,7 @@
 		<row value="25px" />
 		<font name="Calibri" size="10" weight="bold" color="black" adjust="best" />
 		<background mode="solid" />
-		<textctrl row="300px" col_start="3" name="page0Text" style="TE_READONLY|TE_MULTILINE" />
+		<textctrl row="400px" col_start="3" name="page0Text" style="TE_READONLY|TE_MULTILINE" />
 		<row value="5px" />
 		<staticbox row_start="1" row_end="0" col_start="2" col_end="4" label = "Création du Timing Report FIS" />
 		<row value="1" />
