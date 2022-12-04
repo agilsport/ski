@@ -28,6 +28,7 @@
 			<menu title="Résultats Relais - Equipier Paysage" image="./res/16x16_juges.png" id="res_relais_equipier" choix_manche="1" mode_lap="1" first_header="0" />
 			<menu title="Edition des Qualifiés Team-Sprint" image="./res/16x16_bib.png" id="res_qualif_TeamSprint" qualif_critere="1" />
 			<!-- <menu title="Edition Finales Team-Sprint" image="./res/16x16_bib.png" id="res_TeamSprint" /> -->
+			
 			<!-- <menu title="Tours (1-a)" image="./res/16x16_official.png" id="res_Tour" DossardRelais="Lettre" /> -->
 		</menu>
 	</menu>
