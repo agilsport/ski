@@ -84,10 +84,10 @@
 		<text row="auto" col="1" align="center">$(Evenement.Nom)</text>
 		<text row="auto" align="center">$(Discipline.Libelle)</text>
 		<text row="auto" align="center" cond="id == 'res_er'">groupe</text>
+		<text row="auto" align="center" cond="id ~= 'res_er' and id ~= 'res_er_groupe' and base:GetTable('Epreuve'):GetNbRows() ~= 1">'Résultats Scratch Toutes Catégories'</text>
+		<text row="auto" align="center" cond="id ~= 'res_er' and base:GetTable('Epreuve'):GetNbRows() == 1">$(Categorie{$(Epreuve.Code_categorie)}.Libelle)..' - '..$(Sexe{$(Epreuve.Sexe)}.Libelle)</text>
 		<text row="auto" align="center" cond="title" >title</text>
 		<text row="auto" align="center" cond="title_filter">title_filter</text>
-		<text row="auto" align="center" cond="not title_filter and string.find(id,'res_') and base:GetTable('Epreuve'):GetNbRows() &gt; 1">'Résultats Scratch Toutes Catégories'</text>
-		<text row="auto" align="center" cond="id ~= 'res_er' and base:GetTable('Epreuve'):GetNbRows() == 1">$(Categorie{$(Epreuve.Code_categorie)}.Libelle)..' - '..$(Sexe{$(Epreuve.Sexe)}.Libelle)</text>
 		<row value="0.5cm"/>
 	</header>
 
@@ -348,6 +348,7 @@
 
 		<body>
 			<call option="couleur_alternee" file="./edition/options.xml" />
+			<font size="9" adjust="ellipsize"/>
 
 			<row value="2cm"/>
 			<text col="7" align="center" label="Code"><font size="8" cond="group =='body'"/>$(Code_coureur):sub(4)</text>
@@ -357,7 +358,7 @@
 			<text col="7" align="center" label="Cat.">$(Categ)</text>
 			<text col="4" align="center" label="Nat" cond="entite == 'FIS'">$(Nation)</text>
 			<text col="3" align="center" label="CS">$(Comite)</text>
-			<text col="12" align="center" label="Club">$(Club)</text>
+			<text col="12" label="Club">$(Club)</text>
 			<text col="7" align="center" label="Point">$(Point)</text>
 			<padding all="10px" />
 			<qrcode col="2cm" cond="entite == 'FIS'" >'https://www.fis-ski.com/DB/alpine-skiing/biographies.html?fiscode='..string.sub($(Code_coureur),4)..'&amp;search=true'</qrcode>
@@ -375,6 +376,7 @@
 
 		<body>
 			<call option="couleur_alternee" file="./edition/options.xml" />
+			<font size="9" adjust="ellipsize"/>
 			<row value="auto"/>
 			<text col="7" align="center" label="Code"><font size="8" cond="group =='body'"/>$(Code_coureur):sub(4)</text>
 			<text col="20" align="left" label="Nom - Prénom" font_weight="bold" font_size_step="1">$(Identite)</text> 
@@ -383,7 +385,7 @@
 			<text col="7" align="center" label="Cat.">$(Categ)</text>
 			<text col="4" align="center" label="Nat" cond="entite == 'FIS'">$(Nation)</text>
 			<text col="3" align="center" label="CS">$(Comite)</text>
-			<text col="12" align="center" label="Club">$(Club)</text>
+			<text col="12" label="Club">$(Club)</text>
 			<text col="7" align="center" label="Point">$(Point)</text>
 			<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
 		</body>
@@ -444,6 +446,7 @@
 				clt = base:GetClassementCoureur($(Code_coureur)):GetCell('Clt',0);
 				</lua>
 			<call option="couleur_alternee" file="./edition/options.xml" />
+			<font size="9" adjust="ellipsize"/>
 
 			<row value="auto"/>
 			<text col="7" align="center" label="Code"><font size="8" cond="group =='body'"/>$(Code_coureur):sub(4)</text>
@@ -453,7 +456,7 @@
 			<text col="5" align="center" label="Cat.">$(Categ)</text>
 			<text col="4" align="center" label="Nat" cond="entite == 'FIS'">$(Nation)</text>
 			<text col="5" align="center" label="CS" >GetComiteOrigine($(Code_coureur),$(Comite))</text>
-			<text col="12" align="center" label="Club" >$(Club)</text>
+			<text col="12" label="Club" >$(Club)</text>
 			<text col="7" align="center" label="Clt" cond="entite == 'FIS'">clt</text>
 			<text col="7" align="center" label="Points" cond="entite == 'FIS'">$(Point)</text>
 			
@@ -534,29 +537,20 @@
 			<line row_start="4" col_start="1" col_end="0" pen_size="1" border="bottom" cond="x &lt; 5 and not _context_border"/>
 			<lua>if x == 5 then x = 0; end</lua>
 		</body>
-				<!-- for i = 0, body:GetNbRows() -1 do -->
-					<!-- tps1 = body:GetCellInt('Tps1', i); -->
-					<!-- tps2 = body:GetCellInt('Tps2', i); -->
-					<!-- tps_min = math.min(tps1, tps2); -->
-					<!-- if tps_min &lt; 0 then -->
-					<!-- else -->
-					<!-- end -->
-				<!-- end -->
 	</report>
 
 	
 	<!-- Liste de départ Officielle -->
 	<report id="lst_officiel" title="('Liste de Départ Officielle Manche '..manche)">
-		<lua>dofile('./interface/adv.lua')</lua>
-		<lua>dofile('./interface/interface.lua')</lua>
-		<lua>bolM1M2 = 0; if manche == 3 and body:GetCell('Info3', 0) == 'M1_M2' then bolM1M2 = 1; end</lua>
 		<lua>entite = $(Evenement.Code_entite)</lua>
-		<order key="('Rang'..manche..', Dossard')" />
 		
+		<order key="('Rang'..manche..', Dossard')" />
+
 		<body>
 			<call option="couleur_alternee" file="./edition/options.xml" />
 			<font size="9" adjust="ellipsize"/>
-			<row h="auto" />
+
+			<row h="auto"/>
 			<text col="4" cond="body:GetCellInt('Rang'..manche, row) &gt; 0" align="right" label="Rang" font_weight="bold">body:GetCellInt('Rang'..manche, row)</text>
 			<text col="4" align="center" label="Dos" font_weight="bold" font_size_step="1">$(Dossard)</text>
 			<text col="4" align="center" label="Gr." cond="$(Reserve):len() &gt; 0">$(Reserve)</text>
@@ -567,7 +561,7 @@
 			<text col="5" align="center" label="Cat.">$(Categ)</text>
 			<text col="4" align="center" label="Nat" cond="entite == 'FIS'">$(Nation)</text>
 			<text col="3" align="center" label="CS">$(Comite)</text>
-			<text col="12" align="center" label="Club">$(Club)</text>
+			<text col="12" label="Club">$(Club)</text>
 			<text col="7" align="center" label="Point">$(Point)</text>
 			<lua>if manche == 2 then</lua>
 				<text col="7" align="center" label="Tps.M1" font_weight="bold">$(Tps1)</text>
@@ -575,14 +569,7 @@
 				<text col="5" align="center" cond="$(Diff1):sub(1,1) ~= '+'" label="Ec.M1">''</text>
 				<text col="4" align="center" label="C.M1" font_weight="bold">$(Clt1)</text>
 			<lua>end</lua>
-			<lua>if bolM1M2 == 1 then</lua>
-				<text col="7" align="center" label="Tps M1+M2" font_weight="bold">$(Tps_bonus3)</text>
-				<text col="5" align="center" cond="$(Tps_penalite):sub(1,1) ~= '0'" label="Ecart">$(Tps_penalite3)</text>
-				<text col="5" align="center" cond="$(Tps_penalite):sub(1,1) == '-' or $(Tps_penalite):sub(1,1) == '0'" label="Ecart">''</text>
-				<text col="4" align="center" cond="$(Medaille3) ~= '0'" label="Clt" font_weight="bold">$(Medaille3)</text>
-				<text col="4" align="center" cond="$(Medaille3) == '0'" label="Clt" font_weight="bold">''</text>
-			<lua>end</lua>
-			<text row="auto" col_start="1" col_end="0" cond="row &lt; body:GetNbRows() -1 and body:GetCell('Sexe',row) ~= body:GetCell('Sexe',row +1)"><background color="white" mode="solid"/>''</text>
+			
 			<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
 		</body>
 	</report>
@@ -628,7 +615,7 @@
 			<text col="5" align="center" label="Cat.">$(Categ)</text>
 			<text col="4" align="center" label="Nat" cond="entite == 'FIS'">$(Nation)</text>
 			<text col="5" align="center" label="CS">GetComiteOrigine($(Code_coureur),$(Comite))</text>
-			<text col="12" align="center" label="Club">$(Club)</text>
+			<text col="12" label="Club">$(Club)</text>
 			<text col="7" align="center" label="Point">$(Point)</text>
 			<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
 		</body>
@@ -666,7 +653,7 @@
 			<text col="6" align="left" label="Nat" font_style="italic" cond="entite == 'FIS'">$(Nation)</text>
 			<image col_start="0" adjust="height" align="right" border="0" cond="entite == 'FIS'"><background mode="transparent"/>app.ImageNation($(Nation))</image> 
 			<text col="3" align="center" label="CS" font_style="italic">$(Comite)</text>
-			<text col="12" align="center" label="Club" font_style="italic">$(Club)</text>
+			<text col="12" label="Club" font_style="italic">$(Club)</text>
 			<lua>for inter=1,nb_inter do</lua>
 				<lua>infoInter = body:GetCell('Tps'..manche..'_inter'..inter, row)</lua>
 				<lua>if string.len(infoInter) ~= 0 then infoInter = infoInter..' ('..body:GetCell('Clt'..manche..'_inter'..inter, row)..')' end</lua>
@@ -712,13 +699,13 @@
 			<text col="4" align="center" label="Clt" font_weight="bold" font_size_step="1">$(Clt)</text>
 			<text col="4" align="center" label="Dos" font_style="italic">$(Dossard)</text>
 			<text col="7" align="center" label="Code"><font size="8" cond="group =='body'"/>$(Code_coureur):sub(4)</text>
-			<text col="16" align="left" label="Nom - Prénom" font_weight="bold"><font adjust="ellipsize"/>$(Identite)</text> 
+			<text col="16" align="left" label="Nom - Prénom" font_weight="bold">$(Identite)</text> 
 			<text col="2" align="center" label="S." cond="entite == 'FFS'">$(Sexe)</text>
 			<text col="4" align="center" label="An">$(An)</text>
 			<text col="4" align="center" label="Nat." cond="entite == 'FIS'" font_style="italic">$(Nation)</text>
 			<!-- <image col_start="0" adjust="height" align="right" border="0" cond="entite == 'FIS'"><background mode="transparent"/>app.ImageNation($(Nation))</image>  -->
 			<text col="3" align="center" label="CS" font_style="italic">$(Comite)</text>
-			<text col="10" align="center" label="Club" font_style="italic">$(Club)</text>
+			<text col="10" label="Club" font_style="italic">$(Club)</text>
 			
 			<lua>if nb_manche &gt; 1 then</lua>
 				<lua>for m=1,nb_manche do</lua>
@@ -803,13 +790,13 @@
 			<text col="4" align="center" label="Dos" font_style="italic">$(Dossard)</text>
 			<text col="4" align="center" label="GR." cond="$(Reserve):len() &gt; 0" font_style="italic">$(Reserve)</text>
 			<text col="7" align="center" label="Code"><font size="8" cond="group =='body'"/>$(Code_coureur):sub(4)</text>
-			<text col="16" align="left" label="Nom - Prénom" font_weight="bold"><font adjust="ellipsize"/>$(Identite)</text> 
+			<text col="16" align="left" label="Nom - Prénom" font_weight="bold">$(Identite)</text> 
 			<text col="2" align="center" label="S." cond="entite == 'FFS'">$(Sexe)</text>
 			<text col="4" align="center" label="An">$(An)</text>
 			<text col="4" align="center" label="Nat." cond="entite == 'FIS'" font_style="italic">$(Nation)</text>
 			<!-- <image col_start="0" adjust="height" align="right" border="0" cond="entite == 'FIS'"><background mode="transparent"/>app.ImageNation($(Nation))</image>  -->
 			<text col="3" align="center" label="CS" font_style="italic">$(Comite)</text>
-			<text col="10" align="center" label="Club" font_style="italic">$(Club)</text>
+			<text col="10" label="Club" font_style="italic">$(Club)</text>
 			
 			<lua>if nb_manche &gt; 1 then</lua>
 				<lua>for m=1,nb_manche do</lua>
@@ -893,7 +880,7 @@
 				<!-- <image col_start="0" adjust="height" align="right" border="0" cond="entite == 'FIS'"><background mode="transparent"/>app.ImageNation($(Nation))</image>  -->
 
 				<text col="3" align="center" label="CS" cond="entite == 'FFS'">$(Comite)</text>
-				<text col="12" align="center" label="Club" cond="entite == 'FFS'">$(Club)</text>
+				<text col="12" label="Club" cond="entite == 'FFS'">$(Club)</text>
 				<lua>if nb_manche &gt;1 then </lua>
 					<lua>for m=1,nb_manche do</lua>
 						<lua>if group == 'body' then</lua>
@@ -950,7 +937,7 @@
 				<!-- <image col_start="0" adjust="height" align="right" border="0" cond="entite == 'FIS'"><background mode="transparent"/>app.ImageNation($(Nation))</image>  -->
 
 				<text col="3" align="center" label="CS" cond="entite == 'FFS'">$(Comite)</text>
-				<text col="12" align="center" label="Club" cond="entite == 'FFS'">$(Club)</text>
+				<text col="12" label="Club" cond="entite == 'FFS'">$(Club)</text>
 				<lua>if nb_manche &gt;1 then </lua>
 					<lua>for m=1,nb_manche do</lua>
 						<lua>if group == 'body' then</lua>
@@ -997,7 +984,7 @@
 			<text col="4" align="center" label="An">$(An)</text>
 			<text col="4" align="center" label="Nat" cond="entite == 'FIS'">$(Nation)</text>
 			<text col="2" align="center" label="CR" cond="entite == 'FFS'">$(Comite)</text>
-			<text col="12" align="center" label="CR" cond="entite == 'FFS'">$(Club)</text>
+			<text col="12" label="CR" cond="entite == 'FFS'">$(Club)</text>
 			<lua>for m=1,nb_manche do</lua>
 				<text col="6" align="right" label="('Tps.M'..m)" cond="nb_manche ~= 1"><font size_step="-1" cond="group == 'body'" />body:GetCell('Tps'..m,row)</text> 
 			<lua>end</lua>
