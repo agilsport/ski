@@ -3686,7 +3686,7 @@ function main(params_c)
 	draw.height = display:GetSize().height - 30;
 	draw.x = 0;
 	draw.y = 0;
-	scrip_version = "5.0"; -- 4.92 pour 2022-2023
+	scrip_version = "5.1"; -- 4.92 pour 2022-2023
 	if app.GetVersion() >= '4.4c' then 
 		-- vérification de l'existence d'une version plus récente du script.
 		-- Ex de retour : LiveDraw=5.94,Matrices=5.92,TimingReport=4.2
