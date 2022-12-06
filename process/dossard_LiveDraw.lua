@@ -2392,18 +2392,12 @@ Groupe 6 On poursuit selon les points FIS.
 	params.nb_groupe2 = 0;
 	local ecsl_pts = -1;
 	local fis_pts = -1;
-	local ecsl_pts_encours = nil;
-	local fis_pts_encours = nil;
 	draw.rang_tirage = 0;
 	tDrawG1:OrderBy('ECSL_points DESC, FIS_pts');	-- départage des exaequos ECSL par les pts FIS
 	if tDrawG1:GetNbRows() > 0 then
 		for i = 0, tDrawG1:GetNbRows() -1 do		-- On est forcément en Coupe d'Europe sinon tDrawG1 est vide
 			local ecsl_pts = tDrawG1:GetCellInt('ECSL_points', i);
 			local fis_pts = tDrawG1:GetCellDouble('FIS_pts', i);
-			if i == 0 then
-				ecsl_pts_encours = ecsl_pts;
-				fis_pts_encours = fis_pts;
-			end
 			local code_coureur = tDrawG1:GetCell('Code_coureur', i);
 			local r = tDraw:GetIndexRow('Code_coureur', code_coureur);
 			if draw.bolVitesse == true then
@@ -2417,10 +2411,6 @@ Groupe 6 On poursuit selon les points FIS.
 			end
 			tDraw:SetCell('ECSL_30', r, 1);
 			tDraw:SetCell('Groupe_tirage', r, current_group);
-
-			ecsl_pts_encours = ecsl_pts;
-			fis_pts_encours = fis_pts;
-
 			tDraw:SetCell('TG', r, 'tDrawG1');
 			tDraw:SetCell('Pris', r, 1);
 			tDraw:SetCell('ECSL_30', r, 1);
@@ -2557,15 +2547,6 @@ Groupe 6 On poursuit selon les points FIS.
 				tDrawG5:SetCell('Rang_tirage', i, draw.rang_tirage);
 				tDraw:SetCell('Critere', rtDraw, string.format('%03d', draw.rang_tirage));
 				draw.nb_pris_ecsl = draw.nb_pris_ecsl + 1;
-				if draw.nb_pris_ecsl == 30 then
-					if i < tDrawG5:GetNbRows() -1 then
-						if tDrawG5:GetCellInt('ECSL_points', i) == tDrawG5:GetCellInt('ECSL_points', i + 1) then
-							draw.nb_pris_ecsl = 29;
-							exaequo = exaequo + 1;
-						end
-					end
-				end
-				-- adv.Alert('On traite tDrawG5, on prend '..tDrawG5:GetCell('Nom', i)..', ECSL_points = '..tDraw:GetCellInt('ECSL_points', i)..', draw.nb_pris_ecsl = '..draw.nb_pris_ecsl..', draw.rang_tirage = '..draw.rang_tirage);
 				local r = tDrawG4:GetIndexRow('Code_coureur', code_coureur);
 				if r >= 0 then		-- on trouve le coureur
 					tDrawG4:RemoveRowAt(r);
@@ -2574,19 +2555,24 @@ Groupe 6 On poursuit selon les points FIS.
 				if r >= 0 then		-- on trouve le coureur
 					tDrawG6:RemoveRowAt(r);
 				end
+				-- adv.Alert('On traite tDrawG5, on prend '..tDrawG5:GetCell('Nom', i)..', ECSL_points = '..tDraw:GetCellInt('ECSL_points', i)..', draw.nb_pris_ecsl = '..draw.nb_pris_ecsl..', draw.rang_tirage = '..draw.rang_tirage..', tDrawG4:GetNbRows() = '..tDrawG4:GetNbRows());
+				if draw.rang_tirage == 30 and tDrawG4:GetNbRows() > 0 then
+					-- adv.Alert('Avant Traitement tDrawG4, draw.rang_tirage = '..draw.rang_tirage)
+					TraitementtDrawG4();
+					-- adv.Alert('Après Traitement tDrawG4, draw.rang_tirage = '..draw.rang_tirage)
+				end
+				if draw.nb_pris_ecsl == 30 or rang_tirage == 30 then
+					if i < tDrawG5:GetNbRows() -1 then
+						if tDrawG5:GetCellInt('ECSL_points', i) == tDrawG5:GetCellInt('ECSL_points', i + 1) then
+							draw.nb_pris_ecsl = 29;
+							exaequo = exaequo + 1;
+						end
+					end
+				end
 				if draw.nb_pris_ecsl == 30 then
 					draw.bol99done  = true
 					tDrawG5:SetCell('ECSL_30', i, 99);
 					tDraw:SetCell('ECSL_30', rtDraw, 99);
-				end
-				if draw.nb_pris_ecsl == 30 or draw.rang_tirage == 30 + exaequo then
-					if tDrawG4:GetNbRows() > 0 then
-						-- adv.Alert('Avant Traitement tDrawG4, draw.rang_tirage = '..draw.rang_tirage)
-						TraitementtDrawG4();
-						ecsl_pts_encours = -2;
-						fis_pts_encours = -2;
-						-- adv.Alert('Après Traitement tDrawG4, draw.rang_tirage = '..draw.rang_tirage)
-					end
 				end
 				-- draw.nb_pris_ecsl = draw.nb_pris_ecsl + 1;
 				-- adv.Alert('last tDrawG5 traité = '..tDrawG5:GetCell('Nom', i)..', draw.rang_tirage = '..draw.rang_tirage);
@@ -3686,7 +3672,7 @@ function main(params_c)
 	draw.height = display:GetSize().height - 30;
 	draw.x = 0;
 	draw.y = 0;
-	scrip_version = "5.1"; -- 4.92 pour 2022-2023
+	scrip_version = "5.2"; -- 4.92 pour 2022-2023
 	if app.GetVersion() >= '4.4c' then 
 		-- vérification de l'existence d'une version plus récente du script.
 		-- Ex de retour : LiveDraw=5.94,Matrices=5.92,TimingReport=4.2
