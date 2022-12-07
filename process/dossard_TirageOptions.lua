@@ -251,7 +251,7 @@ function CheckExaequo(tablex, idx);
 		-- adv.Alert('tBibo['..idx..'].PtsBibo = '..tBibo[idx].PtsBibo..', point = '..point..', rang_tirage = '..rang_tirage);
 	end
 	-- adv.Alert('sortie de CheckExaequo, taille de params.tExaequo = '..#params.tExaequo)
-	adv.Alert('Sexe en cours : '..tBibo[idx].Sexe)
+	-- adv.Alert('Sexe en cours : '..tBibo[idx].Sexe)
 	for j = 1, #params.tExaequo do
 		adv.Alert('exeaquo sur : '..params.tExaequo[j]);
 	end
@@ -859,7 +859,7 @@ end
 
 
 function BuildTableTirage(tablex, rang_tirage, bib_first, set_rang);
-	adv.Alert('dans BuildTableTirage avant filtrage, tablex:GetNbRows() = '..tablex:GetNbRows());
+	-- adv.Alert('dans BuildTableTirage avant filtrage, tablex:GetNbRows() = '..tablex:GetNbRows());
 	if rang_tirage then
 		local filter = "$(Rang):In("..rang_tirage..")";
 		tablex:Filter(filter, true);
@@ -998,6 +998,7 @@ function OnTirageBackOffice(course, paramsManche, manche_start)
 	-- selection = 4 : 5. Tirage pour des courses de 4 manches
 	-- selection = 5 : 6. Tirage pour des courses de 2 manches
 	-- tirage selon le back office
+	-- 1-2 = du groupe 1 au 2 sans tenir compte du groupe
 	local nbmanches = #paramsManche;
 	tResultat:OrderBy('Dossard');
 	tResultat:SetCounter('Reserve');
@@ -1005,19 +1006,48 @@ function OnTirageBackOffice(course, paramsManche, manche_start)
 	for run = manche_start, nbmanches do
 		local rang = 0;
 		local groupes = paramsManche[run].Groupes;
-		local tGroupes = groupes:Split(',');
-		-- for i = 1, #tGroupes do
-			-- adv.Alert('run = '..run..', Ordre des groupes : '..tGroupes[i]);
-		-- end
+		local tGroupes = {};
 		local sens = paramsManche[run].Sens;
-		for i = 1, #tGroupes do
-			local reserve = tGroupes[i];
-			rang = OnTirageGroupe(params['course'..course], run, reserve, sens, rang);
+		local separator = ',';
+		if string.find(groupes, '-') then
+			separator = '-';
 		end
-		if tResultat:GetCounter('Sexe'):GetNbRows() > 1 then
+		if separator == ',' then
+			tGroupes = groupes:Split(separator);
 			for i = 1, #tGroupes do
-				local reserve = tGroupes[i] + #tGroupes;
+				local reserve = tGroupes[i];
 				rang = OnTirageGroupe(params['course'..course], run, reserve, sens, rang);
+			end
+			if tResultat:GetCounter('Sexe'):GetNbRows() > 1 then
+				for i = 1, #tGroupes do
+					local reserve = tGroupes[i] + #tGroupes;
+					rang = OnTirageGroupe(params['course'..course], run, reserve, sens, rang);
+				end
+			end
+		elseif separator == '-' then
+			local reserve = '';
+			tGroupes = groupes:Split(separator);
+			local depart = tonumber(tGroupes[1]) or 1;
+			local fin = tonumber(tGroupes[#tGroupes]) or 2;
+			local separator = '';
+			if depart < fin then
+				for i = depart, fin do
+					reserve = reserve..separator..i;
+					separator = ',';
+				end
+			else
+				for i = fin, depart, -1 do
+					reserve = reserve..separator..i;
+					separator = ',';
+				end
+			end
+			rang = OnTirageGroupe(params['course'..course], run, reserve, sens, rang);
+			rang = OnTirageGroupe(params['course'..course], run, reserve, sens, rang);
+			if tResultat:GetCounter('Sexe'):GetNbRows() > 1 then
+				for i = 1, #tGroupes do
+					local reserve = tGroupes[i] + #tGroupes;
+					rang = OnTirageGroupe(params['course'..course], run, reserve, sens, rang);
+				end
 			end
 		end
 	end
@@ -1070,7 +1100,7 @@ function main(params_c)
 	params.x = (display:GetSize().width - params.width) / 2;
 	params.y = 200;
 	
-	scrip_version = "3.3"; 
+	scrip_version = "3.4"; 
 	-- vérification de l'existence d'une version plus récente du script.
 	-- Ex de retour : LiveDraw=5.94,Matrices=5.92,TimingReport=4.2,DoubleTirage=3.2,TirageOptions=3.3,TirageER=1.7,ListeMinisterielle=2.3,KandaHarJunior=2.0
 	if app.GetVersion() >= '4.4c' then 
