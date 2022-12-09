@@ -864,7 +864,6 @@ function BuildTableTirage(tablex, rang_tirage, bib_first, set_rang);
 		local filter = "$(Rang):In("..rang_tirage..")";
 		tablex:Filter(filter, true);
 	end
-	adv.Alert('dans BuildTableTirage rang = '..tostring(rang_tirage)..', bib_first = '..tostring(bib_first)..', setrang = '..tostring(set_rang)..')'..', tablex:GetNbRows() = '..tablex:GetNbRows());
 	params.tableDossards1 = {};
 	local shuffle = true;
 
@@ -1042,7 +1041,6 @@ function OnTirageBackOffice(course, paramsManche, manche_start)
 				end
 			end
 			rang = OnTirageGroupe(params['course'..course], run, reserve, sens, rang);
-			rang = OnTirageGroupe(params['course'..course], run, reserve, sens, rang);
 			if tResultat:GetCounter('Sexe'):GetNbRows() > 1 then
 				for i = 1, #tGroupes do
 					local reserve = tGroupes[i] + #tGroupes;
@@ -1075,15 +1073,26 @@ function OnTirageGroupe(code_evenement, manche, reserve, sens, rang)
 		return;
 	end
 	for j = 0, tResultat_Copy:GetNbRows() -1 do
+		local addrow = false;
+		local row = 0;
 		local code_coureur = tResultat_Copy:GetCell('Code_coureur', j);
+		local cmd = 'Select * From Resultat_Manche Where Code_evenement = '..code_evenement.." And Code_coureur = '"..code_coureur.."' And Code_manche = "..manche;
+		base:TableLoad(tResultat_Manche, cmd);
+		if tResultat_Manche:GetNbRows() == 0 then
+			addrow = true;
+			row = tResultat_Manche:AddRow();
+		end
 		rang_tirage = rang_tirage + 1;
-		local row = tResultat_Manche:AddRow();
 		tResultat_Manche:SetCell('Code_evenement', row, code_evenement);
 		tResultat_Manche:SetCell('Code_manche', row, manche);
 		tResultat_Manche:SetCell('Code_coureur', row, code_coureur);
 		tResultat_Manche:SetCell('Rang', row, rang_tirage);
 		tResultat_Manche:SetCell('Reserve', row, reserve);
-		base:TableInsert(tResultat_Manche, row);
+		if addrow == true then
+			base:TableInsert(tResultat_Manche, row);
+		else
+			base:TableUpdate(tResultat_Manche, row);
+		end
 	end
 	return rang_tirage;
 end
@@ -1100,7 +1109,7 @@ function main(params_c)
 	params.x = (display:GetSize().width - params.width) / 2;
 	params.y = 200;
 	
-	scrip_version = "3.4"; 
+	scrip_version = "3.5"; 
 	-- vérification de l'existence d'une version plus récente du script.
 	-- Ex de retour : LiveDraw=5.94,Matrices=5.92,TimingReport=4.2,DoubleTirage=3.2,TirageOptions=3.3,TirageER=1.7,ListeMinisterielle=2.3,KandaHarJunior=2.0
 	if app.GetVersion() >= '4.4c' then 
