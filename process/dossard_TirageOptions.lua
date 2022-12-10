@@ -1011,6 +1011,7 @@ function OnTirageBackOffice(course, paramsManche, manche_start)
 		if string.find(groupes, '-') then
 			separator = '-';
 		end
+		-- adv.Alert('course = '..course..', run = '..run..', groupes = '..groupes..', sens = '..sens);
 		if separator == ',' then
 			tGroupes = groupes:Split(separator);
 			for i = 1, #tGroupes do
@@ -1041,12 +1042,6 @@ function OnTirageBackOffice(course, paramsManche, manche_start)
 				end
 			end
 			rang = OnTirageGroupe(params['course'..course], run, reserve, sens, rang);
-			if tResultat:GetCounter('Sexe'):GetNbRows() > 1 then
-				for i = 1, #tGroupes do
-					local reserve = tGroupes[i] + #tGroupes;
-					rang = OnTirageGroupe(params['course'..course], run, reserve, sens, rang);
-				end
-			end
 		end
 	end
 end
@@ -1058,16 +1053,16 @@ function OnTirageGroupe(code_evenement, manche, reserve, sens, rang)
 	local rang_tirage = rang;
 	local tResultat_Copy = tResultat:Copy();
 	local filter = '$(Reserve):In('..reserve..')';
+	-- adv.Alert('OnTirageGroupe(code_evenement = '..code_evenement..', manche = '..manche..', reserve = '..reserve..', sens = '..sens..', rang = '..rang..')'..', tResultat_Copy filtré :GetNbRows()  = '..tResultat_Copy:GetNbRows());
 	tResultat_Copy:Filter(filter, true);
-	-- adv.Alert('OnTirageGroupe('..code_evenement..', '..manche..', '..reserve..', '..sens..', '..rang..')'..', tResultat_Copy:GetNbRows()  = '..tResultat_Copy:GetNbRows())
 	if sens == 0 then
 		tResultat_Copy:OrderRandom();
 		-- adv.Alert('tirage à la mêlée');
 	elseif sens == 1 then
-		tResultat_Copy:OrderBy('Dossard');
+		tResultat_Copy:OrderBy('Rang, Dossard');
 		-- adv.Alert('tirage par ordre croissant');
 	elseif sens == 2 then
-		tResultat_Copy:OrderBy('Dossard DESC');
+		tResultat_Copy:OrderBy('Rang DESC, Dossard DESC');
 		-- adv.Alert('tirage par ordre décroissant');
 	else
 		return;
@@ -1093,6 +1088,10 @@ function OnTirageGroupe(code_evenement, manche, reserve, sens, rang)
 		else
 			base:TableUpdate(tResultat_Manche, row);
 		end
+		if manche == 1 then
+			local r = tResultat:GetIndexRow('Code_coureur', code_coureur);
+			tResultat:SetCell('Rang', r, rang_tirage);
+		end
 	end
 	return rang_tirage;
 end
@@ -1109,7 +1108,7 @@ function main(params_c)
 	params.x = (display:GetSize().width - params.width) / 2;
 	params.y = 200;
 	
-	scrip_version = "3.5"; 
+	scrip_version = "3.6"; 
 	-- vérification de l'existence d'une version plus récente du script.
 	-- Ex de retour : LiveDraw=5.94,Matrices=5.92,TimingReport=4.2,DoubleTirage=3.2,TirageOptions=3.3,TirageER=1.7,ListeMinisterielle=2.3,KandaHarJunior=2.0
 	if app.GetVersion() >= '4.4c' then 
@@ -1213,7 +1212,7 @@ function main(params_c)
 		height = params.height,
 		x = params.x,
 		y = params.y,
-		label='Configuration du tirage', 
+		label='Configuration du tirage - script version '..scrip_version, 
 		icon='./res/32x32_ffs.png'
 		});
 	dlgConfig:LoadTemplateXML({ 
@@ -1284,6 +1283,7 @@ function main(params_c)
 	ValideClef1(clef1, option1, option2);
 	ValideOption1(clef1, option1, option2);
 	ValideOption2(clef1, option1, option2);
+	wnd.GetParentFrame():Bind(eventType.CURL, OnCurlReturn);
 	dlgConfig:Bind(eventType.TEXT, 
 		function(evt) 
 			local code_evenement1 = tonumber(dlgConfig:GetWindowName('course1'):GetValue()) or -1;
@@ -1433,6 +1433,7 @@ function main(params_c)
 			base:Query(cmd);
 			cmd = 'Delete From Resultat_Manche Where Code_evenement IN('..params.course1..','..params.course2..')' ;
 			base:Query(cmd);
+			-- adv.Alert('function OnTirageGroupe(code_evenement, manche, reserve, sens, rang)');
 			for course = 1, 2 do
 				params.bib_first = 1;
 				if params['course'..course] > 0 then
@@ -1443,34 +1444,22 @@ function main(params_c)
 					if course == 1 or params.bib_skip == 0 then
 						local ok = SetDossardBackOffice(course, nbGroupes);
 						if ok then
-							OnTirageBackOffice(course, paramsManche, 2)
+							-- adv.Alert('OnTirageBackOffice(1, paramsManche, 2)');
+							OnTirageBackOffice(1, paramsManche, 2)
 						end
 					end
-					if course == 2 and params.bib_skip == 1 then
-					-- function OnTirageGroupe(code_evenement, manche, reserve, sens, rang)
-						for row = 0, tResultat:GetNbRows()-1 do
-							local code_coureur = tResultat:GetCell('Code_coureur', row);
-							if tCoureur[code_coureur] then
-								tResultat:SetCell('Dossard', row, tCoureur[code_coureur].Dossard);
-								tResultat:SetCell('Reserve', row, tCoureur[code_coureur].Reserve);
-							end
-						end
-						for run = 1, #paramsManche do
-							local rang = 0;
-							local groupes = paramsManche[run].Groupes;
-							local tGroupes = groupes:Split(',');
-							local sens = paramsManche[run].Sens;
-							for i = 1, #tGroupes do
-								local reserve = tGroupes[i];
-								rang = OnTirageGroupe(params['course'..course], run, reserve, sens, rang);
-							end
-							if tResultat:GetCounter('Sexe'):GetNbRows() > 1 then
-								for i = 1, #tGroupes do
-									local reserve = tGroupes[i] + #tGroupes;
-									rang = OnTirageGroupe(params['course'..course], run, reserve, sens, rang);
+					if course == 2 then
+						if params.bib_skip == 1 then
+							for row = 0, tResultat:GetNbRows()-1 do
+								local code_coureur = tResultat:GetCell('Code_coureur', row);
+								if tCoureur[code_coureur] then
+									tResultat:SetCell('Dossard', row, tCoureur[code_coureur].Dossard);
+									tResultat:SetCell('Reserve', row, tCoureur[code_coureur].Reserve);
 								end
 							end
 						end
+						-- adv.Alert('OnTirageBackOffice(2, paramsManche, 1)');
+						OnTirageBackOffice(2, paramsManche, 1)
 					end
 				end
 				base:TableBulkUpdate(tResultat, 'Rang, Dossard, Reserve', 'Resultat');
