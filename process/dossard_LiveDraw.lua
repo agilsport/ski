@@ -2241,6 +2241,12 @@ function TraitementtDrawG4()
 	end
 	-- adv.Alert('Sortie de TraitementtDrawG4\n');
 	tDrawG4:RemoveAllRows();
+	if draw.nb_pris_ecsl == 30 then
+		draw.ajouter_groupe = 0;
+	else
+		draw.ajouter_groupe = 1;
+	end
+		
 end
 
 function SetuptDraw()
@@ -2528,6 +2534,7 @@ Groupe 6 On poursuit selon les points FIS.
 	-- adv.Alert('on a pris '..draw.nb_pris_ecsl..' sur les 30 à prendre, tDrawG4:GetNbRows() = '..tDrawG4:GetNbRows());
 	-- le premier winner sera toujours au rang 31 = row 30
 	draw.bol99done = false;
+	draw.ajouter_groupe = 0;	
 	local groupe5 = 0;
 	-- adv.Alert('avant traitement de tDrawG5, tDrawG4:GetNbRows() = '..tDrawG4:GetNbRows()..', tDrawG5:GetNbRows() = '..tDrawG5:GetNbRows());
 	local exaequo = 0;
@@ -2585,6 +2592,7 @@ Groupe 6 On poursuit selon les points FIS.
 		-- adv.Alert('3 - rajouter_pts_fis = '..rajouter_pts_fis..', current_group = '..current_group);
 	end
 	tDrawG6:OrderBy('FIS_pts');
+	current_group = current_group + draw.ajouter_groupe;
 	if draw.bolEstCE and draw.nb_pris_ecsl < 30 then
 		for i = 0, tDrawG6:GetNbRows() - 1 do
 			if tDrawG6:GetCell('Winner_CC', i):len() == 0 then
@@ -3672,7 +3680,7 @@ function main(params_c)
 	draw.height = display:GetSize().height - 30;
 	draw.x = 0;
 	draw.y = 0;
-	scrip_version = "5.2"; -- 4.92 pour 2022-2023
+	scrip_version = "5.3"; -- 4.92 pour 2022-2023
 	if app.GetVersion() >= '4.4c' then 
 		-- vérification de l'existence d'une version plus récente du script.
 		-- Ex de retour : LiveDraw=5.94,Matrices=5.92,TimingReport=4.2
