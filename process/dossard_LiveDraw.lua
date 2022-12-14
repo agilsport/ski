@@ -1687,7 +1687,11 @@ function OnRAZData(colonne)
 	ChecktDraw();
 end
 
-function OnSupprimerCoureur(code_coureur, delete_rang_tirage)
+function OnShiftStatut(code_coureur)
+	
+end
+
+function OnSupprimerCoureur(code_coureur, rang_tirage_selected)
 	local cmd = "Delete From Resultat_Info_Tirage Where Code_evenement = "..draw.code_evenement.." And Code_coureur = '"..code_coureur.."'";
 	base:Query(cmd);
 	cmd = "Delete From Resultat Where Code_evenement = "..draw.code_evenement.." And Code_coureur = '"..code_coureur.."'";
@@ -1696,7 +1700,7 @@ function OnSupprimerCoureur(code_coureur, delete_rang_tirage)
 		local rang_tirage = tDraw:GetCellInt('Rang_tirage', i);
 		if rang_tirage > tDraw:GetNbRows() then
 			tDraw:SetCell('Rang_tirage', i, tDraw:GetNbRows());
-		elseif rang_tirage >= delete_rang_tirage then
+		elseif rang_tirage >= rang_tirage_selected then
 			tDraw:SetCell('Rang_tirage', i, tDraw:GetCellInt('Rang_tirage', i) -1);
 		else
 			break;
@@ -1707,6 +1711,7 @@ function OnSupprimerCoureur(code_coureur, delete_rang_tirage)
 	CommandSendOrder();
 	CommandSendMessage();
 end
+
 
 function OnAjouterCoureur()
 	if not draw.trouve_coureur then
@@ -2034,16 +2039,16 @@ function OnCellSelected(evt)
 	local t = grid_tableau:GetTable();
 	local colName = t:GetColumnName(t:GetVisibleColumnsIndex(col));
 	grid_tableau:SelectRow(row);
-	if col > 0 and col < grid_tableau:GetNumberCols() -1 then
+	if col > 0 and col < grid_tableau:GetNumberCols() -2 then
 		return;
 	end
-	local delete_rang_tirage = t:GetCellInt('Rang_tirage', row);
+	local rang_tirage_selected = t:GetCellInt('Rang_tirage', row);
 	local code_coureur = t:GetCell('Code_coureur', row);
 	local nom = t:GetCell('Nom', row);
 	local prenom = t:GetCell('Prenom', row);
 	local nation = t:GetCell('Nation', row);
 	local identite = nom..'   '..prenom;
-	if col == grid_tableau:GetNumberCols() -1 then
+	if col == grid_tableau:GetNumberCols() -2 then
 		local msg = 'Confirmez-vous la suppression de '..identite;
 		if app.GetAuiFrame():MessageBox(msg, "Confirmer la suppression", msgBoxStyle.YES_NO+msgBoxStyle.NO_DEFAULT+msgBoxStyle.ICON_INFORMATION) ~= msgBoxStyle.YES then
 			return ;
@@ -2051,7 +2056,19 @@ function OnCellSelected(evt)
 		-- suppression du coureur
 		table.insert(draw.tModifs_tableau, {Code_coureur = code_coureur:sub(4), Nom = nom, Prenom = prenom, Nation = nation, Status = 'RM'});
 		grid_tableau:DeleteRows(row);
-		OnSupprimerCoureur(code_coureur, delete_rang_tirage);
+		OnSupprimerCoureur(code_coureur, rang_tirage_selected);
+	end
+	if col == grid_tableau:GetNumberCols() -1 then
+		local etat = t:GetCell('Statut', row);
+		if etat == 'UF' then
+			etat = 'CF';
+		else
+			etat = 'UF';
+		end
+		t:SetCell('Statut', row, etat)
+		grid_tableau:RefreshCell(row, col);
+		OnChangeStatut(row);
+		base:TableBulkUpdate(tDraw, 'Statut', 'Resultat_Info_Tirage');
 	end
 end
 
@@ -2077,6 +2094,10 @@ function OnCellContext(evt)
 		elseif colName == 'Action' then
 			evt:SetCellContext({ 
 				bitmaps = { { image = './res/16x16_minus.png'}}
+			});
+		elseif colName == 'Validation' then
+			evt:SetCellContext({ 
+				bitmaps = { { image = './res/40x16_dbl_coche.png'}}
 			});
 		end
 	end
@@ -2812,7 +2833,7 @@ function OnAfficheTableau()
 	grid_tableau = dlgTableau:GetWindowName('tableau');
 	BuildTablesDraw();
 
-	local cmd ='Select r.*, rit.* , Repeat(" ",10) Action, Concat(Prenom, Nom) Identite, Repeat(" ",7) TG, 0 Pris, 0 Dossard_bibo ';
+	local cmd ='Select r.*, rit.* , Repeat(" ",10) Action, Repeat(" ",10) Validation, Concat(Prenom, Nom) Identite, Repeat(" ",7) TG, 0 Pris, 0 Dossard_bibo ';
 	cmd = cmd..'From Resultat r ';
 	cmd = cmd..'Left Join Resultat_Info_Tirage rit On r.Code_evenement = rit.Code_evenement And r.Code_coureur = rit.Code_coureur ';
 	cmd = cmd..'Where r.Code_evenement = '..draw.code_evenement;
@@ -2847,6 +2868,7 @@ function OnAfficheTableau()
 	tDraw:SetColumn('Comite', { label = 'C.R.', width = 6 });
 	tDraw:SetColumn('Club', { label = 'Club', width = 12 });
 	tDraw:SetColumn('Action', { label = 'Supprimer', width = 8 });
+	tDraw:SetColumn('Validation', { label = 'CF / UF', width = 8 });
 	tDraw:SetColumn('Statut', { label = 'UF/CF', width = 6 });
 	tDraw:SetPrimary('Code_evenement, Code_coureur');
 	ReplaceTableEnvironnement(tDraw, '_Draw');
@@ -2856,7 +2878,7 @@ function OnAfficheTableau()
 		if not draw.bolVitesse then
 			grid_tableau:Set({
 				table_base = tDraw,
-				columns = 'Dossard, Rang_tirage, Groupe_tirage, Code_coureur, Nom, Prenom, Nation, ECSL_points, ECSL_rank, WCSL_points, WCSL_rank, ECSL_overall_points, ECSL_overall_rank, Winner_CC, FIS_pts, FIS_clt, Statut, Action',
+				columns = 'Dossard, Rang_tirage, Groupe_tirage, Code_coureur, Nom, Prenom, Nation, ECSL_points, ECSL_rank, WCSL_points, WCSL_rank, ECSL_overall_points, ECSL_overall_rank, Winner_CC, FIS_pts, FIS_clt, Statut, Action, Validation',
 				selection_mode = gridSelectionModes.CELLS,
 				sortable = true,
 				enable_editing = true
@@ -2864,7 +2886,7 @@ function OnAfficheTableau()
 		else
 			grid_tableau:Set({
 				table_base = tDraw,
-				columns = 'Dossard, Rang_tirage, Groupe_tirage, Code_coureur, Nom, Prenom, Nation, ECSL_points, ECSL_rank, WCSL_points, WCSL_rank, ECSL_overall_points, ECSL_overall_rank, Winner_CC, FIS_pts, FIS_clt, FIS_SG_pts, FIS_SG_clt, Statut, Action',
+				columns = 'Dossard, Rang_tirage, Groupe_tirage, Code_coureur, Nom, Prenom, Nation, ECSL_points, ECSL_rank, WCSL_points, WCSL_rank, ECSL_overall_points, ECSL_overall_rank, Winner_CC, FIS_pts, FIS_clt, FIS_SG_pts, FIS_SG_clt, Statut, Action, Validation',
 				selection_mode = gridSelectionModes.CELLS,
 				sortable = true,
 				enable_editing = true
@@ -2882,7 +2904,7 @@ function OnAfficheTableau()
 		end
 		grid_tableau:Set({
 			table_base = tDraw,
-			columns = 'Dossard, Rang_tirage, Groupe_tirage, Code_coureur, Nom, Prenom, Nation, Comite, Club, FIS_pts, FIS_clt, Statut, Action',
+			columns = 'Dossard, Rang_tirage, Groupe_tirage, Code_coureur, Nom, Prenom, Nation, Comite, Club, FIS_pts, FIS_clt, Statut, Action, Validation',
 			selection_mode = gridSelectionModes.CELLS,
 			sortable = true,
 			enable_editing = true
@@ -3680,7 +3702,7 @@ function main(params_c)
 	draw.height = display:GetSize().height - 30;
 	draw.x = 0;
 	draw.y = 0;
-	scrip_version = "5.3"; -- 4.92 pour 2022-2023
+	scrip_version = "5.4"; -- 4.92 pour 2022-2023
 	if app.GetVersion() >= '4.4c' then 
 		-- vérification de l'existence d'une version plus récente du script.
 		-- Ex de retour : LiveDraw=5.94,Matrices=5.92,TimingReport=4.2
