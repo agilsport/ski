@@ -3703,6 +3703,15 @@ function main(params_c)
 	draw.x = 0;
 	draw.y = 0;
 	scrip_version = "5.4"; -- 4.92 pour 2022-2023
+	local imgfile = './res/40x16_dbl_coche.png';
+	if not app.FileExists(imgfile) then
+		app.GetAuiFrame():MessageBox(
+			"Vous devez télécharger une image supplémentaire.\nLe script va se fermer automatiquement.", 
+			"Téléchargement d'une image supplémentaire",
+			msgBoxStyle.OK + msgBoxStyle.ICON_INFORMATION); 
+			local reponse = app.AutoUpdateResource('https://agilsport.fr/bta_alpin/UpdateScript.zip');
+			return true;
+	end
 	if app.GetVersion() >= '4.4c' then 
 		-- vérification de l'existence d'une version plus récente du script.
 		-- Ex de retour : LiveDraw=5.94,Matrices=5.92,TimingReport=4.2
