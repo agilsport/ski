@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- Menu Editions Activité "FOND " suplementaire !-->
-<!-- version="6.8" !-->
+<!-- version="7.0" !-->
 <!-- si possible de faire fonctionne des cond dans les menu -->
 <!-- si possible de fermer des Item par default -->
 <!-- 6.7 mise en place de la fonction page break -->
-<!-- 6.8 resultats officiels relais avec entete -->
-<!-- 6.9 amelioration liste de départ -->
+
 <edition>
 	<menu>
 		<menu title="Utilitaires" image="./res/32x32_options.png">
@@ -18,6 +17,7 @@
 			<menu title="Edition d'un rapport d'accident" image="./res/16x16_text.png" lua="./edition/editionRapport_accident.lua"  />
 			<menu title="Télécharger le Rapport d'accident (PDF remplisable)" image="./res/16x16_pdf.png" action="open ./edition/Rapport_Accident.pdf" />
 		</menu>
+		
 		<menu title="Gestion des Points de Passage et LAP" image="./res/32x32_options.png">
 			<menu title="Configuration des points de passages" image="./res/16x16_text.png" lua="./edition/Config_Passage.lua"  />
 			<menu title="Résultats Avec inter Multi Lap avec Tps et Clt cumulés" image="./res/16x16_ranking.png" id="res_inter_Multi_Lap" Cumul="1" mode_lap="1" header="1" first_header="0" passage="1" choix_manche="1"/>
@@ -27,11 +27,11 @@
 		<menu title="Outils" image="./res/32x32_tools.png">
 			<menu title="Edition des Séquences Chrono" image="./res/16x16_bib.png" id="chrono_seq" choix_manche="1" action="chrono_seq"/>
 			<menu title="Configuration des points de passages" image="./res/16x16_text.png" lua="./edition/Config_Passage.lua"  />
-			<menu title="Transfert du Clt d'un Evt X Ds la colonne Ordre_niveau et du Crietre Coursexx Dans la course sélectionner pour attribution des Dossards suivant le Clt de l'Evt xx" image="./res/16x16_tools.png" lua="./edition/Clt_EprX-ColOrdre_niveau.lua" Colum_Ref="Clt"/>
+			<menu title="Transfert du Clt d'un Evt XX Ds la colonne Ordre_niveau et du Crietre Coursexx Dans la course sélectionner pour attribution des Dossards suivant le Clt de l'Evt xx" image="./res/16x16_tools.png" lua="./edition/Clt_EprX-ColOrdre_niveau.lua" Colum_Ref="Clt"/>
 			<menu title="Transfert de la colonne Odre_niveau d'un Evt X Ds la colonne Ordre_niveau et du Ctrietre Coursexx Dans la course sélectionner pour attribution des Dossards suivant le Clt de l'Evt xx" image="./res/16x16_tools.png" lua="./edition/Clt_EprX-ColOrdre_niveau.lua" Colum_Ref="Ordre_niveau"/>
-			<menu title="Transfert du Clt et des ponits d'un Cha. X">
+			<menu title="Transfert du Clt et des points d'un Cha. X">
 				<menu title="Ds la colonne Pts_Best pour attribution des Dossards suivant le Clt de l'Evt X" image="./res/16x16_tools.png" Label_col="Pts_best" lua="./edition/ColPtsClt_ColPtsBest.lua" />
-				<menu title="Ds la colonne Centre pour attribution des Dossards suivant le Clt de l'Evt X" image="./res/16x16_tools.png" Label_col="Centre" lua="./edition/ColPtsClt_ColPtsBest.lua" />		
+				<menu title="Ds la colonne Info pour attribution des Dossards suivant le Clt de l'Evt X" image="./res/16x16_tools.png" Label_col="Info" lua="./edition/ColPtsClt_ColPtsBest.lua" />		
 			</menu>
 		</menu>
 		

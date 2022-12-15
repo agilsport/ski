@@ -1,24 +1,18 @@
 dofile('./interface/interface.lua');
 dofile('./interface/adv.lua');
 dofile('./interface/device.lua');
--- version 2.6
+-- version 3.0
 	-- Verification edition/PtsFFS_ColPtsBest
 	-- correction mise a jour du body pour edition liste par ordre de points selectionner
-	
-
-function Success(txt)
-	app.GetAuiMessage():AddLineSuccess(txt);
-end
-
-function alert(txt)
-	app.GetAuiMessage():AddLine(txt);
-end
-
 --Creation de la table
 Dlg = {};
 
 function Alert(txt)
 	Dlg.gridMessage:AddLine(txt);
+end
+
+function alert(txt)
+	app.GetAuiMessage():AddLine(txt);
 end
 
 function main(params)
@@ -98,9 +92,9 @@ end
 function LectureDonnees(evt)
 	-- alert("code_evenement = "..code_evenement);
 	-- alert("colum_Pts = "..colum_Pts);
-	-- alert("LabelNc = "..LabelNc);
+	alert("LabelNc = "..LabelNc);
 	-- alert("Colum_Label = "..Colum_Label);
-	Lab_NC = LabelNc;
+	
 
 	cmd = "Select * From Resultat WHERE Code_evenement = "..code_evenement.." Order by Code_coureur"
 	base:TableLoad(tResultat, cmd);
@@ -112,12 +106,12 @@ function LectureDonnees(evt)
 		--alert("resultatPts "..resultatPts);
 		if tResultat:GetCellDouble('Point', i) == 0.0 then 
 			resultatPts = 9999;
-			LabelNc = Lab_NC;
+			NcLabel = LabelNc;
 		else
 			resultatPts = tResultat:GetCell('Point', i);
-			LabelNc = '';
+			NcLabel = '';
 		end
-		cmd = "Update Resultat SET "..colum_Pts.." = "..resultatPts..", "..Colum_Label.." = '"..LabelNc.."' Where Code_evenement = "..tonumber(code_evenement).." and Code_coureur = '"..tResultat:GetCell('Code_coureur', i).."'";
+		cmd = "Update Resultat SET "..colum_Pts.." = "..resultatPts..", "..Colum_Label.." = '"..NcLabel.."' Where Code_evenement = "..tonumber(code_evenement).." and Code_coureur = '"..tResultat:GetCell('Code_coureur', i).."'";
 		base:Query(cmd);
 		-- alert("cmd = "..cmd)
 	end
@@ -132,7 +126,6 @@ function LectureDonnees(evt)
 	alert("Transfert des points:"..LabelPts.." Ok!!!")
 	
 	-- Fermeture
-	Success('Transfert Ok!!!');
 	bodyliste:Delete();
 	dlg:EndModal(idButton.OK);
 
@@ -140,7 +133,8 @@ end
 
 function editionliste(evt, base, bodyliste)
 	theParams = {}
-	alert("Colum_Label: "..Colum_Label);
+	-- alert("Colum_Label: "..Colum_Label);
+	-- alert("LabelNc: "..LabelNc);
 	theParams.Colum_Label = Colum_Label;
 	theParams.LabelNc = LabelNc;
 	theParams.colum_Pts = colum_Pts;

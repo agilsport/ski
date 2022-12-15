@@ -1,7 +1,7 @@
 dofile('./interface/adv.lua');
 dofile('./interface/interface.lua');
 
--- version 1.5
+-- version 2.0
 
 
 function alert(txt)
@@ -87,18 +87,18 @@ function LectureDonnees(evt)
 			Points_Ch = 9999;
 			Place = 9999;
 		end
-		if Label_col == 'Centre' then
-			cmd = "Update Resultat SET Centre = "..tonumber(Points_Ch)..
-			", Ordre_niveau = '"..Place..
-			"', Niveau = '"..Critere..
+		if Label_col == 'Info' then
+			cmd = "Update Resultat SET Info = '"..Points_Ch..
+			"', Ordre_niveau = "..tonumber(Place)..
+			", Niveau = '"..Critere..
 			"', Moniteur = '"..Groupe..
 			"' Where Code_evenement = "..tonumber(code_evenement)..
 			" and Code_coureur = '"..tResultat:GetCell('Code_coureur', i)..
 			"'";
 		else
 			cmd = "Update Resultat SET Pts_best = '"..Points_Ch..
-				"', Ordre_niveau = '"..Place..
-				"', Niveau = '"..Critere..
+				"', Ordre_niveau = "..tonumber(Place)..
+				", Niveau = '"..Critere..
 				"', Moniteur = '"..Groupe..
 				"' Where Code_evenement = "..tonumber(code_evenement)..
 				" and Code_coureur = '"..tResultat:GetCell('Code_coureur', i)..
@@ -123,6 +123,9 @@ end
 
 function editionliste(evt, params, base, bodyliste)
 	-- Creation du Report
+	theParams = {}
+	theParams.Label_col = Label_col;
+	
 	report = wnd.LoadTemplateReportXML({
 		xml = './edition/ColPtsClt_ColPtsBest.xml',
 		node_name = 'root/report',

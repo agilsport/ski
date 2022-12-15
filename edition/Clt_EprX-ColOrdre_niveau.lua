@@ -1,24 +1,10 @@
-dofile('./interface/interface.lua');
 dofile('./interface/adv.lua');
-dofile('./interface/device.lua');
+dofile('./interface/interface.lua');
 
--- version 1.8
-	-- corection du nom de colonne
-	-- corection d'un \ ds le .xml
-	-- rajout d'un grid message pour avoir des données interactives
+-- version 1.6
 
 function alert(txt)
 	app.GetAuiMessage():AddLine(txt);
-end
-
-function Success(txt)
-	app.GetAuiMessage():AddLineSuccess(txt);
-end
-
-Dlg = {};
-
-function Alert(txt)
-	Dlg.gridMessage:AddLine(txt);
 end
 
 function main(params)
@@ -59,7 +45,6 @@ function main(params)
 	end
 	
 	-- Initialisation des controles ...
-	Dlg.gridMessage = dlg:GetWindowName('message');
 	local comboNbCouloir = dlg:GetWindowName('N_Course');
 	
 	local tb = dlg:GetWindowName('tb');
@@ -72,14 +57,7 @@ function main(params)
 		tb:Bind(eventType.MENU, LectureDonnees, btn_edition);
 		tb:Bind(eventType.MENU, function(evt) dlg:EndModal(idButton.CANCEL); end, btn_close);
 	end
-	
-	msg = "Transfert de la Colonne "..theParams.Colum_Ref.." \n"
-	msg = msg.."d'un evenement: XX \n"
-	msg = msg.."Vers la Colonne Ordre_niveau de votre evenement\n"
-	msg = msg.."et mettra 9999 aux non classer pour pouvoir les filtrer \n"
-	msg = msg.."renseigner le code evenement ci dessous"
-	Alert(msg.." Ok!!!");	
-	
+		
 	dlg:Fit();
 	dlg:ShowModal();
 	dlg:Delete();
@@ -146,15 +124,18 @@ function LectureDonnees(evt)
 		bodyliste:AddRow();
 		sqlTable.CopyRow(bodyliste, bodyliste:GetNbRows()-1, tResultat, i);
 	end
+	
 	editionliste(evt, params, base, bodyliste);
+	
 	-- Fermeture
-	Success('Transfert Ok!!!');
 	bodyliste:Delete();
 	dlg:EndModal(idButton.OK);
 
 end
 
 function editionliste(evt, params, base, bodyliste)
+	
+		
 	-- Creation du Report
 	report = wnd.LoadTemplateReportXML({
 		xml = './edition/Clt_EprX-ColOrdre_niveau.xml',

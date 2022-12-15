@@ -147,7 +147,8 @@
 	<officiel code="FinishReferee" label="Juge à l'arrivée" label_inter="Finish Referee" /> 
 	<officiel code="ChiefTiming" label="Responsable des calculs" label_inter="Chief Timing" entite="FIS" /> 
 	<officiel code="TimingBy" label="Chronométreur" label_inter="TimingBy" /> 
-
+	<officiel code="ffs_chef_controleur" label="Chef contrôleurs " label_inter="Chief controller" required="1" />
+	
 	<officiel code="ResponsibleEntry" type="pool" label="Responsable de l'inscriptions" label_inter="Responsible for Entry" required="0,99"/>
 	<officiel code="NationalAssociation" type="pool"  label="Structure Responsable" label_inter="National Association" required="0,99"/>
 	<officiel code="TeamCaptain" type="pool" label="Chef d'Equipe" label_inter="Team Captain" required="0,99"/>
@@ -224,13 +225,13 @@
 	<officiel code="ffs_chr_manuel_start" label="Doublage. manuel départ" label_inter="Dubbing Manual start" activite="FOND,ROL,BIATH" required="1" />
 	<officiel code="ffs_chr_manuel_stop" label="Doublage. manuel arrivée" label_inter="Dubbing Manual stop" activite="FOND,ROL,BIATH" required="1" />
 	<officiel code="ffs_chr_manuel" label="Doublage manuel" label_inter="Dubbing Manual stop" activite="SAUT,CN" required="1" />
-	
+	<officiel code="ffs_chr_manuel_B" label="Chronométreur B" label_inter="Chief Timing B" activite="FOND,ROL,BIATH" required="0,1" />	
 	<!-- informatique et video FFS -->
 	<officiel code="ffs_informatique" label="Gestionnaire informatique" label_inter="Chief Computer" required="0,1" /> 
 	<officiel code="ffs_operateur_video" label="Opérateur vidéo" label_inter="Opérateur vidéo"  activite="FOND,ROL,BIATH" discipline="MASS,POUR,KO" required="0,4" />
 	
 	<!-- staff Controleur FFS -->
-	<officiel code="ffs_chef_controleur" label="Chef contrôleurs " label_inter="Chief Timing" activite="FOND,ROL,BIATH" required="1" />
+	<officiel code="ffs_chef_controleur" label="Chef contrôleurs " label_inter="Chief controller" activite="FOND,ROL,BIATH" required="1" />
 	<officiel code="ffs_juge_start" label="Juge de départ" label_inter="Starting judge" activite="FOND,ROL,BIATH" required="1" />
 	<officiel code="ffs_juge_stop" label="Juge d'arrivée" label_inter="Finish judge" activite="FOND,ROL,BIATH" required="1" />
 	<officiel code="ffs_controleur" label="Contrôleurs passage" label_inter="Turn controller"  activite="FOND,ROL,BIATH" required="2,6" />

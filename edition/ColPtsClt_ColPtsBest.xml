@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
-<!-- version 1.5 -->
+<!-- version 2.0 -->
 <root>
 
 <!-- Fenètre de configuration de l'éditions des couloir de poursuite -->
@@ -41,7 +41,13 @@
 
 <!-- édition -->
 	<report id="ListeClt" title="('liste des participants et Clt Evt1')" >
-		
+		<lua>
+			if params.Label_col == 'Pts_best' then
+				pts = $(Pts_best);
+			elseif params.Label_col == 'Info' then
+				pts = $(Info);
+			end
+		</lua>
 		<order key="Distance, Ordre_niveau" />
 		
 		<first_header />
@@ -55,7 +61,7 @@
 			<text row="auto" align="center" >title</text>
 			<text row="1cm" align="center" ></text>
 			<font name="Calibri" size="26" adjust="max" weight="bold"/>
-			<text row="auto" align="center" >'liste Clt'</text>
+			<text row="auto" align="center" >'liste Clt '</text>
 			<row value="0.5cm"/>
 		</header>
 	
@@ -64,12 +70,11 @@
 			<font size="15" adjust="ellipsize"/>
 			<row value="auto"/>
 			<spacing left="5" right="10" top="2" bottom="2" />
-			<text col="5" align="left" label="Dos.">$(Nom)..' '..$(Prenom) </text>
+			<text col="5" align="left" label="Identité.">$(Nom)..' '..$(Prenom) </text>
 			<text col="2" align="center" label="Distance" >$(Distance)..'Km'</text>
 			<text col="2" align="center" label="Chal. Origine" >$(Moniteur)</text>
-			<text col="2" align="center" cond="(label_col == 'Pts_best')" label="Pts Challenge" >$(Pts_best)</text>
-			<text col="2" align="center" cond="(label_col == 'Centre')" label="Pts Challenge" >$(Centre)</text>
 			<text col="2" align="center" label="Clt Challenge" >$(Ordre_niveau)</text>
+			<text col="2" align="center" label="Pts Challenge" >pts</text>
 			<text col="2" align="center" label="N.Cl." >$(Niveau)</text>
 		</body>
 	</report>

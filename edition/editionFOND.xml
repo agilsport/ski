@@ -1,15 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- Menu Editions Activité "FOND" version="6.5" 
-	nettoyage du fichier mise en place de la fonction getidentitecoureur 
-	Activation de la fenetre filtrage epreuves pour une edition gerer par un .lua => Option filter="before" 
-	calcul de la note poursuite 2éme jour 
-	si possible de faire fonctionner les cond="discipline:In('POURS')" dans les <menus> ?? dans <marging> et dans les <options> 
-	 <paper orientation="landscape" cond="Nb_tps_inter >= 4 "/> 
-	6.3 mise en fonction du pagebreak 
-	6.5 corection bug affichage coordinateur ds les entetes / gestion disc 'IND
-
-!-->
+<!--  Menu Editions Activité "FOND" version="7.0"  -->
+	<!-- nettoyage du fichier mise en place de la fonction getidentitecoureur  -->
+	<!-- Activation de la fenetre filtrage epreuves pour une edition gerer par un .lua => Option filter="before"  -->
+	<!-- calcul de la note poursuite 2éme jour  -->
+	<!-- si possible de faire fonctionner les cond="discipline:In('POURS')" dans les <menus> ?? dans <marging> et dans les <options>  -->
+	 <!-- <paper orientation="landscape" cond="Nb_tps_inter >= 4 "/>  -->
+		
 
 <edition>
 	<menu>
@@ -39,7 +36,7 @@
 				<menu title="Officieuse (Ecart)" image="./res/16x16_official.png" id="Lst_officielle_pours" choix_manche="1" cond="discipline:In('POURS')" officiel="0" header="1" first_header="0"/>
 				<menu title="Edition des couloirs" image="./res/16x16_text.png" filter="before" lua="./edition/couloir.lua" cond="discipline:In('POURS')" />
 			</menu>
-			<menu title="Par Epreuve" image="./res/16x16_bib.png" >
+			<menu title="Par Epreuve:" image="./res/16x16_bib.png" >
 				<menu title="Nom Prénom" image="./res/16x16_bib.png" id="Lst_epr_speaker" officiel="0" speaker="0" />
 				<menu title="Prénom Nom (speaker)" image="./res/16x16_bib.png" id="Lst_epr_speaker" officiel="0" speaker="1" />
 				
@@ -258,7 +255,7 @@
 			<text col="24" align="center">'Nom - Prénom'</text>
 			<text col="4" align="center">'An'</text>
 			<text col="4" cond="entite == 'FIS'" align="center">'Nat.'</text>
-			<text col="3" cond="entite == 'FFS'" align="center">'CR'</text>
+			<text col="3" align="center">'CR'</text>
 			<text col="12" cond="entite == 'FFS'" align="center">'Club'</text>
 			<text col="8" align="center">'Pt.Insc.'</text>
 			<text col="8" align="center">'3 Notes.'</text>
@@ -276,7 +273,7 @@
 				<text lua="c=c+1" col_start="(c)" align="left">best5:GetCell('Identite',i)</text>
 				<text lua="c=c+1" col_start="(c)" align="center">best5:GetCell('An',i)</text>
 				<text lua="c=c+1" col_start="(c)" cond="entite == 'FIS'" align="center">best5:GetCell('Nation',i)</text>
-				<text lua="c=c+1" col_start="(c)" cond="entite == 'FFS'" align="center">best5:GetCell('Comite',i)</text>
+				<text lua="c=c+1" col_start="(c)" align="center">best5:GetCell('Comite',i)</text>
 				<text lua="c=c+1" col_start="(c)" cond="entite == 'FFS'" align="center">best5:GetCell('Club',i)</text>
 				<text lua="c=c+1" col_start="(c)" align="right">best5:GetCell('Point',i)</text>
 				<text lua="c=c+1" col_start="(c)" align="right">best5:GetCell('3Best',i)</text>
@@ -325,7 +322,7 @@
 			<text col="4" align="center" label="S.">$(Sexe)</text>
 			<text col="4" align="center" label="Dist.">$(Distance)</text>
 			<text col="4" align="center" label="Nat" cond="entite == 'FIS'">$(Nation)</text>
-			<text col="4" align="center" label="CS." cond="entite == 'FFS'">$(Comite)</text>
+			<text col="4" align="center" label="CS." >$(Comite)</text>
 			<text col="12" align="left" label="Club" cond="entite == 'FFS'">$(Club)</text>
 			<text col="6" align="right" label="Points" cond="entite == 'FFS'">$(Point)</text>
 			<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
@@ -350,7 +347,7 @@
 			<text col="4" align="center" label="S.">$(Sexe)</text>
 			<text col="4" align="center" label="Dist.">$(Distance)</text>
 			<text col="4" align="center" label="Nat" cond="entite == 'FIS'">$(Nation)</text>
-			<text col="4" align="center" label="CS." cond="entite == 'FFS'">$(Comite)</text>
+			<text col="4" align="center" label="CS." >$(Comite)</text>
 			<text col="12" align="left" label="Club" cond="entite == 'FFS'">$(Club)</text>
 			<text col="6" align="right" label="Points" cond="entite == 'FFS'">$(Point)</text>
 			<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
@@ -400,7 +397,7 @@
 			<text col="4" align="center" label="S.">$(Sexe)</text>
 			<text col="4" align="center" label="Dist.">$(Distance)</text>
 			<text col="4" align="center" label="Nat" cond="entite == 'FIS'">$(Nation)</text>
-			<text col="4" align="center" label="CS." cond="entite == 'FFS'">$(Comite)</text>
+			<text col="4" align="center" label="CS." >$(Comite)</text>
 			<text col="12" align="left" label="Club" cond="entite == 'FFS'">$(Club)</text>
 			<text col="6" align="right" label="Points" >$(Point)</text>
 			<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
@@ -448,7 +445,7 @@
 			<text col="4" align="center" label="S.">$(Sexe)</text>
 			<text col="4" align="center" label="Dist.">$(Distance)</text>
 			<text col="4" align="center" label="Nat" cond="entite == 'FIS'">$(Nation)</text>
-			<text col="4" align="center" label="CS." cond="entite == 'FFS'">$(Comite)</text>
+			<text col="4" align="center" label="CS." >$(Comite)</text>
 			<text col="12" align="left" label="Club" cond="entite == 'FFS'">$(Club)</text>
 			<text col="6" align="right" label="Points" cond="entite == 'FFS'">$(Point)</text>
 			<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
@@ -491,7 +488,7 @@
 			<text col="4" align="center" label="S.">$(Sexe)</text>
 			<text col="4" align="center" label="Dist.">$(Distance)</text>
 			<text col="4" align="center" label="Nat" cond="entite == 'FIS'">$(Nation)</text>
-			<text col="4" align="center" label="CS." cond="entite == 'FFS'">$(Comite)</text>
+			<text col="4" align="center" label="CS." >$(Comite)</text>
 			<text col="12" align="left" label="Club" cond="entite == 'FFS'">$(Club)</text>
 			<text col="6" align="right" label="Points" cond="entite == 'FFS'">$(Point)</text>
 			<text col="9" align="right" label="H. Départ" cond="discipline:In('FS','KO-QLF','IND')">$(Heure_depart1, "%2hh%2m:%2s")</text>
@@ -540,7 +537,7 @@
 			<text col="4" align="center" label="S.">$(Sexe)</text>
 			<text col="4" align="center" label="Dist.">$(Distance)</text>
 			<text col="4" align="center" label="Nat" cond="entite == 'FIS'">$(Nation)</text>
-			<text col="4" align="center" label="CS." cond="entite == 'FFS'">$(Comite)</text>
+			<text col="4" align="center" label="CS." >$(Comite)</text>
 			<text col="12" align="left" label="Club" cond="entite == 'FFS'">$(Club)</text>
 			<!-- <text col="6" align="right" label="Points" cond="entite == 'FFS'">$(Point)</text> -->
 			<!-- <text col="9" align="right" label="H. Départ" cond="discipline:In('FS','KO-QLF','IND')">$(Heure_depart1, "%2hh%2m:%2s")</text> -->
@@ -600,7 +597,7 @@
 			<text col="4" align="center" label="S.">$(Sexe)</text>
 			<text col="4" align="center" label="Dist.">$(Distance)</text>
 			<text col="4" align="center" label="Nat" cond="entite == 'FIS'">$(Nation)</text>
-			<text col="4" align="center" label="CS" cond="entite == 'FFS'">$(Comite)</text>
+			<text col="4" align="center" label="CS" >$(Comite)</text>
 			<text col="12" align="left" label="Club" cond="entite == 'FFS'">$(Club)</text>
 			<text col="6" align="right" label="Points" cond="entite == 'FFS'">$(Point)</text>
 			<text col="9" align="right" label="H. Départ" cond="discipline:In('FS', 'POURS', 'KO-QLF')">$(Heure_depart1, "%2hh%2m:%2s")</text>
@@ -651,7 +648,7 @@
 			<text col="4" align="center" label="S.">$(Sexe)</text>
 			<text col="4" align="center" label="Dist.">$(Distance)</text>
 			<text col="4" align="center" label="Nat" cond="entite == 'FIS'">$(Nation)</text>
-			<text col="4" align="center" label="CS." cond="entite == 'FFS'">$(Comite)</text>
+			<text col="4" align="center" label="CS." >$(Comite)</text>
 			<text col="12" align="left" label="Club" cond="entite == 'FFS'">$(Club)</text>
 			<text col="6" align="right" label="Points" cond="entite == 'FFS'">$(Point)</text>
 			<text col="9" align="right" label="H. Départ" cond="discipline:In('FS','POURS', 'KO-QLF','IND')">$(Heure_depart1, "%2hh%2m:%2s")</text>
@@ -698,7 +695,7 @@
 			<text col="18" align="left" label="Prénom - Nom" >GetIdentiteCoureur(officiel)</text> 
 			<text col="4" align="center" label="An">$(An)</text>
 			<text col="4" align="left" label="Nat" cond="entite == 'FIS'">$(Nation)</text>
-			<text col="3" align="left" label="CS." cond="entite == 'FFS'">$(Comite)</text>
+			<text col="3" align="left" label="CS." >$(Comite)</text>
 			<text col="12" align="left" label="Club" cond="entite == 'FFS'">$(Club)</text>
 			<lua>for m=1,nb_manche do</lua>
 				<text col="6" align="right" label="('Tps.M'..m)" cond="nb_manche ~= 1"><font size_step="-1" cond="group == 'body'" />body:GetCell('Tps'..m,row)</text> 
@@ -841,7 +838,7 @@
 				<text col="4" align="center" label="An">$(An)</text>
 				<text col="6" align="left" label="Nat" cond="entite == 'FIS'">$(Nation)</text>
 				<image col_start="0" adjust="height" align="right" border="0" cond="entite == 'FIS'"><background mode="transparent"/>app.ImageNation($(Nation))</image> 
-				<text col="3" align="center" label="CS." cond="entite == 'FFS'">$(Comite)</text>
+				<text col="3" align="center" label="CS." >$(Comite)</text>
 				<text col="12" align="center" label="Club" cond="entite == 'FFS'">$(Club)</text>
 				<lua>for m=1,nb_manche do</lua>
 					<lua>if body:GetCellInt('Tps'..m,row) > 0 then cltManche = ' ('..body:GetCell('Cltc'..m,row)..')' else cltManche = '' end</lua>
