@@ -5,10 +5,10 @@
 <root>
   <config bibo="15" course1="-1" course2="-1" clef1="3" option1="0" option2="4"/>
   <manchesx4 bib_skip="0" nb_manches="4">
-    <course1 m1="1-2" m1_sens="0" m2="1,2" m2_sens="2" m3="2,1" m3_sens="1" m4="1,2" m4_sens="2"/>
-    <course2 m1="1-2" m1_sens="0" m2="1,2" m2_sens="2" m3="2,1" m3_sens="1" m4="1,2" m4_sens="2"/>
+    <course1 m1="1-2" m1_sens="0" m2="1-2" m2_sens="2" m3="2,1" m3_sens="1" m4="1,2" m4_sens="2"/>
+    <course2 m1="1-2" m1_sens="0" m2="1-2" m2_sens="2" m3="2,1" m3_sens="1" m4="1,2" m4_sens="2"/>
   </manchesx4>
-  <manches2x2 nb_manches="2" bib_skip="1">
+  <manches2x2 bib_skip="1" nb_manches="2">
     <course1 m1="1-2" m1_sens="0" m2="1,2" m2_sens="2"/>
     <course2 m1="2,1" m1_sens="1" m2="1,2" m2_sens="2"/>
   </manches2x2>
