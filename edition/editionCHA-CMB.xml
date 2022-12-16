@@ -6,17 +6,29 @@
 <edition>
 	<menu>		
 		<menu title="Résultats Challenge " image="./res/32x32_ranking.png">
-			<menu title="Résultats Officiels Challenge Scrath" image="./res/16x16_ranking.png" header="Résultats Officiels" id="res_Cha"/>
-			<menu title="Résultats Challenge Scrath Freestyle" image="./res/16x16_ranking.png" header="Résultats Officiels" id="res_Cha_FS"/>
-			<menu title="Résultats Officiels Challenge Scrath (Rglt Nordic Challenge)" image="./res/16x16_ranking.png" header="Résultats Officiels" id="res_Cha_Vit"/>
-			<menu title="Résultats par Sexe / catégories" image="./res/16x16_ranking.png" id="res_Cha_Cat" choix_clt_max="1"/>
-			<menu title="Résultats par Club" image="./res/16x16_ranking.png" id="res_Cha_Cat_club" choix_clt_max="1"/>
-			<menu title="Résultats adition de tps par Sexe / catégories" image="./res/16x16_ranking.png" id="res_Com_Cat" choix_clt_max="1"/>
+			<menu title="Toute Discipline:" image="./res/16x16_official.png">
+				<menu title="Résultats Officiels Challenge Scrath" image="./res/16x16_ranking.png" header="Résultats Officiels" id="res_Cha"/>
+				<menu title="Résultats par Sexe / catégories" image="./res/16x16_ranking.png" id="res_Cha_Cat" choix_clt_max="1"/>
+				<menu title="Résultats par Club" image="./res/16x16_ranking.png" id="res_Cha_Cat_club" choix_clt_max="1"/>
+			</menu>
+			
+			<menu title="Freestyle:" image="./res/16x16_official.png">
+				<menu title="Résultats Challenge Scrath Freestyle" image="./res/16x16_ranking.png" header="Résultats Officiels" id="res_Cha_FS"/>
+			</menu>
+			
+			<menu title="Nordique:" image="./res/16x16_official.png">
+				<menu title="Résultats Officiels Challenge Scrath (Rglt Nordic Challenge)" image="./res/16x16_ranking.png" header="Résultats Officiels" id="res_Cha_Vit"/>
+			</menu>
+			
+			<menu title="Par adition de temps:" image="./res/16x16_official.png">
+				<menu title="Résultats adition de tps par Sexe / catégories" image="./res/16x16_ranking.png" id="res_Com_Cat" choix_clt_max="1"/>
+			</menu>
+			
 		</menu>
 		
-		<menu title="Résultats Challenge par Sexe et Categorie" image="./res/32x32_ranking.png">
-			<menu title="Résultats Officiels MST Scrath" image="./res/16x16_ranking.png" header="Résultats Officiels" id="res_MST"/>
-			<menu title="Résultats par catégories et sexe" image="./res/16x16_ranking.png" id="res_MST_Cat" choix_clt_max="1"/>
+		<menu title="Résultats Marathon Ski Tour" image="./res/32x32_ranking.png">
+			<!-- <menu title="Résultats Officiels MST Scrath" image="./res/16x16_ranking.png" header="Résultats Officiels" id="res_MST"/> -->
+			<!-- <menu title="Résultats par catégories et sexe" image="./res/16x16_ranking.png" id="res_MST_Cat" choix_clt_max="1"/> -->
 		</menu>
 	</menu>
 
@@ -134,8 +146,19 @@
 				<lua>end</lua>
 			<lua>else</lua>
 				<lua>for m=0,nb_Epreuve-1 do</lua>
-					<lua>Nom_Epreuve = base:GetTable('EpreuveEvenement_Challenge'):GetCell('Code_discipline',m+1)</lua>
-					<!-- <lua>if m == 0 then  -->
+					<lua>
+						
+						Nom_Epreuve = base:GetTable('EpreuveEvenement_Challenge'):GetCell('Code_discipline',m)
+
+					</lua>
+					<!-- 
+						tDiscipline = base:GetTable('Discipline');
+						base:TableLoad(tDiscipline, "Select * From Discipline Where Code_activite = '"..$(Evenement.Code_activite).."' And Code_entite = '"..$(Evenement.Code_entite).."' And Code_saison = "..$(Evenement.Code_saison))
+						nbRow = tDiscipline:GetNbRows();
+					
+						Nom_Epreuve = Discipline{Nom_Epreuve}.Libelle
+					
+					<lua>if m == 0 then  -->
 							<!-- Nom_Epreuve = 'KO-Final' -->
 						<!-- else -->
 							<!-- Nom_Epreuve = 'Indiv. ' -->

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Edition des duels (KO - SX - ...) !-->
-<!-- version="2.0" -->
+<!-- version="2.1" -->
 <edition>
 	<!-- footer standard !-->
 	<footer>
@@ -92,7 +92,7 @@
 			<text col="6" align="center" label="Cat." font_size_step="-1">$(An)</text>
 			<text col="6" align="center" label="Cat." font_size_step="-1">$(Categ)</text>
 			<text col="4" align="right" label="C.Cat" font_size_step="-1">$(Cltc)</text>
-			<text col="3" align="center" label="CS">$(Comite)</text>
+			<text col="3" align="center" label="CS.">$(Comite)</text>
 			<text col="14" align="center" label="Club">$(Club)</text>
 
 			<text col="7" align="right" label="T.Qualif" >$(Tps_qualif)</text>
@@ -230,10 +230,10 @@
 
 						<matrix col_start="1">
 							<col w="(GetLabelDuelWidth(tour,duel))" />
-							<col w="3,5,20" /> <!-- couloir, bib, identity -->
+							<col w="3,5,20,4" /> <!-- couloir, bib, identity, Categ -->
 							<col cond="presentation == 'team'" w="15" />
 							<col cond="presentation == 'club'" w="4,12" />
-							<col cond="presentation == 'nation'" w="4" />
+							<col cond="presentation == 'nation'" w="4,4" />
 							<col cond="presentation == 'progression'" w="10" />
 							<col w="10,4" /> <!-- time, rk -->
 							
@@ -243,11 +243,13 @@
 									<text col_start="2">'C.'</text>
 									<text col_start="3">'Dos'</text>
 									<text col_start="4">'Identité'</text>
-									<text col_start="5" cond="presentation == 'nation'">'Nat'</text>
-									<text col_start="5" cond="presentation == 'team'">'Equipe'</text>
-									<text col_start="5" cond="presentation == 'progression'">'Progression'</text>
-									<text col_start="5" cond="presentation == 'club'">'CS'</text>
-									<text col_start="6" cond="presentation == 'club'">'Club'</text>
+									<text col_start="5">'Categ.(S)'</text>
+									<text col_start="6" cond="presentation == 'nation'">'Nat'</text>
+									<text col_start="7" cond="presentation == 'nation'">'CS.'</text>
+									<text col_start="6" cond="presentation == 'team'">'Equipe'</text>
+									<text col_start="6" cond="presentation == 'progression'">'Progression'</text>
+									<text col_start="6" cond="presentation == 'club'">'CS.'</text>
+									<text col_start="7" cond="presentation == 'club'">'Club'</text>
 									<text col_start="-1">'Temps'</text>
 									<text col_start="0">'Clt'</text>
 								</font>
@@ -259,14 +261,16 @@
 								<text col_start="2" font_color="yellow" bk_color="black" pen_color="dkgray">couloir</text>
 								<text col_start="3" align="right">GetText(tour, duel, couloir, 'Dossard')</text>
 								<text col_start="4" align="left" font_size_step="-1">GetText(tour, duel, couloir, 'Identite')</text>
+								<text col_start="5" align="center" font_size_step="-1">GetText(tour, duel, couloir, 'Categ').." "..GetText(tour, duel, couloir, 'Sexe'):Parenthesis()</text>
 								
-								<text col_start="5" cond="presentation == 'nation'">GetText(tour, duel, couloir, 'Nation')</text>
-								<text col_start="5" cond="presentation == 'team'">GetText(tour, duel, couloir, 'Equipe')</text>
-								<text col_start="5" cond="presentation == 'progression'">GetLabelProgression(tour, duel, couloir)</text>
+								<text col_start="6" cond="presentation == 'nation'">GetText(tour, duel, couloir, 'Nation')</text>
+								<text col_start="7" cond="presentation == 'nation'">GetText(tour, duel, couloir, 'Comite')</text>
+								<text col_start="6" cond="presentation == 'team'">GetText(tour, duel, couloir, 'Equipe')</text>
+								<text col_start="6" cond="presentation == 'progression'">GetLabelProgression(tour, duel, couloir)</text>
 								
 								<font weight="normal" size_step="-2" >
-									<text col_start="5" cond="presentation == 'club'">GetText(tour, duel, couloir, 'Comite')</text>
-									<text col_start="6" cond="presentation == 'club'">GetText(tour, duel, couloir, 'Club')</text>
+									<text col_start="6" cond="presentation == 'club'">GetText(tour, duel, couloir, 'Comite')</text>
+									<text col_start="8" cond="presentation == 'club'">GetText(tour, duel, couloir, 'Club')</text>
 								</font>
 
 								<text col_start="-1" align="right">GetText(tour, duel, couloir, 'Tps')</text>
