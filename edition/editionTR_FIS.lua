@@ -1,5 +1,6 @@
 dofile('./interface/adv.lua');
 dofile('./interface/interface.lua');
+dofile('./edition/functionPG.lua');
 
 function ReplaceTableEnvironnement(t, name)		-- replace la table créée dans l'environnement de la base de donnée pour éviter les memory leaks
 	if type(t) ~= 'userdata' then
@@ -999,8 +1000,6 @@ end
 -- Point Entree Principal
 function main(params)
 	-- vérification de l'existence d'une version plus récente du script.
-	local url = 'https://live.ffs.fr/maj_pg/tr/last_version.txt'
-	local version = curl.AsyncGET(wnd.GetParentFrame(), url);
 	base = base or sqlBase.Clone();
 	Device = {};
 	TR = {};
@@ -1010,7 +1009,7 @@ function main(params)
 	TR.x = 0;
 	TR.y = 0;
 
-	scrip_version = "4.5"; 
+	scrip_version = "4.6"; 
 	-- vérification de l'existence d'une version plus récente du script.
 -- Ex de retour : LiveDraw=5.94,Matrices=5.92,TimingReport=4.3,DoubleTirage=3.2,TirageOptions=3.3,TirageER=1.7,ListeMinisterielle=2.3,KandaHarJunior=2.0
 	if app.GetVersion() >= '4.4c' then 
@@ -1044,10 +1043,6 @@ function main(params)
 	TR.saison = tonumber(Epreuve:GetCell("Code_saison", 0)) or 0;
 	
 	base:TableLoad(Resultat_Chrono, "Select * From Resultat_Chrono Where Code_evenement = "..TR.code_evenement);
-	if Resultat_Chrono:GetNbRows() == 0 then
-		TR.errormessage = TR.errormessage.."La course n'a pas été chronométrée en base de temps \nou bien résulte d'un import XML !!\nMerci d'importer la course au format sav ou d'utiliser le logiciel de la FIS.\n";
-		TR.OK = false;
-	end
 	if TR.OK == true then
 		for i = 1, TR.nombre_de_manche do
 			local cmd = "Select * From Resultat_Chrono Where Code_evenement = "..TR.code_evenement.." and Code_manche = "..i.." and ABS(Dossard) > 0 And Heure > 0 And (Id = 0 Or Origine = 'D')";
@@ -1313,6 +1308,10 @@ function SetValuesPage1()
 end
 
 function AfficheDialog1()
+	if Resultat_Chrono:GetNbRows() == 0 then
+		msg = "La course n'a pas (encore) été chronométrée en base de temps sur cet ordinateur.\nVous ne pourrez enregistrer que les données de la page 1.";
+		app.GetAuiFrame():MessageBox(msg, "Attention", msgBoxStyle.OK+msgBoxStyle.ICON_WARNING)
+	end
 	dlgConfig:EndModal(idButton.CANCEL) 
 	dlgPage1 = wnd.CreateDialog(
 		{
@@ -1392,10 +1391,15 @@ function AfficheDialog1()
 		end
 		-- adv.Alert('\n----------------- fin de lecture de TRini.xml\n')
 	end
-	if not app.FileExists('./res/tr/ETS2.jpg') then
-		local msg = "Voulez-vous télécharger les images manquantes des appareils homologués ?";
+	if not app.FileExists('./res/tr/WIRC.jpg') then
+		local url = 'http://188.165.236.85/maj_pg/tr/TimingReportImages2.exe';
+		adv.Alert('./res/tr/WIRC.jpg existe pas')
+		local msg = "Voulez-vous télécharger les images manquantes pour les appareils homologués ? ";
 		if app.GetAuiFrame():MessageBox(msg, "Télécharger les images manquantes", msgBoxStyle.YES_NO+msgBoxStyle.ICON_WARNING) == msgBoxStyle.YES then
-			local url = 'http://188.165.236.85/maj_pg/tr/TimingReportImages.exe';
+			if not app.FileExists('./res/tr/RLS1.jpg') then
+				adv.Alert('./res/tr/RLS1.jpg existe pas')
+				url = 'http://188.165.236.85/maj_pg/tr/TimingReportImages.exe';
+			end
 			TelechargementImages(url);
 		end
 	end
@@ -1417,12 +1421,23 @@ function AfficheDialog1()
 	local btnClose = tbpage1:AddTool("Quitter", "./res/32x32_exit.png");
 	tbpage1:AddStretchableSpace();
 	tbpage1:Realize();
+	tbpage1:EnableTool(btnNext:GetId(), not Eval(Resultat_Chrono:GetNbRows(), 0)); 
 
 	dlgPage1:Bind(eventType.MENU, 
 		function(evt) 
 			TR.XML = app.GetPath().."/edition/TRini.xml";
 			TR.XML = string.gsub(TR.XML, "\\", "/");
 			OnSaveXML(TR.XML, false)
+			local msg = "Attention, Si vous avez déjà enregistré les données de la manche 1,\n"..
+						"vous devez Ouvrir le Timing Report déjà enregistré.\n"..
+						"Sinon les données de la manche 1 du Système B seront effacées.\n"..
+						"Voulez-vous poursuivre ?";
+			if app.GetAuiFrame():MessageBox(msg,
+							"Passer sur la page 2", 
+							msgBoxStyle.YES+msgBoxStyle.NO+msgBoxStyle.NO_DEFAULT+msgBoxStyle.ICON_WARNING
+							) == msgBoxStyle.NO then
+				return;
+			end
 			AfficheDialog2() 
 		end, btnNext); 
 	dlgPage1:Bind(eventType.MENU, 
