@@ -2076,6 +2076,7 @@ function OnCellContext(evt)
 	local row = evt:GetRow();
 	local col = evt:GetCol();
 	if row >= 0 and col >= 0 then
+		local cf_uf = 'CF';
 		local t = grid_tableau:GetTable();
 		local colName = t:GetColumnName(t:GetVisibleColumnsIndex(col));
 		if not colName:find('Nom') and not colName:find('Prenom') and not colName:find('Code') and not colName:find('Club')then
@@ -2086,6 +2087,10 @@ function OnCellContext(evt)
 				align_horz = wndStyle.ALIGN_CENTER_HORIZONTAL
 			});
 		end
+		-- if colName == 'Statut' then
+			-- cf_uf = t:GetCell('Statut', row);
+			-- grid_tableau:SetCellBackgroundColour(row, col, 'green');
+		-- elseif colName == 'Nation' then
 		if colName == 'Nation' then
 			local nation = tDraw:GetCell('Nation', row);
 			evt:SetCellContext({ 
@@ -2517,7 +2522,7 @@ Groupe 6 On poursuit selon les points FIS.
 		end
 	end
 	-- draw.rang_tirage = tDrawG1:GetNbRows() + tDrawG2:GetNbRows() + 1;
-	tDrawG3:OrderBy('ECSL_points, FIS_pts, WCSL_rank');				-- dans les 30 de la WCSL
+	tDrawG3:OrderBy('ECSL_points DESC, FIS_pts, WCSL_rank');				-- dans les 30 de la WCSL
 	if tDrawG3:GetNbRows() > 0 then
 		for i = 0, tDrawG3:GetNbRows() -1 do		-- dans les 30 de la WCSL 
 			local code_coureur = tDrawG3:GetCell('Code_coureur', i);
@@ -3212,9 +3217,8 @@ function OnAfficheTableau()
 				grid_tableau:RefreshCell(row, indexcol);
 			end
 			grid_tableau:SynchronizeRowsView();
-			CommandSendList();
-			CommandSendOrder();
 			base:TableBulkUpdate(tDraw, 'Statut', 'Resultat_Info_Tirage');
+			OnSendTableau(true);
 			SendMessage('Board refreshed');
 		end
 		, btnValiderSelection);
@@ -3232,9 +3236,10 @@ function OnAfficheTableau()
 				grid_tableau:RefreshCell(row, indexcol);
 			end
 			grid_tableau:SynchronizeRowsView(); -- on est sur la vue
+			base:TableBulkUpdate(t, 'Statut', 'Resultat_Info_Tirage');
+			RefreshGrid(false);
 			CommandSendList();
 			CommandSendOrder();
-			base:TableBulkUpdate(tDraw, 'Statut', 'Resultat_Info_Tirage');
 			SendMessage('Board refreshed');
 		end
 		, btnInValiderSelection);
@@ -3702,7 +3707,7 @@ function main(params_c)
 	draw.height = display:GetSize().height - 30;
 	draw.x = 0;
 	draw.y = 0;
-	scrip_version = "5.4"; -- 4.92 pour 2022-2023
+	scrip_version = "5.42"; -- 4.92 pour 2022-2023
 	local imgfile = './res/40x16_dbl_coche.png';
 	if not app.FileExists(imgfile) then
 		app.GetAuiFrame():MessageBox(
