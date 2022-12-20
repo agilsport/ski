@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- version 2.0 -->
 <root>
 	<panel name="config">
 		<padding all="2px"/>

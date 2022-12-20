@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
+<!-- Version 1.2 -->
 <edition>
 	<menu>
 		<menu title="Edition Participants" image="./res/32x32_juges.png" bold="false" cond ="($(Epreuve.Code_discipline)='RELAIS')">
@@ -27,8 +27,10 @@
 		<menu title="Résultats " image="./res/32x32_snow_esf.png">
 			<menu title="Résultats Relais - Equipier Paysage" image="./res/16x16_juges.png" id="res_relais_equipier" choix_manche="1" mode_lap="1" first_header="0" />
 			<menu title="Edition des Qualifiés Team-Sprint" image="./res/16x16_bib.png" id="res_qualif_TeamSprint" qualif_critere="1" />
-			<menu title="Edition Finales Team-Sprint" image="./res/16x16_bib.png" id="res_TeamSprint" />
-			
+			<menu title="Edition Finales Team-Sprint:" image="./res/16x16_official.png">
+				<menu title="Officiels" image="./res/16x16_bib.png" id="res_TeamSprint" />
+				<menu title="Officiels avec équipiers" image="./res/16x16_bib.png" id="res_TeamSprint_Equ" />
+			</menu>
 			<!-- <menu title="Tours (1-a)" image="./res/16x16_official.png" id="res_Tour" DossardRelais="Lettre" /> -->
 		</menu>
 	</menu>
@@ -432,7 +434,6 @@
 			</before>
 		</rupture>
 		<!-- <paper orientation="landscape" /> -->
-		<!-- manque la fonction getNbEquiper() -->
 		<lua>
 			_context_border = true;
 			entite = $(Evenement.Code_entite);
@@ -523,8 +524,10 @@
 	<report id="res_relais_equipier" title="Résultats Relais" >
 
 		<paper orientation="landscape" />
-		<lua>nb_lap = base:GetRecord('Epreuve'):GetInt('Nb_participants');</lua>
-		<lua>manche = manche or 1</lua>
+		<lua>
+			nb_lap = base:GetRecord('Epreuve'):GetInt('Nb_participants');
+			manche = manche or 1
+		</lua>
 
 		<order key="Tps, Dossard Desc" />
 	
@@ -565,26 +568,80 @@
 		<column name="Status_equipe" type="text">' '</column>
 		<column name="Type_qualif" type="text">' '</column>
 		<lua>
+		msg = ''
+		stop = 0
+		if body:GetNbRows()-1 > 0 then
+			for i=0, body:GetNbRows()-1 do
+				ordre_niveau = tonumber(body:GetCell('Clt',i))
+				if ordre_niveau == nil then
+					msg = 'pas de temps cumulé, revenir en 2 phases et relancer l\'édition'
+					stop = 1
+					break
+				end
+			end
+		end
+		if stop == 0 then
+			if $(code_epreuve) == nil then
+				epr = 0
+			else
+				epr = tonumber($(Code_epreuve))
+				if epr &lt; 0 then 
+					epr = 0
+				end
+			end
+			PcodeEvenement = $(Code_evenement)
+			PcodeManche = 3
 			for i=0, body:GetNbRows()-1 do
 				body:SetCell('Type_qualif', i, body:GetCell('Critere', i):sub(1,1));
 			end
-
 			for i=0,body:GetNbRows()-1 do 
 				if body:GetCell('Critere', i):sub(1,1) == "T" then 
 					body:SetCell('Status_equipe', i, "Qualifié");
 					ordre_niveau = 1;
-					centre = "A";
+					centre = '0'..string.format('%02d',epr);
 				else
 					ordre_niveau = tonumber(body:GetCell('Clt',i));
-					centre = "B";
+					centre = '9'..string.format('%02d',epr);
 				end
 				reserve = tonumber(body:GetCellInt('Tps1',i)) + tonumber(body:GetCellInt('Tps2',i))
 				local cmd = "Update Resultat Set Centre = '"..centre.."', Ordre_niveau = "..ordre_niveau..", reserve = "..reserve.." ";
 				cmd =  cmd.."Where Code_evenement = "..body:GetCell('Code_evenement',i).." ";
 				cmd =  cmd.."And Code_coureur = '"..body:GetCell('Code_coureur',i).."' ";
 				base:Query(cmd);
+				PcodeCoureur = body:GetCell('Code_coureur',i)
+				cmd    =   " Select * From Resultat_Manche ";
+				cmd = cmd.." Where Code_evenement = "..PcodeEvenement;
+				cmd = cmd.." And Code_coureur = '"..PcodeCoureur.."'";
+				cmd = cmd.." And Code_manche = "..PcodeManche;
+				local tReq = base:TableLoad(cmd);
+				if tonumber(centre) &lt; 900 then
+					Prang = tonumber(centre)*1000 + body:GetCellInt('Clt',i);
+					if tReq:GetNbRows() == 0 then
+						cmd =      "Insert Into Resultat_Manche (Code_evenement, Code_coureur, Code_manche, Rang) values (";
+						cmd = cmd..PcodeEvenement;
+						cmd = cmd..",'";
+						cmd = cmd..PcodeCoureur;
+						cmd = cmd.."',"..PcodeManche..",";
+						cmd = cmd..Prang;
+						cmd = cmd..")";
+					else
+						cmd =      "Update Resultat_Manche Set Rang = "..Prang;
+						cmd = cmd.." Where Code_evenement = "..PcodeEvenement;
+						cmd = cmd.." And Code_coureur = '"..PcodeCoureur.."'";
+						cmd = cmd.." And Code_manche = "..PcodeManche;
+					end
+					base:Query(cmd);
+				else
+					if tReq:GetNbRows() ~= 0 then
+						cmd =      "Update Resultat_Manche Set Rang = Null";
+						cmd = cmd.." Where Code_evenement = "..PcodeEvenement;
+						cmd = cmd.." And Code_coureur = '"..PcodeCoureur.."'";
+						cmd = cmd.." And Code_manche = "..PcodeManche;
+						base:Query(cmd);
+					end
+				end
 			end
-			
+		end	
 		</lua>		
 		<order key="Clt, Tps, Dossard" />		
 		<rupture key="Type_qualif">
@@ -593,6 +650,9 @@
 				<row value="0.4cm"/>
 				<lua>
 					local ruptureQualif = 'Suite des classements';
+					if stop == 1 then
+						ruptureQualif = msg;
+					end
 					if $(Type_qualif) == 'A' then ruptureQualif = 'Qualifiés Manche 1';
 					elseif $(Type_qualif) == 'B' then ruptureQualif = 'Qualifiés Manche 2';
 					elseif $(Type_qualif) == 'T' then ruptureQualif = 'Qualifiés Total des 2 Manches';
@@ -618,26 +678,28 @@
 		</label>
 		
 		<body>
-			<font name="Calibri" size="9" adjust="max" weight="bold" />
-			<call option="couleur_alternee" file="./edition/options.xml"/>
-			<pen border="none" size="1" />
-			
-			<row value="auto"/>
-			<text col="6" align="center" label="Qualif." font_weight="bold" font_size_step="1"><font color="white" cond="($(Type_qualif) ~= '')"/><background color="rgb 210 0 1" mode="solid" cond="($(Type_qualif) ~= '')"/>$(Clt)</text>
-			<text col="4" align="right" label="Dos">$(Dossard)</text>
-			<text col="15" align="left" label="Nom - Prénom" font_weight="bold" font_size_step="1">$(Identite)</text> 
-			<text col="4" align="center" label="S." font_size_step="-1">$(Sexe)</text>
-			
-			<text col="8" align="right" label="Tps.M1">$(Tps1)</text>
-			<text col="4" align="right" label="C.M1" font_weight="bold"><font color="white" cond="($(Type_qualif) == 'A')"/><background color="rgb 210 0 1" mode="solid" cond="($(Type_qualif) == 'A')"/>$(Clt1)</text>
-			
-			<text col="8" align="right" label="Tps.M2">$(Tps2)</text>
-			<text col="4" align="right" label="C.M2" font_weight="bold"><font color="white" cond="($(Type_qualif) == 'B')"/><background color="rgb 210 0 1" mode="solid" cond="($(Type_qualif) == 'B')"/>$(Clt2)</text>
-			
-			<text col="8" align="right" label="Total">$(Tps)</text>
-			<text col="4" align="right" label="C.T" font_weight="bold"><font color="white" cond="($(Type_qualif) == 'T')"/><background color="rgb 210 0 1" mode="solid" cond="($(Type_qualif) == 'T')"/>$(Status_equipe)</text>
-	
-			<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
+			<lua>if stop == 0 then</lua>
+				<font name="Calibri" size="9" adjust="max" weight="bold" />
+				<call option="couleur_alternee" file="./edition/options.xml"/>
+				<pen border="none" size="1" />
+				
+				<row value="auto"/>
+				<text col="6" align="center" label="Qualif." font_weight="bold" font_size_step="1"><font color="white" cond="($(Type_qualif) ~= '')"/><background color="rgb 210 0 1" mode="solid" cond="($(Type_qualif) ~= '')"/>$(Clt)</text>
+				<text col="4" align="right" label="Dos">$(Dossard)</text>
+				<text col="15" align="left" label="Nom - Prénom" font_weight="bold" font_size_step="1">$(Identite)</text> 
+				<text col="4" align="center" label="S." font_size_step="-1">$(Sexe)</text>
+				
+				<text col="8" align="right" label="Tps.M1">$(Tps1)</text>
+				<text col="4" align="right" label="C.M1" font_weight="bold"><font color="white" cond="($(Type_qualif) == 'A')"/><background color="rgb 210 0 1" mode="solid" cond="($(Type_qualif) == 'A')"/>$(Clt1)</text>
+				
+				<text col="8" align="right" label="Tps.M2">$(Tps2)</text>
+				<text col="4" align="right" label="C.M2" font_weight="bold"><font color="white" cond="($(Type_qualif) == 'B')"/><background color="rgb 210 0 1" mode="solid" cond="($(Type_qualif) == 'B')"/>$(Clt2)</text>
+				
+				<text col="8" align="right" label="Total">$(Tps)</text>
+				<text col="4" align="right" label="C.T" font_weight="bold"><font color="white" cond="($(Type_qualif) == 'T')"/><background color="rgb 210 0 1" mode="solid" cond="($(Type_qualif) == 'T')"/>$(Status_equipe)</text>
+		
+				<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
+			<lua>end</lua>
 		</body>
 		<!-- <end> -->
 			<!-- <lua>sqlBase.FixationTableRanking(body)</lua> -->
@@ -720,5 +782,94 @@
 		</end>
 	</report>
 	
+	<report id="res_TeamSprint_Equ" title="Edition des Qualifiés" first_header="0" >
+		<column name="Type_qualif" type="text">' '</column>
+		<lua>
+			NbEquipiers = base:GetRecord('Epreuve'):GetInt('Nb_participants');
+			app.GetAuiMessage():AddLine("NbEquipiers="..NbEquipiers);
+			for i=0, body:GetNbRows()-1 do
+				body:SetCell('Type_qualif', i, body:GetCell('Critere', i):sub(1,1));
+			end
+			body:SetRanking('Clt', 'Centre, Clt3 Asc NULL_OK, Ordre_niveau')
+		</lua>
+		<order key="Clt, Dossard" />
+		<rupture key="Type_qualif">
+			<before cond="1">
+				<font size="14"/>
+				<row value="0.4cm"/>
+				<lua>
+					local ruptureQualif = 'Suite des classements';
+					if $(Type_qualif) == 'A' then ruptureQualif = 'Qualifiés Manche 1';
+					elseif $(Type_qualif) == 'B' then ruptureQualif = 'Qualifiés Manche 2';
+					elseif $(Type_qualif) == 'T' then ruptureQualif = 'Finale Team-Sprint';
+					else
+					ruptureQualif = 'Qualification'
+					end
+				</lua>
+				<text row="auto" col="1" >ruptureQualif</text>
+			</before>
+		</rupture>
+		
+		<label>
+			<font size="9" adjust="ellipsize"/>
+			<spacing left="10" right="10" top="2" bottom="2" />
+			<row h="auto" />
+			<pen border="all" size="1" />
+			<text col="6" align="center" >'Clt'</text>
+			<text col="4" align="center" >'Dos'</text>
+			<text col="17" align="center" >'Nom - Equipe'</text>
+			<text col="4" align="center" >'S.'</text>
+			<text col="12" align="right" >'Tps | Clt Qualif.1'</text>
+			<text col="12" align="right" >'Tps | Clt Qualif.2'</text>
+			<text col="12" align="right" >'Tps | Clt Finale'</text>
+			<row h="0.4cm"/>
+		</label>
+		
+		<body>
+			<font name="Calibri" size="9" adjust="max" weight="bold" />
+			<call option="couleur_alternee" file="./edition/options.xml"/>
+			<pen border="none" size="1" />
+			<row value="auto"/>
+			<lua>					
+				for m=0, NbEquipiers-1 do
+			</lua>
+					<row value="auto"/>
+			<lua>
+				end
+			</lua>
+			<!-- <text col="6" align="center" label="Qualif." font_weight="bold" font_size_step="1"><font color="white" cond="($(Type_qualif) ~= '')"/><background color="rgb 210 0 1" mode="solid" cond="($(Type_qualif) ~= '')"/>$(Ordre_niveau)</text> -->
+			<text row_start="1" row_end="1" col="6" align="center" label="Clt">$(Clt)</text>
+			<text row_start="1" row_end="1" col="4" align="right" label="Dos">$(Dossard)</text>
+			<text row_start="1" row_end="1" col="17" align="left" label="Nom - Prénom" font_weight="bold" font_size_step="1">$(Identite)</text> 
+			<text row_start="1" row_end="1" col="4" align="center" label="Sexe" font_size_step="-1">$(Sexe)</text>
+			<!-- <text row_start="1" row_end="1" col="20" align="center" label="Centre" font_size_step="-1">$(Centre)</text> -->
+			<!-- <text row_start="1" row_end="1" col="20" align="center" label="Ordre_niveau" font_size_step="-1">$(Ordre_niveau)</text> -->
+			<!-- <text row_start="1" row_end="1" col="20" align="center" label="Clt3" font_size_step="-1">$(Clt3)</text> -->
+			<text row_start="1" row_end="1" col="8" align="right" label="Tps.Qualif.1">$(Tps1)</text>
+			<text row_start="1" row_end="1" col="4" align="right" label="C.M1" font_weight="bold"><font color="white" cond="($(Type_qualif) == 'T')"/>$(Clt1)</text>
+			
+			<text row_start="1" row_end="1" col="8" align="right" label="Tps.Qualif2">$(Tps2)</text>
+			<text row_start="1" row_end="1" col="4" align="right" label="C.M2" font_weight="bold"><font color="white" cond="($(Type_qualif) == 'T')"/>$(Clt2)</text>
+			
+			<text row_start="1" row_end="1" col="8" align="right" label="Tps.Finale">$(Tps3)</text>
+			<text row_start="1" row_end="1" col="4" align="right" label="C.M3" font_weight="bold"><font color="white" cond="($(Type_qualif) == 'T')"/>$(Clt3)</text>
+ 
+			<!-- <text row_start="1" row_end="1" col="6" align="right" label="Total">$(Tps)</text> -->
+			<!-- <text row_start="1" row_end="1" col="4" align="right" label="C.T" font_weight="bold"><font color="white" cond="($(Type_qualif) == 'T')"/><background color="rgb 210 0 1" mode="solid" cond="($(Type_qualif) == 'T')"/>$(Clt)</text> -->
+			<lua>					
+				for m=0, NbEquipiers-1 do
+			</lua>
+					<text row_start='(m+2)' col_start="3" col_end="3" align="left" label="('Identité Relayeur '..m+1)">$(Dossard)..'-'..base:GetEquipier($(Code_coureur), m+1, 'Numero')..' - '..base:GetEquipier($(Code_coureur), m+1, 'Nom')..' '..base:GetEquipier($(Code_coureur), m+1, 'Prenom')..' '..base:GetEquipier($(Code_coureur), m+1, 'Sexe'):Parenthesis()</text>
+					<text row_start='(m+2)' col_start="4" col_end="7" align="left" label="('Identité Relayeur '..m+1)">base:GetEquipier($(Code_coureur), m+1, 'Naissance'):sub(7,10)..' - '..base:GetEquipier($(Code_coureur), m+1, 'Categ')..' / '..base:GetEquipier($(Code_coureur), m+1, 'Club')..' '..base:GetEquipier($(Code_coureur), m+1, 'Comite'):Parenthesis()</text>
+					
+			<lua>
+				end
+			</lua>
+			<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
+		</body>
+		<end>
+			<lua>sqlBase.FixationTableRanking(body)</lua>
+		</end>
+	</report>
 </edition>
 
