@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- Menu Editions Activité "FOND " suplementaire !-->
-<!-- version="7.0" !-->
+<!-- version="7.2" !-->
 <!-- si possible de faire fonctionne des cond dans les menu -->
 <!-- si possible de fermer des Item par default -->
 <!-- 6.7 mise en place de la fonction page break -->
@@ -42,7 +42,7 @@
 				<menu title="FIS Sprint dans la Colonne Pts" image="./res/16x16_fis.png" LabelPts="FIS_Spr" colum_Pts="Pts" LabelNc="NC_FIS_Spr" Colum_Label="Info" lua="./edition/PtsFFS_ColPtsBest.lua" />
 			</menu>
 			<menu title="Start List pour controle avec les 3 colonnes Pts (FFS, Fis Distance, Fis sprint) par Ordre de dossards" image="./res/16x16_official.png" id="lst_FIS" Qrcode="0" officiel="0" />			
-			<menu title="Par Nation / Comité" image="./res/16x16_ranking.png" id="part_NatClub" first_header="0" orderby="Nation" choix_manche="1" /></menu>
+			<menu title="Edition des entrées Par Nation / Comité" image="./res/16x16_ranking.png" id="part_NatClub" first_header="0" orderby="Nation" choix_manche="1" /></menu>
 				
 		<menu title="Editions Supplémentaires" image="./res/32x32_options.png">
 			<menu title="Edition du Timing Report FIS" image="./res/16x16_fis.png" id="timing_report" lua="./edition/editionTR_FIS.lua" />
@@ -260,47 +260,58 @@
 				<text row="auto" align="center" cond="title" >title</text>
 				<row h="0.5cm"/>
 			</header>
-			<first_header />
+			
 			<!-- <background mode="transparent" /> -->
 			<lua>
-				entite = $(Evenement.Code_entite)
-				body:SetCounter('Distance,Sexe,Categ', 'recap')
-				body:SetCounter('Distance')
-				body:SetCounter('Distance,Sexe', 'sex')
-				counter = body:GetCounter('recap')
-				counter1 = body:GetCounter('Distance')
-				counter2 = body:GetCounter('sex')
+				entite = $(Evenement.Code_entite);
+				body:SetCounter('Distance,Sexe,Categ', 'recap');
+				body:SetCounter('Distance');
+				body:SetCounter('Distance,Sexe', 'sex');
+				counter = body:GetCounter('recap');
+				counter1 = body:GetCounter('Distance');
+				counter2 = body:GetCounter('sex');
+				body:SetCounter('Nation');
+				body:SetCounter('Nation, Comite', 'comite');
+				counter3 = body:GetCounter('Nation');
+				counter4 = body:GetCounter('comite');
 			</lua>
 			<order key="Distance, Sexe, Categ" />	
-			<end>
+			<first_header>
 				<!-- Par Distance -->
-				<text row="auto" col_start="1" col_end="0" border="1" align="center" >'Récapitulatif par Distance'</text>
+				<text row="auto" col_start="1" col_end="0" border="1" align="center" >'Récapitulatif par Distance et Sexe'</text>
 				<row h="0.3cm"/>
 				<lua>for i=0, counter1:GetNbRows()-1 do </lua>
-				<text row="auto" col_start="1" col_end="0">
-					'distance '..counter1:GetCell(0,i)..' Km => '..counter1:GetCell('_count_',i)..'Inscrits'
-				</text>
-				<lua>sex = counter:GetCell(1,i)</lua> 
-				<lua>dista = counter1:GetCell(0,i)</lua>
-						<lua>for y=0, counter2:GetNbRows()-1 do </lua>
-							<lua>if counter2:GetCell(0,y) == dista and counter2:GetCell(1,y) == 'F' then </lua>
-								<lua>nbDamesT = counter2:GetCell('_count_',y)</lua>
-									<text row="auto" col_start="1" col_end="0">
-								'           Avec '..nbDamesT..' Dames'
-								</text>
+					<text row="auto" col_start="1" col_end="0">
+						'distance '..counter1:GetCell(0,i)..' Km => '..counter1:GetCell('_count_',i)..'Inscrits'
+					</text>
+					<lua>
+						sex = counter:GetCell(1,i)
+						dista = counter1:GetCell(0,i)
+							for y=0, counter2:GetNbRows()-1 do
+								if counter2:GetCell(0,y) == dista and counter2:GetCell(1,y) == 'F' then
+									nbDamesT = counter2:GetCell('_count_',y)
+					</lua>
+									<text row="auto" col_start="1" col_end="0">'           Avec '..nbDamesT..' Dames'</text>
 							
-							<lua>elseif counter2:GetCell(0,y) == dista and counter2:GetCell(1,y) == 'M' then </lua>
-								<lua>nbHommesT = counter2:GetCell('_count_',y)</lua>
-							<text row="auto" col_start="1" col_end="0">
-								'           Avec '..nbHommesT..' Hommes'
-								</text>
-							<lua>else </lua>
+					<lua>
+								elseif counter2:GetCell(0,y) == dista and counter2:GetCell(1,y) == 'M' then
+									nbHommesT = counter2:GetCell('_count_',y)
+					</lua>
+									<text row="auto" col_start="1" col_end="0">'           Avec '..nbHommesT..' Hommes'</text>
+					<lua>
+								else
 								
-							<lua>end</lua>						
-						<lua>end</lua>
+								end						
+							end
+					</lua>
 					<row h="0.1cm"/>
 				<lua>end</lua>
 				<row h="1cm"/>
+			
+			
+			</first_header >
+			<end>
+				
 				
 				<!-- Distance, Sexe, Categ -->
 				<text row="auto" col_start="1" col_end="0" border="1" align="center">'Récapitulatif par Distance / sexe / Catégories'</text>
@@ -338,6 +349,37 @@
 						</matrix>
 					<row h="0.1cm"/>	
 			<lua>end</lua>
+			
+			<!-- Par Nation et comité -->
+				<row h="0.5cm"/>
+				<text row="auto" col_start="1" col_end="0" border="1" align="center" >'Récapitulatif par Nation Comité'</text>
+				<row h="0.3cm"/>
+				<matrix row="auto" col_start="1" col_end="0" >
+				<col w="10, 0.5cm,30" />
+					<lua>
+						for d=0, counter3:GetNbRows()-1 do 
+					</lua>
+						<text row="auto" col_start="1" col_end="0">'Nation '..counter3:GetCell(0,d)..' => '..counter3:GetCell('_count_',d)..'Inscrits'</text>
+							<lua>
+								nat = counter3:GetCell(0,d)
+								for f=0, counter4:GetNbRows()-1 do
+									if counter4:GetCell(0,f) == nat and counter4:GetCell(1,f) ~= '' then							
+							</lua>
+										<text row="auto" col_start="2" col_end="0">
+											'Comité '..counter4:GetCell(1,f)..' => '..counter4:GetCell('_count_',f)..'Inscrits'
+										</text>
+										<row h="0.1cm"/>
+							<lua>
+									end
+								end</lua>
+							
+						<row h="0.1cm"/>
+					<lua>end</lua>
+				</matrix>	
+				<row h="1cm"/>
+			
+			
+			
 			</end>
 		</report>	
 
@@ -622,6 +664,12 @@
 			officiel = tonumber(params.officiel or 0);
 			
 			entite = $(Evenement.Code_entite);
+			discpline = $(Epreuve.Code_discipline);
+			if discpline == 'KO-KLF' then
+				disc_FIS = 'Sprint';
+			else
+				disc_FIS = 'Distance';
+			end
 			lang = lang or 'fr';
 
 			body:SetCounter('Nation');
@@ -634,26 +682,27 @@
 		<rupture key="Nation">
 			<before>
 				<lua>
-					nation = body:GetCell('Nation', row);
+					local nation = body:GetCell('Nation', row);
 					local comite = body:GetCell('Comite', row)
 				</lua>
-			<pagebreak cond="page_break == 1 and row ~= 0 and comite == '' " />
+			<pagebreak cond="page_break == 1 and row >= 1 " />
 				
 				<row h="0.2cm"/>
-				<text row="auto" col="1" align="left" ><font size="14"/>$(Nation{nation}.Libelle)..' ('..body:GetCounterValue('Nation', nation)..')'</text>
+				<text row="auto" col="1" align="left" ><font size="14"/>nation..':   '..$(Nation{nation}.Libelle)..' ('..body:GetCounterValue('Nation', nation)..')'</text>
 			</before>
 		</rupture>
 
 		<rupture key="Comite">
 			<before>
 				<lua>
+					local nation = body:GetCell('Nation', row);
 					local comite = body:GetCell('Comite', row)
 				</lua>
-				<pagebreak cond="row ~= 0" />
+				<pagebreak cond="row >= 1 and nation == 'FRA' and comite ~= '' " />
 				<font size="12"/>
 				<row h="0.4cm"/>
 				<!-- <lua>comite = body:GetCell('Comite', row)</lua> -->
-				<text row="auto" col="1" >comite..'. '..$(Comite{comite}.Nom)..' ('..body:GetCounterValue('Comite', comite)..')'</text>
+				<text row="auto" col="1" cond="row ~= 1 and nation == 'FRA' and comite ~= '' " >comite..'. '..$(Comite{comite}.Nom)..' ('..body:GetCounterValue('Comite', comite)..')'</text>
 			</before>
 		</rupture>
 
@@ -665,16 +714,19 @@
 			<row h="auto"/>
 			<!-- <text col="0.5cm" font_size="6" align="center" label="Pb">$(Modif_manuel) </text> -->
 			<!-- <text col="4" align="right" label="(traduction('Dos'))">$(Dossard) </text> -->
-			<text col="7" align="center" label="(traduction('Code'))" ><font size="8" cond="group =='body'"/>$(Code_coureur):sub(4)</text>
-			<text col="18" align="left" label="(traduction('Identité'))">GetIdentiteCoureur(officiel)</text> 
+			<text col="6" align="center" label="(traduction('Code'))" ><font size="8" cond="group =='body'"/>$(Code_coureur)</text>
+			<text col="11" align="left" label="(traduction('Identité'))">GetIdentiteCoureur(officiel)</text> 
 			<text col="4" align="center" label="(traduction('An'))">$(An)</text>
-			<text col="6" align="center" label="(traduction('Categ'))">$(Categ)</text>
+			<text col="5" align="center" label="(traduction('Categ'))">$(Categ)</text>
 			<text col="4" align="center" label="(traduction('S.'))">$(Sexe)</text>
 			<text col="4" align="center" label="(traduction('Nat'))" cond="entite == 'FIS'">$(Nation)</text>
-			<text col="4" align="center" label="(traduction('CS.'))" cond="entite == 'FFS'">$(Comite)</text>
-			<text col="12" align="left" label="(traduction('Club'))" cond="entite == 'FIS'">$(Club)</text>
-			<text col="6" align="right" label="(traduction('Points'))" cond="entite == 'FFS'">$(Point)</text>
-			<text col="6" align="right" label="Pts FIS" cond="entite == 'FFS'">$(Pts_best)</text>
+			<text col="4" align="center" label="(traduction('CS.'))" >$(Comite)</text>
+			<text col="10" align="left" label="(traduction('Club'))" cond="entite == 'FFS'">$(Club)</text>
+			<!-- <text col="6" align="right" label="(traduction('Points ')..entite)" cond="entite == 'FFS'">$(Point)</text> -->
+			<!-- <text col="8" align="right" label="(traduction('Points ')..entite..'-'..disc_FIS)" cond="entite == 'FIS'">$(Point)</text> -->
+			<!-- <text col="6" align="right" label="(traduction('Points ')..'FIS Dist.')" cond="entite == 'FIS' and disc_FIS == 'Sprint' ">$(Pts_best)</text> -->
+			<!-- <text col="6" align="right" label="(traduction('Points ')..'FIS spr.')" cond="entite == 'FIS' and disc_FIS == 'Distance'">$(Pts)</text> -->
+			<!-- <text col="6" align="right" label="Pts FFS" cond="entite == 'FIS'">$(PtsClt)</text> -->
 			<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
 		</body>
 	</report>
