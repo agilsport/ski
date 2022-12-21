@@ -307,12 +307,8 @@
 					<row h="0.1cm"/>
 				<lua>end</lua>
 				<row h="1cm"/>
-			
-			
 			</first_header >
 			<end>
-				
-				
 				<!-- Distance, Sexe, Categ -->
 				<text row="auto" col_start="1" col_end="0" border="1" align="center">'Récapitulatif par Distance / sexe / Catégories'</text>
 				<row h="0.3cm"/>
@@ -377,9 +373,6 @@
 					<lua>end</lua>
 				</matrix>	
 				<row h="1cm"/>
-			
-			
-			
 			</end>
 		</report>	
 

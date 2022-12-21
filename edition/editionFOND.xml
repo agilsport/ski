@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!--  Menu Editions Activité "FOND" version="7.0"  -->
+<!--  Menu Editions Activité "FOND" version="7.2"  -->
 	<!-- nettoyage du fichier mise en place de la fonction getidentitecoureur  -->
 	<!-- Activation de la fenetre filtrage epreuves pour une edition gerer par un .lua => Option filter="before"  -->
 	<!-- calcul de la note poursuite 2éme jour  -->
@@ -55,6 +55,8 @@
 			<menu title="Par épreuve / catégories et sexe" image="./res/16x16_ranking.png" id="res_categ" header="1" first_header="0" choix_clt_max="1"/>
 			<menu title="Skiathlon" image="./res/16x16_ranking.png" id="res_Skiathlon" header="1" first_header="0" choix_manche="1"/>
 			<menu title="Analyse des différences entre chaque temps inter" image="./res/16x16_ranking.png" id="res_DiffInter" header="1" first_header="0" choix_manche="1"/>
+			<menu title="Analyse des différences entre chaque temps inter par plage d'intermédiaire (2=>5)" image="./res/16x16_ranking.png" filter="before" lua="./edition/Edition_plage_Inter.lua" first_header="0"/>
+			<menu title="Résultats avec choix de l'intermédiaire à éditer " image="./res/16x16_ranking.png" id="res_Cant_Chrono_inter_x" Inter="1" choix_manche="1" first_header="0"/>
 		</menu>
 	</menu>
 
@@ -1132,8 +1134,6 @@
 				<text row="auto" col="1" >ranking.Code(status)..' - '..ranking.Label(status)..' ('..body:GetCounterValue('Tps_status', status)..')'</text>
 			</before>
 		</rupture>
-		
-
 
 		<body>
 			<row h="auto" />
@@ -1186,11 +1186,122 @@
 						
 						<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
 						
-				</matrix>				
-						
+				</matrix>							
 		</body>
-
 	</report>	
 	
+	<!-- Résultatsinter X -->
+	<report id="res_Cant_Chrono_inter_x" title="(params.title or '')" header="1" first_header="(params.first_header or '1')" >
+		<lua>
+			Inter = wnd.GetNumberFromUser('Temps Inter', 'Valeur Inter', 'Selection Choix Inter', 1, 1, 99, app.GetAuiFrame());
+
+			title = 'Résultat de l\'intermédiaire: '..Inter;
+			TableEpreuvePassage = base:GetTable('Epreuve_Passage')
+			cmd = "Select * From Epreuve_Passage Where Code_evenement = "..$(Evenement.Code)..
+						  " and Code_epreuve = "..$(Epreuve.Code_epreuve)..
+						  " and Code_manche = "..manche..
+						  " and Code_Passage = "..Inter
+					Passage_lieu = base:TableLoad(TableEpreuvePassage, cmd):GetCell('Lieu', 0);
+					Passage_Altitude = base:TableLoad(TableEpreuvePassage, cmd):GetCell('Altitude', 0); 
+					Passage_Distance_Cumulee = base:TableLoad(TableEpreuvePassage, cmd):GetCellInt('Distance_Cumulee', 0)
+					Passage_Libelle = base:TableLoad(TableEpreuvePassage, cmd):GetCell('Libelle', 0);
+					Passage_Code_Passage = base:TableLoad(TableEpreuvePassage, cmd):GetCellInt('Code_Passage', 0);
+			if Passage_Code_Passage == tonumber(Inter) then
+				title = title..'\n du '..Passage_Libelle..' au Km '..Passage_Distance_Cumulee;
+			end
+			TpsInter = 'Tps'..manche..'_inter'..Inter;
+			CltInter = 'Clt'..manche..'_inter'..Inter;
+			CltcInter = 'Cltc'..manche..'_inter'..Inter;
+		</lua>
+	
+		<column name="Tps_status">chrono.Status(body:GetCellInt(TpsInter, row))</column>
+		<column name="Rank_SexeF" type="ranking" />
+		<column name="Rank_SexeM" type="ranking" />
+		<lua>
+			type_edition = id:sub(1,4);
+			body:SetCounter('Tps_status');
+			entite = $(Evenement.Code_entite);
+			nb_manche = base:GetTable('Epreuve'):GetCellInt('Nombre_de_manche', 0, 1);
+			body:SetRanking('Rank_SexeF', 'Sexe, '..TpsInter..', Dossard Desc');
+			body:SetRanking('Rank_SexeM', 'Sexe desc, '..TpsInter..', Dossard Desc');
+			orderby = 'Tps'..manche..'_inter'..Inter..', Dossard Desc';
+			
+		</lua>	
+		<order key="('Tps'..manche..'_inter'..Inter..', Dossard Desc')" />
+
+		<rupture key="Tps_status">
+			<before cond="$(Tps_status) ~= 'ok'">
+				<font size="14"/>
+				<lua>local status = $(Tps_status)</lua>
+				<row value="0.5cm"/>
+				<text row="auto" col="1" >ranking.Code(status)..' - '..ranking.Label(status)..' ('..body:GetCounterValue('Tps_status', status)..')'</text>
+				<row value="0.2cm"/>
+			</before>
+		</rupture>
+
+		<body>
+			<call option="couleur_alternee" file="./edition/options.xml" />
+			<call option="identiteCoureur" file="./edition/options.xml"/>
+			<font name="calibri" size="9" adjust="ellipsize" />
+			<spacing all="2" />
+			<spacing left="7" right="10" top="2" bottom="2" />
+			<row value="auto"/><font color="Red" cond="$(Sexe) == 'F'"/>
+			<text col="4" align="center" label="Clt" font_weight="bold" font_size_step="1">body:GetCellInt(CltInter, row)</text>
+			<text col="4" align="right" label="Dos">$(Dossard)</text>
+			<text col="7" align="right" label="Clt /Cat / S."><font size_step="-1" cond="group=='body'"/>body:GetCellInt(CltcInter, row)..' /'..$(Categ)..' /'..$(Sexe)..' '</text>
+			<lua>if $(Sexe) == 'F' then 
+					Rank_Sexe = body:GetCell('Rank_SexeF', row)..' / '..$(Sexe)
+				elseif $(Sexe) == 'M' then
+					Rank_Sexe = body:GetCell('Rank_SexeM', row)..' / '..$(Sexe)
+				else 
+					Rank_Sexe = ''
+				end
+			</lua>
+			<text col="4" align="right" label="Clt/S." ><font size_step="-1" cond="group=='body'"/>Rank_Sexe</text>
+			<text col="17" align="left" label="Nom - Prénom" >GetIdentiteCoureur(officiel)</text> 
+			<text col="4" align="center" label="Nat" cond="entite == 'FIS'">$(Nation)</text>
+				<lua>
+					CodeInscrit = $(Code_coureur)
+					TableResultatAdresse = base:GetTable('Resultat_Adresse')
+					cmd = "Select * From Resultat_Adresse Where Code_evenement = "..$(Evenement.Code)..
+								  " and Code_coureur = '"..$(Code_coureur).."'"
+
+							CodePostal = base:TableLoad(TableResultatAdresse, cmd):GetCell('Code_postal', 0):sub(1,2)
+							Ville = base:TableLoad(TableResultatAdresse, cmd):GetCell('Ville', 0)
+				</lua>
+			<text col="3" align="center" label="CP." >CodePostal</text>
+			<text col="15" align="center" label="Ville" >Ville</text>
+			<text col="12" align="center" label="Club" >$(Club)</text>
+			<!-- <lua>for m=1,nb_manche do</lua> -->
+				<!-- <text col="4" align="right" label="('Tps.M'..m)" cond="nb_manche ~= 1"><font size_step="-1" cond="group == 'body'" />body:GetCell('Tps'..m,row)</text>  -->
+			<!-- <lua>end</lua> -->
+			<text col="8" align="right" label="Tps" font_weight="bold" font_size_step="1">body:GetCell(TpsInter, row)</text>
+			<!-- calculvitesse -->	
+				<lua>
+					Temps = body:GetCell('_inter1',row,"%xs");
+
+					if $(Tps_status) == 'ok' then
+						TempsH = body:GetCell(TpsInter,row,"%2h");
+						TempsM = body:GetCell(TpsInter,row,"%2m");
+						TempsS = body:GetCell(TpsInter,row,"%2s");
+						
+						Temps1 = (TempsH*3600)+(TempsM*60)+TempsS;
+						
+						
+						Distancem = $(Distance)*1000;
+						
+						Vitesse1 = Distancem/Temps1;
+						
+						Vitesse2 = (Vitesse1*3600)/1000 ;
+						
+						Vitesse = tonumber(string.format("%.1f", Vitesse2));
+					else 
+						Vitesse = ''
+					end
+				</lua>
+			<text col="5" align="right" label="Km/H" >Vitesse</text>
+			<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
+		</body>
+	</report>	
 </edition>
 

@@ -1,0 +1,209 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!-- Version 1.0 -->
+<root>
+
+<!-- Fenètre de configuration de l'éditions des couloir de poursuite -->
+<panel name="Plage">
+	<padding all="2px"/>
+	<col value="5,5,5,5,5" />
+
+	<row value="auto" />
+		<statictext col_start="1" col_end="3"  align="right" label='N° de manche à éditer'/>
+		<spinctrl col_start="4" name="manche">'1'</spinctrl>
+
+	<row value="auto" />
+		<statictext col_start="1" col_end="0"  align="center" label="Plage de temps intermédiaires à éditer" />
+	
+	<row value="auto" />
+		<statictext col_start="1" col_end="3"  align="right" label='1er Intermédiaire à éditer'/>
+		<spinctrl col_start="4" name="FirstInter">'1'</spinctrl>
+
+	<row value="auto" />
+		<statictext col_start="1" col_end="3"  align="right" label='dernier Intermédiaire à éditer'/>
+		<spinctrl col_start="4" name="LastInter" >'1'</spinctrl>
+		
+	<row value="auto" />
+	<toolbar name="tb" col_start="1" col_end="0" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
+</panel>
+
+<!-- édition des couloirs de poursuite -->
+		<!-- Résultats diff inter -->
+			<!-- ligne pour faire des vérif de debug sur le nom des colonnes créer -->
+			<!-- app.GetAuiMessage():AddLine('colRankdiff = '..colRankdiff); -->
+		
+		<report id="res_DiffInter_Plage" title="(params.title or '')" header="1" first_header="0" >
+			<!-- header standard !-->
+			<header>
+				<lua>type_edition = id:sub(1,4)</lua>
+				<spacing all="0"/>
+				<background mode="transparent"/>
+				<font name="Calibri" size="14" adjust="max" weight="bold"/>
+				<text row="auto" col="1" font_size_step="18" align="center">$(Evenement.Nom)</text>
+				<text row="auto" align="center">$(Categorie{$(Epreuve.Code_categorie)}.Libelle)</text>
+				<text row="auto" align="center">$(Epreuve.Distance)..' Km - '..$(Sexe{$(Epreuve.Sexe)}.Libelle)</text>
+				<text row="auto" align="center" cond="title" >title</text>
+				<text row="auto" align="center" cond="title" ></text>
+				<row value="0.2cm"/>
+				<matrix row_start="-3" row_end="0" col_start="1" col_end="0">
+					<row value="1.5cm" />
+					<col value="1, 1.5cm" />
+					<qrcode adjust="best" col_start="2" cond="params.Qrcode=='1' and entite=='FFS' ">'http://live.cantal-chrono.fr/live_cc.php?codex='..$(Evenement.Codex)</qrcode>
+				</matrix>
+				
+				<!-- affichage du Compteur des classés si c'est un resultat (id commence par 'res_' et si le first header n'est pas actif) -->
+				<lua>if type_edition == 'res_' and first_header == '0' then</lua>
+					<call option="stat_ranking" cond="editor:GetPageCurrent() == 1" file="./edition/options.xml"/>
+				<lua>end</lua>
+				
+			</header>
+			<!-- <paper orientation="landscape" cond="Nb_tps_inter >= 4 "/> -->
+			<lua>
+				manche = params.manche;
+				FirstInter = params.FirstInter;
+				LastInter = params.LastInter;
+				Nb_tps_inter = params.Nb_tps_inter;
+				ColTpsX = 'Tps'..manche
+				ColTpsInterX = 'Tps'..manche..'_inter'..LastInter
+				ColdiffTpsinterx = 'Diff_Tps'..manche..'_I'..LastInter
+				ColRankTpsinterx = 'Rank_Diff_Tps'..manche..'_I'..LastInter
+				ColrefOrderX = 'Diff_Tps'..manche..'_I'..LastInter..', Dossard Desc'
+				body:ComputeSubtractTime(ColdiffTpsinterx, ColTpsX, ColTpsInterX)
+				body:SetRanking(ColRankTpsinterx, ColrefOrderX)
+			</lua>
+			<column name="Tps_status">chrono.Status(body:GetCellInt('Tps'..manche, row))</column>
+			<lua>
+				body:SetCounter('Tps_status')
+				for m=FirstInter,LastInter do
+					if tonumber(m) >= FirstInter then
+						ColTps2 = 'Tps'..manche..'_inter'..m 
+						ColTps1 = 'Tps'..manche..'_inter'..m-1 
+						Coldiffinter = 'Diff_I'..m..'_I'..m-1
+						colRankdiff = 'Rank_Diff_Tps'..m..'_I'..m-1
+						j = m-1
+						ColrefOrder = 'Diff_I'..m..'_I'..j..', Dossard Desc'
+						body:ComputeSubtractTime(Coldiffinter, ColTps2, ColTps1)
+						body:SetRanking(colRankdiff, ColrefOrder)
+					end
+				end
+				
+				type_edition = id:sub(1,4)
+				body:SetCounter('Tps_status')
+				entite = $(Evenement.Code_entite)
+			</lua>
+			
+			<order key="('Tps'..manche..', Dossard Desc')" />
+			
+			<rupture key="Tps_status">
+				<before cond="$(Tps_status) ~= 'ok'">
+					<font size="14"/>
+					<lua>local status = $(Tps_status)</lua>
+					<row value="0.4cm"/>
+					<text row="auto" col="1" >ranking.Code(status)..' - '..ranking.Label(status)..' ('..body:GetCounterValue('Tps_status', status)..')'</text>
+				</before>
+			</rupture>
+
+			<body>
+				<row value="auto" />
+				<row value="auto" />
+				<call option="couleur_alternee" file="./edition/options.xml" />
+				<call option="identite" file="./edition/options.xml"/>
+				<font name="calibri" size="9" adjust="ellipsize" />
+				<spacing all="2" />
+				<spacing left="7" right="10" top="2" bottom="2" />
+				<col value="1cm"/>
+				<text row_start="1" row_end="0" align="center" label="('Clt'..manche)" font_weight="bold" font_size_step="1"><background mode="solid" color="green" cond="(body:GetCell('Clt'..manche ,row)) == '1'" /><font color="white" cond="$(Clt) == '1'"/>body:GetCell('Clt'..manche ,row)</text>
+				<col value="1cm"/>
+				<text row_start="1" row_end="0" align="center" label="Dos.">$(Dossard)</text>
+		
+				<col value="5cm"/>
+					<text row_start="1">''</text> 
+					<background mode="transparent" />
+					<text row_start="1" align="left" label="Identité  - Code coureur">$(Identite)</text> 
+					<text row_start="1" align="right" ></text> 
+					<background mode="solid" />
+					<text row_start="2" align="left" label="Club - (CS.)">$(Club)..' - '..$(Comite{$(Comite)}.Nom):Parenthesis()</text> 
+				<col value="2cm"/>
+					<text row_start="1" align="center" label="Categ.(Cltc.)">$(Categ)..' - '..$(Cltc):Parenthesis()</text> 
+					<text row_start="2" align="center" label="Sexe - An">$(Sexe)..' - '..$(An)</text> 
+				<col value="0.5cm"/>
+				<text row_start="1" row_end="0" border="1"></text>
+					<matrix col_start="0" row_start="1" row_end="0">
+						<row value="auto" />
+						<row value="auto" />
+							<col value="4cm" />
+								<text row_start="1" row_end="0" col_start="1" align="right" label="('Inter'..FirstInter..'(Clt)')" ><background mode="solid" color="blue" cond="$(Clt1_inter1) == '1'" /><font color="white" cond="$(Clt1_inter1) == '1'"/>body:GetCell('Tps'..manche..'_inter'..FirstInter ,row)..' '..body:GetCell('Clt'..manche..'_inter'..FirstInter ,row):Parenthesis()</text>
+								
+						<lua>
+							col_num = 2;
+							aff_inter = FirstInter;
+							for m=FirstInter,LastInter do
+								if tonumber(m) == FirstInter then
+									m = 1;
+						</lua>	
+								<text row_start="1" row_end="0" col_start="1" align="right" label="('Inter'..FirstInter..'(Clt)')" ><background mode="solid" color="blue" cond="$(Clt1_inter1) == '1'" /><font color="white" cond="$(Clt1_inter1) == '1'"/>body:GetCell('Tps'..manche..'_inter'..FirstInter ,row)..' '..body:GetCell('Clt'..manche..'_inter'..FirstInter ,row):Parenthesis()</text>
+									
+						<lua>	
+								
+								else
+								m = m-1
+								j = m-1
+								i = aff_inter + 1
+								k = i-1
+						</lua>
+								<col value="4cm" />
+								<text row_start="1" align="left" label="('Inter'..i..'(Clt)')" ><background mode="solid" color="blue" cond="group =='body' and (body:GetCell('Clt'..manche..'_inter'..i ,row)) == '1'" /><font color="white" cond="(body:GetCellInt('Clt'..manche..'_inter'..i ,row)) == '1'"/>body:GetCell('Tps'..manche..'_inter'..i ,row)..' '..body:GetCell('Clt'..manche..'_inter'..i ,row):Parenthesis()</text> 
+								<text row_start="2" align="left" label="('Diff.I'..i..'/ I'..k..'(Clt)')" ><background mode="solid" color="yellow" cond="group =='body' and (body:GetCell('Rank_Diff_Tps'..i..'_I'..k,row)) == '1'" />body:GetCell('Diff_I'..i..'_I'..k,row)..' '..body:GetCell('Rank_Diff_Tps'..i..'_I'..k,row):Parenthesis()</text>
+								
+								<!-- <text row_start="1" col_start="(col_num)" align="left" label="('Inter'..i..'(Clt)')" ><background mode="solid" color="blue" cond="group =='body' and (body:GetCell('Clt'..manche..'_inter'..i ,row)) == '1'" /><font color="white" cond="(body:GetCellInt('Clt'..manche..'_inter'..i ,row)) == '1'"/>body:GetCell('Tps'..manche..'_inter'..i ,row)..' '..body:GetCell('Clt'..manche..'_inter'..i ,row):Parenthesis()</text>  -->
+								<!-- <text row_start="2" col_start="(col_num)" align="left" label="('Diff.I'..i..'/ I'..k..'(Clt)')" ><background mode="solid" color="yellow" cond="group =='body' and (body:GetCell('Rank_Diff_Tps'..m..'_I'..k,row)) == '1'" />body:GetCell('Diff_I'..i..'_I'..k,row)..' '..body:GetCell('Rank_Diff_Tps'..i..'_I'..k,row):Parenthesis()</text> -->
+						<lua>
+								col_num = tonumber(col_num) + 1;
+								aff_inter = aff_inter + 1;
+								end
+								
+							end
+						</lua>
+							
+						<col value="3cm" />
+							<text row_start="1" col_start="(Nb_tps_inter+1)" align="right" label="('Tps'..manche)" ><background mode="solid" color="green" cond="(body:GetCell('Clt'..manche,row)) == '1'" /><font color="white" cond="(body:GetCell('Clt'..manche,row)) == '1'"/>body:GetCell('Tps'..manche,row)..' '..body:GetCell('Clt'..manche,row):Parenthesis()</text> 
+							<text row_start="2" col_start="(Nb_tps_inter+1)" align="left" label="(ColdiffTpsinterx..'(Clt)')" ><background mode="solid" color="yellow" cond="(body:GetCell(ColRankTpsinterx,row)) == '1'" />body:GetCell(ColdiffTpsinterx,row)..' '..body:GetCell(ColRankTpsinterx,row):Parenthesis()</text> 
+							
+							<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
+							
+					</matrix>				
+							
+			</body>
+
+			<footer>
+				<background mode="transparent"/>
+				<font name="Calibri" size="8" adjust="best" weight="normal"/>
+				<pen border="none" />
+
+				<lua>entite = entite or $(Evenement.Code_entite)</lua>
+				<lua>info = $(Epreuve.Date_epreuve,'%2D/%2M/%4Y')..' / '..$(Evenement.Station)..' ('</lua>
+				<lua cond="entite=='FIS'">info = info..$(Evenement.Code_nation)..'-'</lua>
+				<lua>info = info..$(Evenement.Code_comite).. ') / '..$(Evenement.Organisateur)</lua>
+				<text row="auto" col="1" align="left">info</text>
+				<text align="right" font_weight="bold" cond="entite=='FIS'">$(Epreuve.Fichier_transfert_int)..' (Liste n°'..$(Evenement.Code_liste)..')'</text>
+				<text align="right" font_weight="bold" cond="entite=='FFS'">$(Epreuve.Fichier_transfert)..' (Liste n°'..$(Evenement.Code_liste)..')'</text>
+				<line col_start="1" col_end="0" pen_size="2" pen_color="dkgray" border="bottom"/>
+				<!-- <text row="auto" align="left"><pen border="top" />app.GetName()..' Version '..app.GetVersion()..' (FFS - ESF - Agil Informatique) - '..os.date('Edité le %d-%m-%Y à %H:%M:%S')</text> -->
+				
+				<row value="auto" />
+				<matrix col_start="1">
+					<row value="auto"/>
+					<text col="auto" align="left">app.GetName()..' Version '..app.GetVersion()..' / Cantal Chrono'</text>
+					<image col="0.4cm" adjust="width" align="left">'./logo/Cantal-chrono/Mini-Logo-CCE.png'</image>
+					
+					<text col="auto" align="left">' / Agil Informatique'</text>
+					<image col="0.4cm" adjust="width" align="left">'./res/32x32_agil.png'</image>
+					<text col="auto" align="left">os.date(' / Edité le %d-%m-%Y à %H:%M:%S')</text>
+				</matrix>	
+				<text align="right">string.format('Page %d/%s',editor:GetPageCurrent(), editor:GetPageCountLabel())</text>
+				<line col_start="1" col_end="0" border="top" />
+			</footer>
+
+		</report>		
+
+
+</root>
