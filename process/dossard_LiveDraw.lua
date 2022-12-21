@@ -2535,9 +2535,9 @@ Groupe 6 On poursuit selon les points FIS.
 				tDrawG6:RemoveRowAt(r);
 			end
 		end
-		if draw.bolVitesse == true then
-			current_group = current_group + 1;
-		end
+	end
+	if draw.bolVitesse == true then
+		current_group = current_group + 1;
 	end
 	-- draw.rang_tirage = tDrawG1:GetNbRows() + tDrawG2:GetNbRows() + 1;
 	tDrawG3:OrderBy('ECSL_points DESC, FIS_pts, WCSL_rank');				-- dans les 30 de la WCSL
@@ -3677,7 +3677,7 @@ function main(params_c)
 	draw.height = display:GetSize().height - 30;
 	draw.x = 0;
 	draw.y = 0;
-	scrip_version = "5.5"; -- 4.92 pour 2022-2023
+	scrip_version = "5.52"; -- 4.92 pour 2022-2023
 	local imgfile = './res/40x16_dbl_coche.png';
 	if not app.FileExists(imgfile) then
 		app.GetAuiFrame():MessageBox(
@@ -3904,6 +3904,8 @@ function main(params_c)
 	tbconfig:AddStretchableSpace();
 	local btnSave = tbconfig:AddTool("Enregistrer", "./res/vpe32x32_save.png");
 	tbconfig:AddSeparator();
+	local btnSOS = tbconfig:AddTool("Mode d'emploi du sript", "./res/32x32_sos.png");
+	tbconfig:AddSeparator();
 	local btnClose = tbconfig:AddTool("Quitter", "./res/32x32_exit.png");
 	tbconfig:AddStretchableSpace();
 	tbconfig:Realize();
@@ -3945,6 +3947,10 @@ function main(params_c)
 			OnClose();
 			dlgConfig:EndModal(idButton.CANCEL) 
 		 end,  btnClose);
+	dlgConfig:Bind(eventType.MENU, 
+		function(evt) 
+			app.LaunchDefaultEditor('./process/LiveDrawHelp.rtf');
+		 end,  btnSOS);
 
 	if dlgConfig:ShowModal() == idButton.OK then
 		local cmd = "Update Resultat Set Critere = NULL, Groupe = NULL Where Code_evenement = "..draw.code_evenement;
