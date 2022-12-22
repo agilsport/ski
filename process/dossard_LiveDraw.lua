@@ -2970,6 +2970,8 @@ function OnAfficheTableau()
 	menuRAZ:AppendSeparator();
 	btnRAZDossard = menuRAZ:Append({label="RAZ des dossards", image ="./res/32x32_clear.png"});
 	menuRAZ:AppendSeparator();
+	btnRAZDossardSel = menuRAZ:Append({label="RAZ des dossards pour les lignes sélectionnées", image ="./res/32x32_clear.png"});
+	menuRAZ:AppendSeparator();
 	btnRAZDossardBibo = menuRAZ:Append({label="RAZ des dossards du BIBO", image ="./res/32x32_clear.png"});
 	tbTableau:SetDropdownMenu(btnMenuRAZ:GetId(), menuRAZ);
 	tbTableau:AddSeparator();
@@ -3126,6 +3128,18 @@ function OnAfficheTableau()
 			OnRAZData('Dossard')
 			SendMessage('Board refreshed');
 		end, btnRAZDossard);
+		
+	dlgTableau:Bind(eventType.MENU, 
+		function(evt)
+			local rows = grid_tableau:GetSelectedRows();
+			for i = draw.row_selected, draw.row_selected + #rows - 1 do
+				tDraw:SetCellNull('Dossard', i);
+			end
+			RefreshGrid();
+			CommandRenvoyerDossards(false);
+		end
+		, btnRAZDossardSel);
+
 	dlgTableau:Bind(eventType.MENU, 
 		function(evt)
 			draw.skip_question = false;
@@ -3678,7 +3692,7 @@ function main(params_c)
 	draw.height = display:GetSize().height - 30;
 	draw.x = 0;
 	draw.y = 0;
-	scrip_version = "5.53"; -- 4.92 pour 2022-2023
+	scrip_version = "5.54"; -- 4.92 pour 2022-2023
 	local imgfile = './res/40x16_dbl_coche.png';
 	if not app.FileExists(imgfile) then
 		app.GetAuiFrame():MessageBox(
