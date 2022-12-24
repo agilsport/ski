@@ -35,22 +35,6 @@
         <background mode="solid" color="rgb 28 91 162"/>' '</text>
     </matrix>
   </layer>
-  <layer id="MST">
-    <matrix>
-      <row value="0.05cm, 3.21cm"/>
-      <col value="2.47cm, 16.02cm"/>
-      <image adjust="best">'./logo/Bandeau_FFS/Nord_2022/MARATHON-SKI-TOUR.jpg'
-        <background mode="transparent"/>
-      </image>
-    </matrix>
-  </layer>
-   <layer id="SNT">
-    <matrix>
-      <row value="0.05cm, 3.21cm"/>
-      <col value="2.47cm, 16.02cm"/>
-      <image adjust="best">'./logo/Bandeau_FFS/Nord_2022/Bandeau SNT 2021-22.jpg'</image>
-    </matrix>
-  </layer>
   <layer id="FFS">
     <matrix>
       <row value="0.13cm, 2.97cm"/>
@@ -74,6 +58,105 @@
       <row value="1cm, 2.5cm"/>
       <col value="1cm, 2.5cm"/>
       <image adjust="best">'./res/logo_fis.jpg'
+        <background mode="transparent"/>
+      </image>
+    </matrix>
+  </layer>
+  
+  <!-- layer Nordique -->
+  
+   <layer id="VITTOZ">
+    <matrix>
+      <row value="0.03cm, 2.84cm"/>
+      <col value="3.78cm, 13.76cm"/>
+      <image adjust="best">'C:/skiFFS/logo/Bandeau_FFS/Nord_2023/Cha_Vittoz.jpg'
+        <background mode="transparent"/>
+      </image>
+    </matrix>
+  </layer>
+  
+  <layer id="Chpt_FR">
+    <matrix>
+      <row value="0.06cm, 3.58cm"/>
+      <col value="0.81cm, 19.68cm"/>
+      <image adjust="best">'C:/skiFFS/logo/Bandeau_FFS/Nord_2023/SKI-DE-FOND-ETE.jpg'
+        <background mode="transparent"/>
+      </image>
+    </matrix>
+  </layer>
+  
+  <layer id="Cha_U15">
+    <matrix>
+      <row value="0.06cm, 3.58cm"/>
+      <col value="0.81cm, 19.68cm"/>
+      <image adjust="best">'C:/skiFFS/logo/Bandeau_FFS/Nord_2023/SAMSE_CHALLENGE-NATIONAL-U15.jpg'
+        <background mode="transparent"/>
+      </image>
+    </matrix>
+  </layer>
+  
+   <layer id="Chpt_Club">
+    <matrix>
+      <row value="0.06cm, 3.58cm"/>
+      <col value="0.81cm, 19.68cm"/>
+      <image adjust="best">'C:/skiFFS/logo/Bandeau_FFS/Nord_2023/SKI-DE-FOND-FRANCE-CLUBS-SKI-NORDIQUE.jpg'
+        <background mode="transparent"/>
+      </image>
+    </matrix>
+  </layer>
+  
+    <layer id="Chpt_Jeu-Sen">
+    <matrix>
+      <row value="0.06cm, 3.58cm"/>
+      <col value="0.81cm, 19.68cm"/>
+      <image adjust="best">'C:/skiFFS/logo/Bandeau_FFS/Nord_2023/SKI-DE-FOND-FRANCE-JEUNES-JUNIORS-SENIORS.jpg'
+        <background mode="transparent"/>
+      </image>
+    </matrix>
+  </layer>
+ 
+  <layer id="Chpt_EQU_U16">
+    <matrix>
+      <row value="0.06cm, 3.58cm"/>
+      <col value="0.81cm, 19.68cm"/>
+      <image adjust="best">'C:/skiFFS/logo/Bandeau_FFS/Nord_2023/SKI-DE-FOND-FRANCE-PAR-EQUIPE-U16.jpg'
+        <background mode="transparent"/>
+      </image>
+    </matrix>
+  </layer>
+  
+  <layer id="Chpt_U16-SEN_Lg_Dist">
+    <matrix>
+      <row value="0.06cm, 3.58cm"/>
+      <col value="0.81cm, 19.68cm"/>
+      <image adjust="best">'C:/skiFFS/logo/Bandeau_FFS/Nord_2023/SKI-DE-FOND-FRANCE-U16-A-SENIORS-LONGUE-DISTANCE.jpg'
+        <background mode="transparent"/>
+      </image>
+    </matrix>
+  </layer> .
+  
+  <layer id="SNT_Coupe-Fr">
+    <matrix>
+      <row value="0.06cm, 3.58cm"/>
+      <col value="0.81cm, 19.68cm"/>
+      <image adjust="best">'C:/skiFFS/logo/Bandeau_FFS/Nord_2023/SNT_CoupeFrance_SkideFond.jpg'
+        <background mode="transparent"/>
+      </image>
+    </matrix>
+  </layer> 
+  
+  <layer id="FIS_Nord">
+    <matrix>
+      <row value="3.44cm, 2.91cm"/>
+      <col value="0.89cm, 2.42cm"/>
+      <image adjust="best">'C:/skiFFS/logo/logo_fis.jpg'
+        <background mode="transparent"/>
+      </image>
+    </matrix>
+    <matrix>
+      <row value="5.87cm, 1.02cm"/>
+      <col value="1.91cm, 19.04cm"/>
+      <image adjust="best">'C:/skiFFS/logo/bandeau_fis.png'
         <background mode="transparent"/>
       </image>
     </matrix>
