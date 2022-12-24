@@ -112,9 +112,8 @@ function SortTable(array, colnom, sens)	-- tri des tables
 	end
 end
 
-function ChargeECSL(filename, bolOverall)
+function ChargeECSL(filename)
 	draw.tECSL = {};
-	bolOverall = bolOverall or false;
 	lines = {};
 	for line in io.lines(filename) do 
 		lines[#lines + 1] = line
@@ -134,37 +133,47 @@ function ChargeECSL(filename, bolOverall)
 			idxcolCltAll = i;
 		end
 	end
-	if idxcolPts and idxcolClt then
-		for i = 0, tDraw:GetNbRows() -1 do
-			tDraw:SetCellNull('ECSL_points', i);
-			tDraw:SetCellNull('ECSL_rank', i);
-			if bolOverall then
-				--tDraw:SetCellNull('ECSL_overall_points', i);
-				--tDraw:SetCellNull('ECSL_overall_rank', i);
-			end
-		end
-		for i = 2, #lines do
-			local cols = lines[i]:Split(',');
-			local fiscode = 'FIS'..cols[1];
-			draw.tECSL[fiscode] = {};
-			draw.tECSL[fiscode].Point = tonumber(cols[idxcolPts]);
-			draw.tECSL[fiscode].Clt = tonumber(cols[idxcolClt]);
-			draw.tECSL[fiscode].AllPoint = tonumber(cols[idxcolPtsAll]);
-			draw.tECSL[fiscode].AllClt = tonumber(cols[idxcolCltAll]);
-			local r = tDraw:GetIndexRow('Code_coureur', fiscode);
-			if r and r >= 0 then
-				if draw.tECSL[fiscode].Point and draw.tECSL[fiscode].Point > 0 then
-					tDraw:SetCell('ECSL_points', r, draw.tECSL[fiscode].Point);
-					tDraw:SetCell('ECSL_rank', r, draw.tECSL[fiscode].Clt);
-				end
-				if draw.tECSL[fiscode].AllPoint and draw.tECSL[fiscode].AllPoint >= 450 then
-					tDraw:SetCell('ECSL_overall_points', r, draw.tECSL[fiscode].AllPoint);
-					tDraw:SetCell('ECSL_overall_rank', r, draw.tECSL[fiscode].AllClt);
-				end
-			end
-		end
-		RefreshGrid();
+	for i = 0, tDraw:GetNbRows() -1 do
+		tDraw:SetCellNull('ECSL_points', i);
+		tDraw:SetCellNull('ECSL_rank', i);
 	end
+	for i = 2, #lines do
+		local cols = lines[i]:Split(',');
+		local fiscode = 'FIS'..cols[1];
+		draw.tECSL[fiscode] = {};
+		draw.tECSL[fiscode].Point = 0;
+		draw.tECSL[fiscode].Clt = 0;
+		draw.tECSL[fiscode].AllPoint = 0;
+		draw.tECSL[fiscode].AllClt = 0;
+		if idxcolPts > 0 and idxcolClt > 0 then
+			local pts = tonumber(cols[idxcolPts]) or 0;
+			local clt = tonumber(cols[idxcolClt]) or 0;
+			if pts > 0 and clt > 0 then
+				draw.tECSL[fiscode].Point = pts;
+				draw.tECSL[fiscode].Clt = clt;
+			end
+		end
+		if idxcolPtsAll > 0 and idxcolCltAll > 0 then
+			local ptsall = tonumber(cols[idxcolPtsAll]) or 0;
+			local cltall = tonumber(cols[idxcolCltAll]) or 0;
+			if ptsall > 0 and cltall > 0 then
+				draw.tECSL[fiscode].AllPoint = ptsall;
+				draw.tECSL[fiscode].AllClt = cltall;
+			end
+		end
+		local r = tDraw:GetIndexRow('Code_coureur', fiscode);
+		if r and r >= 0 then
+			if draw.tECSL[fiscode].Point > 0 then
+				tDraw:SetCell('ECSL_points', r, draw.tECSL[fiscode].Point);
+				tDraw:SetCell('ECSL_rank', r, draw.tECSL[fiscode].Clt);
+			end
+			if draw.tECSL[fiscode].AllPoint >= 450 then
+				tDraw:SetCell('ECSL_overall_points', r, draw.tECSL[fiscode].AllPoint);
+				tDraw:SetCell('ECSL_overall_rank', r, draw.tECSL[fiscode].AllClt);
+			end
+		end
+	end
+	RefreshGrid();
 end
 
 function ReadECSL()
@@ -190,7 +199,7 @@ function ReadECSL()
 		draw.doc:SaveFile()
 	end
 	if filename:len() > 0 then
-		ChargeECSL(filename, true);
+		ChargeECSL(filename);
 	end
 end
 
@@ -1294,14 +1303,6 @@ function CommandSendStartList()
 	local nodeMessage = xmlNode.Create(nodeRoot, xmlNodeType.ELEMENT_NODE, "message");
 	xmlNode.Create(nodeMessage, xmlNodeType.ELEMENT_NODE, "text", msg);	
 	CreateXML(nodeRoot);
-	if bolEstCE then
-		if nodelivedraw:HasAttribute('ECSL_'..draw.code_evenement) then
-			nodelivedraw:DeleteAttribute('ECSL_'..draw.code_evenement);
-		end
-		if nodelivedraw:HasAttribute('WCSL_'..draw.code_evenement) then
-			nodelivedraw:DeleteAttribute('WCSL_'..draw.code_evenement);
-		end
-	end
 end
 
 
@@ -2969,6 +2970,8 @@ function OnAfficheTableau()
 	menuRAZ:AppendSeparator();
 	btnRAZDossard = menuRAZ:Append({label="RAZ des dossards", image ="./res/32x32_clear.png"});
 	menuRAZ:AppendSeparator();
+	btnRAZDossardSel = menuRAZ:Append({label="RAZ des dossards pour les lignes sélectionnées", image ="./res/32x32_clear.png"});
+	menuRAZ:AppendSeparator();
 	btnRAZDossardBibo = menuRAZ:Append({label="RAZ des dossards du BIBO", image ="./res/32x32_clear.png"});
 	tbTableau:SetDropdownMenu(btnMenuRAZ:GetId(), menuRAZ);
 	tbTableau:AddSeparator();
@@ -3088,7 +3091,7 @@ function OnAfficheTableau()
 		if nodelivedraw:HasAttribute('ECSL_'..draw.code_evenement) then
 			local path = nodelivedraw:GetAttribute('ECSL_'..draw.code_evenement);
 			if app.FileExists(path) then
-				ChargeECSL(path, false);
+				ChargeECSL(path);
 			else
 				nodelivedraw:DeleteAttribute('ECSL_'..draw.code_evenement);
 				draw.doc:SaveFile();
@@ -3097,7 +3100,7 @@ function OnAfficheTableau()
 		if nodelivedraw:HasAttribute('WCSL_'..draw.code_evenement) then
 			local path = nodelivedraw:GetAttribute('WCSL_'..draw.code_evenement);
 			if app.FileExists(path) then
-				ChargeWCSL(path, false);
+				ChargeWCSL(path);
 			else
 				nodelivedraw:DeleteAttribute('WCSL_'..draw.code_evenement);
 				draw.doc:SaveFile();
@@ -3125,6 +3128,18 @@ function OnAfficheTableau()
 			OnRAZData('Dossard')
 			SendMessage('Board refreshed');
 		end, btnRAZDossard);
+		
+	dlgTableau:Bind(eventType.MENU, 
+		function(evt)
+			local rows = grid_tableau:GetSelectedRows();
+			for i = draw.row_selected, draw.row_selected + #rows - 1 do
+				tDraw:SetCellNull('Dossard', i);
+			end
+			RefreshGrid();
+			CommandRenvoyerDossards(false);
+		end
+		, btnRAZDossardSel);
+
 	dlgTableau:Bind(eventType.MENU, 
 		function(evt)
 			draw.skip_question = false;
@@ -3677,7 +3692,7 @@ function main(params_c)
 	draw.height = display:GetSize().height - 30;
 	draw.x = 0;
 	draw.y = 0;
-	scrip_version = "5.52"; -- 4.92 pour 2022-2023
+	scrip_version = "5.54"; -- 4.92 pour 2022-2023
 	local imgfile = './res/40x16_dbl_coche.png';
 	if not app.FileExists(imgfile) then
 		app.GetAuiFrame():MessageBox(
@@ -3831,21 +3846,16 @@ function main(params_c)
 		end
 		io.close(f);
 	end
-	local attribute = nodelivedraw:GetAttributes();
 	local date_jour = os.date("%Y-%m-%d");
+	local date_epreuve = tEpreuve:GetCell('Date_epreuve', 0, "%4Y-%2M-%2D");
+	local attribute = nodelivedraw:GetAttributes();
 	while attribute ~= nil do
 		local name = attribute:GetName();
 		local pos1, pos2 = string.find(name, 'ECSL_');
 		if pos1 and pos1 > 0 then
 			local code_evenement = tonumber(string.sub(name, pos2 + 1)) or 0;
 			if code_evenement > 0 then
-				local epreuve = base:TableLoad('Select Date_epreuve From Epreuve Where Code_evenement = '..code_evenement)
-				if epreuve:GetNbRows() > 0 then
-					local date_epreuve = epreuve:GetCell('Date_epreuve', 0,"%4Y-%2M-%2D")
-					if date_jour > date_epreuve then
-						nodelivedraw:DeleteAttribute(name);
-					end
-				else
+				if date_jour > date_epreuve then
 					nodelivedraw:DeleteAttribute(name);
 				end
 			end
@@ -3854,13 +3864,7 @@ function main(params_c)
 		if pos1 and pos1 > 0 then
 			local code_evenement = tonumber(string.sub(name, pos2 + 1)) or 0;
 			if code_evenement > 0 then
-				local epreuve = base:TableLoad('Select Date_epreuve From Epreuve Where Code_evenement = '..code_evenement)
-				if epreuve:GetNbRows() > 0 then
-					local date_epreuve = epreuve:GetCell('Date_epreuve', 0,"%4Y-%2M-%2D")
-					if date_jour > date_epreuve then
-						nodelivedraw:DeleteAttribute(name);
-					end
-				else
+				if date_jour > date_epreuve then
 					nodelivedraw:DeleteAttribute(name);
 				end
 			end
