@@ -993,6 +993,7 @@ function CommandValiderUnCoureur(row)
 	if statut == 'CF' then
 		dlgTableau:GetWindowName('info'):SetValue(tDraw:GetCell('Nom', row)..' '..tDraw:GetCell('Prenom', row)..' confirmé.');
 	else
+		CommandRenvoyerDossards(false);
 		dlgTableau:GetWindowName('info'):SetValue(tDraw:GetCell('Nom', row)..' '..tDraw:GetCell('Prenom', row)..' non confirmé.');
 	end
 end
@@ -1088,7 +1089,7 @@ function ChecktDraw()
 	end
 end
 
-function CommandSendOrder(bolSendParticipants)
+function CommandSendOrder(bolSendDrawOrder)
 	ChecktDraw();
 	-- Génération des balises 
 	local nodeRaceEvent = xmlNode.Create(nil, xmlType.ELEMENT_NODE, "raceevent");
@@ -1101,7 +1102,7 @@ function CommandSendOrder(bolSendParticipants)
  		local nodeDrawGroup = xmlNode.Create(nodeRaceEvent, xmlType.ELEMENT_NODE, "drawgroup");
 		nodeDrawGroup:AddAttribute('fiscode', code_coureur);
 		local nodeGroup = xmlNode.Create(nodeDrawGroup, xmlType.ELEMENT_NODE, "group", math.abs(tDraw:GetCellInt('Groupe_tirage', i)));
-		if bolSendParticipants then
+		if bolSendDrawOrder then
 			local nodeDrawOrder = xmlNode.Create(nodeRaceEvent, xmlType.ELEMENT_NODE, "draworder");
 			nodeDrawOrder:AddAttribute('fiscode', code_coureur);
 			local nodeOrder = xmlNode.Create(nodeDrawOrder, xmlType.ELEMENT_NODE, "order", tDraw:GetCellInt('Rang_tirage', i));
@@ -1618,11 +1619,15 @@ function GetCateg(an)
 	return tCategorie:GetCell('Code', 0);
 end
 
-function OnSendTableau(bolSendParticipants)
+function OnSendTableau(bolSendDrawOrder)
 	local msg = "Confirmation de l'envoi du tableau à la FIS.";
+	local txtdialog = "Envoi du tableau à la FIS";
+	if not bolSendDrawOrder then
+		msg = "Confirmation de l'envoi de la liste des participants à la FIS.";
+		txtdialog = "Envoi des participants à la FIS";
+	end
 	if dlgTableau:MessageBox(
-		msg, 
-		"Envoi du tableau à la FIS", 
+		msg, txtdialog, 
 		msgBoxStyle.YES_NO+msgBoxStyle.ICON_INFORMATION
 	) ~= msgBoxStyle.YES then
 		return;
@@ -1632,8 +1637,18 @@ function OnSendTableau(bolSendParticipants)
 	CommandRaceInfo(true);
 	CommandPhaseD();
 	CommandSendList();
-	CommandSendOrder(bolSendParticipants);
-	-- CommandRenvoyerDossards(false);
+	CommandSendOrder(bolSendDrawOrder);
+	if bolSendDrawOrder then
+		local msg = "Voulez-vous en plus envoyer les dossards à la FIS ?";
+		if dlgTableau:MessageBox(
+			msg, 
+			"Envoi des dossards à la FIS", 
+			msgBoxStyle.YES_NO+msgBoxStyle.NO_DEFAULT+msgBoxStyle.ICON_INFORMATION
+		) == msgBoxStyle.NO then
+			return;
+		end
+		CommandRenvoyerDossards(false);
+	end
 end
 
 function OnRAZData(colonne)
@@ -1896,10 +1911,7 @@ function OnChangeDossard(row)
 	local nodeBib = xmlNode.Create(nodeDrawBib, xmlType.ELEMENT_NODE, "bib", dossard);
 	nodeDrawBib:AddAttribute('fiscode', code_coureur);
 	nodeRoot = xmlNode.Create(nil, xmlType.ELEMENT_NODE, "livetiming");
-	-- nodeCommand = xmlNode.Create(nil, xmlType.ELEMENT_NODE, "command");
-	-- local nodeDrawInProgress = xmlNode.Create(nodeCommand, xmlType.ELEMENT_NODE, "drawinprogress");
 	nodeRoot:AddChild(nodeRaceEvent);
-	-- nodeRoot:AddChild(nodeCommand);
 	CreateXML(nodeRoot);
 	dlgTableau:GetWindowName('info'):SetValue('Dossard '..dossard..' attribué pour '..tDraw:GetCell('Nom', row)..' '..tDraw:GetCell('Prenom', row));
 end
@@ -2070,18 +2082,18 @@ function OnCellSelected(evt)
 		if etat == 'UF' then
 			etat = 'CF';
 		else
-			if t:GetCellInt('Dossard', row) == 0 then
-				etat = 'UF';
-			else
-				local msg = 'Opération impossible !\nCe concurrent a déjà un dossard.';
-				app.GetAuiFrame():MessageBox(msg, "Attention !!!", msgBoxStyle.OK+msgBoxStyle.ICON_WARNING);
-				return;
+			if t:GetCellInt('Dossard', row) > 0 then
+				local msg = 'Attention - Ce concurrent a déjà un dossard.\nSi vous poursuivez, ce dossard sera effacé\nVoulez-vous poursuivre ?';
+				if app.GetAuiFrame():MessageBox(msg, "Attention !!!", msgBoxStyle.YES_NO+msgBoxStyle.NO_DEFAULT+msgBoxStyle.ICON_WARNING) ~= msgBoxStyle.YES then
+					return;
+				end
 			end
+			etat = 'UF';
+			t:SetCellNull('Dossard', row);
 		end
 		t:SetCell('Statut', row, etat)
-		grid_tableau:RefreshCell(row, col);
 		OnChangeStatut(row);
-		base:TableBulkUpdate(tDraw, 'Statut', 'Resultat_Info_Tirage');
+		RefreshGrid();
 		CommandValiderUnCoureur(row);
 	end
 end
