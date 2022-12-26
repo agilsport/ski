@@ -659,6 +659,9 @@ end
 function OnPrintNation()
 	-- Creation du Report
 	local estce = 0;
+	if draw.bolEstCE then
+		estce = 1;
+	end
 	report = wnd.LoadTemplateReportXML({
 		xml = './process/dossard_LiveDraw.xml',
 		node_name = 'root/report',
@@ -1323,7 +1326,7 @@ end
 
 
 -- Envoi Course
-function CommandSendList()
+function CommandSendList(bolSendDrawOrder)
 	tDraw:OrderBy('Rang_tirage');
 	-- Génération des balises 
 	local nodeStartlist = xmlNode.Create(nil, xmlType.ELEMENT_NODE, "startlist");
@@ -1338,8 +1341,12 @@ function CommandSendList()
 		local nom = tDraw:GetCell('Nom', i);
 		local prenom = tDraw:GetCell('Prenom', i);
 		local nation = tDraw:GetCell('Nation', i);
-		if tDraw:GetCell('Statut', i) == 'UF' then
-			draw.statut_CF = false;
+		if not draw.bolEstCE then
+			if not bolSendDrawOrder then	-- envoi des participants
+				if nation == 'FRA' then
+					nom = tDraw:GetCell('Comite', i)..' - '..nom;
+				end
+			end
 		end
 		local code = tDraw:GetCell('Code_coureur', i):sub(4);
 		local rang_tirage = tDraw:GetCellInt('Rang_tirage', i);
@@ -1636,9 +1643,9 @@ function OnSendTableau(bolSendDrawOrder)
 	-- CommandClear();
 	CommandRaceInfo(true);
 	CommandPhaseD();
-	CommandSendList();
+	CommandSendList(bolSendDrawOrder);
 	CommandSendOrder(bolSendDrawOrder);
-	if bolSendDrawOrder then
+	if bolSendDrawOrder and draw.state == true then
 		local msg = "Voulez-vous en plus envoyer les dossards à la FIS ?";
 		if dlgTableau:MessageBox(
 			msg, 
@@ -1729,11 +1736,10 @@ function OnSupprimerCoureur(code_coureur, rang_tirage_selected)
 		end
 	end
 	RefreshGrid(false);
-	CommandSendList();
-	CommandSendOrder();
+	CommandSendList(bolSendDrawOrder);
+	CommandSendOrder(bolSendDrawOrder);
 	CommandSendMessage();
 end
-
 
 function OnAjouterCoureur()
 	if not draw.trouve_coureur then
@@ -1830,8 +1836,8 @@ function OnAjouterCoureur()
 	end
 	draw.build_table = true;
 	OnOrder();
-	CommandSendList();
-	CommandSendOrder();
+	CommandSendList(bolSendDrawOrder);
+	CommandSendOrder(bolSendDrawOrder);
 	CommandSendMessage();
 	local row = tResultat:AddRow();
 	tResultat:SetCell('Code_evenement', row, draw.code_evenement);
@@ -2967,6 +2973,8 @@ function OnAfficheTableau()
       grid_tableau:AddRowLabel(1, 48);
 
 -- Initialisation des Controles
+
+	bolSendDrawOrder = true;
 	
 	tbTableau = dlgTableau:GetWindowName('tbtableau');
 	tbTableau:AddStretchableSpace();
@@ -3265,12 +3273,14 @@ function OnAfficheTableau()
 			end
 			grid_tableau:SynchronizeRowsView();
 			base:TableBulkUpdate(tDraw, 'Statut', 'Resultat_Info_Tirage');
-			OnSendTableau(true);
+			bolSendDrawOrder = true;
+			OnSendTableau(bolSendDrawOrder);
 			SendMessage('Board refreshed');
 		end
 		, btnValiderSelection);
 	dlgTableau:Bind(eventType.MENU, 
 		function(evt)
+			bolSendDrawOrder = true;
 			CommandSendStartList();
 		end
 		, btnSendStartList);
@@ -3284,19 +3294,22 @@ function OnAfficheTableau()
 			end
 			grid_tableau:SynchronizeRowsView(); -- on est sur la vue
 			base:TableBulkUpdate(tDraw, 'Statut', 'Resultat_Info_Tirage');
-			OnSendTableau(true);
+			bolSendDrawOrder = true;
+			OnSendTableau(bolSendDrawOrder);
 			SendMessage('Board refreshed');
 		end
 		, btnInValiderSelection);
 	dlgTableau:Bind(eventType.MENU, 
 		function(evt)
-			OnSendTableau(true)
+			bolSendDrawOrder = true;
+			OnSendTableau(bolSendDrawOrder)
 			SendMessage('Draw available');
 		end
 		, btnSendTableau);
 	dlgTableau:Bind(eventType.MENU, 
 		function(evt)
-			OnSendTableau(false)
+			bolSendDrawOrder = false;
+			OnSendTableau(bolSendDrawOrder)
 			SendMessage('Participants list');
 		end
 		, btnSendParticipants);
@@ -3713,7 +3726,7 @@ function main(params_c)
 	draw.height = display:GetSize().height - 30;
 	draw.x = 0;
 	draw.y = 0;
-	scrip_version = "5.55"; -- 4.92 pour 2022-2023
+	scrip_version = "5.56"; -- 4.92 pour 2022-2023
 	local imgfile = './res/40x16_dbl_coche.png';
 	if not app.FileExists(imgfile) then
 		app.GetAuiFrame():MessageBox(
