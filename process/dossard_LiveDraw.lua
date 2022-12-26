@@ -979,6 +979,25 @@ function CommandValiderCoureurs(statut)
 	dlgTableau:GetWindowName('info'):SetValue(tDraw:GetNbRows()..' coureurs modifiés.');
 end
 
+function CommandValiderUnCoureur(row)
+	local nodeRaceEvent = xmlNode.Create(nil, xmlType.ELEMENT_NODE, "raceevent");
+	local code_coureur = tDraw:GetCell('Code_coureur', row):sub(4);
+	local statut = tDraw:GetCell('Statut', row)
+	local nodeDrawStatus = xmlNode.Create(nodeRaceEvent, xmlType.ELEMENT_NODE, "drawstatus");
+	nodeDrawStatus:AddAttribute('fiscode', code_coureur);
+	local nodeStatus = xmlNode.Create(nodeDrawStatus, xmlType.ELEMENT_NODE, "status", statut);
+
+	nodeRoot = xmlNode.Create(nil, xmlType.ELEMENT_NODE, "livetiming");
+	nodeRoot:AddChild(nodeRaceEvent);
+	CreateXML(nodeRoot);
+	if statut == 'CF' then
+		dlgTableau:GetWindowName('info'):SetValue(tDraw:GetCell('Nom', row)..' '..tDraw:GetCell('Prenom', row)..' confirmé.');
+	else
+		CommandRenvoyerDossards(false);
+		dlgTableau:GetWindowName('info'):SetValue(tDraw:GetCell('Nom', row)..' '..tDraw:GetCell('Prenom', row)..' non confirmé.');
+	end
+end
+
 function CheckDossardAfter()
 	local ligne = -1;
 	for i = draw.row_selected, tDraw:GetNbRows() -1 do
@@ -1068,12 +1087,9 @@ function ChecktDraw()
 	if draw.bolExisteSansPoint == false then
 		bolTirageSansPointFait = true;
 	end
-	menuOutils:Enable(btnTirageDossardsBIBO:GetId(), not draw.bolTirageBiboFait);
-	menuOutils:Enable(btnTirageDossardsRestants:GetId(), not draw.bolTirageAvecPointFait);
-	menuOutils:Enable(btnTirageDossardsSansPoints:GetId(), not draw.bolTirageSansPointFait);
 end
 
-function CommandSendOrder(bolSendParticipants)
+function CommandSendOrder(bolSendDrawOrder)
 	ChecktDraw();
 	-- Génération des balises 
 	local nodeRaceEvent = xmlNode.Create(nil, xmlType.ELEMENT_NODE, "raceevent");
@@ -1086,7 +1102,7 @@ function CommandSendOrder(bolSendParticipants)
  		local nodeDrawGroup = xmlNode.Create(nodeRaceEvent, xmlType.ELEMENT_NODE, "drawgroup");
 		nodeDrawGroup:AddAttribute('fiscode', code_coureur);
 		local nodeGroup = xmlNode.Create(nodeDrawGroup, xmlType.ELEMENT_NODE, "group", math.abs(tDraw:GetCellInt('Groupe_tirage', i)));
-		if bolSendParticipants then
+		if bolSendDrawOrder then
 			local nodeDrawOrder = xmlNode.Create(nodeRaceEvent, xmlType.ELEMENT_NODE, "draworder");
 			nodeDrawOrder:AddAttribute('fiscode', code_coureur);
 			local nodeOrder = xmlNode.Create(nodeDrawOrder, xmlType.ELEMENT_NODE, "order", tDraw:GetCellInt('Rang_tirage', i));
@@ -1603,11 +1619,15 @@ function GetCateg(an)
 	return tCategorie:GetCell('Code', 0);
 end
 
-function OnSendTableau(bolSendParticipants)
+function OnSendTableau(bolSendDrawOrder)
 	local msg = "Confirmation de l'envoi du tableau à la FIS.";
+	local txtdialog = "Envoi du tableau à la FIS";
+	if not bolSendDrawOrder then
+		msg = "Confirmation de l'envoi de la liste des participants à la FIS.";
+		txtdialog = "Envoi des participants à la FIS";
+	end
 	if dlgTableau:MessageBox(
-		msg, 
-		"Envoi du tableau à la FIS", 
+		msg, txtdialog, 
 		msgBoxStyle.YES_NO+msgBoxStyle.ICON_INFORMATION
 	) ~= msgBoxStyle.YES then
 		return;
@@ -1617,8 +1637,18 @@ function OnSendTableau(bolSendParticipants)
 	CommandRaceInfo(true);
 	CommandPhaseD();
 	CommandSendList();
-	CommandSendOrder(bolSendParticipants);
-	-- CommandRenvoyerDossards(false);
+	CommandSendOrder(bolSendDrawOrder);
+	if bolSendDrawOrder then
+		local msg = "Voulez-vous en plus envoyer les dossards à la FIS ?";
+		if dlgTableau:MessageBox(
+			msg, 
+			"Envoi des dossards à la FIS", 
+			msgBoxStyle.YES_NO+msgBoxStyle.NO_DEFAULT+msgBoxStyle.ICON_INFORMATION
+		) == msgBoxStyle.NO then
+			return;
+		end
+		CommandRenvoyerDossards(false);
+	end
 end
 
 function OnRAZData(colonne)
@@ -1669,12 +1699,6 @@ function OnRAZData(colonne)
 			local cmd = 'Delete From Resultat_Info_Bibo Where Code_evenement = '..draw.code_evenement;
 			base:Query(cmd);
 			tDraw:SetCellNull('Dossard', i);
-		elseif colonne == 'Dossard_bibo' then
-			local cmd = 'Delete From Resultat_Info_Bibo Where Code_evenement = '..draw.code_evenement;
-			base:Query(cmd);
-			if tDraw:GetCellInt('Rang_tirage', i) <= 15 then
-				tDraw:SetCellNull('Dossard', i);
-			end
 		elseif colonne == 'Tout' then
 			tDraw:SetCellNull('Rang_tirage', i);
 			tDraw:SetCell('Groupe_tirage', i, 5);
@@ -1682,7 +1706,7 @@ function OnRAZData(colonne)
 			tDraw:SetCellNull('Dossard', i);
 		end
 	end
-	if colonne == 'Dossard' or colonne == 'Dossard_bibo' then
+	if colonne == 'Dossard' then
 		CommandRenvoyerDossards();
 	end
 	RefreshGrid();
@@ -1887,10 +1911,7 @@ function OnChangeDossard(row)
 	local nodeBib = xmlNode.Create(nodeDrawBib, xmlType.ELEMENT_NODE, "bib", dossard);
 	nodeDrawBib:AddAttribute('fiscode', code_coureur);
 	nodeRoot = xmlNode.Create(nil, xmlType.ELEMENT_NODE, "livetiming");
-	-- nodeCommand = xmlNode.Create(nil, xmlType.ELEMENT_NODE, "command");
-	-- local nodeDrawInProgress = xmlNode.Create(nodeCommand, xmlType.ELEMENT_NODE, "drawinprogress");
 	nodeRoot:AddChild(nodeRaceEvent);
-	-- nodeRoot:AddChild(nodeCommand);
 	CreateXML(nodeRoot);
 	dlgTableau:GetWindowName('info'):SetValue('Dossard '..dossard..' attribué pour '..tDraw:GetCell('Nom', row)..' '..tDraw:GetCell('Prenom', row));
 end
@@ -2061,18 +2082,19 @@ function OnCellSelected(evt)
 		if etat == 'UF' then
 			etat = 'CF';
 		else
-			if t:GetCellInt('Dossard', row) == 0 then
-				etat = 'UF';
-			else
-				local msg = 'Opération impossible !\nCe concurrent a déjà un dossard.';
-				app.GetAuiFrame():MessageBox(msg, "Attention !!!", msgBoxStyle.OK+msgBoxStyle.ICON_WARNING);
-				return;
+			if t:GetCellInt('Dossard', row) > 0 then
+				local msg = 'Attention - Ce concurrent a déjà un dossard.\nSi vous poursuivez, ce dossard sera effacé\nVoulez-vous poursuivre ?';
+				if app.GetAuiFrame():MessageBox(msg, "Attention !!!", msgBoxStyle.YES_NO+msgBoxStyle.NO_DEFAULT+msgBoxStyle.ICON_WARNING) ~= msgBoxStyle.YES then
+					return;
+				end
 			end
+			etat = 'UF';
+			t:SetCellNull('Dossard', row);
 		end
 		t:SetCell('Statut', row, etat)
-		grid_tableau:RefreshCell(row, col);
 		OnChangeStatut(row);
-		base:TableBulkUpdate(tDraw, 'Statut', 'Resultat_Info_Tirage');
+		RefreshGrid();
+		CommandValiderUnCoureur(row);
 	end
 end
 
@@ -2132,7 +2154,7 @@ function OnGridShown(evt)
 	if row >= 0 and col >= 0 then
 		local t = grid_tableau:GetTable();
 		local colName = t:GetColumnName(t:GetVisibleColumnsIndex(col));
-		if colName:find('Rang') or colName:find('Dossard') or colName:find('points') or colName:find('_rank') or colName:find('Groupe') or colName:find('Winner') or colName:find('Statut') or colName:find('pts') or colName:find('clt') then
+		if colName:find('_tirage') or colName:find('Dossard') or colName:find('ECSL') or colName:find('WCSL') or colName:find('Winner') then
 			evt:Skip(true);
 			return;
 		end
@@ -2787,7 +2809,7 @@ function CreatePanelCoureur()
 	grid_coureur:Set({
 		table_base = tCoureur,
 		columns = 'Code_coureur, Nom, Prenom, Naissance, Code_nation, Code_comite, Club',
-		selection_mode = gridSelectionModes.CELLS,
+		selection_mode = gridSelectionModes.ROWS,
 		sortable = false,
 		enable_editing = false
 	});
@@ -2903,7 +2925,9 @@ function OnAfficheTableau()
 			grid_tableau:Set({
 				table_base = tDraw,
 				columns = 'Dossard, Rang_tirage, Groupe_tirage, Code_coureur, Nom, Prenom, Nation, ECSL_points, ECSL_rank, WCSL_points, WCSL_rank, ECSL_overall_points, ECSL_overall_rank, Winner_CC, FIS_pts, FIS_clt, Statut, Action, Validation',
-				selection_mode = gridSelectionModes.CELLS,
+				selection_mode = gridSelectionModes.ROWS,
+				-- focus_cell_highlight = true,
+				label_tracking = true,
 				sortable = true,
 				enable_editing = true
 			});
@@ -2911,7 +2935,9 @@ function OnAfficheTableau()
 			grid_tableau:Set({
 				table_base = tDraw,
 				columns = 'Dossard, Rang_tirage, Groupe_tirage, Code_coureur, Nom, Prenom, Nation, ECSL_points, ECSL_rank, WCSL_points, WCSL_rank, ECSL_overall_points, ECSL_overall_rank, Winner_CC, FIS_pts, FIS_clt, FIS_SG_pts, FIS_SG_clt, Statut, Action, Validation',
-				selection_mode = gridSelectionModes.CELLS,
+				selection_mode = gridSelectionModes.ROWS,
+				-- focus_cell_highlight = true,
+				label_tracking = true,
 				sortable = true,
 				enable_editing = true
 			});
@@ -2929,7 +2955,9 @@ function OnAfficheTableau()
 		grid_tableau:Set({
 			table_base = tDraw,
 			columns = 'Dossard, Rang_tirage, Groupe_tirage, Code_coureur, Nom, Prenom, Nation, Comite, Club, FIS_pts, FIS_clt, Statut, Action, Validation',
-			selection_mode = gridSelectionModes.CELLS,
+			selection_mode = gridSelectionModes.ROWS,
+			-- focus_cell_highlight = true,
+			label_tracking = true,
 			sortable = true,
 			enable_editing = true
 		});
@@ -2971,8 +2999,6 @@ function OnAfficheTableau()
 	btnRAZDossard = menuRAZ:Append({label="RAZ des dossards", image ="./res/32x32_clear.png"});
 	menuRAZ:AppendSeparator();
 	btnRAZDossardSel = menuRAZ:Append({label="RAZ des dossards pour les lignes sélectionnées", image ="./res/32x32_clear.png"});
-	menuRAZ:AppendSeparator();
-	btnRAZDossardBibo = menuRAZ:Append({label="RAZ des dossards du BIBO", image ="./res/32x32_clear.png"});
 	tbTableau:SetDropdownMenu(btnMenuRAZ:GetId(), menuRAZ);
 	tbTableau:AddSeparator();
 
@@ -3132,20 +3158,14 @@ function OnAfficheTableau()
 	dlgTableau:Bind(eventType.MENU, 
 		function(evt)
 			local rows = grid_tableau:GetSelectedRows();
-			for i = draw.row_selected, draw.row_selected + #rows - 1 do
-				tDraw:SetCellNull('Dossard', i);
+			for i = 1, #rows do
+				tDraw:SetCellNull('Dossard', rows[i]);
 			end
 			RefreshGrid();
 			CommandRenvoyerDossards(false);
 		end
 		, btnRAZDossardSel);
 
-	dlgTableau:Bind(eventType.MENU, 
-		function(evt)
-			draw.skip_question = false;
-			OnRAZData('Dossard_bibo')
-			SendMessage('Board refreshed');
-		end, btnRAZDossardBibo);
 	dlgTableau:Bind(eventType.MENU, 
 		function(evt)
 			draw.skip_question = false;
@@ -3346,7 +3366,7 @@ function OnAfficheTableau()
 			end
 			draw.print_alone = true;
 			ChecktDraw()
-			menuOutils:Enable(btnTirageDossardsBIBO:GetId(), false);
+			CommandRenvoyerDossards();
 			draw.bolTirageBiboFait = true;
 		end
 		, btnTirageDossardsBIBO);
@@ -3384,7 +3404,7 @@ function OnAfficheTableau()
 			RefreshGrid()
 			-- CommandRenvoyerDossards(false);
 			ChecktDraw()
-			menuOutils:Enable(btnTirageDossardsRestants:GetId(), false);
+			CommandRenvoyerDossards();
 			draw.bolTirageAvecPointFait = true;
 		end
 		, btnTirageDossardsRestants);
@@ -3446,6 +3466,7 @@ function OnAfficheTableau()
 				end
 			end
 			ChecktDraw()
+			CommandRenvoyerDossards();
 		end
 		, btnTirageVitesse1530);		
 
@@ -3459,9 +3480,9 @@ function OnAfficheTableau()
 			SetRangsPtsNull();
 			if #draw.tRangsPtsNull > 0 then
 				OnTirageRangsPtsNull(draw.tRangsPtsNull[#draw.tRangsPtsNull]);
-				menuOutils:Enable(btnTirageDossardsSansPoints:GetId(), false);
 				draw.bolTirageSansPointFait = true;
 			end
+			CommandRenvoyerDossards();
 			RefreshGrid();
 			-- ChecktDraw()
 		end
@@ -3692,7 +3713,7 @@ function main(params_c)
 	draw.height = display:GetSize().height - 30;
 	draw.x = 0;
 	draw.y = 0;
-	scrip_version = "5.54"; -- 4.92 pour 2022-2023
+	scrip_version = "5.55"; -- 4.92 pour 2022-2023
 	local imgfile = './res/40x16_dbl_coche.png';
 	if not app.FileExists(imgfile) then
 		app.GetAuiFrame():MessageBox(
