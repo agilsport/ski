@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!--  Menu Editions Activité "FOND" version="7.2"  -->
+<!--  Menu Editions Activité "FOND" version="7.3"  -->
 	<!-- nettoyage du fichier mise en place de la fonction getidentitecoureur  -->
 	<!-- Activation de la fenetre filtrage epreuves pour une edition gerer par un .lua => Option filter="before"  -->
 	<!-- calcul de la note poursuite 2éme jour  -->
@@ -31,9 +31,9 @@
 				<menu title="Club" image="./res/16x16_bib.png" orderby="Club" id="Lst_officielle_Filtrer"/>
 			</menu>
 			<menu title="Poursuite:" image="./res/16x16_official.png">
-				<menu title="Officielle (H. Départ)" image="./res/16x16_official.png" id="Lst_officielle_pours" choix_manche="1" cond="discipline:In('POURS')" officiel="1" header="1" first_header="1"/>
-				<menu title="Officieuse (H. Départ)" image="./res/16x16_official.png" id="Lst_officielle_pours" choix_manche="1" cond="discipline:In('POURS')" officiel="0" header="1" first_header="0"/>
-				<menu title="Officieuse (Ecart)" image="./res/16x16_official.png" id="Lst_officielle_pours" choix_manche="1" cond="discipline:In('POURS')" officiel="0" header="1" first_header="0"/>
+				<menu title="Officielle (H. Départ)" image="./res/16x16_official.png" id="Lst_officielle_pours" choix_manche="1" cond="discipline:In('POURS')" officiel="1" Ecart="0" header="1" first_header="1"/>
+				<menu title="Officieuse (H. Départ)" image="./res/16x16_official.png" id="Lst_officielle_pours" choix_manche="1" cond="discipline:In('POURS')" officiel="0" Ecart="0" header="1" first_header="0"/>
+				<menu title="Officieuse (Ecart)" image="./res/16x16_official.png" id="Lst_officielle_pours" choix_manche="1" cond="discipline:In('POURS')" officiel="0" Ecart="1" header="1" first_header="0"/>
 				<menu title="Edition des couloirs" image="./res/16x16_text.png" filter="before" lua="./edition/couloir.lua" cond="discipline:In('POURS')" />
 			</menu>
 			<menu title="Par Epreuve:" image="./res/16x16_bib.png" >
@@ -493,7 +493,7 @@
 			<text col="4" align="center" label="CS." >$(Comite)</text>
 			<text col="12" align="left" label="Club" cond="entite == 'FFS'">$(Club)</text>
 			<text col="6" align="right" label="Points" cond="entite == 'FFS'">$(Point)</text>
-			<text col="9" align="right" label="H. Départ" cond="discipline:In('FS','KO-QLF','IND')">$(Heure_depart1, "%2hh%2m:%2s")</text>
+			<text col="9" align="right" label="H. Départ" cond="discipline:In('FS','KO-QLF','IND', 'TEA-SP')">$(Heure_depart1, "%2hh%2m:%2s")</text>
 			<text col="11" align="right" label="H. Départ Pours" cond="discipline:In('POURS')">$(Heure_depart2, "%2hh%2m:%2s")</text>
 			<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
 		</body>
@@ -503,11 +503,12 @@
 	<report id="Lst_officielle_pours" title="(params.title or '')" header="1" first_header="0" >
 		<call option="identiteCoureur" file="./edition/options.xml"/>
 		<lua>
-			entite = $(Evenement.Code_entite)
-			discipline = $(Epreuve.Code_discipline)
-			officiel = tonumber(params.officiel)
-			rang = 'Rang'..manche
-			Hdpt = 'Heure_depart'..manche
+			entite = $(Evenement.Code_entite);
+			discipline = $(Epreuve.Code_discipline);
+			officiel = tonumber(params.officiel) or '';
+			Ecart= tonumber(params.Ecart) or '';
+			rang = 'Rang'..manche;
+			Hdpt = 'Heure_depart'..manche;
 			body:OrderBy('Heure_depart'..manche..' Asc' );
 			body:AddColumn({ name = 'Diff_heure_depart2', label = 'Diff_heure_depart'..manche, type = sqlType.CHRONO });	
 			if body:GetNbRows() > 0 then
@@ -543,8 +544,9 @@
 			<text col="12" align="left" label="Club" cond="entite == 'FFS'">$(Club)</text>
 			<!-- <text col="6" align="right" label="Points" cond="entite == 'FFS'">$(Point)</text> -->
 			<!-- <text col="9" align="right" label="H. Départ" cond="discipline:In('FS','KO-QLF','IND')">$(Heure_depart1, "%2hh%2m:%2s")</text> -->
-			<text col="11" align="right" label="H. Dépt.Pours" cond="officiel==1 " >body:GetCell(Hdpt, row, '%2hh%2m:%2s')</text>
-			<text col="11" align="right" label="('Ecart. '..discipline)" cond="officiel==0 ">$(Diff_heure_depart2, '%-1m%2s.%1f')</text>
+			<text col="11" align="right" label="H. Dépt.Pours" cond="Ecart==0" >body:GetCell(Hdpt, row, '%2hh%2m:%2s')</text>
+			<text col="11" align="right" label="('Ecart. '..discipline)" cond="officiel==0 and Ecart==1">$(Diff_heure_depart2, '%-1m%2s')</text>
+			<!-- <text col="11" align="right" label="('Ecart. '..discipline)" cond="officiel==0 ">$(Diff_heure_depart2, '%-1m:%2s.%1f')</text> -->
 			<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
 		</body>
 	</report>

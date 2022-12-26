@@ -50,8 +50,6 @@ function main(params)
 		Club = theParams.Club,
 	Comite = theParams.Code_comite,
 	codeActivite = theParams.Code_activite
-
-		
 	});
 	
 	-- body:SetName('body');
@@ -73,6 +71,7 @@ function main(params)
 	comboGestionAbs:SetValue('facturer tout les inscrits');
 
 	local tEpreuve = base:GetTable('Epreuve');
+	base:TableLoad(tEpreuve, 'Select * From Epreuve Where Code_evenement = '..params.code_evenement);
 	tEpreuve:AddColumn('Tarif_Inscriptions');
 	
 	tEpreuve:SetColumn('Code_discipline', { label = 'Disc.', width = 12 });
