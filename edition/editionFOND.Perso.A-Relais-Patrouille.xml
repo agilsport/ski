@@ -1,27 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
+<!-- Menu Editions Activité "FOND " Discipline Relais / patrouille / team-sprint !-->
+<!-- version="2.0" !-->
 <edition>
 	<menu>
 		<menu title="Edition Participants" image="./res/32x32_juges.png" bold="false" cond ="($(Epreuve.Code_discipline)='RELAIS')">
-			<menu title="Equipe Alpha (1-a) Officiels" image="./res/16x16_official.png" id="Lst_Relais" Officiel="1" first_header="1" orderby="Nom" DossardRelais="Lettre"/>
-			<menu title="Equipe Alpha (1-a)" image="./res/16x16_official.png" id="Lst_Relais" Officiel="0" first_header="0" orderby="Nom" DossardRelais="Lettre"/>
-			<menu title="Equipe Alpha (1/²)" image="./res/16x16_official.png" id="Lst_Relais" Officiel="0" first_header="0" orderby="Nom" DossardRelais="Numeric"/>
+			<menu title="Equipe Alpha (1-a) Officielle" image="./res/16x16_official.png" id="Lst_Relais" Officiel="1" first_header="1" orderby="Nom" DossardRelais="Lettre"/>
+			<menu title="Equipe Alpha (1-a) Officieuse" image="./res/16x16_official.png" id="Lst_Relais" Officiel="0" first_header="0" orderby="Nom" DossardRelais="Lettre"/>
+			<menu title="Equipe Alpha (1/²) Officieuse" image="./res/16x16_official.png" id="Lst_Relais" Officiel="0" first_header="0" orderby="Nom" DossardRelais="Numeric"/>
 		</menu>
 		<menu title="Edition Liste de Départ" image="./res/32x32_bib.png" bold="false" cond ="($(Epreuve.Code_discipline)='RELAIS')">
-			<menu title="Relais (1-a) Officiels" image="./res/16x16_official.png"  Officiel="1" first_header="1" id="Lst_Relais" orderby="Dossard" DossardRelais="Lettre"/>
-			<menu title="Relais (1-a)" image="./res/16x16_official.png"  Officiel="0" first_header="0" id="Lst_Relais" orderby="Dossard" DossardRelais="Lettre"/>
-			<menu title="Relais (1/²)" image="./res/16x16_official.png" id="Lst_Relais" orderby="Dossard" DossardRelais="Numeric"/>
+			<menu title="Relais (1-a) Officielle" image="./res/16x16_official.png"  Officiel="1" first_header="1" id="Lst_Relais" orderby="Dossard" DossardRelais="Lettre"/>
+			<menu title="Relais (1-a) Officieuse" image="./res/16x16_official.png"  Officiel="0" first_header="0" id="Lst_Relais" orderby="Dossard" DossardRelais="Lettre"/>
+			<menu title="Relais (1/²) Officieuse" image="./res/16x16_official.png" id="Lst_Relais" orderby="Dossard" DossardRelais="Numeric"/>
 		</menu>
 		<menu title="Résultats Relais" image="./res/32x32_ranking.png" bold="false" cond ="($(Epreuve.Code_discipline)='RELAIS')">
 			<menu title="Officiels(1-a)" image="./res/16x16_official.png" id="res_Relais" Officiel="1" first_header="1" DossardRelais="Lettre" mode_lap="1" />
 			<menu title="Officieux (1-a)" image="./res/16x16_official.png" id="res_Relais" Officiel="0" first_header="0" DossardRelais="Lettre" mode_lap="1" />
-			<menu title="Relais (1/²)" image="./res/16x16_official.png" id="res_Relais" DossardRelais="Numeric" mode_lap="1" />
+			<menu title="Officiels (1/²)" image="./res/16x16_official.png" id="res_Relais" Officiel="1" first_header="1" DossardRelais="Numeric" mode_lap="1" />
+			<menu title="Officieux (1/²)" image="./res/16x16_official.png" id="res_Relais" Officiel="0" first_header="0" DossardRelais="Numeric" mode_lap="1" />
 		</menu>
 		<menu title="Résultats Patrouille" image="./res/32x32_ranking.png" bold="false" cond ="($(Epreuve.Code_discipline)='RELAIS')">
-			<menu title="Officiels Patrouille (1-a)" image="./res/16x16_official.png" id="res_Patr" Officiel="1" first_header="1" DossardRelais="Lettre" />	
-			<menu title="Officieux Patrouille (1-a)" image="./res/16x16_official.png" id="res_Patr" Officiel="0" first_header="0" DossardRelais="Lettre" />
-			<menu title="Officiels Patrouille (1/²)" image="./res/16x16_official.png" id="res_Patr" Officiel="1" first_header="1" DossardRelais="Numeric" />
-			<menu title="Patrouille (1/²)" image="./res/16x16_official.png" id="res_Patr" Officiel="0" first_header="0" DossardRelais="Numeric" />
+			<menu title="Officiels (1-a)" image="./res/16x16_official.png" id="res_Patr" Officiel="1" first_header="1" DossardRelais="Lettre" />	
+			<menu title="Officieux (1-a)" image="./res/16x16_official.png" id="res_Patr" Officiel="0" first_header="0" DossardRelais="Lettre" />
+			<menu title="Officiels (1/²)" image="./res/16x16_official.png" id="res_Patr" Officiel="1" first_header="1" DossardRelais="Numeric" />
+			<menu title="Officieux (1/²)" image="./res/16x16_official.png" id="res_Patr" Officiel="0" first_header="0" DossardRelais="Numeric" />
 			<menu title="Résultats Tours (1-a)" image="./res/16x16_official.png" id="res_Patr" DossardRelais="Lettre" />
 		</menu>	
 		<menu title="Gestion des Team-Sprint " image="./res/32x32_snow_esf.png">
@@ -321,7 +323,6 @@
 			</before>
 		</rupture>
 		<!-- <paper orientation="landscape" /> -->
-		<!-- manque la fonction getNbEquiper() -->
 		<lua>
 			_context_border = true;
 			entite = $(Evenement.Code_entite);

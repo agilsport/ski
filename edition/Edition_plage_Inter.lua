@@ -1,7 +1,7 @@
 dofile('./interface/adv.lua');
 dofile('./interface/interface.lua');
 
--- version 1.0
+-- version 2.0
 	-- permet l'edition de l'analyse de performance entre inter d'une plage définie
 
 
