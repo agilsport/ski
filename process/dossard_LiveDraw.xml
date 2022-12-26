@@ -261,7 +261,6 @@
 			title = params.Title;
 		end
 		params.EstCE = params.EstCE or 'nada';
-		adv.Alert('params.EstCE = '..params.EstCE);
 	</lua>
     <lua>rupture = params.Rupture; label = params.Rupture; title = title..label; body:SetCounter(rupture); if rupture ~= 'Nation' then body:SetCounter('Nation'); end 
 		orderby = rupture..", Comite, Sexe, Point, Nom, Prenom"; 
