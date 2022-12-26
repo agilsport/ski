@@ -92,8 +92,9 @@
       <row value="10px"/>
       <staticbox row_start="1" row_end="0" col_start="1" col_end="0" label="Informations sur la communication avec la FIS"/>
     </matrix>
-    <toolbar row="auto" col_start="1" col_end="0" name="tbtableau" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
-    <row value="20px"/>
+    <row value="5px" />
+	<toolbar row="auto" col_start="2" name="tbtableau" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
+   <row value="50px"/>
   </panel>
   <panel name="gridFIS">
     <padding all="2px"/>
@@ -249,7 +250,8 @@
       <text col_start="5" align="center">$(Code_coureur):sub(4)</text>
       <text col_start="6" align="left">$(Nom)..' '..$(Prenom)</text>
       <text col_start="7" align="center">$(Nation)</text>
-      <text col_start="8" cond="params.EstCE == 0" align="center">$(FIS_pts)</text>
+      <text col_start="8" cond="params.EstCE == 0 and GetCellInt('FIS_clt', row) &gt; 0" align="center">$(FIS_pts)</text>
+      <text col_start="8" cond="params.EstCE == 0 and GetCellInt('FIS_clt', row) &lt; 0" align="center">''</text>
     </body>
   </panel>
   <!-- Participants - par nations -->
@@ -258,8 +260,11 @@
 		if params.Title then
 			title = params.Title;
 		end
+		params.EstCE = params.EstCE or 'nada';
 	</lua>
-    <lua>rupture = params.Rupture; label = params.Rupture; title = title..label; body:SetCounter(rupture); if rupture ~= 'Nation' then body:SetCounter('Nation'); end orderby = rupture..", Sexe, Point, Nom, Prenom"; somme_rupture = 0; nb_etrangers = 0; bolAjouter = false; comite = {};</lua>
+    <lua>rupture = params.Rupture; label = params.Rupture; title = title..label; body:SetCounter(rupture); if rupture ~= 'Nation' then body:SetCounter('Nation'); end 
+		orderby = rupture..", Comite, Sexe, Point, Nom, Prenom"; 
+		somme_rupture = 0; nb_etrangers = 0; bolAjouter = false; comite = {};</lua>
     <header>
       <spacing all="0"/>
       <padding all="0"/>
@@ -319,22 +324,40 @@
       </before>
     </rupture>
     <body>
-      <lua>if $(Comite) == 'EQ' then comite_origine = string.sub(GetComiteOrigine($(Code_coureur),$(Comite)),-2) if not comite[comite_origine] then comite[comite_origine] = {}; comite[comite_origine].EQ = 0; end if bolAjouter == true then comite[comite_origine].EQ = comite[comite_origine].EQ + 1; else bolAjouter = true; end end clt = base:GetClassementCoureur($(Code_coureur)):GetCell('Clt',0);</lua>
-      <call option="couleur_alternee" file="./edition/options.xml"/>
+      <lua>if $(Comite) == 'EQ' then 
+			comite_origine = string.sub(GetComiteOrigine($(Code_coureur),$(Comite)),-2);
+			if not comite[comite_origine] then 
+				comite[comite_origine] = {}; 
+				comite[comite_origine].EQ = 0; 
+			end 
+			if bolAjouter == true then 
+				comite[comite_origine].EQ = comite[comite_origine].EQ + 1; 
+			else 
+				bolAjouter = true; 
+			end 
+		end 
+		clt = base:GetClassementCoureur($(Code_coureur)):GetCell('Clt',0);
+	</lua>
+      <lua></lua>
+	<call option="couleur_alternee" file="./edition/options.xml"/>
       <row value="auto"/>
       <text col="2" align="center" label="#">
-        <font size="8" cond="group =='body'"/>				$(Reserve)
+        <font size="8" cond="group =='body'"/>$(Reserve)
 			</text>
       <text col="5" align="center" label="Code">
-        <font size="8" cond="group =='body'"/>				$(Code_coureur):sub(4)
+        <font size="8" cond="group =='body'"/>$(Code_coureur):sub(4)
 			</text>
+			params.EstCE == 1 
       <text col="20" align="left" label="Identity" font_weight="bold" font_size_step="1">$(Nom)..' '..$(Prenom)</text>
-      <text col="15" align="left" label="Club">$(Club)</text>
+      <text col="15" align="left" label="Club" cond="params.EstCE == 1">$(Club)</text>
+      <text col="15" align="left" label="Club" cond="params.EstCE == 0 and $(Comite):len() &gt; 0">$(Comite)..' - '..$(Club)</text>
+      <text col="15" align="left" label="Club" cond="params.EstCE == 0 and $(Comite):len() == 0">$(Club)</text>
       <!-- <text col="2" align="center" label="S." cond="">$(Sexe)</text> -->
       <text col="4" align="center" label="YoB">$(An)</text>
       <!-- <text col="4" align="center" label="Nation" >$(Nation)</text> -->
       <!-- <text col="12" align="center" label="Club" >$(Club)</text> -->
-      <text col="7" align="center" label="Points">$(Point)</text>
+      <text col="7" align="center" label="Points" cond="body:GetCellInt('FIS_clt', row) &gt; 0">$(Point)</text>
+      <text col="7" align="center" label="Points" cond="body:GetCellInt('FIS_clt', row) == 0">''</text>
       <text col="4" align="center" label="Rank">clt</text>
       <line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
     </body>
