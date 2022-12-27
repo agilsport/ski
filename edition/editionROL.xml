@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!--  Menu Editions Activité "FOND" version="7.3"  -->
+<!--  Menu Editions Activité "FOND" version="7.4"  -->
 	<!-- nettoyage du fichier mise en place de la fonction getidentitecoureur  -->
 	<!-- Activation de la fenetre filtrage epreuves pour une edition gerer par un .lua => Option filter="before"  -->
 	<!-- calcul de la note poursuite 2éme jour  -->
@@ -54,9 +54,11 @@
 			</menu>
 			<menu title="Par épreuve / catégories et sexe" image="./res/16x16_ranking.png" id="res_categ" header="1" first_header="0" choix_clt_max="1"/>
 			<menu title="Skiathlon" image="./res/16x16_ranking.png" id="res_Skiathlon" header="1" first_header="0" choix_manche="1"/>
-			<menu title="Analyse des différences entre chaque temps inter" image="./res/16x16_ranking.png" id="res_DiffInter" header="1" first_header="0" choix_manche="1"/>
-			<menu title="Analyse des différences entre chaque temps inter par plage d'intermédiaire (2=>5)" image="./res/16x16_ranking.png" filter="before" lua="./edition/Edition_plage_Inter.lua" first_header="0"/>
-			<menu title="Résultats avec choix de l'intermédiaire à éditer " image="./res/16x16_ranking.png" id="res_Cant_Chrono_inter_x" Inter="1" choix_manche="1" first_header="0"/>
+			<menu title="Analyse des différences entre:" image="./res/16x16_official.png">
+				<menu title="Chaque temps inter" image="./res/16x16_ranking.png" id="res_DiffInter" header="1" first_header="0" choix_manche="1"/>
+				<menu title="Chaque temps inter par plage d'intermédiaire (2=>5)" image="./res/16x16_ranking.png" filter="before" lua="./edition/Edition_plage_Inter.lua" first_header="0"/>
+			</menu>
+			<menu title="Résultats d'un l'intermédiaire définis (édition en arriére plan)" image="./res/16x16_ranking.png" id="res_Cant_Chrono_inter_x" Inter="1" first_header="0"/>
 		</menu>
 	</menu>
 
@@ -493,7 +495,7 @@
 			<text col="4" align="center" label="CS." >$(Comite)</text>
 			<text col="12" align="left" label="Club" cond="entite == 'FFS'">$(Club)</text>
 			<text col="6" align="right" label="Points" cond="entite == 'FFS'">$(Point)</text>
-			<text col="9" align="right" label="H. Départ" cond="discipline:In('FS','KO-QLF','IND')">$(Heure_depart1, "%2hh%2m:%2s")</text>
+			<text col="9" align="right" label="H. Départ" cond="discipline:In('FS','KO-QLF','IND', 'TEA-SP')">$(Heure_depart1, "%2hh%2m:%2s")</text>
 			<text col="11" align="right" label="H. Départ Pours" cond="discipline:In('POURS')">$(Heure_depart2, "%2hh%2m:%2s")</text>
 			<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
 		</body>
@@ -1193,8 +1195,9 @@
 	</report>	
 	
 	<!-- Résultatsinter X -->
-	<report id="res_Cant_Chrono_inter_x" title="(params.title or '')" header="1" first_header="(params.first_header or '1')" >
+	<report id="res_Cant_Chrono_inter_x" header="1" first_header="(params.first_header or '1')" >
 		<lua>
+			manche = wnd.GetNumberFromUser('N° Manche voulu', 'Manche N°', 'Selection N° Manche', 1, 1, 99, app.GetAuiFrame());
 			Inter = wnd.GetNumberFromUser('Temps Inter', 'Valeur Inter', 'Selection Choix Inter', 1, 1, 99, app.GetAuiFrame());
 
 			title = 'Résultat de l\'intermédiaire: '..Inter;
@@ -1223,11 +1226,12 @@
 			type_edition = id:sub(1,4);
 			body:SetCounter('Tps_status');
 			entite = $(Evenement.Code_entite);
+			discipline = $(Epreuve.Code_discipline);
+			officiel = tonumber(params.officiel);
 			nb_manche = base:GetTable('Epreuve'):GetCellInt('Nombre_de_manche', 0, 1);
 			body:SetRanking('Rank_SexeF', 'Sexe, '..TpsInter..', Dossard Desc');
 			body:SetRanking('Rank_SexeM', 'Sexe desc, '..TpsInter..', Dossard Desc');
 			orderby = 'Tps'..manche..'_inter'..Inter..', Dossard Desc';
-			
 		</lua>	
 		<order key="('Tps'..manche..'_inter'..Inter..', Dossard Desc')" />
 
@@ -1240,6 +1244,20 @@
 				<row value="0.2cm"/>
 			</before>
 		</rupture>
+
+		<!-- header standard !-->
+		<header>
+			<spacing all="0"/>
+			<background mode="transparent"/>
+			<font name="Calibri" size="14" adjust="max" weight="bold"/>
+			<text row="auto" col="1" align="center">$(Evenement.Nom)</text>
+			<text row="auto" align="center">$(Discipline.Libelle)</text>
+			<text row="auto" align="center" cond="params.code_epreuve ~= -1">$(Categorie{$(Epreuve.Code_categorie)}.Libelle)..' - '..$(Sexe{$(Epreuve.Sexe)}.Libelle)</text>
+			<text row="auto" align="center" >'Manche'..manche..' Inter: '..Inter</text>
+			<row h="0.5cm"/>
+			<call option="stat_ranking" cond="editor:GetPageCurrent() == 1" file="./edition/options.xml"/>
+			<row value="0.4cm" />
+		</header>
 
 		<body>
 			<call option="couleur_alternee" file="./edition/options.xml" />
@@ -1306,4 +1324,3 @@
 		</body>
 	</report>	
 </edition>
-

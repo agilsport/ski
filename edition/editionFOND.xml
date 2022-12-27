@@ -54,8 +54,10 @@
 			</menu>
 			<menu title="Par épreuve / catégories et sexe" image="./res/16x16_ranking.png" id="res_categ" header="1" first_header="0" choix_clt_max="1"/>
 			<menu title="Skiathlon" image="./res/16x16_ranking.png" id="res_Skiathlon" header="1" first_header="0" choix_manche="1"/>
-			<menu title="Analyse des différences entre chaque temps inter" image="./res/16x16_ranking.png" id="res_DiffInter" header="1" first_header="0" choix_manche="1"/>
-			<menu title="Analyse des différences entre chaque temps inter par plage d'intermédiaire (2=>5)" image="./res/16x16_ranking.png" filter="before" lua="./edition/Edition_plage_Inter.lua" first_header="0"/>
+			<menu title="Analyse des différences entre:" image="./res/16x16_official.png">
+				<menu title="Chaque temps inter" image="./res/16x16_ranking.png" id="res_DiffInter" header="1" first_header="0" choix_manche="1"/>
+				<menu title="Chaque temps inter par plage d'intermédiaire (2=>5)" image="./res/16x16_ranking.png" filter="before" lua="./edition/Edition_plage_Inter.lua" first_header="0"/>
+			</menu>
 			<menu title="Résultats avec choix de l'intermédiaire à éditer " image="./res/16x16_ranking.png" id="res_Cant_Chrono_inter_x" Inter="1" choix_manche="1" first_header="0"/>
 		</menu>
 	</menu>
