@@ -126,12 +126,6 @@ function ChargeECSL(filename)
 		if cols[i] == draw.discipline..'pos' then
 			idxcolClt = i;
 		end
-		if cols[i] == 'ALLpoints' then
-			idxcolPtsAll = i;
-		end
-		if cols[i] == 'ALLpos' then
-			idxcolCltAll = i;
-		end
 	end
 	for i = 0, tDraw:GetNbRows() -1 do
 		tDraw:SetCellNull('ECSL_points', i);
@@ -143,8 +137,6 @@ function ChargeECSL(filename)
 		draw.tECSL[fiscode] = {};
 		draw.tECSL[fiscode].Point = 0;
 		draw.tECSL[fiscode].Clt = 0;
-		draw.tECSL[fiscode].AllPoint = 0;
-		draw.tECSL[fiscode].AllClt = 0;
 		if idxcolPts > 0 and idxcolClt > 0 then
 			local pts = tonumber(cols[idxcolPts]) or 0;
 			local clt = tonumber(cols[idxcolClt]) or 0;
@@ -153,23 +145,11 @@ function ChargeECSL(filename)
 				draw.tECSL[fiscode].Clt = clt;
 			end
 		end
-		if idxcolPtsAll > 0 and idxcolCltAll > 0 then
-			local ptsall = tonumber(cols[idxcolPtsAll]) or 0;
-			local cltall = tonumber(cols[idxcolCltAll]) or 0;
-			if ptsall > 0 and cltall > 0 then
-				draw.tECSL[fiscode].AllPoint = ptsall;
-				draw.tECSL[fiscode].AllClt = cltall;
-			end
-		end
 		local r = tDraw:GetIndexRow('Code_coureur', fiscode);
 		if r and r >= 0 then
 			if draw.tECSL[fiscode].Point > 0 then
 				tDraw:SetCell('ECSL_points', r, draw.tECSL[fiscode].Point);
 				tDraw:SetCell('ECSL_rank', r, draw.tECSL[fiscode].Clt);
-			end
-			if draw.tECSL[fiscode].AllPoint >= 450 then
-				tDraw:SetCell('ECSL_overall_points', r, draw.tECSL[fiscode].AllPoint);
-				tDraw:SetCell('ECSL_overall_rank', r, draw.tECSL[fiscode].AllClt);
 			end
 		end
 	end
@@ -3726,7 +3706,7 @@ function main(params_c)
 	draw.height = display:GetSize().height - 30;
 	draw.x = 0;
 	draw.y = 0;
-	scrip_version = "5.56"; -- 4.92 pour 2022-2023
+	scrip_version = "5.57"; -- 4.92 pour 2022-2023
 	local imgfile = './res/40x16_dbl_coche.png';
 	if not app.FileExists(imgfile) then
 		app.GetAuiFrame():MessageBox(
