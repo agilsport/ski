@@ -2295,9 +2295,9 @@ function TraitementtDrawG4()
 	-- adv.Alert('Sortie de TraitementtDrawG4\n');
 	tDrawG4:RemoveAllRows();
 	if draw.nb_pris_ecsl == 30 then
-		draw.ajouter_groupe = 0;
-	else
 		draw.ajouter_groupe = 1;
+	else
+		draw.ajouter_groupe = 0;
 	end
 		
 end
@@ -3063,7 +3063,7 @@ function OnAfficheTableau()
 	menuOutils:AppendSeparator();
 	btnDecalerGroupeHaut = menuOutils:Append({label="Décaler les groupes de tirage de -1", image ="./res/32x32_up.png"});
 	menuOutils:AppendSeparator();
-	btnExporter = menuOutils:Append({label="Exporter le tableau (fichier csv)", image ="./res/32x32_export.png"});
+	btnExporter = menuOutils:Append({label="Exporter le tableau (fichier csv)", image ="./res/32x32_csv.png"});
 	menuOutils:AppendSeparator();
 	btnGetECSL = menuOutils:Append({label="Charger un fichier csv ECSL", image ="./res/32x32_startlist.png"});
 	menuOutils:AppendSeparator();
@@ -3150,9 +3150,18 @@ function OnAfficheTableau()
 				tDraw:SetCellNull('Dossard', rows[i]);
 			end
 			RefreshGrid();
-			CommandRenvoyerDossards(false);
+			if draw.state == true then
+				local msg = "Cliquer sur Oui pour Renvoyer tous les dossards à la FIS.";
+				if dlgTableau:MessageBox(
+					msg, "Renvoi des dossards",
+					msgBoxStyle.YES_NO+msgBoxStyle.NO_DEFAULT+msgBoxStyle.ICON_INFORMATION
+				) ~= msgBoxStyle.YES then
+					return;
+				end
+				CommandRenvoyerDossards(false);
+			end
 		end
-		, btnRAZDossardSel);
+	, btnRAZDossardSel);
 
 	dlgTableau:Bind(eventType.MENU, 
 		function(evt)
@@ -3359,8 +3368,17 @@ function OnAfficheTableau()
 			end
 			draw.print_alone = true;
 			ChecktDraw()
-			CommandRenvoyerDossards();
 			draw.bolTirageBiboFait = true;
+			if draw.state == true then
+				local msg = "Cliquer sur Oui pour Renvoyer tous les dossards à la FIS.";
+				if dlgTableau:MessageBox(
+					msg, "Renvoi des dossards",
+					msgBoxStyle.YES_NO+msgBoxStyle.NO_DEFAULT+msgBoxStyle.ICON_INFORMATION
+				) ~= msgBoxStyle.YES then
+					return;
+				end
+				CommandRenvoyerDossards();
+			end
 		end
 		, btnTirageDossardsBIBO);
 	dlgTableau:Bind(eventType.MENU, 
@@ -3397,8 +3415,17 @@ function OnAfficheTableau()
 			RefreshGrid()
 			-- CommandRenvoyerDossards(false);
 			ChecktDraw()
-			CommandRenvoyerDossards();
 			draw.bolTirageAvecPointFait = true;
+			if draw.state == true then
+				local msg = "Cliquer sur Oui pour Renvoyer tous les dossards à la FIS.";
+				if dlgTableau:MessageBox(
+					msg, "Renvoi des dossards",
+					msgBoxStyle.YES_NO+msgBoxStyle.NO_DEFAULT+msgBoxStyle.ICON_INFORMATION
+				) ~= msgBoxStyle.YES then
+					return;
+				end
+				CommandRenvoyerDossards();
+			end
 		end
 		, btnTirageDossardsRestants);
 
@@ -3459,7 +3486,16 @@ function OnAfficheTableau()
 				end
 			end
 			ChecktDraw()
-			CommandRenvoyerDossards();
+			if draw.state == true then
+				local msg = "Cliquer sur Oui pour Renvoyer tous les dossards à la FIS.";
+				if dlgTableau:MessageBox(
+					msg, "Renvoi des dossards",
+					msgBoxStyle.YES_NO+msgBoxStyle.NO_DEFAULT+msgBoxStyle.ICON_INFORMATION
+				) ~= msgBoxStyle.YES then
+					return;
+				end
+				CommandRenvoyerDossards();
+			end
 		end
 		, btnTirageVitesse1530);		
 
@@ -3475,8 +3511,17 @@ function OnAfficheTableau()
 				OnTirageRangsPtsNull(draw.tRangsPtsNull[#draw.tRangsPtsNull]);
 				draw.bolTirageSansPointFait = true;
 			end
-			CommandRenvoyerDossards();
 			RefreshGrid();
+			if draw.state == true then
+				local msg = "Cliquer sur Oui pour Renvoyer tous les dossards à la FIS.";
+				if dlgTableau:MessageBox(
+					msg, "Renvoi des dossards",
+					msgBoxStyle.YES_NO+msgBoxStyle.NO_DEFAULT+msgBoxStyle.ICON_INFORMATION
+				) ~= msgBoxStyle.YES then
+					return;
+				end
+				CommandRenvoyerDossards();
+			end
 			-- ChecktDraw()
 		end
 		, btnTirageDossardsSansPoints);		
@@ -3706,7 +3751,7 @@ function main(params_c)
 	draw.height = display:GetSize().height - 30;
 	draw.x = 0;
 	draw.y = 0;
-	scrip_version = "5.57"; -- 4.92 pour 2022-2023
+	scrip_version = "5.6"; -- 4.92 pour 2022-2023
 	local imgfile = './res/40x16_dbl_coche.png';
 	if not app.FileExists(imgfile) then
 		app.GetAuiFrame():MessageBox(
@@ -3716,12 +3761,18 @@ function main(params_c)
 			local reponse = app.AutoUpdateResource('https://agilsport.fr/bta_alpin/UpdateScript.zip');
 			return true;
 	end
-	if app.GetVersion() >= '4.4c' then 
+	if app.GetVersion() >= '5.0' then 
 		-- vérification de l'existence d'une version plus récente du script.
 		-- Ex de retour : LiveDraw=5.94,Matrices=5.92,TimingReport=4.2
 		indice_return = 1;
 		local url = 'https://agilsport.fr/bta_alpin/versionsPG.txt'
 		version = curl.AsyncGET(wnd.GetParentFrame(), url);
+	else
+		app.GetAuiFrame():MessageBox(
+			"Vous devez mettre à jour le logiciel avec\nla dernière version stable (téléchargement -> Logiciel).", 
+			"Mise à jour du logiciel",
+			msgBoxStyle.OK + msgBoxStyle.ICON_INFORMATION); 
+		return true;
 	end
 
 	local updatefile = './tmp/updatesPG.txt';
@@ -3748,15 +3799,29 @@ function main(params_c)
 	tPistes = base:GetTable('Pistes');
 	tNation = base:GetTable('Nation');
 	tResultat_Info_Tirage = base:GetTable('Resultat_Info_Tirage');
+	if tResultat_Info_Tirage == nil then
+		CreateTableResultat_Info_Tirage();
+	else
+		if tResultat_Info_Tirage:GetIndexColumn("Pts_info") < 0 then
+			local cmd = "ALTER TABLE Resultat_Info_Tirage ADD COLUMN TG CHAR(10) NULL";
+			base:Query(cmd);
+			cmd = "ALTER TABLE Resultat_Info_Tirage ADD COLUMN Racer_info CHAR(10) NULL";
+			base:Query(cmd);
+			cmd = "ALTER TABLE Resultat_Info_Tirage ADD COLUMN Pts_info CHAR(3) NULL";
+			base:Query(cmd);
+			app.GetAuiFrame():MessageBox(
+				"La base de donnée a nécessité la modification d'une table'.\nLe script va se fermer automatiquement.\nVous devrez quitter complètement skiFFS et relancer le programme.", 
+				"Téléchargement d'une image supplémentaire",
+				msgBoxStyle.OK + msgBoxStyle.ICON_INFORMATION); 
+			return true;
+		end
+	end
 	tResultat_Info_Bibo = base:GetTable('Resultat_Info_Bibo');
 	tCoureur = base:GetTable('Coureur');
 	tCategorie = base:GetTable('Categorie');
 	tClassement_Coureur = base:GetTable('Classement_Coureur');
 	tEpreuve_Alpine_Manche = base:GetTable('Epreuve_Alpine_Manche');
 	tResultat_Info_Tirage = base:GetTable('Resultat_Info_Tirage');
-	if tResultat_Info_Tirage == nil then
-		CreateTableResultat_Info_Tirage();
-	end
 	if tResultat_Info_Bibo == nil then
 		CreateTableResultat_Info_Bibo();
 	end
