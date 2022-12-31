@@ -43,9 +43,11 @@ function main(params)
 	Comite = theParams.Code_comite,
 	codeActivite = theParams.Code_activite
 	});
-	
-	code_evenement = theParams.code_evenement;
+	--body = base:GetTable('body');
+	-- Tri du body
 	body:OrderBy('Code_epreuve,Heure_depart1 Asc' );
+	code_evenement = theParams.code_evenement;
+
 	tEpreuve = base:GetTable('Epreuve');
 
 	-- on recherche si il y a deja des inscrits ds la tables resultats_manche
@@ -191,6 +193,7 @@ function LectureDonnees(evt)
 				-- Alert("Update Heure_depart2: "..Heure_depart2);
 				if body:GetCell('Code_epreuve', i) == code_epreuve then
 					cmd =      "Update Resultat_Manche Set Heure_depart = "..Heure_depart2;
+					cmd = cmd..", Rang = "..i+1;
 					cmd = cmd.." Where Code_evenement = "..tonumber(code_evenement);
 					cmd = cmd.." And Code_coureur = '"..body:GetCell('Code_coureur', i).."'";
 					cmd = cmd.." And Code_manche = "..PcodeManche;
