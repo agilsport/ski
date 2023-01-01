@@ -968,7 +968,10 @@
 	
 		<!-- Résultats Skiathlon -->
 	<report id="res_Skiathlon" title="(params.title or '')" header="1" first_header="0" >
-		<lua>Nb_tps_inter = base:GetTable('Epreuve_Nordique'):GetCellInt('Nb_temps_inter', 0, 1) or 2</lua>
+		<lua>
+			Nb_tps_inter = base:GetTable('Epreuve_Nordique'):GetCellInt('Nb_temps_inter', 0, 1) or 2;
+			manche = params.manche or 1;
+		</lua>
 		<!-- <lua>Nb_tps_inter = 2</lua> -->
 		<!-- <lua>Nb_tps_inter = base:GetTable('Epreuve_Alpine_Manche'):GetCellInt('Nb_temps_inter', 0, 1)</lua> -->
 		<!-- <paper orientation="landscape" cond="Nb_tps_inter >= 4 "/> -->
@@ -1085,7 +1088,10 @@
 	
 		<!-- Résultats diff inter -->
 	<report id="res_DiffInter" title="(params.title or '')" header="1" first_header="0" >
-		<lua>Nb_tps_inter = base:GetTable('Epreuve_Nordique'):GetCellInt('Nb_temps_inter', 0, 1) or 1</lua>
+		<lua>
+			Nb_tps_inter = base:GetTable('Epreuve_Nordique'):GetCellInt('Nb_temps_inter', 0, 1) or 1
+			manche = params.manche or 1;
+		</lua>
 		<!-- <paper orientation="landscape" cond="Nb_tps_inter >= 4 "/> -->
 		<!-- création des colonne dans le body -->
 		<column name="Diff_I2_I1" type="chrono" />
