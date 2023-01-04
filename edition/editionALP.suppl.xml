@@ -16,6 +16,7 @@
 			<menu title="Regroupement de coureurs" image="./res/32x32_official.png" lua="./process/regroupementALP.lua" />
 			<menu title="Liste de départ en Manche 3 avec BIBO sur M1 + M2" faire="M1_M2" image="./res/32x32_ranking.png" lua="./process/dossard_TirageOptions.lua" />
 			<menu title="Marquage des Equipes" origine="edition" image="./res/32x32_ranking.png" lua="./process/marquageEquipe.lua" />
+			<menu title="Résultats du Kandahar Junior" image="./res/16x16_ranking.png" lua="./process/kandahar_junior.lua"/>
 		</menu>
 		<menu title="Coupes d'Europe et FIS" image="./res/32x32_juges.png">
 			<menu title="Tirage en ligne des dossards sur le site de la FIS" origine="edition" image="./res/16x16_ranking.png" lua="./process/dossard_LiveDraw.lua"/>
