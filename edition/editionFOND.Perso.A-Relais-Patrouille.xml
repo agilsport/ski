@@ -9,9 +9,9 @@
 			<menu title="Equipe Alpha (1/²) Officieuse" image="./res/16x16_official.png" id="Lst_Relais" Officiel="0" first_header="0" orderby="Nom" DossardRelais="Numeric"/>
 		</menu>
 		<menu title="Edition Liste de Départ" image="./res/32x32_bib.png" bold="false" cond ="($(Epreuve.Code_discipline)='RELAIS')">
-			<menu title="Relais (1-a) Officielle" image="./res/16x16_official.png"  Officiel="1" first_header="1" id="Lst_Relais" orderby="Dossard" DossardRelais="Lettre"/>
-			<menu title="Relais (1-a) Officieuse" image="./res/16x16_official.png"  Officiel="0" first_header="0" id="Lst_Relais" orderby="Dossard" DossardRelais="Lettre"/>
-			<menu title="Relais (1/²) Officieuse" image="./res/16x16_official.png" id="Lst_Relais" orderby="Dossard" DossardRelais="Numeric"/>
+			<menu title="Relais (1-a) Officielle" image="./res/16x16_official.png" id="Lst_Relais" Officiel="1" first_header="1" orderby="Dossard" DossardRelais="Lettre"/>
+			<menu title="Relais (1-a) Officieuse" image="./res/16x16_official.png" id="Lst_Relais" Officiel="0" first_header="0" orderby="Dossard" DossardRelais="Lettre"/>
+			<menu title="Relais (1/²) Officieuse" image="./res/16x16_official.png" id="Lst_Relais" Officiel="0" first_header="0" orderby="Dossard" DossardRelais="Numeric"/>
 		</menu>
 		<menu title="Résultats Relais" image="./res/32x32_ranking.png" bold="false" cond ="($(Epreuve.Code_discipline)='RELAIS')">
 			<menu title="Officiels(1-a)" image="./res/16x16_official.png" id="res_Relais" Officiel="1" first_header="1" DossardRelais="Lettre" mode_lap="1" />
@@ -434,7 +434,6 @@
 			</before>
 		</rupture>
 		<!-- <paper orientation="landscape" /> -->
-		<!-- manque la fonction getNbEquiper() -->
 		<lua>
 			_context_border = true;
 			entite = $(Evenement.Code_entite);
