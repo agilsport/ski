@@ -566,7 +566,7 @@ function main(params_c)
 	params.x = (display:GetSize().width - params.width) / 2;
 	params.y = 50;
 	
-	scrip_version = "2.0"; 
+	scrip_version = "2.2"; 
 	-- vérification de l'existence d'une version plus récente du script.
 	-- Ex de retour : LiveDraw=5.94,Matrices=5.92,TimingReport=4.2,DoubleTirage=3.2,TirageOptions=3.3,TirageER=1.7,ListeMinisterielle=2.3,KandaHarJunior=2.0
 	if app.GetVersion() >= '4.4c' then 
@@ -730,6 +730,7 @@ function main(params_c)
 	dlgConfig:GetWindowName('nb_garcons'):SetValue(params.nb_garcons);
 	
 	
+	wnd.GetParentFrame():Bind(eventType.CURL, OnCurlReturn);
 	dlgConfig:Bind(eventType.COMBOBOX, 
 		function(evt) 
 			params.comboPtsTps = dlgConfig:GetWindowName('comboPtsTps'):GetSelection();
@@ -774,7 +775,7 @@ function main(params_c)
 		dlgConfig:Bind(eventType.TEXT, 
 			function(evt) 
 				params['courseg'..i] = tonumber(dlgConfig:GetWindowName('courseg'..i):GetValue()) or -1;
-				tEvenement = base:TableLoad('Select Nom From Evenement Where Code = '..params['coursefg'..i]);
+				tEvenement = base:TableLoad('Select Nom From Evenement Where Code = '..params['courseg'..i]);
 				if tEvenement:GetNbRows() > 0 then
 					dlgConfig:GetWindowName('courseg'..i..'_nom'):SetValue(tEvenement:GetCell('Nom', 0));
 					dlgConfig:GetWindowName('filtrageg'..i):Enable(true);

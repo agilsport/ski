@@ -334,6 +334,8 @@ function OnChangecomboTypePoint(valeur)		-- selon le contenu du contrôle comboTy
 			dlgConfig:GetWindowName('coefDefautMancheBloc2'):SetValue(matrice.coefDefautMancheBloc2);
 		end
 	else
+		dlgConfig:GetWindowName('comboGarderInfQuota'):SetValue('Oui');
+		matrice.comboGarderInfQuota = 'Oui';
 		dlgConfig:GetWindowName('coefDefautCourseBloc1'):SetValue('100');
 		dlgConfig:GetWindowName('coefDefautMancheBloc1'):SetValue('100');
 		if matrice.numPtsMaxi < 9999 then
@@ -2778,6 +2780,9 @@ function LitMatriceCourses(bolcalculer);	-- lecture des courses figurant dans la
 	matrice.discipline = {};
 	ajouter = {};
 	for i = 0, tMatrice_Courses:GetNbRows() -1 do
+		if matrice.texteCodex == 'Non' then
+			tMatrice_Courses:SetCellNull('Codex', i);
+		end
 		local idxcourse = i + 1;
 		tMatrice_Courses:SetCell('Ordre', i, idxcourse);
 		local bloc = 1;
@@ -3175,8 +3180,9 @@ function LitMatrice()	-- lecture des variables et affectation des valeurs dans l
 	matrice.texteMargeHaute1 = matrice.texteMargeHaute1 or 1;
 	matrice.texteMargeHaute2 = matrice.texteMargeHaute2 or 1;
 	matrice.texteNbColPresCourses = matrice.texteNbColPresCourses or GetValue ("texteNbColPresCourses", '3');
-	matrice.texteImageStatCourses = matrice.texteImageStatCourses or GetValue ("texteImageStatCourses", '')
-	matrice.texteComiteOrigine = matrice.texteComiteOrigine or GetValue("texteComiteOrigine", 'Non')
+	matrice.texteImageStatCourses = matrice.texteImageStatCourses or GetValue ("texteImageStatCourses", '');
+	matrice.texteComiteOrigine = matrice.texteComiteOrigine or GetValue("texteComiteOrigine", 'Non');
+	matrice.texteCodex = matrice.texteCodex or GetValue("texteCodex", 'Non');
 	BuildRegroupement();
 
 	matrice.scriptLUA = matrice.scriptLUA or GetValue("scriptLUA", "")
@@ -5222,6 +5228,8 @@ function OnSavedlgTexte()
 
 	matrice.texteCodeComplet = dlgTexte:GetWindowName('texteCodeComplet'):GetValue();
 	AddRowEvenement_Matrice('texteCodeComplet', matrice.texteCodeComplet);
+	matrice.texteCodex = dlgTexte:GetWindowName('texteCodex'):GetValue();
+	AddRowEvenement_Matrice('texteCodex', matrice.texteCodex);
 	matrice.texteFiltreSupplementaire = dlgTexte:GetWindowName('texteFiltreSupplementaire'):GetValue();
 	AddRowEvenement_Matrice('texteFiltreSupplementaire', matrice.texteFiltreSupplementaire);
 	RempliTableauMatrice();
@@ -5347,6 +5355,9 @@ function AffichedlgTexte()		-- boîte de dialogue pour le choix des textes à impr
 
 	dlgTexte:GetWindowName('texteCodeComplet'):SetTable(tOuiNon, 'Choix', 'Choix');
 	dlgTexte:GetWindowName('texteCodeComplet'):SetValue(matrice.texteCodeComplet);
+
+	dlgTexte:GetWindowName('texteCodex'):SetTable(tOuiNon, 'Choix', 'Choix');
+	dlgTexte:GetWindowName('texteCodex'):SetValue(matrice.texteCodex);
 
 	-- Bind
 	tbtexte:Bind(eventType.MENU, 
@@ -6119,6 +6130,7 @@ function BuildTableRanking(indice_filtrage)
 		local idxcourse = row + 1;
 		local discipline = tMatrice_Courses:GetCell('Code_discipline', row);
 		tMatrice_Ranking:AddColumn({ name = 'Code_evenement'..idxcourse, label = 'Code_evenement'..idxcourse, type = sqlType.LONG, style = sqlStyle.NULL});
+		tMatrice_Ranking:AddColumn({ name = 'Codex'..idxcourse, label = 'Codex'..idxcourse, type = sqlType.CHAR, width = '15', style = sqlStyle.NULL});
 		tMatrice_Ranking:AddColumn({ name = 'Course_prise'..idxcourse, label = 'Course_prise'..idxcourse, type = sqlType.LONG, style = sqlStyle.NULL});
 		tMatrice_Ranking:AddColumn({ name = 'Manche_prise'..idxcourse, label = 'Manche_prise'..idxcourse, type = sqlType.LONG, style = sqlStyle.NULL});
 		tMatrice_Ranking:AddColumn({ name = 'Selection'..idxcourse, label = 'Selection'..idxcourse, type = sqlType.CHAR, width = '100', style = sqlStyle.NULL});
@@ -6166,15 +6178,17 @@ function BuildTableRanking(indice_filtrage)
 		arResultat_Manchex = {};
 		local nombre_de_manche = tMatrice_Courses:GetCellInt('Nombre_de_manche', row_course);
 		local idxcourse = row_course + 1;
-		local discipline = tMatrice_Courses:GetCell('Code_discipline', row_course)
+		local discipline = tMatrice_Courses:GetCell('Code_discipline', row_course);
 		local code_evenement = tMatrice_Courses:GetCellInt('Code', row_course);
+		local codex = tMatrice_Courses:GetCell('Codex', row_course);
 		local cmd = 'Select * From Resultat Where Code_evenement = '..code_evenement..' Order By Code_coureur';
 		base:TableLoad(tResultat, cmd);
 		if indice_filtrage == 0 and matrice.Cle_filtrage then
 			tResultat:Filter(matrice.Cle_filtrage, true);
 		end
 		for row = 0, tMatrice_Ranking:GetNbRows() -1 do
-			tMatrice_Ranking:SetCell('Code_evenement'..idxcourse, row, code_evenement)
+			tMatrice_Ranking:SetCell('Code_evenement'..idxcourse, row, code_evenement);
+			tMatrice_Ranking:SetCell('Codex'..idxcourse, row, codex);
 			local coltps = 'Tps'..idxcourse;
 			local code_coureur = tMatrice_Ranking:GetCell('Code_coureur', row);
 			if matrice.comboEntite == 'FIS' and row_course == 0 then
@@ -7671,6 +7685,10 @@ function OnSavedlgConfiguration()	-- sauvegarde des paramètres de la matrice.
 	matrice.comboTypePoint = dlgConfig:GetWindowName('comboTypePoint'):GetValue();
 	matrice.comboPrendreBloc1 = dlgConfig:GetWindowName('comboPrendreBloc1'):GetValue();
 	matrice.comboResultatPar = dlgConfig:GetWindowName('comboResultatPar'):GetValue();
+	if string.find(matrice.comboTypePoint, 'course') then
+		matrice.comboGarderInfQuota = 'Oui';
+		dlgConfig:GetWindowName('comboGarderInfQuota'):SetValue('Oui');
+	end
 	if matrice.bloc2 then
 		matrice.comboPrendreBloc2 = dlgConfig:GetWindowName('comboPrendreBloc2'):GetValue();
 	end
@@ -7988,7 +8006,7 @@ function OnConfiguration(cparams)
 	else
 		return false;
 	end
-	scrip_version = '5.96';
+	scrip_version = '5.97';
 	-- vérification de l'existence d'une version plus récente du script.
 	-- Ex de retour : LiveDraw=5.94,Matrices=5.92,TimingReport=4.2
 	if app.GetVersion() >= '4.4c' then 		-- début d'implementation de la fonction UpdateRessource
