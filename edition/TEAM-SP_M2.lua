@@ -1,12 +1,10 @@
 dofile('./interface/adv.lua');
 dofile('./interface/interface.lua');
 
--- version 2.6
+-- version 2.7
 
--- point a voir avec pierre
-			-- Edition des factures par club comité ou nation 
-			-- manque la gestion des abs a traiter
-			-- une page blache se créer a la fin de l'edition par nation comite club le row ~= 0 n'est pas valable comme on est ds le end
+-- création des heures de départ de la M2 
+			
 
 function Alert(txt)
 	app.GetAuiMessage():AddLine(txt);
@@ -40,12 +38,12 @@ function main(params)
 		code_manche = theParams.code_manche,
 		Organisateur = theParams.Organisateur,
 		Club = theParams.Club,
-	Comite = theParams.Code_comite,
-	codeActivite = theParams.Code_activite
+		Comite = theParams.Code_comite,
+		codeActivite = theParams.Code_activite
 	});
 	--body = base:GetTable('body');
 	-- Tri du body
-	body:OrderBy('Code_epreuve,Heure_depart1 Asc' );
+	body:OrderBy('Code_epreuve,Heure_depart1 Asc,Rang1 Asc,Dossard Asc' );
 	code_evenement = theParams.code_evenement;
 
 	tEpreuve = base:GetTable('Epreuve');
@@ -136,7 +134,7 @@ function main(params)
 		-- Toolbar
 		local tb = dlg:GetWindowName('tb');
 		if tb then
-			local btn_edition = tb:AddTool('Edition', './res/16x16_xml.png');
+			-- local btn_edition = tb:AddTool('Edition', './res/16x16_xml.png');
 			tb:AddStretchableSpace();
 			local btn_close = tb:AddTool('Fermer', './res/16x16_close.png');
 			tb:Realize();
@@ -144,7 +142,6 @@ function main(params)
 			tb:Bind(eventType.MENU, LectureDonnees, btn_edition);
 			tb:Bind(eventType.MENU, function(evt) dlg:EndModal(idButton.CANCEL); end, btn_close);
 		end
-	
 	end
 		
 	dlg:Fit();
@@ -165,7 +162,6 @@ function OnEditorShown(evt)
 			return;
 		end
 	end
-
 	-- Dans tous les autres cas on n'autorise pas l'édition ...
 	evt:Veto();
 end
@@ -194,9 +190,9 @@ function LectureDonnees(evt)
 				if body:GetCell('Code_epreuve', i) == code_epreuve then
 					cmd =      "Update Resultat_Manche Set Heure_depart = "..Heure_depart2;
 					cmd = cmd..", Rang = "..i+1;
-					cmd = cmd.." Where Code_evenement = "..tonumber(code_evenement);
-					cmd = cmd.." And Code_coureur = '"..body:GetCell('Code_coureur', i).."'";
-					cmd = cmd.." And Code_manche = "..PcodeManche;
+					cmd = cmd.." Where Code_evenement = "..tostring(code_evenement);
+					cmd = cmd.." And Code_coureur = '"..body:GetCell('Code_coureur', i);
+					cmd = cmd.."' And Code_manche = "..tostring(PcodeManche);
 					base:Query(cmd);
 					body:SetCell('Heure_depart2',i, Heure_depart2);
 					Heure_depart2 = Heure_depart2 + Ecart2
@@ -206,19 +202,18 @@ function LectureDonnees(evt)
 			for i=0, body:GetNbRows()-1 do	
 				-- Alert("Insert Into Heure_depart2: "..Heure_depart2);
 				if body:GetCell('Code_epreuve', i) == code_epreuve then
-					cmd = "Insert Into Resultat_Manche (Code_evenement, Code_coureur, Code_manche, Heure_depart) values (";
-					cmd = cmd..tonumber(code_evenement);
-					cmd = cmd..",'";
-					cmd = cmd..body:GetCell('Code_coureur', i);
-					cmd = cmd.."',"..PcodeManche..",";
-					cmd = cmd..Heure_depart2;
+					cmd = "Insert Into Resultat_Manche (Code_evenement, Code_coureur, Code_manche, Rang, Heure_depart) values (";
+					cmd = cmd..tostring(code_evenement);
+					cmd = cmd..",'"..body:GetCell('Code_coureur', i);
+					cmd = cmd.."',"..tostring(PcodeManche);
+					cmd = cmd..","..tostring(i+1);
+					cmd = cmd..","..tostring(Heure_depart2);
 					cmd = cmd..")";
 					base:Query(cmd);
 					body:SetCell('Heure_depart2',i, Heure_depart2);
 					Heure_depart2 = Heure_depart2 + Ecart2
 				end
 			end		
-		
 		end
 	end
 	
