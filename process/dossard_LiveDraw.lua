@@ -58,7 +58,7 @@ function OnExport()
 	if f == nil then 
 		return
 	end
-	local chaine = 'Code;CodeFIS;Bib;Name;Surname;Identity;Nation;Club;FIS Points\n'
+	local chaine = 'Code;CodeFIS;Bib;Name;Surname;Identity;Nation;YoB;Club;FIS Points\n'
 	f:write(chaine);
 	for i = 0, tDraw:GetNbRows() -1 do
 		local pts = string.gsub(tDraw:GetCell('FIS_pts', i),"%.",",");
@@ -69,6 +69,7 @@ function OnExport()
 		chaine = chaine..';'..tDraw:GetCell('Prenom', i);
 		chaine = chaine..';'..tDraw:GetCell('Nom', i)..' '..tDraw:GetCell('Prenom', i);
 		chaine = chaine..';'..tDraw:GetCell('Nation', i);
+		chaine = chaine..';'..tDraw:GetCell('An', i);
 		chaine = chaine..';'..tDraw:GetCell('Club', i);
 		chaine = chaine..';'..pts..'\n';
 		f:write(chaine);
@@ -1323,8 +1324,13 @@ function CommandSendList(bolSendDrawOrder)
 		local nation = tDraw:GetCell('Nation', i);
 		if not draw.bolEstCE then
 			if not bolSendDrawOrder then	-- envoi des participants
+				-- if nation == 'FRA' then
+					-- nom = tDraw:GetCell('Comite', i)..' - '..nom;
+				-- end
 				if nation == 'FRA' then
-					nom = tDraw:GetCell('Comite', i)..' - '..nom;
+					if not draw.bolEstNC then 
+						nation = '-'..tDraw:GetCell('Comite', i);
+					end
 				end
 			end
 		end
@@ -1676,7 +1682,7 @@ function OnRAZData(colonne)
 		tDraw:SetCell('Pris', i, 0);
 		if colonne == 'Rang_tirage' then
 			tDraw:SetCellNull('Rang_tirage', i);
-			tDraw:SetCellNull('Critere', i);
+			tDraw:SetCellNull('Reserve', i);
 		elseif colonne == 'Groupe_tirage' then 
 			tDraw:SetCell('Groupe_tirage', i, 5);
 		elseif colonne == 'All' then 
@@ -1689,7 +1695,7 @@ function OnRAZData(colonne)
 		elseif colonne == 'Tout' then
 			tDraw:SetCellNull('Rang_tirage', i);
 			tDraw:SetCell('Groupe_tirage', i, 5);
-			tDraw:SetCellNull('Critere', i);
+			tDraw:SetCellNull('Reserve', i);
 			tDraw:SetCellNull('Dossard', i);
 		end
 	end
@@ -2171,7 +2177,7 @@ function OnTirageRangsPtsNull(tableau)
 		local r = tDraw:GetIndexRow('Code_coureur', code_coureur);
 		if r >= 0 then
 			tDraw:SetCell('Dossard', r, valeur_shuffle);
-			local cmd = "Update Resultat Set Dossard = "..(valeur_shuffle)..", Critere = '"..string.format('%03d', tDraw:GetCellInt('Rang_tirage', r)).."' Where Code_evenement = "..draw.code_evenement.." And Code_coureur = '"..tDraw:GetCell('Code_coureur', r).."'";
+			local cmd = "Update Resultat Set Dossard = "..(valeur_shuffle)..", Reserve = '"..string.format('%03d', tDraw:GetCellInt('Rang_tirage', r)).."' Where Code_evenement = "..draw.code_evenement.." And Code_coureur = '"..tDraw:GetCell('Code_coureur', r).."'";
 			base:Query(cmd);
 		end
 	end
@@ -2216,7 +2222,7 @@ function RefreshGrid(bolTableSource)	-- bolTableSource = true ou false
 	else
 		grid_tableau:SynchronizeRowsView();
 	end
-	base:TableBulkUpdate(tDraw,'Dossard, Critere', 'Resultat');
+	base:TableBulkUpdate(tDraw,'Dossard', 'Resultat');
 	base:TableBulkUpdate(tDraw,'Code_evenement, Groupe_tirage, TG, Rang_tirage, WCSL_points, WCSL_rank, ECSL_points, ECSL_rank, ECSL_30, ECSL_overall_points, ECSL_overall_rank, Winner_CC, FIS_pts, FIS_clt, FIS_SG_pts, FIS_SG_clt, Statut', 'Resultat_Info_Tirage');
 end
 
@@ -2280,7 +2286,7 @@ function TraitementtDrawG4()
 		tDraw:SetCell('ECSL_30', r2, 10);
 		tDraw:SetCell('Rang_tirage', r2, draw.rang_tirage);
 		tDraw:SetCell('Dossard', r2, draw.rang_tirage);
-		tDraw:SetCell('Critere', r2, string.format('%03d', draw.rang_tirage));
+		tDraw:SetCell('Reserve', r2, string.format('%03d', draw.rang_tirage));
 		local rtDrawG5 = tDrawG5:GetIndexRow('Code_coureur', code_coureur);
 		if rtDrawG5 >= 0 then		-- on trouve le coureur
 			tDrawG5:RemoveRowAt(rtDrawG5);
@@ -2316,7 +2322,7 @@ function SetuptDraw()
 	base:Query(cmd);
 	for i = 0, tDraw:GetNbRows() -1 do
 		tDraw:SetCell('Pris', i, 0);
-		tDraw:SetCellNull('Critere', i);
+		tDraw:SetCellNull('Reserve', i);
 		tDraw:SetCellNull('Groupe', i);
 		tDraw:SetCellNull('TG', i);
 		tDraw:SetCellNull('ECSL_30', i);
@@ -2476,7 +2482,7 @@ Groupe 6 On poursuit selon les points FIS.
 			
 			draw.rang_tirage = draw.rang_tirage + 1;
 			tDraw:SetCell('Rang_tirage', r, draw.rang_tirage);
-			tDraw:SetCell('Critere', r, string.format('%03d', draw.rang_tirage));
+			tDraw:SetCell('Reserve', r, string.format('%03d', draw.rang_tirage));
 			draw.nb_pris_ecsl = draw.nb_pris_ecsl + 1;
 			local r = tDrawG2:GetIndexRow('Code_coureur', code_coureur);
 			if r >= 0 then		-- on trouve le coureur
@@ -2525,7 +2531,7 @@ Groupe 6 On poursuit selon les points FIS.
 			if draw.bolVitesse == false then
 				tDraw:SetCell('Dossard', r, draw.rang_tirage);
 			end
-			tDraw:SetCell('Critere', r, string.format('%03d', draw.rang_tirage));
+			tDraw:SetCell('Reserve', r, string.format('%03d', draw.rang_tirage));
 			draw.nb_pris_ecsl = draw.nb_pris_ecsl + 1;
 			local r = tDrawG3:GetIndexRow('Code_coureur', code_coureur);
 			if r >= 0 then		-- on trouve le coureur
@@ -2565,7 +2571,7 @@ Groupe 6 On poursuit selon les points FIS.
 			if draw.bolVitesse == false then
 				tDraw:SetCell('Dossard', r, draw.rang_tirage);
 			end
-			tDraw:SetCell('Critere', r, string.format('%03d', draw.rang_tirage));
+			tDraw:SetCell('Reserve', r, string.format('%03d', draw.rang_tirage));
 			local r = tDrawG4:GetIndexRow('Code_coureur', code_coureur);
 			if r >= 0 then		-- on trouve le coureur
 				tDrawG4:RemoveRowAt(r);
@@ -2605,7 +2611,7 @@ Groupe 6 On poursuit selon les points FIS.
 				draw.rang_tirage = draw.rang_tirage + 1;
 				tDraw:SetCell('Rang_tirage', rtDraw, draw.rang_tirage);
 				tDrawG5:SetCell('Rang_tirage', i, draw.rang_tirage);
-				tDraw:SetCell('Critere', rtDraw, string.format('%03d', draw.rang_tirage));
+				tDraw:SetCell('Reserve', rtDraw, string.format('%03d', draw.rang_tirage));
 				draw.nb_pris_ecsl = draw.nb_pris_ecsl + 1;
 				local r = tDrawG4:GetIndexRow('Code_coureur', code_coureur);
 				if r >= 0 then		-- on trouve le coureur
@@ -2666,7 +2672,7 @@ Groupe 6 On poursuit selon les points FIS.
 					end
 					tDraw:SetCell('Groupe_tirage', rtDraw, current_group);
 					tDraw:SetCell('Rang_tirage', rtDraw, draw.rang_tirage);
-					tDraw:SetCell('Critere', rtDraw, string.format('%03d', draw.rang_tirage));
+					tDraw:SetCell('Reserve', rtDraw, string.format('%03d', draw.rang_tirage));
 				end
 				if draw.rang_tirage == 30 then
 					break;
@@ -2745,7 +2751,7 @@ Groupe 6 On poursuit selon les points FIS.
 				end
 				tDraw:SetCell('Rang_tirage', r, draw.rang_tirage);
 				tDraw:SetCell('Groupe', r, current_group);
-				tDraw:SetCell('Critere', r, string.format('%03d', tDraw:GetCellInt('Rang_tirage', r)));
+				tDraw:SetCell('Reserve', r, string.format('%03d', tDraw:GetCellInt('Rang_tirage', r)));
 			end
 		end
 	end
@@ -2758,7 +2764,7 @@ Groupe 6 On poursuit selon les points FIS.
 			draw.rang_tirage = draw.rang_tirage + 1;
 			tDraw:SetCell('Rang_tirage', i, draw.rang_tirage);
 			tDraw:SetCell('Groupe_tirage', i, current_group);
-			tDraw:SetCell('Critere', i, string.format('%03d', draw.rang_tirage));
+			tDraw:SetCell('Reserve', i, string.format('%03d', draw.rang_tirage));
 		end
 		if tDraw:GetCell('TG', i):len() == 0 or tDraw:GetCellDouble('FIS_pts', i, -1) < 0 then
 			tDraw:SetCell('TG', i, 'PtsFISNull');
@@ -3407,7 +3413,7 @@ function OnAfficheTableau()
 					if dossard == 0 then
 						dossard = rang_tirage;
 						tDraw:SetCell('Dossard', i, dossard);
-						local cmd = "Update Resultat Set Dossard = "..dossard..", Critere = '"..string.format('%03d', rang_tirage).."' Where Code_evenement = "..draw.code_evenement.." And Code_coureur = '"..code_coureur.."'";
+						local cmd = "Update Resultat Set Dossard = "..dossard..", Reserve = '"..string.format('%03d', rang_tirage).."' Where Code_evenement = "..draw.code_evenement.." And Code_coureur = '"..code_coureur.."'";
 						base:Query(cmd);
 					end
 				end
@@ -3481,7 +3487,7 @@ function OnAfficheTableau()
 					-- adv.Alert('avant set dossard');
 					tDraw:SetCell('Dossard', r, dossard);
 					table.remove(draw.tDossardsAvailable, 1);
-					local cmd = "Update Resultat Set Dossard = "..dossard..", Critere = '"..string.format('%03d', tDrawG6:GetCellInt('Rang_tirage', i)).."' Where Code_evenement = "..draw.code_evenement.." And Code_coureur = '"..code_coureur.."'";
+					local cmd = "Update Resultat Set Dossard = "..dossard..", Reserve = '"..string.format('%03d', tDrawG6:GetCellInt('Rang_tirage', i)).."' Where Code_evenement = "..draw.code_evenement.." And Code_coureur = '"..code_coureur.."'";
 					base:Query(cmd);
 				end
 			end
@@ -3721,7 +3727,7 @@ function OnAfficheTableau()
 				tDraw:SetCellNull('Rang_tirage', i);
 				tDraw:SetCellNull('Groupe_tirage', i);
 				tDraw:SetCellNull('Dossard', i);
-				tDraw:SetCellNull('Critere', i);
+				tDraw:SetCellNull('Reserve', i);
 			end
 			RefreshGrid();
 			ChecktDraw();
@@ -3751,7 +3757,7 @@ function main(params_c)
 	draw.height = display:GetSize().height - 30;
 	draw.x = 0;
 	draw.y = 0;
-	scrip_version = "5.6"; -- 4.92 pour 2022-2023
+	scrip_version = "5.61"; -- 4.92 pour 2022-2023
 	local imgfile = './res/40x16_dbl_coche.png';
 	if not app.FileExists(imgfile) then
 		app.GetAuiFrame():MessageBox(
@@ -4036,7 +4042,7 @@ function main(params_c)
 		 end,  btnSOS);
 
 	if dlgConfig:ShowModal() == idButton.OK then
-		local cmd = "Update Resultat Set Critere = NULL, Groupe = NULL Where Code_evenement = "..draw.code_evenement;
+		local cmd = "Update Resultat Set Reserve = NULL, Groupe = NULL Where Code_evenement = "..draw.code_evenement;
 		base:Query(cmd);
 		OnAfficheTableau();
 	end
