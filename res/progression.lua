@@ -1,23 +1,27 @@
--- Synthaxe Progression :
--- Version 4.3 (12/03/2022)
--- Rectif placement en final
--- rajout de dim_min en tab nordique
--- Création d'un niveau KO_Spec pour pouvoir faire des ko30 ou autre spécifique en cas de reclamation ou de repeche ou l'on faire un duel a 7 a la place de 6 par exemple 
--- rajout du KO_12 en 'FOND,ROL'
--- rajout du KO_42 et MontDesc 10 en 'FOND,ROL'
--- Creation du Progression Cut pour tt les tableaux Montée_Descente
--- start~= nil pour eviter un bug ds le proression cut
--- corection d'une possition ds le couloir en Mont_Desc_10
+-- Apport Version :
+-- Version 4.5 (12/01/2023)
+	-- Rectif placement en final
+	-- rajout de dim_min en tab nordique
+	-- Création d'un niveau KO_Spec pour pouvoir faire des ko30 ou autre spécifique en cas de reclamation ou de repeche ou l'on faire un duel a 7 a la place de 6 par exemple 
+	-- rajout du KO_12 en 'FOND,ROL'
+	-- rajout du KO_42 et MontDesc 10 en 'FOND,ROL'
+	-- Creation du Progression Cut pour tt les tableaux Montée_Descente
+	-- start~= nil pour eviter un bug ds le proression cut
+	-- corection d'une possition ds le couloir en Mont_Desc_10
+	-- rajout du niveau = 'KO_12_3T' en 'FOND,ROL'
+	-- corection courreurs en double en Tb_A_Bxx et Mont_Desc_10
+	-- rajout fonction Col_verif
 
--- clt/duel/tour/ordre/tri : clt (obligatoire ...), duel, tour, ordre (non obligatoires ...)
--- exemple 1 : 12 => 12ième du tour précédent (et de tous les duels)
--- exemple 2 : 2/3 => 2ème du duel 3 du tour précédent
--- exemple 3 : 2/3/1 => 2ème du duel 3 du tour 1
--- exemple 4 : 3/1-5/2/1 => Meilleur Troisième des duels 1 à 5 du tour 2 (1er Lucky Looser)
--- exemple 5 : 3/1-5/2/2 => Deuxième Troisième des duels 1 à 5 du tour 2 (2ème Lucky Looser)
--- exemple 6 : 3/1-5/2/2/qualif => Deuxième Troisième des duels 1 à 5 du tour 2 (2ème Lucky Looser) avec tri sur les temps de Qualification
--- exemple 7 : 3/1-5/2/2/duel => Deuxième Troisième des duels 1 à 5 du tour 2 (2ème Lucky Looser) avec tri sur le temps du duel
--- la valeur par default pour le tri est qualif
+-- Synthaxe Progression :
+	-- clt/duel/tour/ordre/tri : clt (obligatoire ...), duel, tour, ordre (non obligatoires ...)
+	-- exemple 1 : 12 => 12ième du tour précédent (et de tous les duels)
+	-- exemple 2 : 2/3 => 2ème du duel 3 du tour précédent
+	-- exemple 3 : 2/3/1 => 2ème du duel 3 du tour 1
+	-- exemple 4 : 3/1-5/2/1 => Meilleur Troisième des duels 1 à 5 du tour 2 (1er Lucky Looser)
+	-- exemple 5 : 3/1-5/2/2 => Deuxième Troisième des duels 1 à 5 du tour 2 (2ème Lucky Looser)
+	-- exemple 6 : 3/1-5/2/2/qualif => Deuxième Troisième des duels 1 à 5 du tour 2 (2ème Lucky Looser) avec tri sur les temps de Qualification
+	-- exemple 7 : 3/1-5/2/2/duel => Deuxième Troisième des duels 1 à 5 du tour 2 (2ème Lucky Looser) avec tri sur le temps du duel
+	-- la valeur par default pour le tri est qualif
 
 function GetLabel3Tours(progression, tour)
 	if tour == 1 then return 'Quart de Finale';
@@ -1370,16 +1374,16 @@ duel_progression = {
 			},
 			{ 
 				-- tour 2 : 10 duels de 10 couloirs
-				{ '1/1', '2/1', '3/1',  '4/1', '5/1', '6/1', '7/1', '1/2', '2/2', '3/2' }, 		-- D1
-				{ '8/1', '9/1', '10/1',  '4/2', '5/2', '6/2', '7/2', '1/3','2/3', '3/3' }, 		-- D2
-				{ '8/2', '9/2', '10/2',  '4/3', '5/3', '6/3', '7/3', '1/4','2/4', '3/4' }, 		-- D3
-				{ '8/3', '9/3', '10/3',  '4/4', '5/4', '6/4', '7/4', '1/5','2/5', '3/5' }, 		-- D4
-				{ '8/4', '9/4', '10/4',  '4/5', '5/5', '6/5', '7/5', '1/6','2/6', '3/6' }, 		-- D5
-				{ '8/5', '9/5', '10/5',  '4/6', '5/6', '6/6', '7/6', '1/7','2/7', '3/7' }, 		-- D6
-				{ '8/6', '9/6', '10/6',  '4/7', '5/7', '6/7', '7/7', '1/8','2/8', '3/8' }, 		-- D7
-				{ '8/7', '9/7', '10/7',  '4/8', '5/8', '6/8', '7/8', '1/9','2/9', '3/9' }, 		-- D8
-				{ '8/8', '9/8', '10/8',  '4/9', '5/9', '6/9', '7/9', '1/10','2/10', '3/10' },	-- D9 
-				{ '8/9', '9/9', '10/9',  '4/9', '5/9', '6/9', '7/9', '8/10','9/10', '10/10' },	-- D10
+				{ '1/1', '2/1', '3/1',  '4/1', '5/1', '6/1', '7/1', '1/2', '2/2', '3/2' }, 			-- D1
+				{ '8/1', '9/1', '10/1',  '4/2', '5/2', '6/2', '7/2', '1/3','2/3', '3/3' }, 			-- D2
+				{ '8/2', '9/2', '10/2',  '4/3', '5/3', '6/3', '7/3', '1/4','2/4', '3/4' }, 			-- D3
+				{ '8/3', '9/3', '10/3',  '4/4', '5/4', '6/4', '7/4', '1/5','2/5', '3/5' }, 			-- D4
+				{ '8/4', '9/4', '10/4',  '4/5', '5/5', '6/5', '7/5', '1/6','2/6', '3/6' }, 			-- D5
+				{ '8/5', '9/5', '10/5',  '4/6', '5/6', '6/6', '7/6', '1/7','2/7', '3/7' }, 			-- D6
+				{ '8/6', '9/6', '10/6',  '4/7', '5/7', '6/7', '7/7', '1/8','2/8', '3/8' }, 			-- D7
+				{ '8/7', '9/7', '10/7',  '4/8', '5/8', '6/8', '7/8', '1/9','2/9', '3/9' }, 			-- D8
+				{ '8/8', '9/8', '10/8',  '4/9', '5/9', '6/9', '7/9', '1/10','2/10', '3/10' },		-- D9 
+				{ '8/9', '9/9', '10/9',  '4/10', '5/10', '6/10', '7/9', '8/10','9/10', '10/10' },	-- D10
 			},
 			{ 
 				-- tour 3 : 10 duels de 10 couloirs
@@ -1392,7 +1396,7 @@ duel_progression = {
 				{ '8/6', '9/6', '10/6',  '4/7', '5/7', '6/7', '7/7', '1/8','2/8', '3/8' }, 		-- D7
 				{ '8/7', '9/7', '10/7',  '4/8', '5/8', '6/8', '7/8', '1/9','2/9', '3/9' }, 		-- D8
 				{ '8/8', '9/8', '10/8',  '4/9', '5/9', '6/9', '7/9', '1/10','2/10', '3/10' },	-- D9 
-				{ '8/9', '9/9', '10/9',  '4/9', '5/9', '6/9', '7/9', '8/10','9/10', '10/10' },	-- D10
+				{ '8/9', '9/9', '10/9',  '4/10', '5/10', '6/10', '7/10', '8/10','9/10', '10/10' },	-- D10
 			}
 		}
 	},
