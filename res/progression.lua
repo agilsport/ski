@@ -108,6 +108,12 @@ end
 -- et de mettre la bonne progression aux derniers couloirs des duels
 function Getprogression_cut(dim, active_progression)
 	local progression = active_progression.progression;
+	
+	if active_progression ~= nil then
+--		app.GetAuiMessage(true):AddLine('OUT DEBUG');
+		return;
+	end
+	
 	-- Gestion du Tour 1
 	local progression_tour1 = progression[1];
 
@@ -368,8 +374,6 @@ duel_progression = {
 			}
 		}
 	},
-
-
 
 	std32 =
 	{
@@ -736,7 +740,7 @@ duel_progression = {
 		dimension = 96,
 		dimension_min = 66,
 		activite = 'SB,FS',
-		Niveau = 'Duel_6',
+		niveau = 'Duel_6',
 		label = { '8ième de finale', 'Quart de Finale', 'Demi Finale', 'Finale' },
 		GetLabelDuel = GetLabelDuelFS_4Tours,
 		progression = {
@@ -825,11 +829,40 @@ duel_progression = {
 		}
 	},
 
+	KO_12_3T =
+	{
+		dimension = 12,
+		dimension_min = 9,
+		niveau = 'KO_12_3T',
+		--label = { 'Quart de Finale', 'Demi Finale', 'Finale' },
+		GetLabelTour = GetLabel3Tours,
+
+		progression = {
+			{ 
+				-- tour 1 :  Quart de final => 5 duels de 4 couloirs
+				{ '1', '4', '5', '7', '10', '12' }, 
+				{ '2', '3', '6', '8', '9', '11' }
+			},
+			{ 
+				-- tour 2 : demie finale => 2 duels de 6 couloirs
+				{ '1/1', '2/1', '3/1', '4/1' }, 
+				{ '1/2', '2/2', '3/2', '4/2' }
+			},
+			{ 
+				-- tour  : Finale A et Finale B => 2 duel de 6 couloirs 3/1-5/2/1 => Meilleur Troisième des duels 1 à 5 du tour 2 
+				{ '1/1-2/2/1', '1/1-2/2/2', '2/1-2/2/1', '2/1-2/2/2', '3/1-2/2/1', '3/1-2/2/2'}
+				--{ '4/1-2/2/1', '4/1-2/2/2', '5/1-2/2/1', '5/1-2/2/2', '6/1-2/2/1', '6/1-2/2/2'}
+			}
+		}
+	},
+
 	KO_12 =
 	{
 		dimension = 12,
 		dimension_min = 9,
 		activite = 'FOND,ROL',
+		niveau = '!KO_12_3T',	-- tous les niveaux sauf KO_12_3T ...
+	
 		label = { 'Demi Finale', 'Finale' },
 		progression = {
 			{ 
@@ -850,7 +883,7 @@ duel_progression = {
 		dimension = 20,
 		dimension_min = 13,
 		niveau = 'KO_20_D4',
-		--label = { 'Quart de Finale', 'Demi Finale', 'Finale' },
+		-- label = { 'Quart de Finale', 'Demi Finale', 'Finale' },
 		GetLabelTour = GetLabel3Tours,
 
 		progression = {
@@ -859,7 +892,7 @@ duel_progression = {
 				{ '1', '10', '11', '20' }, 
 				{ '4',  '7', '14', '17' },
 				{ '5',  '6', '15', '16' },
-				{ '2',  '7', '12', '19' },
+				{ '2',  '9', '12', '19' },
 				{ '3',  '8', '13', '18' },
 			},
 			{ 
@@ -907,6 +940,7 @@ duel_progression = {
 		entite = 'FIS',
 		dimension = 20,
 		dimension_min = 13,
+		niveau = '!KO_20_D4, KO_20_D5', -- tous les niveaux sauf KO_20_D4 et KO_20_D5 ...
 		GetLabelTour = GetLabel3Tours,
 		progression = {
 			{ 
@@ -959,7 +993,7 @@ duel_progression = {
 		}
 	},
 	
-		-- Tableau à 30 avec lucky lozer par Clt
+	-- Tableau à 30 avec lucky lozer par Clt
 	KO_30_LO =
 	{
 		dimension = 30,
@@ -1025,6 +1059,7 @@ duel_progression = {
 		dimension = 42,
 		dimension_min = 31,
 		niveau = 'Tb_A_B42',
+		col_verif = 'Centre',
 		GetLabelDuel = GetLabelDuelTabA_B,
 		GetLabelTour = GetLabel3Tours,
 		GetLabelDuelWidth = function() return 9; end,
@@ -1062,6 +1097,7 @@ duel_progression = {
 		dimension = 50,
 		dimension_min = 43,
 		niveau = 'Tb_A_B50',
+		col_verif = 'Centre',
 		GetLabelDuel = GetLabelDuelTabA_B,
 		GetLabelTour = GetLabel3Tours,
 		GetLabelDuelWidth = function() return 9; end,
@@ -1104,6 +1140,7 @@ duel_progression = {
 		dimension = 60,
 		dimension_min = 51,
 		niveau = 'Tb_A_B60',
+		col_verif = 'Centre',
 		label = { 'Quart de Finale', 'Demi Finale', 'Finale' },
 		GetLabelDuel = GetLabelDuelTabA_B,
 		GetLabelTour = GetLabel3Tours,
@@ -1148,14 +1185,13 @@ duel_progression = {
 	Mont_Desc_5 =
 	{
 		dimension = 100,
-		dimension_min = 15,
+		dimension_min = 5,
+		niveau = 'KO_MT_D5',
 	
 		GetLabelTour = GetLabelTour_Mont_Desc,
 		GetLabelDuel = GetLabelDuel_Mont_Desc,
 		GetLabelDuelWidth = function() return 8; end,
-		
-		niveau = 'KO_MT_D5',
-		
+
 		progression_cut = Getprogression_cut,
 		
 		progression = {
@@ -1234,7 +1270,7 @@ duel_progression = {
 	Mont_Desc_6 =
 	{
 		dimension = 102,
-		dimension_min = 18,
+		dimension_min = 6,
 		
 		niveau = 'KO_MT_D6',
 		GetLabelTour = GetLabelTour_Mont_Desc,
@@ -1311,12 +1347,11 @@ duel_progression = {
 	{
 		dimension = 100,
 		dimension_min = 10,
-	
+		niveau = 'KO_MT_10',
 		GetLabelTour = GetLabelTour_Mont_Desc,
 		GetLabelDuel = GetLabelDuel_Mont_Desc,
 		GetLabelDuelWidth = function() return 8; end,
-		
-		niveau = 'KO_MT_10',
+	
 		progression_cut = Getprogression_cut,
 		
 		progression = {
@@ -1362,7 +1397,4 @@ duel_progression = {
 		}
 	},
 };
-
-
-
 
