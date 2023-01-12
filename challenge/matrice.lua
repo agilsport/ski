@@ -8006,7 +8006,7 @@ function OnConfiguration(cparams)
 	else
 		return false;
 	end
-	scrip_version = '5.97';
+	scrip_version = '5.98';
 	-- vérification de l'existence d'une version plus récente du script.
 	-- Ex de retour : LiveDraw=5.94,Matrices=5.92,TimingReport=4.2
 	if app.GetVersion() >= '4.4c' then 		-- début d'implementation de la fonction UpdateRessource
