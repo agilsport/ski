@@ -1,9 +1,9 @@
 dofile('./interface/adv.lua');
 dofile('./interface/interface.lua');
 
--- version 2.7
-
--- création des heures de départ de la M2 
+-- version 3.0
+	-- création des heures de départ de la M2
+	-- affectation des Rang2 pour affichage ds chrono M2
 			
 
 function Alert(txt)
