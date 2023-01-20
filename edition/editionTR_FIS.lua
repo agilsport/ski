@@ -14,6 +14,12 @@ function ReplaceTableEnvironnement(t, name)		-- replace la table créée dans l'en
 end
 
 function AddRowDeviceFIS(brand, device, model, homologationnumber, validuntil, comment)
+	if string.find(device, 'Start') then
+		device = 'Start';
+	end
+	if string.find(device, 'Photo') then
+		device = 'Photocell';
+	end
 	local row = Device_FIS:AddRow();
 	Device_FIS:SetCell('Brand', row, brand);
 	Device_FIS:SetCell('Device', row, device);
@@ -68,9 +74,6 @@ function CreateDeviceFis()
 				local model = tData[4];
 				local comment = tData[5];
 				local device = tData[6];
-				device = string.gsub(device, ' cell', '');
-				device = string.gsub(device, ' door', '');
-				device = string.gsub(device, ' gate', '');
 				local ok = tonumber(tData[7]) or 0;
 				if ok == 1 then
 					AddRowDeviceFIS(brand, device, model, homologation, valid, comment);
@@ -103,7 +106,7 @@ function CreateDeviceFis()
 	
 	Brand_Photocell = Device_FIS:Copy();
 	ReplaceTableEnvironnement(Brand_Photocell, 'Brand_Photocell');
-	Brand_Photocell:Filter("$(Device):In('Photo')", true)
+	Brand_Photocell:Filter("$(Device):In('Photocell')", true)
 
 	Brand_Start = Device_FIS:Copy();
 	ReplaceTableEnvironnement(Brand_Start, 'Brand_Start');
@@ -616,7 +619,7 @@ function LectureXML(node)
 		end
 		LectureXML(child);
 	end
-	LectureXML(node:GetNext())
+	LectureXML(node:GetNext());
 end
 
 function OpenTables(code_evenement)
@@ -840,13 +843,11 @@ end
 function OnChangeComboBrand(ctrlComboBrand, device)
 	-- timersystemA_Brand  
 	-- timersystemA_Homologation
-	if TR[ctrlComboBrand] then
-		dlgPage1:GetWindowName(ctrlComboBrand):SetValue(TR[ctrlComboBrand]);
-	end
 	local brand = dlgPage1:GetWindowName(ctrlComboBrand):GetValue();
 	if brand:len() == 0 then
 		return;
 	end
+	Device_FIS:Snapshot('Device_FIS.db3');
 	local filter = "$(Brand):In('"..brand.."') and $(Device):In('"..device.."')";
 	local Device_FIS_Filtre = Device_FIS:Copy();
 	Device_FIS_Filtre:Filter(filter, true);
@@ -1009,9 +1010,10 @@ function main(params)
 	TR.x = 0;
 	TR.y = 0;
 
-	scrip_version = "4.6"; 
+			
+	scrip_version = "4.7"; 
 	-- vérification de l'existence d'une version plus récente du script.
--- Ex de retour : LiveDraw=5.94,Matrices=5.92,TimingReport=4.3,DoubleTirage=3.2,TirageOptions=3.3,TirageER=1.7,ListeMinisterielle=2.3,KandaHarJunior=2.0
+	-- Ex de retour : LiveDraw=5.94,Matrices=5.92,TimingReport=4.3,DoubleTirage=3.2,TirageOptions=3.3,TirageER=1.7,ListeMinisterielle=2.3,KandaHarJunior=2.0
 	if app.GetVersion() >= '4.4c' then 
 		indice_return = 3;
 		local url = 'https://agilsport.fr/bta_alpin/versionsPG.txt'
@@ -1029,6 +1031,16 @@ function main(params)
 		app.LaunchDefaultEditor('./'..alire);
 	end
 	
+	local device_file = './res/tr/FIS-Timing-Devices.csv';
+	if not app.FileExists(device_file) then
+		app.GetAuiFrame():MessageBox(
+			"Vous devez télécharger le fichier des appareils homologués.\nLe script va se fermer automatiquement.", 
+			"Téléchargement du fichier supplémentaire",
+			msgBoxStyle.OK + msgBoxStyle.ICON_INFORMATION); 
+			local reponse = app.AutoUpdateResource('https://agilsport.fr/bta_alpin/UpdateScript.zip');
+			return true;
+	end
+
 	TR.OK = true;
 	TR.errormessage = "";
 	TR.code_evenement = params.code_evenement or -1;
@@ -1088,6 +1100,7 @@ function OnCheckBoxManche2(evt)
 end
 
 function AfficheDialog2()
+	dlgPage1:EndModal(idButton.OK) 
 
 	dlgPage2 = wnd.CreateDialog(
 		{
@@ -1427,18 +1440,20 @@ function AfficheDialog1()
 		function(evt) 
 			TR.XML = app.GetPath().."/edition/TRini.xml";
 			TR.XML = string.gsub(TR.XML, "\\", "/");
-			OnSaveXML(TR.XML, false)
-			local msg = "Attention, Si vous avez déjà enregistré les données de la manche 1,\n"..
-						"vous devez Ouvrir le Timing Report déjà enregistré.\n"..
-						"Sinon les données de la manche 1 du Système B seront effacées.\n"..
-						"Voulez-vous poursuivre ?";
-			if app.GetAuiFrame():MessageBox(msg,
-							"Passer sur la page 2", 
-							msgBoxStyle.YES+msgBoxStyle.NO+msgBoxStyle.NO_DEFAULT+msgBoxStyle.ICON_WARNING
-							) == msgBoxStyle.NO then
-				return;
+			OnSaveXML(TR.XML, false);
+			if not TR.XML_lu then
+				local msg = "Attention, Si vous avez déjà enregistré les données de la manche 1,\n"..
+							"vous devez Ouvrir le Timing Report déjà enregistré.\n"..
+							"Sinon les données de la manche 1 du Système B seront effacées.\n"..
+							"Voulez-vous poursuivre ?";
+				if app.GetAuiFrame():MessageBox(msg,
+						"Passer sur la page 2", 
+						msgBoxStyle.YES+msgBoxStyle.NO+msgBoxStyle.NO_DEFAULT+msgBoxStyle.ICON_WARNING
+						) == msgBoxStyle.NO then
+					return;
+				end
 			end
-			AfficheDialog2() 
+			AfficheDialog2();
 		end, btnNext); 
 	dlgPage1:Bind(eventType.MENU, 
 		function(evt) 
@@ -1464,13 +1479,14 @@ function AfficheDialog1()
 						-- adv.Alert('\n-------------- lecture de '..TR.XML..'\n');
 						racine = '';
 						LectureXML(root);	-- lecture du TRini.xml
-						PopulateCombo(true);
 						GetCartouche();
 						ControlData();  
 						SetValuesPage1();
+						PopulateCombo(true);
 					end
 					TR.doc.Delete();
 				end
+				TR.XML_lu = true;
 			end
 		end, btnOpenXML); 
 	dlgPage1:Bind(eventType.MENU, 
