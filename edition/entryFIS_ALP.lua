@@ -6,7 +6,7 @@ function main(params_c)
 		return false;
 	end
 	params = params_c;
-	params.version = '1.6';
+	params.version = '1.7';
 	params.pluscode = 0;
 	params.closeDlg = false;
 	params.impression = tonumber(params.impression) or 1;
@@ -496,7 +496,7 @@ function OnEdition(evt)
 			local plus_moins = body:GetCell('Critere',i):sub(1,1);
 			if plus_moins == '+' or plus_moins == '-' then
 				tCritere.plus_moins = plus_moins;
-				tCritere.discipline = body:GetCell('Critere',i):sub(2);
+				tCritere.discipline = body:GetCell('Critere',i):sub(2,3);
 			end
 			for j = 1, #t do
 				local pts = '';
