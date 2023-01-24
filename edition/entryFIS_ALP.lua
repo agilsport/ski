@@ -6,7 +6,7 @@ function main(params_c)
 		return false;
 	end
 	params = params_c;
-	params.version = '1.7';
+	params.version = '1.8';
 	params.pluscode = 0;
 	params.closeDlg = false;
 	params.impression = tonumber(params.impression) or 1;
@@ -463,9 +463,20 @@ function OnEdition(evt)
 		tEvenement_Officiel:SetCell('Date_arrivee', i, date_arrivee_update);
 		tEvenement_Officiel:SetCell('Date_depart', i, date_depart_update);
 	end
+	local arDiscipline = {};
+	arDiscipline['DH'] = {};
+	arDiscipline['DH'].Nombre = 0;
+	arDiscipline['SG'] = {};
+	arDiscipline['SG'].Nombre = 0;
+	arDiscipline['GS'] = {};
+	arDiscipline['GS'].Nombre = 0;
+	arDiscipline['SL'] = {};
+	arDiscipline['SL'].Nombre = 0;
 	base:TableBulkUpdate(tEvenement_Officiel);
 	for i = 0, tEpreuve:GetNbRows() -1 do
-		table.insert(t, 'IA'..tEpreuve:GetCell('Code_discipline', i));
+		local discipline = tEpreuve:GetCell('Code_discipline', i);
+		table.insert(t, 'IA'..discipline);
+		arDiscipline [discipline].Nombre = arDiscipline [discipline].Nombre + 1;
 		local sexe = tEpreuve:GetCell('Sexe', i);
 		arEpreuve[sexe] = sexe;
 	end
@@ -496,9 +507,10 @@ function OnEdition(evt)
 			local plus_moins = body:GetCell('Critere',i):sub(1,1);
 			if plus_moins == '+' or plus_moins == '-' then
 				tCritere.plus_moins = plus_moins;
-				tCritere.discipline = body:GetCell('Critere',i):sub(2,3);
+				tCritere.discipline = body:GetCell('Critere',i):sub(2);
+				tCritere.code_epreuve = tonumber(body:GetCell('Critere',i):sub(4,4)) or -1;
 			end
-			for j = 1, #t do
+			for j = 1, #t do  -- il y a autant de ligne que d'épreuve.
 				local pts = '';
 				local discipline = t[j]:sub(3);
 				if not tCritere.discipline then
@@ -508,16 +520,26 @@ function OnEdition(evt)
 					end
 				else
 					if plus_moins == '+' then
-						if discipline == tCritere.discipline then	-- +GS : plus_moins = +
+						if discipline == string.sub(tCritere.discipline, 1, 2) then	
 							pts = base:GetClassementCoureur(code_coureur, t[j]):GetCell('Pts', 0);
 						else
 							params.no_entry = params.no_entry + 1;
 						end
 					elseif plus_moins == '-' then
-						if discipline ~= tCritere.discipline then	-- -GS : plus_moins = -
+						-- épreuve 1 = SL
+						-- épreuve 2 = GS
+						-- épreuve 3 = GS, -GS2 = on fait le SL et le GS1, on met les points du SL ET les points du GS, 
+						-- épreuve 1 = GS 
+						-- épreuve 2 = GS, -SG2 = on fait le GS1 donc on met les points du GS
+						if arDiscipline[discipline].Nombre > 1 then	-- je mets les points de la discipline
 							pts = base:GetClassementCoureur(code_coureur, t[j]):GetCell('Pts', 0);
+							params.no_entry = params.no_entry + arDiscipline[discipline].Nombre -1;
 						else
-							params.no_entry = params.no_entry + 1;
+							if discipline ~= tCritere.discipline then	-- -GS : plus_moins = -
+								pts = base:GetClassementCoureur(code_coureur, t[j]):GetCell('Pts', 0);
+							else
+								params.no_entry = params.no_entry + 1;
+							end
 						end
 					end
 				end			
