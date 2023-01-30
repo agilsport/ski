@@ -58,7 +58,7 @@ function OnExport()
 	if f == nil then 
 		return
 	end
-	local chaine = 'Code;CodeFIS;Bib;Name;Surname;Identity;Nation;YoB;Club;FIS Points\n'
+	local chaine = 'Code;CodeFIS;Bib;Name;Surname;Identity;Nation;YoB;Cat.;Club;FIS Points\n'
 	f:write(chaine);
 	for i = 0, tDraw:GetNbRows() -1 do
 		local pts = string.gsub(tDraw:GetCell('FIS_pts', i),"%.",",");
@@ -70,6 +70,7 @@ function OnExport()
 		chaine = chaine..';'..tDraw:GetCell('Nom', i)..' '..tDraw:GetCell('Prenom', i);
 		chaine = chaine..';'..tDraw:GetCell('Nation', i);
 		chaine = chaine..';'..tDraw:GetCell('An', i);
+		chaine = chaine..';'..tDraw:GetCell('Categ', i);
 		chaine = chaine..';'..tDraw:GetCell('Club', i);
 		chaine = chaine..';'..pts..'\n';
 		f:write(chaine);
@@ -2886,26 +2887,26 @@ function OnAfficheTableau()
 			break;
 		end
 	end
-	tDraw:SetColumn('Rang_tirage', { label = 'Rang', width = 6 });
-	tDraw:SetColumn('Groupe_tirage', { label = 'Groupe', width = 7 });
+	tDraw:SetColumn('Rang_tirage', { label = 'Rang', width = 5 });
+	tDraw:SetColumn('Groupe_tirage', { label = 'Groupe', width = 5 });
 	tDraw:SetColumn('Code_coureur', { label = 'Code', width = 10 });
 	tDraw:SetColumn('Nom', { label = 'Nom', width = 20 });
 	tDraw:SetColumn('Prenom', { label = 'Prenom', width = 12 });
 	tDraw:SetColumn('Nation', { label = 'Nat.', width = 5 });
-	tDraw:SetColumn('ECSL_points', { label = 'EC SL', width = 6 });
-	tDraw:SetColumn('ECSL_rank', { label = 'EC Clt', width = 6 });
-	tDraw:SetColumn('WCSL_points', { label = 'WC SL', width = 6 });
-	tDraw:SetColumn('WCSL_rank', { label = 'WC Clt', width = 6 });
-	tDraw:SetColumn('ECSL_overall_points', { label = 'Overall Pts', width = 10 });
-	tDraw:SetColumn('ECSL_overall_rank', { label = 'Overall Clt', width = 8 });
-	tDraw:SetColumn('Winner_CC', { label = 'Winner CC', width = 8 });
+	tDraw:SetColumn('ECSL_points', { label = 'ECSL', width = 6 });
+	tDraw:SetColumn('ECSL_rank', { label = 'EC Rk', width = 6 });
+	tDraw:SetColumn('WCSL_points', { label = 'WCSL', width = 6 });
+	tDraw:SetColumn('WCSL_rank', { label = 'WC Rk', width = 6 });
+	tDraw:SetColumn('ECSL_overall_points', { label = 'OA Pts', width = 6 });
+	tDraw:SetColumn('ECSL_overall_rank', { label = 'OA Rk', width = 6 });
+	tDraw:SetColumn('Winner_CC', { label = 'COC Win.', width = 6 });
 	tDraw:SetColumn('FIS_pts', { label = 'Pts '..draw.discipline, width = 6 });
-	tDraw:SetColumn('FIS_clt', { label = 'Clt '..draw.discipline, width = 6 });
+	tDraw:SetColumn('FIS_clt', { label = 'Rk '..draw.discipline, width = 6 });
 	tDraw:SetColumn('FIS_SG_pts', { label = 'Pts SG', width = 6 });
-	tDraw:SetColumn('FIS_SG_clt', { label = 'Clt SG', width = 6 });
+	tDraw:SetColumn('FIS_SG_clt', { label = 'Rk SG', width = 6 });
 	tDraw:SetColumn('Comite', { label = 'C.R.', width = 6 });
 	tDraw:SetColumn('Club', { label = 'Club', width = 12 });
-	tDraw:SetColumn('Action', { label = 'Supprimer', width = 8 });
+	tDraw:SetColumn('Action', { label = 'Supprimer', width = 10});
 	tDraw:SetColumn('Validation', { label = 'CF / UF', width = 8 });
 	tDraw:SetColumn('Statut', { label = 'UF/CF', width = 6 });
 	tDraw:SetPrimary('Code_evenement, Code_coureur');
@@ -2916,7 +2917,7 @@ function OnAfficheTableau()
 		if not draw.bolVitesse then
 			grid_tableau:Set({
 				table_base = tDraw,
-				columns = 'Dossard, Rang_tirage, Groupe_tirage, Code_coureur, Nom, Prenom, Nation, ECSL_points, ECSL_rank, WCSL_points, WCSL_rank, ECSL_overall_points, ECSL_overall_rank, Winner_CC, FIS_pts, FIS_clt, Statut, Action, Validation',
+				columns = 'Dossard, Rang_tirage, Groupe_tirage, Code_coureur, Nom, Prenom, Nation, ECSL_points, ECSL_rank, WCSL_points, WCSL_rank, ECSL_overall_points, Winner_CC, FIS_pts, FIS_clt, Statut, Action, Validation',
 				selection_mode = gridSelectionModes.ROWS,
 				-- focus_cell_highlight = true,
 				label_tracking = true,
@@ -2926,7 +2927,7 @@ function OnAfficheTableau()
 		else
 			grid_tableau:Set({
 				table_base = tDraw,
-				columns = 'Dossard, Rang_tirage, Groupe_tirage, Code_coureur, Nom, Prenom, Nation, ECSL_points, ECSL_rank, WCSL_points, WCSL_rank, ECSL_overall_points, ECSL_overall_rank, Winner_CC, FIS_pts, FIS_clt, FIS_SG_pts, FIS_SG_clt, Statut, Action, Validation',
+				columns = 'Dossard, Rang_tirage, Groupe_tirage, Code_coureur, Nom, Prenom, Nation, ECSL_points, ECSL_rank, WCSL_points, WCSL_rank, ECSL_overall_points, Winner_CC, FIS_pts, FIS_clt, FIS_SG_pts, FIS_SG_clt, Statut, Action, Validation',
 				selection_mode = gridSelectionModes.ROWS,
 				-- focus_cell_highlight = true,
 				label_tracking = true,
@@ -3743,6 +3744,7 @@ function OnAfficheTableau()
 			dlgTableau:EndModal(idButton.CANCEL);
 		 end,  btnClose);
 
+	dlgTableau:Fit();
 	dlgTableau:ShowModal();
 end
 
@@ -3754,10 +3756,10 @@ function main(params_c)
 		return;
 	end
 	draw.width = display:GetSize().width;
-	draw.height = display:GetSize().height - 30;
+	draw.height = display:GetSize().height - 50;
 	draw.x = 0;
 	draw.y = 0;
-	scrip_version = "5.61"; -- 4.92 pour 2022-2023
+	scrip_version = "5.62"; -- 4.92 pour 2022-2023
 	local imgfile = './res/40x16_dbl_coche.png';
 	if not app.FileExists(imgfile) then
 		app.GetAuiFrame():MessageBox(

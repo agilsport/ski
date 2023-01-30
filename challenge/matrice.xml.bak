@@ -276,8 +276,6 @@
       <combobox col_start="2" name="texteNbColPresCourses" style="ALIGN_CENTER|CB_READONLY"/>
       <statictext row="auto" col_start="1" style="ALIGN_RIGHT" label="Imprimer le Comité d\'origine pour les coureurs EQ : "/>
       <combotable col_start="2" name="texteComiteOrigine" style="CB_READONLY"/>
-      <statictext row="auto" col_start="1" style="ALIGN_RIGHT" label="Imprimer le Codex des courses"/>
-      <combotable col_start="2" name="texteCodex" style="CB_READONLY"/>
     </matrix>
     <row value="15px"/>
     <!-- <staticbox col_start="1" col_end="2" row_start="1" row_end="0" label="Paramétrage supplémentaire des impressions"/> -->
@@ -1052,9 +1050,9 @@
       <lua>if params.Criteres1 ~= nil and params.Criteres1:len() &gt; 15 then</lua>
       <pen border="none"/>
       <font weight="bold"/>
-      <!-- <text row="auto" col_start="1" col_end="0" cond="params.Criteres1:len() &gt; 0">params.Criteres1</text> -->
-      <!-- <text row="auto" col_start="1" col_end="0" cond="params.Criteres2:len() &gt; 0">params.Criteres2</text> -->
-      <!-- <lua>row_start = row_start -2;</lua> -->
+      <text row="auto" col_start="1" col_end="0" cond="params.Criteres1:len() &gt; 0">params.Criteres1</text>
+      <text row="auto" col_start="1" col_end="0" cond="params.Criteres2:len() &gt; 0">params.Criteres2</text>
+      <lua>row_start = row_start -2;</lua>
       <lua>end</lua>
       <lua>else</lua>
       <matrix col_start="1" row="1.5cm" row_start="-1">
@@ -1081,12 +1079,11 @@
         <lua>row_start = 1;
 							for i = 1, nb_cell do
 								discipline = tMatrice_Courses:GetCell('Code_discipline', i-1);
-								codex = tMatrice_Courses:GetCell('Codex', i-1);
 								rgbx = colorDiscipline[discipline];</lua>
-        <text row_start="(row_start)" col_start="(col_start)" cond="discipline:len() &gt; 0 and texteImprimerStatCourses == 'Oui'" adjust="width" >
-          <background mode="solid" color="(rgbx)"/>(i)..' '..tMatrice_Courses:GetCell('Station', i-1)..' '..string.sub(tMatrice_Courses:GetCell('Date_epreuve', i-1),1,-6)..' '..tMatrice_Courses:GetCell('Codex', i-1)</text>
+        <text row_start="(row_start)" col_start="(col_start)" cond="discipline:len() &gt; 0 and texteImprimerStatCourses == 'Oui'">
+          <background mode="solid" color="(rgbx)"/>(i)..' '..tMatrice_Courses:GetCell('Station', i-1)..' '..string.sub(tMatrice_Courses:GetCell('Date_epreuve', i-1),1,-6)</text>
         <text row_start="(row_start)" col_start="(col_start)" cond="discipline:len() &gt; 0 and texteImprimerStatCourses == 'Non'">
-          <background mode="solid" color="(rgbx)"/>(i)..'   '..tMatrice_Courses:GetCell('Code_discipline', i-1)..' '..tMatrice_Courses:GetCell('Station', i-1)..' '..string.sub(tMatrice_Courses:GetCell('Date_epreuve', i-1),1,-6)..' '..tMatrice_Courses:GetCell('Codex', i-1)</text>
+          <background mode="solid" color="(rgbx)"/>(i)..'   '..tMatrice_Courses:GetCell('Code_discipline', i-1)..' '..tMatrice_Courses:GetCell('Station', i-1)..' '..string.sub(tMatrice_Courses:GetCell('Date_epreuve', i-1),1,-6)</text>
         <text row_start="(row_start)" col_start="(col_start)" cond="discipline:len() == 0">''</text>
         <lua>row_start = row_start + 1;
 								if row_start &gt; nb_ligne then
@@ -1143,7 +1140,6 @@
         <lua>for i = 0, tMatrice_Courses:GetNbRows() -1 do
 						idxcourse = i + 1;
 						code_discipline = arCourses[idxcourse].Discipline;
-						codex = tMatrice_Courses:GetCell('Codex', i);
 						col_start = tMatrice_Courses:GetCellInt('Col_start', i);
 						nb_col = tMatrice_Courses:GetCellInt('Nb_col', i);
 						rgbx = colorDiscipline[code_discipline];

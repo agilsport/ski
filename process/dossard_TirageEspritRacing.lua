@@ -813,7 +813,28 @@ function main(params_c)
 	params.height = display:GetSize().height / 2;
 	params.x = (display:GetSize().width - params.width) / 2;
 	params.y = 50;
-	params.version = "1.5";
+	
+	scrip_version = "1.7"; 
+	-- vérification de l'existence d'une version plus récente du script.
+	-- Ex de retour : LiveDraw=5.94,Matrices=5.92,TimingReport=4.2,DoubleTirage=3.2,TirageOptions=3.3,TirageER=1.7,ListeMinisterielle=2.3,KandaHarJunior=2.0
+	if app.GetVersion() >= '4.4c' then 
+		indice_return = 6;
+		local url = 'https://agilsport.fr/bta_alpin/versionsPG.txt'
+		version = curl.AsyncGET(wnd.GetParentFrame(), url);
+	end
+
+	local updatefile = './tmp/updatesPG.txt';
+	if app.FileExists(updatefile) then
+		local f = io.open(updatefile, 'r')
+		for lines in f:lines() do
+			alire = lines;
+		end
+		io.close(f);
+		app.RemoveFile(updatefile);
+		app.LaunchDefaultEditor('./'..alire);
+	end
+	-- vérification de l'existence d'une version plus récente du script.
+	-- Ex de retour : LiveDraw=5.94,Matrices=5.92,TimingReport=4.2
 	base = base or sqlBase.Clone();
 	tEvenement = base:GetTable('Evenement');
 	base:TableLoad(tEvenement, 'Select * From Evenement Where Code = '..params.code_evenement);
@@ -864,7 +885,7 @@ function main(params_c)
 		height = params.height,
 		x = params.x,
 		y = params.y,
-		label='Configuration du tirage - version '..params.version..' du script', 
+		label='Configuration du tirage - version '..scrip_version..' du script', 
 		icon='./res/32x32_ffs.png'
 		});
 	dlgConfig:LoadTemplateXML({ 
