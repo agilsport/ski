@@ -12,7 +12,7 @@ end
 -- Information : Numéro de Version, Nom, Interface
 function device.GetInformation()
 	return { 
-		version = 6.93;
+		version = 6.94;
 		name = 'Live Timing Async.', 
 		class = 'network'
 	};
@@ -232,7 +232,7 @@ function device.OnInit(params, node)
 	live.fmt = GetFormatChrono();
 	live.Code_entite = tEvenement:GetCell("Code_entite",0);
 	live.Code_activite = tEvenement:GetCell("Code_activite",0);
-	live.category = tEpreuve:GetCell('Code_regroupement');
+	live.category = tEpreuve:GetCell('Code_regroupement',0);
 	
 	if live.Code_entite == 'ESF' then
 		local rc, dataForerunner = app.SendNotify('<forerunner_load>');
