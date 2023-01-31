@@ -699,7 +699,8 @@
 			<text col="4" align="center" label="Clt" font_weight="bold" font_size_step="1">$(Clt)</text>
 			<text col="4" align="center" label="Dos" font_style="italic">$(Dossard)</text>
 			<text col="7" align="center" label="Code"><font size="8" cond="group =='body'"/>$(Code_coureur):sub(4)</text>
-			<text col="16" align="left" label="Nom - Prénom" font_weight="bold">$(Identite)</text> 
+			<text col="16" align="left" cond="$(Critere) == 'DSQ'" label="Nom - Prénom" font_weight="bold">$(Identite)..'  **'</text> 
+			<text col="16" align="left" cond="$(Critere) ~= 'DSQ'" label="Nom - Prénom" font_weight="bold">$(Identite)</text> 
 			<text col="2" align="center" label="S." cond="entite == 'FFS'">$(Sexe)</text>
 			<text col="4" align="center" label="An">$(An)</text>
 			<text col="4" align="center" label="Nat." cond="entite == 'FIS'" font_style="italic">$(Nation)</text>
