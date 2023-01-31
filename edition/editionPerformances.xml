@@ -95,7 +95,8 @@
 			<text col="3" row_start="1" row_end="(params.nb_row_ligne)" align="center" font_style="italic">body:GetCell('Dossard', row)</text>
 	
 			<col w="13"/>
-			<text row_start="1" row_end="(params.nb_row_ligne -1)" align="left" >body:GetCell('Identite', row)</text> 
+			<text row_start="1" cond="body:GetCell('Critere', row) ~= 'DSQ'" row_end="(params.nb_row_ligne -1)" align="left" >body:GetCell('Identite', row)</text> 
+			<text row_start="1" cond="body:GetCell('Critere', row) == 'DSQ'" row_end="(params.nb_row_ligne -1)" align="left" >body:GetCell('Identite', row)..' **'</text> 
 			<text row_start="3" align="left" >'('..body:GetCell('Code_coureur', row):sub(4)..')'</text> 
 			<text row_start="3" align="left" cond="params.nb_inter ~= 0">'('..body:GetCell('Code_coureur', row):sub(4)..')'</text> 
 
