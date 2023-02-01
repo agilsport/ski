@@ -1,5 +1,5 @@
 -- Apport Version :
--- Version 4.5 (12/01/2023)
+-- Version 4.8 (01/02/2023)
 	-- Rectif placement en final
 	-- rajout de dim_min en tab nordique
 	-- Création d'un niveau KO_Spec pour pouvoir faire des ko30 ou autre spécifique en cas de reclamation ou de repeche ou l'on faire un duel a 7 a la place de 6 par exemple 
@@ -11,6 +11,8 @@
 	-- rajout du niveau = 'KO_12_3T' en 'FOND,ROL'
 	-- corection courreurs en double en Tb_A_Bxx et Mont_Desc_10
 	-- rajout fonction Col_verif
+	-- correction bug progression cut
+	-- correction bug progression poule 10 tour 2
 
 -- Synthaxe Progression :
 	-- clt/duel/tour/ordre/tri : clt (obligatoire ...), duel, tour, ordre (non obligatoires ...)
@@ -108,19 +110,39 @@ function GetLabelDuelFS_4Tours(progression, tour, duel)
 	end
 end
 
+
+function GetLabelDuelFS_5Tours(progression, tour, duel)
+	if tour == 1 then
+		return tostring(duel)..'/16';
+	elseif tour == 2 then
+		return tostring(duel)..'/8';
+	elseif tour == 3 then
+		return tostring(duel)..'/4';
+	elseif tour == 4 then
+		return tostring(duel)..'/2';
+	elseif tour == 5 then
+		if duel == 1 then 
+			return 'Big \n Final';
+		else
+			return 'Small \n Final';
+		end
+	end
+end
+
 -- progression cut qui permet de couper le nombre du duel dans les tableaux montée descente 
 -- et de mettre la bonne progression aux derniers couloirs des duels
 function Getprogression_cut(dim, active_progression)
 	local progression = active_progression.progression;
-	
-	if active_progression ~= nil then
---		app.GetAuiMessage(true):AddLine('OUT DEBUG');
+	-- app.GetAuiMessage(true):AddLine('Getprogression_cut');
+	-- app.GetAuiMessage(true):AddLine('dim'..dim);
+	if active_progression == nil then
+		app.GetAuiMessage(true):AddLine('OUT DEBUG');
 		return;
 	end
 	
 	-- Gestion du Tour 1
 	local progression_tour1 = progression[1];
-
+	app.GetAuiMessage(true):AddLine('Création du tableau 1');
 	for j=1, #progression_tour1 do
 		local bib = tonumber(progression_tour1[j][1]);
 
@@ -705,40 +727,59 @@ duel_progression = {
 		dimension = 64,
 		dimension_min = 50,
 		activite = 'SB,FS',
-		label = { '8ième de finale', 'Quart de Finale', 'Demi Finale', 'Finale' },
-		GetLabelDuel = GetLabelDuelFS_4Tours,
+		label = { '16ième de finale', '8ième de finale', 'Quart de Finale', 'Demi Finale', 'Finale' },
+		GetLabelDuel = GetLabelDuelFS_5Tours,
 		progression = {
 			{ 
-				-- tour 1 : 8 duels de 4 couloirs
-				{ '1', '16', '17', '32' }, 
-				{ '8',  '9', '24', '25' },
-				{ '5', '12', '21', '28' },
-				{ '4', '13', '20', '29' },
-				{ '3', '14', '19', '30' },
-				{ '6', '11', '22', '27' },
-				{ '7', '10', '23', '26' },
-				{ '2', '15', '18', '31' }
-			},
-			{ 
-				-- tour 2 : 4 duels de 4 couloirs
-				{ '1-2/1-2/1/1', '1-2/1-2/1/2',  '1-2/1-2/1/3', '1-2/1-2/1/4' }, 
-				{ '1-2/3-4/1/1', '1-2/3-4/1/2',  '1-2/3-4/1/3', '1-2/3-4/1/4' }, 
-				{ '1-2/5-6/1/1', '1-2/5-6/1/2',  '1-2/5-6/1/3', '1-2/5-6/1/4' }, 
-				{ '1-2/7-8/1/1', '1-2/7-8/1/2',  '1-2/7-8/1/3', '1-2/7-8/1/4' }
-			},
-			{ 
-				-- tour 3 : 2 duels de 4 couloirs
-				{ '1-2/1-2/2/1', '1-2/1-2/2/2', '1-2/1-2/2/3', '1-2/1-2/2/4' }, 
-				{ '1-2/3-4/2/1', '1-2/3-4/2/2', '1-2/3-4/2/3', '1-2/3-4/2/4' }
+				-- tour 1 : 16 duels de 4 couloirs
+				{ '1', '32', '33', '64' }, 
+				{ '16','17', '48', '49' },
+				{ '9', '24', '41', '56' },
+				{ '8', '25', '40', '57' },
+				{ '5', '28', '37', '60' },
+				{ '12','21', '44', '53' },
+				{ '13','20', '45', '52' },
+				{ '4', '29', '36', '61' },
+				{ '3', '30', '35', '62' },
+				{ '14','19', '46', '51' },
+				{ '11','22', '43', '54' },
+				{  '6','27', '38', '59' },
+				{  '7','26', '39', '58' },
+				{ '10','23', '42', '45' },
+				{ '15','18', '47', '50' },
+				{  '2','31', '34', '63' }
 			},
 			{
-				-- tour 4 : Finale A et finale B
+				-- tour 2 : 8 duels de 4 couloirs
+				{ '1-2/1-2/1/1'  , '1-2/1-2/1/2'  , '1-2/1-2/1/3'  , '1-2/1-2/1/4' }, 
+				{ '1-2/3-4/1/1'  , '1-2/3-4/1/2'  , '1-2/3-4/1/3'  , '1-2/3-4/1/4' },
+				{ '1-2/5-6/1/1'  , '1-2/5-6/1/2'  , '1-2/5-6/1/3'  , '1-2/5-6/1/4' }, 
+				{ '1-2/7-8/1/1'  , '1-2/7-8/1/2'  , '1-2/7-8/1/3'  , '1-2/7-8/1/4' },
+				{ '1-2/9-10/1/1' , '1-2/9-10/1/2' , '1-2/9-10/1/3' , '1-2/9-10/1/4'}, 
+				{ '1-2/11-12/1/1', '1-2/11-12/1/2', '1-2/11-12/1/3', '1-2/11-12/1/4' },
+				{ '1-2/13-14/1/1', '1-2/13-14/1/2', '1-2/13-14/1/3', '1-2/13-14/1/4' }, 
+				{ '1-2/15-16/1/1', '1-2/15-16/1/2', '1-2/15-16/1/3', '1-2/15-16/1/4' }
+			},
+			{ 
+				-- tour 3 : 4 duels de 4 couloirs
+				{ '1-2/1-2/2/1', '1-2/1-2/2/2',  '1-2/1-2/2/3', '1-2/1-2/2/4' }, 
+				{ '1-2/3-4/2/1', '1-2/3-4/2/2',  '1-2/3-4/2/3', '1-2/3-4/2/4' }, 
+				{ '1-2/5-6/2/1', '1-2/5-6/2/2',  '1-2/5-6/2/3', '1-2/5-6/2/4' }, 
+				{ '1-2/7-8/2/1', '1-2/7-8/2/2',  '1-2/7-8/2/3', '1-2/7-8/2/4' }
+			},
+			{ 
+				-- tour 4 : 2 duels de 4 couloirs
 				{ '1-2/1-2/3/1', '1-2/1-2/3/2', '1-2/1-2/3/3', '1-2/1-2/3/4' }, 
-				{ '3-4/1-2/3/1', '3-4/1-2/3/2', '3-4/1-2/3/3', '3-4/1-2/3/4' }
+				{ '1-2/3-4/3/1', '1-2/3-4/3/2', '1-2/3-4/3/3', '1-2/3-4/3/4' }
+			},
+			{
+				-- tour 5 : Finale A et finale B
+				{ '1-2/1-2/4/1', '1-2/1-2/4/2', '1-2/1-2/4/3', '1-2/1-2/4/4' }, 
+				{ '3-4/1-2/4/1', '3-4/1-2/4/2', '3-4/1-2/4/3', '3-4/1-2/4/4' }
 			}
 		}
 	},
-	
+
 	FS_96 =
 	{
 		dimension = 96,
@@ -804,7 +845,7 @@ duel_progression = {
 	{
 		dimension = 6,
 		dimension_min = 4,
-		activite = 'FOND,ROL',
+		activite = 'FOND,BIATH,ROL',
 		progression = {
 			{ 
 				-- tour unique: 1 duel de 6 couloirs
@@ -817,7 +858,7 @@ duel_progression = {
 	{
 		dimension = 8,
 		dimension_min = 7,
-		activite = 'FOND,ROL',
+		activite = 'FOND,BIATH,ROL',
 		label = { 'Demi Finale', 'Finale' },
 		progression = {
 			{ 
@@ -837,6 +878,7 @@ duel_progression = {
 	{
 		dimension = 12,
 		dimension_min = 9,
+		activite = 'FOND,BIATH,ROL',
 		niveau = 'KO_12_3T',
 		--label = { 'Quart de Finale', 'Demi Finale', 'Finale' },
 		GetLabelTour = GetLabel3Tours,
@@ -860,13 +902,13 @@ duel_progression = {
 		}
 	},
 
-	KO_12 =
+	KO_12_2T =
 	{
 		dimension = 12,
 		dimension_min = 9,
-		activite = 'FOND,ROL',
-		niveau = '!KO_12_3T',	-- tous les niveaux sauf KO_12_3T ...
-	
+		activite = 'FOND,BIATH,ROL',
+		niveau = 'KO_12_2T',
+		--	niveau = '!KO_12_2T',	tous les niveaux sauf KO_12_3T ...
 		label = { 'Demi Finale', 'Finale' },
 		progression = {
 			{ 
@@ -886,6 +928,7 @@ duel_progression = {
 	{
 		dimension = 20,
 		dimension_min = 13,
+		activite = 'FOND,BIATH,ROL',
 		niveau = 'KO_20_D4',
 		-- label = { 'Quart de Finale', 'Demi Finale', 'Finale' },
 		GetLabelTour = GetLabel3Tours,
@@ -905,7 +948,7 @@ duel_progression = {
 				{ '1/4-5/1/1', '1/4-5/1/2', '2/3-5/1/1', '2/3-5/1/2', '2/3-5/1/3', '3/1-5/1/1' }
 			},
 			{ 
-				-- tour  : Finale A et Finale B => 2 duel de 6 couloirs
+				-- tour 3 : Finale A et Finale B => 2 duel de 6 couloirs
 				{ '1/1-2/2/1', '1/1-2/2/2', '2/1-2/2/1', '2/1-2/2/2', '3/1-2/2/1', '3/1-2/2/2'}, 
 				{ '4/1-2/2/1', '4/1-2/2/2', '5/1-2/2/1', '5/1-2/2/2', '6/1-2/2/1', '6/1-2/2/2'}
 			}
@@ -916,6 +959,7 @@ duel_progression = {
 	{
 		dimension = 20,
 		dimension_min = 13,
+		activite = 'FOND,BIATH,ROL',
 		niveau = 'KO_20_D5',
 		GetLabelTour = GetLabel3Tours,
 		progression = {
@@ -932,7 +976,7 @@ duel_progression = {
 				{ '1/3-4/1/1', '1/3-4/1/2', '2/3-4/1/1', '2/3-4/1/2', '3/3-4/1/1', '3/3-4/1/2' },
 			},
 			{ 
-				-- tour  : Finale A et Finale B => 2 duel de 6 couloirs
+				-- tour 3 : Finale A et Finale B => 2 duel de 6 couloirs
 				{ '1/1-2/2/1', '1/1-2/2/2', '2/1-2/2/1', '2/1-2/2/2', '3/1-2/2/1', '3/1-2/2/2'}, 
 				{ '4/1-2/2/1', '4/1-2/2/2', '5/1-2/2/1', '5/1-2/2/2', '6/1-2/2/1', '6/1-2/2/2'}
 			}
@@ -942,6 +986,7 @@ duel_progression = {
 	Tab20FIS =
 	{
 		entite = 'FIS',
+		activite = 'FOND,BIATH,ROL',
 		dimension = 20,
 		dimension_min = 13,
 		niveau = '!KO_20_D4, KO_20_D5', -- tous les niveaux sauf KO_20_D4 et KO_20_D5 ...
@@ -960,7 +1005,7 @@ duel_progression = {
 				{ '1/2-4/1/1', '1/2-4/1/2', '2/2-4/1/1', '2/2-4/1/2' }
 			},
 			{ 
-				-- tour  : Finale A et Finale B => 2 duel de 4 couloirs
+				-- tour 3 : Finale A et Finale B => 2 duel de 4 couloirs
 				{ '1/1-2/2/1', '1/1-2/2/2', '2/1-2/2/1', '2/1-2/2/2'}, 
 				{ '3/1-2/2/1', '3/1-2/2/2', '4/1-2/2/1', '4/1-2/2/2'}
 			}
@@ -972,6 +1017,7 @@ duel_progression = {
 	{
 		dimension = 30,
 		dimension_min = 21,
+		activite = 'FOND,BIATH,ROL',
 		niveau = 'KO_Spec',
 		GetLabelTour = GetLabel3Tours,
 		--label = { 'Quart de Finale', 'Demi Finale', 'Finale' },
@@ -990,7 +1036,7 @@ duel_progression = {
 				{ '1/4-5/1/1', '1/4-5/1/2', '2/3-5/1/1', '2/3-5/1/2', '2/3-5/1/3', '3/1-5/1/1','3/3' }
 			},
 			{ 
-				-- tour  : Finale A et Finale B => 2 duel de 6 couloirs
+				-- tour 3  : Finale A et Finale B => 2 duel de 6 couloirs
 				{ '1/1-2/2/1', '1/1-2/2/2', '2/1-2/2/1', '2/1-2/2/2', '3/1-2/2/1', '3/1-2/2/2'}, 
 				{ '4/1-2/2/1', '4/1-2/2/2', '5/1-2/2/1', '5/1-2/2/2', '6/1-2/2/1', '6/1-2/2/2'}
 			}
@@ -1002,6 +1048,7 @@ duel_progression = {
 	{
 		dimension = 30,
 		dimension_min = 21,
+		activite = 'FOND,BIATH,ROL',
 		niveau = 'KO_30_LO',
 		GetLabelTour = GetLabel3Tours,
 		--label = { 'Quart de Finale', 'Demi Finale', 'Finale' },
@@ -1032,6 +1079,7 @@ duel_progression = {
 	{
 		dimension = 30,
 		dimension_min = 21,
+		activite = 'FOND,BIATH,ROL',
 		niveau = 'KO_30_CH',
 		GetLabelTour = GetLabel3Tours,
 
@@ -1062,6 +1110,7 @@ duel_progression = {
 	{
 		dimension = 42,
 		dimension_min = 31,
+		activite = 'FOND,BIATH,ROL',
 		niveau = 'Tb_A_B42',
 		col_verif = 'Centre',
 		GetLabelDuel = GetLabelDuelTabA_B,
@@ -1086,12 +1135,10 @@ duel_progression = {
 				{ '32', '33', '36', '37', '40', '41' }	 -- D4
 			},
 			{ 
-				-- tour 3 : Finale A et Finale B => 2 duel de 6 couloirs => tableau A
+				-- tour 3  : Finale tableau A  => 2 duel de 6 couloirs =>
 				{ '1/1-2/2/1', '1/1-2/2/2', '2/1-2/2/1', '2/1-2/2/2', '3/1-2/2/1', '3/1-2/2/2'}, 
-				--{ '4/1-2/2/1', '4/1-2/2/2', '5/1-2/2/1', '5/1-2/2/2', '6/1-2/2/1', '6/1-2/2/2'}
-				-- tour 3 : Finale A et Finale B => 2 duel de 6 couloirs => tableau B
+				-- tour 3  : Finale tableau B  => 2 duel de 6 couloirs =>
 				{ '1/3-4/2/1', '1/3-4/2/2', '2/3-4/2/1', '2/3-4/2/2', '3/3-4/2/1', '3/3-4/2/2'}, 
-				--{ '4/3-4/2/1', '4/3-4/2/2', '5/3-4/2/1', '5/3-4/2/2', '6/3-4/2/1', '6/3-4/2/2'}
 			}
 		}
 	},
@@ -1100,6 +1147,7 @@ duel_progression = {
 	{
 		dimension = 50,
 		dimension_min = 43,
+		activite = 'FOND,BIATH,ROL',
 		niveau = 'Tb_A_B50',
 		col_verif = 'Centre',
 		GetLabelDuel = GetLabelDuelTabA_B,
@@ -1129,12 +1177,54 @@ duel_progression = {
 				{ '1/8-9/1/1', '1/8-9/1/2', '2/8-9/1/1', '2/8-9/1/2', '3/8-9/1/1', '3/8-9/1/2' }, -- D4
 			},
 			{ 
-				-- tour 3  : Finale A et Finale B => 2 duel de 6 couloirs => tableau A
+				-- tour 3  : Finale tableau A  => 2 duel de 6 couloirs =>
 				{ '1/1-2/2/1', '1/1-2/2/2', '2/1-2/2/1', '2/1-2/2/2', '3/1-2/2/1', '3/1-2/2/2'}, 
-				--{ '4/1-2/2/1', '4/1-2/2/2', '5/1-2/2/1', '5/1-2/2/2', '6/1-2/2/1', '6/1-2/2/2'}
-				-- tour 3 : Finale A et Finale B => 2 duel de 6 couloirs => tableau B
+				-- tour 3 : Finale tableau B => 2 duel de 6 couloirs =>
 				{ '1/3-4/2/1', '1/3-4/2/2', '2/3-4/2/1', '2/3-4/2/2', '3/3-4/2/1', '3/3-4/2/2'}, 
-				--{ '4/3-4/2/1', '4/3-4/2/2', '5/3-4/2/1', '5/3-4/2/2', '6/3-4/2/1', '6/3-4/2/2'}
+				
+			}
+		}
+	},
+	
+		FISA_B50 =
+	{
+		dimension = 50,
+		dimension_min = 43,
+		niveau = 'FISA_B50',
+		col_verif = 'Centre',
+		GetLabelDuel = GetLabelDuelTabA_B,
+		GetLabelTour = GetLabel3Tours,
+		GetLabelDuelWidth = function() return 9; end,
+		
+		progression = {
+			{ 
+				-- tour 1 :  Quart de final => tableau A
+				{ '1', '10', '11', '20', '21', '30' }, -- D1
+				{ '4', '7', '14', '17', '24', '27' },  -- D2
+				{ '5', '6', '15', '16', '25', '26' },  -- D3
+				{ '2', '9', '12', '19', '22', '29' },  -- D4
+				{ '3', '8', '13', '18', '23', '28' },  -- D5
+				-- tour 1 :  Quart de final => tableau B
+				{ '31', '40', '41', '50' }, 	   -- D6
+				{ '34',  '37', '44', '47' },	   -- D7
+				{ '35',  '36', '45', '46' },	   -- D8
+				{ '32',  '39', '42', '49' },	   -- D9
+				{ '33',  '38', '43', '48' },	   -- D10
+			},
+			{ 
+				-- tour 2 : demie finale => 2 duels de 6 couloirs => tableau A
+				{ '1/1-3/1/1', '1/1-3/1/2', '1/1-3/1/3', '2/1-2/1/1', '2/1-2/1/2', '3/1-5/1/2' }, -- D1
+				{ '1/4-5/1/1', '1/4-5/1/2', '2/3-5/1/1', '2/3-5/1/2', '2/3-5/1/3', '3/1-5/1/1' }, -- D2
+				-- tour 2 : demie finale => 2 duels de 6 couloirs => tableau B
+				{ '1/6-8/1/1', '1/6-8/1/2', '1/6-8/1/3', '2/6-7/1/1', '2/6-7/1/2', '3/6-10/1/2' }, 
+				{ '1/9-10/1/1', '1/9-10/1/2', '2/8-10/1/1', '2/8-10/1/2', '2/8-10/1/3', '3/6-10/1/1' }
+
+			},
+			{ 
+				-- tour 3  : Finale tableau A  => 2 duel de 6 couloirs =>
+				{ '1/1-2/2/1', '1/1-2/2/2', '2/1-2/2/1', '2/1-2/2/2', '3/1-2/2/1', '3/1-2/2/2'}, 
+				-- tour 3  : Finale tableau B  => 2 duel de 6 couloirs =>
+				{ '1/3-4/2/1', '1/3-4/2/2', '2/3-4/2/1', '2/3-4/2/2', '3/3-4/2/1', '3/3-4/2/2'}, 
 			}
 		}
 	},
@@ -1143,6 +1233,7 @@ duel_progression = {
 	{
 		dimension = 60,
 		dimension_min = 51,
+		activite = 'FOND,BIATH,ROL',
 		niveau = 'Tb_A_B60',
 		col_verif = 'Centre',
 		label = { 'Quart de Finale', 'Demi Finale', 'Finale' },
@@ -1190,6 +1281,7 @@ duel_progression = {
 	{
 		dimension = 100,
 		dimension_min = 5,
+		activite = 'FOND,BIATH,ROL',
 		niveau = 'KO_MT_D5',
 	
 		GetLabelTour = GetLabelTour_Mont_Desc,
@@ -1200,7 +1292,7 @@ duel_progression = {
 		
 		progression = {
 			{ 
-				-- tour 1 : 17 duels de 5 couloirs
+				-- tour 1 : 20 duels de 5 couloirs
 				{ '1', '2', '3', '4', '5' }, 		-- D1
 				{ '6', '7', '8', '9', '10' },		-- D2
 				{ '11', '12', '13', '14', '15' },	-- D3
@@ -1223,7 +1315,7 @@ duel_progression = {
 				{ '96', '97', '98', '99', '100'}	-- D20
 			},
 			{ 
-				-- tour 2 : 17 duels de 6 couloirs
+				-- tour 2 : 20 duels de 5 couloirs
 				{ '1/1', '2/1', '3/1', '1/2', '2/2' }, 		-- D1
 				{ '4/1', '5/1', '3/2', '1/3', '2/3' }, 		-- D2
 				{ '4/2', '5/2', '3/3', '1/4', '2/4' },		-- D3
@@ -1246,7 +1338,7 @@ duel_progression = {
 				{ '4/19', '5/19', '3/20', '4/20', '5/20' }  -- D20
 			},
 			{ 
-				-- tour 3 : 17 duels de 6 couloirs
+				-- tour 3 : 20 duels de 5 couloirs
 				{ '1/1', '2/1', '3/1', '1/2', '2/2' }, 		-- D1
 				{ '4/1', '5/1', '3/2', '1/3', '2/3' }, 		-- D2
 				{ '4/2', '5/2', '3/3', '1/4', '2/4' },		-- D3
@@ -1275,7 +1367,7 @@ duel_progression = {
 	{
 		dimension = 102,
 		dimension_min = 6,
-		
+		activite = 'FOND,BIATH,ROL',
 		niveau = 'KO_MT_D6',
 		GetLabelTour = GetLabelTour_Mont_Desc,
 		GetLabelDuel = GetLabelDuel_Mont_Desc,
@@ -1351,6 +1443,7 @@ duel_progression = {
 	{
 		dimension = 100,
 		dimension_min = 10,
+		activite = 'FOND,BIATH,ROL',
 		niveau = 'KO_MT_10',
 		GetLabelTour = GetLabelTour_Mont_Desc,
 		GetLabelDuel = GetLabelDuel_Mont_Desc,
@@ -1360,7 +1453,7 @@ duel_progression = {
 		
 		progression = {
 			{ 
-				-- tour 1 : 17 duels de 5 couloirs	
+				-- tour 1 : 10 duels de 10 couloirs	
 				{ '1', '2', '3', '4', '5', '6', '7', '8', '9', '10' }, 				-- D1
 				{ '11', '12', '13', '14', '15', '16', '17', '18', '19', '20' },		-- D2
 				{ '21', '22', '23', '24', '25', '26', '27', '28', '29', '30' },		-- D3
@@ -1383,7 +1476,7 @@ duel_progression = {
 				{ '8/6', '9/6', '10/6',  '4/7', '5/7', '6/7', '7/7', '1/8','2/8', '3/8' }, 			-- D7
 				{ '8/7', '9/7', '10/7',  '4/8', '5/8', '6/8', '7/8', '1/9','2/9', '3/9' }, 			-- D8
 				{ '8/8', '9/8', '10/8',  '4/9', '5/9', '6/9', '7/9', '1/10','2/10', '3/10' },		-- D9 
-				{ '8/9', '9/9', '10/9',  '4/10', '5/10', '6/10', '7/9', '8/10','9/10', '10/10' },	-- D10
+				{ '8/9', '9/9', '10/9',  '4/10', '5/10', '6/10', '7/10', '8/10','9/10', '10/10' },	-- D10
 			},
 			{ 
 				-- tour 3 : 10 duels de 10 couloirs

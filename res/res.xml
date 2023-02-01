@@ -140,7 +140,8 @@
 <list_officiel activite="ALP,TM,SS">
 	<officiel code="TechnicalDelegate" label="Délégué Technique" label_inter="Technical Delegate" /> 
 	<officiel code="Referee" label="Arbitre" label_inter="Referee" /> 
-	<officiel code="AssistantReferee" label="Arbitre Adjoint" label_inter="Assistant Referee" required="0,1" /> 
+	<officiel code="AssistantReferee" label="Arbitre Adjoint" label_inter="Assistant Referee" discipline="DH, SG" required="1" /> 
+	<officiel code="AssistantReferee" label="Arbitre Adjoint" label_inter="Assistant Referee" required="0,1" />
 	<officiel code="ChiefCourse" label="Chef de Piste" label_inter="Chief Course" required="0,1" /> 
 	<officiel code="ChiefRace" label="Directeur d'épreuve" label_inter="Chief Race" /> 
 	<officiel code="StartReferee" label="Juge au Départ" label_inter="Start Referee" /> 
@@ -220,12 +221,15 @@
 
 	<!-- Chronométreur FFS ou FIS-->
 	<officiel code="ChiefTiming" label="Chronométreur" label_inter="Chief Timing" activite="FOND,ROL,BIATH" required="1" />
+	
 	<!-- staff Chronométreur FFS -->
 	<officiel code="ffs_chr_starter" label="Starter" label_inter="Starter" activite="FOND,ROL,BIATH" required="1" /> <!-- discipline="FS,POUR" -->
 	<officiel code="ffs_chr_manuel_start" label="Doublage. manuel départ" label_inter="Dubbing Manual start" activite="FOND,ROL,BIATH" required="1" />
 	<officiel code="ffs_chr_manuel_stop" label="Doublage. manuel arrivée" label_inter="Dubbing Manual stop" activite="FOND,ROL,BIATH" required="1" />
 	<officiel code="ffs_chr_manuel" label="Doublage manuel" label_inter="Dubbing Manual stop" activite="SAUT,CN" required="1" />
-	<officiel code="ffs_chr_manuel_B" label="Chronométreur B" label_inter="Chief Timing B" activite="FOND,ROL,BIATH" required="0,1" />	
+	<officiel code="ffs_chr_manuel_B" label="Chronométreur B" label_inter="Chief Timing B" activite="FOND,ROL,BIATH" entite="FFS" required="0,1" />	
+	<officiel code="ffs_chr_manuel_B" label="Chronométreur B" label_inter="Chief Timing B" activite="FOND,ROL,BIATH" entite="FIS" required="1" />
+	
 	<!-- informatique et video FFS -->
 	<officiel code="ffs_informatique" label="Gestionnaire informatique" label_inter="Chief Computer" required="0,1" /> 
 	<officiel code="ffs_operateur_video" label="Opérateur vidéo" label_inter="Opérateur vidéo"  activite="FOND,ROL,BIATH" discipline="MASS,POUR,KO" required="0,4" />
