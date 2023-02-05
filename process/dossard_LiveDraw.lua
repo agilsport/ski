@@ -2511,7 +2511,7 @@ Groupe 6 On poursuit selon les points FIS.
 		end
 	end
 	
-	tDrawG2:OrderBy('ECSL_overall_points DESC, ECSL_points DESC, FIS_pts');				-- les + de 450 pts
+	tDrawG2:OrderBy('ECSL_points DESC, ECSL_overall_points DESC, FIS_pts');				-- les + de 450 pts
 	if tDrawG2:GetNbRows() > 0 then
 		local pts_overall_next  = nil;
 		local pts_fis_next  = nil;
@@ -3759,7 +3759,7 @@ function main(params_c)
 	draw.height = display:GetSize().height - 50;
 	draw.x = 0;
 	draw.y = 0;
-	scrip_version = "5.62"; -- 4.92 pour 2022-2023
+	scrip_version = "5.63"; -- 4.92 pour 2022-2023
 	local imgfile = './res/40x16_dbl_coche.png';
 	if not app.FileExists(imgfile) then
 		app.GetAuiFrame():MessageBox(
