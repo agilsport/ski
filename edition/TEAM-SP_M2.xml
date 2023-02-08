@@ -8,6 +8,11 @@
 	
 	<row value="auto" />
 		<statictext col_start="1" col_end="0"  style="ALIGN_CENTER" label='Heure de départ'/>
+		
+	<row value="auto" />
+	<statictext col_start="1" col_end="2" style="ALIGN_RIGHT" label='Choix ordre de départ équipiers 2'/>
+	<combobox col_start="3" col_end="4" name="OrderBy_M2"/> 	
+		
 	<scrolledwindow row="1" col_start="1" col_end="0" name="scrolled_epreuves">
 	<row value="1" />
 	<!-- Grille Epreuve -->

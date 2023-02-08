@@ -1,10 +1,12 @@
 dofile('./interface/adv.lua');
 dofile('./interface/interface.lua');
 
--- version 3.0
-	-- création des heures de départ de la M2
-	-- affectation des Rang2 pour affichage ds chrono M2
-			
+-- version 2.6
+
+-- point a voir avec pierre
+			-- Edition des factures par club comité ou nation 
+			-- manque la gestion des abs a traiter
+			-- une page blache se créer a la fin de l'edition par nation comite club le row ~= 0 n'est pas valable comme on est ds le end
 
 function Alert(txt)
 	app.GetAuiMessage():AddLine(txt);
@@ -38,12 +40,12 @@ function main(params)
 		code_manche = theParams.code_manche,
 		Organisateur = theParams.Organisateur,
 		Club = theParams.Club,
-		Comite = theParams.Code_comite,
-		codeActivite = theParams.Code_activite
+	Comite = theParams.Code_comite,
+	codeActivite = theParams.Code_activite
 	});
 	--body = base:GetTable('body');
 	-- Tri du body
-	body:OrderBy('Code_epreuve,Heure_depart1 Asc,Rang1 Asc,Dossard Asc' );
+	body:OrderBy('Code_epreuve , Heure_depart1 Desc' );
 	code_evenement = theParams.code_evenement;
 
 	tEpreuve = base:GetTable('Epreuve');
@@ -87,6 +89,12 @@ function main(params)
 			node_attr = 'name', 				-- Facultatif si le node_name est unique ...
 			node_value = 'Heure_equipier2',			-- Facultatif si le node_name est unique ...	
 		});
+		
+		local comboOrderBy = dlg:GetWindowName('OrderBy_M2');
+		comboOrderBy:Append('Ordre Inverse des équipiers 1');
+		comboOrderBy:Append('Mêmes ordre que les équipiers 1');
+		comboOrderBy:SetValue('Ordre Inverse des équipiers 1');
+		
 		-- local tEpreuve = base:GetTable('Epreuve');
 		tEpreuve:AddColumn({ name = 'Heure_depart2', label = 'Heure_depart2', type = sqlType.CHRONO, style = sqlStyle.INT });
 		tEpreuve:AddColumn({ name = 'Ecart2', label = 'Ecart2', type = sqlType.CHRONO, style = sqlStyle.NULL });
@@ -134,7 +142,7 @@ function main(params)
 		-- Toolbar
 		local tb = dlg:GetWindowName('tb');
 		if tb then
-			-- local btn_edition = tb:AddTool('Edition', './res/16x16_xml.png');
+			local btn_edition = tb:AddTool('Edition', './res/16x16_xml.png');
 			tb:AddStretchableSpace();
 			local btn_close = tb:AddTool('Fermer', './res/16x16_close.png');
 			tb:Realize();
@@ -142,6 +150,7 @@ function main(params)
 			tb:Bind(eventType.MENU, LectureDonnees, btn_edition);
 			tb:Bind(eventType.MENU, function(evt) dlg:EndModal(idButton.CANCEL); end, btn_close);
 		end
+	
 	end
 		
 	dlg:Fit();
@@ -162,6 +171,7 @@ function OnEditorShown(evt)
 			return;
 		end
 	end
+
 	-- Dans tous les autres cas on n'autorise pas l'édition ...
 	evt:Veto();
 end
@@ -172,7 +182,13 @@ function LectureDonnees(evt)
 	code_evenement = theParams.code_evenement;
 	PcodeManche = 2;
 	theParams.title = 'Génération des Heures de Départ des 2ème équipiers';
-
+	OrderBy_M2 = dlg:GetWindowName('OrderBy_M2'):GetValue();
+	if OrderBy_M2 == 'Ordre Inverse des équipiers 1' then
+		body:OrderBy('Code_epreuve,Heure_depart1 Desc' );
+	else
+		body:OrderBy('Code_epreuve,Heure_depart1 Asc' );
+	end
+	
 	for i=0, tEpreuve:GetNbRows()-1 do	
 		-- Heure_depart2 = 0;
 		-- Ecart2 = 0;
@@ -190,9 +206,9 @@ function LectureDonnees(evt)
 				if body:GetCell('Code_epreuve', i) == code_epreuve then
 					cmd =      "Update Resultat_Manche Set Heure_depart = "..Heure_depart2;
 					cmd = cmd..", Rang = "..i+1;
-					cmd = cmd.." Where Code_evenement = "..tostring(code_evenement);
-					cmd = cmd.." And Code_coureur = '"..body:GetCell('Code_coureur', i);
-					cmd = cmd.."' And Code_manche = "..tostring(PcodeManche);
+					cmd = cmd.." Where Code_evenement = "..tonumber(code_evenement);
+					cmd = cmd.." And Code_coureur = '"..body:GetCell('Code_coureur', i).."'";
+					cmd = cmd.." And Code_manche = "..PcodeManche;
 					base:Query(cmd);
 					body:SetCell('Heure_depart2',i, Heure_depart2);
 					Heure_depart2 = Heure_depart2 + Ecart2
@@ -202,18 +218,19 @@ function LectureDonnees(evt)
 			for i=0, body:GetNbRows()-1 do	
 				-- Alert("Insert Into Heure_depart2: "..Heure_depart2);
 				if body:GetCell('Code_epreuve', i) == code_epreuve then
-					cmd = "Insert Into Resultat_Manche (Code_evenement, Code_coureur, Code_manche, Rang, Heure_depart) values (";
-					cmd = cmd..tostring(code_evenement);
-					cmd = cmd..",'"..body:GetCell('Code_coureur', i);
-					cmd = cmd.."',"..tostring(PcodeManche);
-					cmd = cmd..","..tostring(i+1);
-					cmd = cmd..","..tostring(Heure_depart2);
+					cmd = "Insert Into Resultat_Manche (Code_evenement, Code_coureur, Code_manche, Heure_depart) values (";
+					cmd = cmd..tonumber(code_evenement);
+					cmd = cmd..",'";
+					cmd = cmd..body:GetCell('Code_coureur', i);
+					cmd = cmd.."',"..PcodeManche..",";
+					cmd = cmd..Heure_depart2;
 					cmd = cmd..")";
 					base:Query(cmd);
 					body:SetCell('Heure_depart2',i, Heure_depart2);
 					Heure_depart2 = Heure_depart2 + Ecart2
 				end
 			end		
+		
 		end
 	end
 	
