@@ -188,7 +188,17 @@ function LectureDonnees(evt)
 	else
 		body:OrderBy('Code_epreuve,Heure_depart1 Asc' );
 	end
-	
+
+		-- si j'ai pas le memes nombre de ligne dans le body et la table manche 2 j'efface la table et je repart a 0
+	nbrows_body = body:GetNbRows()
+	if nbrow_tResultat_Manche2 < nbrows_body then
+		cmd = 	   "Delete From Resultat_Manche" 
+		cmd = cmd.." Where Code_evenement = "..tonumber(code_evenement);
+		cmd = cmd.." And Code_manche = "..PcodeManche;
+		base:Query(cmd);
+		Alert("je fait un raz de la table"); 
+	end
+
 	for i=0, tEpreuve:GetNbRows()-1 do	
 		-- Heure_depart2 = 0;
 		-- Ecart2 = 0;
@@ -201,11 +211,12 @@ function LectureDonnees(evt)
 		Ecart2 = tEpreuve:GetCellInt('Ecart2', i)
 		Alert("Avec un Ecart de: "..tEpreuve:GetCell('Ecart2', i).." sec.");
 		if nbrow_tResultat_Manche2 >=1 then
-			for i=0, body:GetNbRows()-1 do	
-				-- Alert("Update Heure_depart2: "..Heure_depart2);
+			for i=0, body:GetNbRows()-1 do
+				rang2 = i+1;
+				Alert("Update Heure_depart2: "..Heure_depart2);
 				if body:GetCell('Code_epreuve', i) == code_epreuve then
 					cmd =      "Update Resultat_Manche Set Heure_depart = "..Heure_depart2;
-					cmd = cmd..", Rang = "..i+1;
+					cmd = cmd..", Rang = "..rang2;
 					cmd = cmd.." Where Code_evenement = "..tonumber(code_evenement);
 					cmd = cmd.." And Code_coureur = '"..body:GetCell('Code_coureur', i).."'";
 					cmd = cmd.." And Code_manche = "..PcodeManche;
@@ -216,14 +227,16 @@ function LectureDonnees(evt)
 			end
 		else
 			for i=0, body:GetNbRows()-1 do	
-				-- Alert("Insert Into Heure_depart2: "..Heure_depart2);
+				Alert("Insert Into Heure_depart2: "..Heure_depart2);
+				rang2 = i+1;
 				if body:GetCell('Code_epreuve', i) == code_epreuve then
-					cmd = "Insert Into Resultat_Manche (Code_evenement, Code_coureur, Code_manche, Heure_depart) values (";
+					cmd = "Insert Into Resultat_Manche (Code_evenement, Code_coureur, Code_manche, Heure_depart, Rang) values (";
 					cmd = cmd..tonumber(code_evenement);
 					cmd = cmd..",'";
-					cmd = cmd..body:GetCell('Code_coureur', i);
-					cmd = cmd.."',"..PcodeManche..",";
-					cmd = cmd..Heure_depart2;
+					cmd = cmd..body:GetCell('Code_coureur', i).."', ";
+					cmd = cmd..PcodeManche..", ";
+					cmd = cmd..Heure_depart2..", ";
+					cmd = cmd..rang2;
 					cmd = cmd..")";
 					base:Query(cmd);
 					body:SetCell('Heure_depart2',i, Heure_depart2);

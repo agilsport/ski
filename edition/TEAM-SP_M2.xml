@@ -75,7 +75,7 @@
 		<spacing left="5" right="10" top="2" bottom="2" />
 		<row h="auto"/>
 		<!-- <text col="0.5cm" font_size="6" align="center" label="Pb">$(Modif_manuel) </text> -->
-		<!-- <text col="0.5cm" font_size="6" align="center" label="Rang2">$(Rang2) </text> -->
+		<text col="0.5cm" font_size="6" align="center" label="Rang2">$(Rang2) </text>
 		<text col="4" align="right" label="Dos">$(Dossard) </text>
 		<text col="7" align="center" label="Code"><font size="8" cond="group =='body'"/>$(Code_coureur):sub(4)</text>
 		<text col="20" align="left" label="Nom - Prénom">GetIdentiteCoureur(officiel)</text> 

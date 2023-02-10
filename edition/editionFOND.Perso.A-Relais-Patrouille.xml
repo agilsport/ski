@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Menu Editions Activité "FOND " Discipline Relais / patrouille / team-sprint !-->
-<!-- version="2.1" !-->
+<!-- version="2.0" !-->
 <edition>
 	<menu>
 		<menu title="Edition Participants" image="./res/32x32_juges.png" bold="false" cond ="($(Epreuve.Code_discipline)='RELAIS')">
@@ -18,7 +18,6 @@
 			<menu title="Officieux (1-a)" image="./res/16x16_official.png" id="res_Relais" Officiel="0" first_header="0" DossardRelais="Lettre" mode_lap="1" />
 			<menu title="Officiels (1/²)" image="./res/16x16_official.png" id="res_Relais" Officiel="1" first_header="1" DossardRelais="Numeric" mode_lap="1" />
 			<menu title="Officieux (1/²)" image="./res/16x16_official.png" id="res_Relais" Officiel="0" first_header="0" DossardRelais="Numeric" mode_lap="1" />
-			<menu title="Résultats Relais - Equipier Paysage" image="./res/16x16_juges.png" id="res_relais_equipier" choix_manche="1" mode_lap="1" first_header="0" />
 		</menu>
 		<menu title="Résultats Patrouille" image="./res/32x32_ranking.png" bold="false" cond ="($(Epreuve.Code_discipline)='RELAIS')">
 			<menu title="Officiels (1-a)" image="./res/16x16_official.png" id="res_Patr" Officiel="1" first_header="1" DossardRelais="Lettre" />	
@@ -28,10 +27,12 @@
 			<menu title="Résultats Tours (1-a)" image="./res/16x16_official.png" id="res_Patr" DossardRelais="Lettre" />
 		</menu>	
 		<menu title="Gestion des Team-Sprint " image="./res/32x32_snow_esf.png">
-			<menu title="Génération des Heure de Départ des 2ème Equipiers" image="./res/16x16_text.png" filter="before" lua="./edition/TEAM-SP_M2.lua"  />
+			<menu title="Génération des Heure de Départ des 2ème Equipiers" image="./res/16x16_text.png" lua="./edition/TEAM-SP_M2.lua"  filter="after" />
+			<menu title="Liste de départ des équipiers 2" image="./res/16x16_juges.png" id="H_dept_M2" first_header="0" />
+			<menu title="Résultats Relais - Equipier Paysage" image="./res/16x16_juges.png" id="res_relais_equipier" choix_manche="1" mode_lap="1" first_header="0" />
 			<menu title="Edition des Qualifiés Team-Sprint" image="./res/16x16_bib.png" id="res_qualif_TeamSprint" qualif_critere="1" />
 			<menu title="Edition Finales Team-Sprint" image="./res/16x16_bib.png" id="res_TeamSprint" />
-			
+			<menu title="Libélé comité en course equipe Comité" image="./res/16x16_text.png" lua="./edition/Label_equipe.lua"  />
 			<!-- <menu title="Tours (1-a)" image="./res/16x16_official.png" id="res_Tour" DossardRelais="Lettre" /> -->
 		</menu>
 	</menu>
@@ -301,7 +302,7 @@
 	</report>	
 
 	<!-- Resultat de relais-->
-	<report id="res_Relais" title="Résultats Relais " header="1" first_header="(params.first_header or '1')" modemode_lap="1" >
+	<report id="res_Relais" title="Résultats Relais " header="1" first_header="(params.first_header or '1')" mode_lap="1" >
 	<call option="identiteOfficiel" file="./edition/options.xml"/>
 <lua>
 			if tonumber(params.Officiel) == 1 then
@@ -778,6 +779,37 @@
 		<end>
 			<lua>sqlBase.FixationTableRanking(body)</lua>
 		</end>
+	</report>
+	
+	<report id="H_dept_M2" title="(params.title or '')" first_header="0" header="1">
+		<!-- header simplifier !-->
+		<order key="Heure_depart2, Dossard, Identite" />
+		<call option="identiteCoureur" file="./edition/options.xml"/>
+		
+		<first_header />
+
+		<body>
+			<call option="color_alternate" file="./edition/options.xml" />
+			<font size="9" adjust="ellipsize"/>
+			<pen border="none" />
+			<spacing left="5" right="10" top="2" bottom="2" />
+			<row h="auto"/>
+			<!-- <text col="0.5cm" font_size="6" align="center" label="Pb">$(Modif_manuel) </text> -->
+			<!-- <text col="0.5cm" font_size="6" align="center" label="Rang2">$(Rang2) </text> -->
+			<text col="4" align="right" label="Dos">$(Dossard) </text>
+			<text col="7" align="center" label="Code"><font size="8" cond="group =='body'"/>$(Code_coureur):sub(4)</text>
+			<text col="20" align="left" label="Nom - Prénom">GetIdentiteCoureur(officiel)</text> 
+			<text col="4" align="center" label="An">$(An)</text>
+			<text col="6" align="center" label="Categ">$(Categ)</text>
+			<text col="4" align="center" label="S.">$(Sexe)</text>
+			<text col="4" align="center" label="Dist.">$(Distance)</text>
+			<text col="4" align="center" label="Nat" cond="entite == 'FIS'">$(Nation)</text>
+			<text col="4" align="center" label="CS" >$(Comite)</text>
+			<text col="12" align="left" label="Club" cond="entite == 'FFS'">$(Club)</text>
+			<!-- <text col="6" align="right" label="Points" cond="entite == 'FFS'">$(Point)</text> -->
+			<text col="9" align="right" label="H. Départ" cond="discipline:In('FS', 'POURS', 'KO-QLF', 'TEA-SP')">$(Heure_depart2, "%2hh%2m:%2s")</text>
+			<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
+		</body>	
 	</report>
 	
 </edition>
