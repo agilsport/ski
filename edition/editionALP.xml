@@ -1036,6 +1036,7 @@
 				scratch = {};
 				u18 = {};
 				u18_scratch = {};
+				coureur_erreur = {};
 				for i = 0, body:GetCounterCount('Comite') -1 do
 					if body:GetCounter('Comite'):GetCell(0,i):len() > 0 then
 						comite[body:GetCounter('Comite'):GetCell(0,i)] = {};
@@ -1074,6 +1075,11 @@
 						u18_scratch.clt = body:GetCell('Clt', i)
 					end
 					if body:GetCell('Nation', i) == 'FRA' then
+						if comitelu:len() == 0 then
+							comitelu = '??';
+							body:SetCell('Comite', i, '**');
+							table.insert(coureur_erreur, {Identite = body:GetCell('Identite', i), Comite = comitelu, Categ = body:GetCell('Categ', i), Annee = body:GetCell('An', i)});
+						end
 						comite[comitelu] = comite[comitelu] or {};
 						if body:GetCell('Categ', i) == 'U18' then
 							fra_u18 = fra_u18 + 1;
@@ -1088,6 +1094,14 @@
 							end
 						else
 							fra_else = fra_else + 1;
+							if not comite[comitelu].fra_else then
+								comite[comitelu].fra_else = 0;
+								comite[comitelu].fra_u18 = 0;
+								comite[comitelu].fra_else = 0;
+								comite[comitelu].u18_an1 = 0;
+								comite[comitelu].u18_an2 = 0;
+								comite[comitelu].total = 0;
+							end
 							comite[comitelu].fra_else = comite[comitelu].fra_else + 1;
 						end
 						an = body:GetCellInt('An', i);
@@ -1173,6 +1187,16 @@
 						<text col_start="5" align="center">comite[body:GetCounter('Comite'):GetCell(0,i)].total</text>
 					<lua>end</lua>
 				<lua>end</lua>
+				<lua>if #coureur_erreur &gt; 0 then
+					for i = 1, #coureur_erreur do </lua>
+						<text row="auto" col_start="1" align="center">'Erreur sur '..coureur_erreur[i].Identite</text>
+						<text col_start="2" align="center">'Comité : '..coureur_erreur[i].Comite</text>
+						<text col_start="3" align="center">'Catégorie : '..coureur_erreur[i].Categ</text>
+						<text col_start="4" align="center">'Année : '..coureur_erreur[i].Annee</text>
+						<text col_start="5" align="center">''</text>
+				<lua>
+					end end
+				</lua>
 			</matrix>
 		</end>
 	</report>
