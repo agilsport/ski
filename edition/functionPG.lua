@@ -560,7 +560,6 @@ function AnalysePerformances(code_evenement)
 		end
 	end
 	body:OrderBy('Analyse_groupe, Analyse1 DESC, Analyse2 DESC, Analyse3 DESC, Analyse4 DESC, Analyse5 DESC, Pts_inscription');
-	body:Snapshot('body.db3');
 end
 
 function EvaluateVal(val, tps)
@@ -618,8 +617,18 @@ function EvaluatePts(row, idxcourse, colpts, abddsq)
 		pts = math.floor(pts);
 	end	
 	local run_best = body:GetCellInt('Run'..idxcourse..'_best', row);
-	if string.find(prendre, '1') or string.find(prendre, '2') then
+	if string.find(prendre, '1')then
 		if tps > 0 then
+			return pts;
+		elseif tps == -500 or tps == -800 then
+			if abddsq == 'Oui' then
+				return txt_tps;
+			else
+				return '-';
+			end
+		end
+	elseif string.find(prendre, '2') then
+		if pts >= 0 then
 			return pts;
 		elseif tps == -500 or tps == -800 then
 			if abddsq == 'Oui' then
@@ -910,7 +919,6 @@ function InitPrnColonnes()
 	prnColonne.EtapePts.Label = prnBloc1['EtapePts'].Label;
 	local bloc2_existe = false;
 	local etape_ajoutee = false;
-	tMatrice_Courses:Snapshot('tMatrice_Courses.db3');
 	for i = 0, tMatrice_Courses:GetNbRows() -1 do
 		local idxcourse = i + 1;
 		local bloc = tMatrice_Courses:GetCellInt('Bloc', i);
@@ -983,8 +991,13 @@ function InitPrnColonnes()
 					prnColonne.Ptstotal[idxcourse].Imprimer = 0;
 				end
 			end
-			if prendre == 'Classement général' then
-			elseif prendre == 'Classement général' then
+			if string.find(prendre, '1') then
+				prnColonne.Ptstotal[idxcourse].Imprimer = 0;
+			end
+			if string.find(prendre, '2') then
+				prnColonne.Ptstotal[idxcourse].Imprimer = 0;
+				prnColonne.Ptsrun[idxcourse].Imprimer = 1;
+				prnColonne.Pts[idxcourse].Imprimer = 0;
 			end
 			
 	-- bloc1 : Clt,0|Tps,0|Diff,0|Pts,1|Cltrun,0|Tpsrun,0|Diffrun,0|Ptsrun,1|Ptstotal,1	/ EtapeClt,0|EtapePts,0
@@ -1013,7 +1026,6 @@ function InitPrnColonnes()
 		prnBloc1['EtapeClt'].Imprimer = 0;
 		prnBloc1['EtapePts'].Imprimer = 0;
 	end
-	tMatrice_Courses:Snapshot('Matrice_Courses.db3');
 end
 
 function GetRowEquipier(code_coureur)

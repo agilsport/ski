@@ -1087,7 +1087,7 @@
           <background mode="solid" color="(rgbx)"/>(i)..' '..tMatrice_Courses:GetCell('Station', i-1)..' '..string.sub(tMatrice_Courses:GetCell('Date_epreuve', i-1),1,-6)..' '..tMatrice_Courses:GetCell('Codex', i-1)</text>
         <text row_start="(row_start)" col_start="(col_start)" cond="discipline:len() &gt; 0 and texteImprimerStatCourses == 'Non'">
           <background mode="solid" color="(rgbx)"/>(i)..'   '..tMatrice_Courses:GetCell('Code_discipline', i-1)..' '..tMatrice_Courses:GetCell('Station', i-1)..' '..string.sub(tMatrice_Courses:GetCell('Date_epreuve', i-1),1,-6)..' '..tMatrice_Courses:GetCell('Codex', i-1)</text>
-        <text row_start="(row_start)" col_start="(col_start)" cond="discipline:len() == 0">''</text>
+        <text row_start="(row_start)" col_start="(col_start)" cond="discipline:len() == 0 and texteImprimerStatCourses == 'Oui'">''</text>
         <lua>row_start = row_start + 1;
 								if row_start &gt; nb_ligne then
 									row_start = 1;
@@ -1179,13 +1179,13 @@
         <text col="(largeur_etroite)" align="center" cond="prnCombiSaut.Ptstotalcs.Imprimer == 1">
           <background color="(rgbx)" mode="solid" cond="string.find(params.Presentation,'horizontale')"/>idxcourse..' '..prnCombiSaut.Ptstotalcs.Label</text>
         <lua>end
-						for run = 1, arCourses[idxcourse].Nb_run do
-							suffixe = run;
-							if arCourses[idxcourse].Nb_run == 1 then
-								suffixe = '';						
-							end		
-							if code_discipline ~= 'CS' then</lua>
-        <text col="(largeur_large)" align="center" cond="prnColonne.Tpsrun[idxcourse].Imprimer == 1">
+		for run = 1, arCourses[idxcourse].Nb_run do
+			suffixe = run;
+			if arCourses[idxcourse].Nb_run == 1 then
+				suffixe = '';						
+			end		
+			if code_discipline ~= 'CS' then</lua>
+		<text col="(largeur_large)" align="center" cond="prnColonne.Tpsrun[idxcourse].Imprimer == 1">
           <background color="(rgbx)" mode="solid" cond="string.find(params.Presentation,'horizontale')"/>prnColonne['Tpsrun'].Label..suffixe</text>
         <text col="(largeur_etroite)" align="center" cond="prnColonne.Ptsrun[idxcourse].Imprimer == 1">
           <background color="(rgbx)" mode="solid" cond="string.find(params.Presentation,'horizontale')"/>prnColonne['Ptsrun'].Label..suffixe</text>
@@ -1317,7 +1317,7 @@
       <text col="(largeur_etroite)" align="center" cond="sigma &gt;= 0 and sigma &lt; 10000">sigma</text>
       <text col="(largeur_etroite)" align="center" cond="sigma &lt; 0 or sigma &gt;= 10000">''</text>
       <text col="(largeur_etroite)" align="center" cond="prnCombiSaut.Ptstotalcs.Imprimer == 1 and body:GetCellInt('Clt'..idxcourse, row) &gt;0 ">
-        <font color="red" size_step="1" cond="string.find(selection, 'G')"/>							EvaluatePts(row, idxcourse, 'Pts'..idxcourse..'_total', params.AbdDsq)</text>
+        <font color="red" size_step="1" cond="string.find(selection, 'G')"/>EvaluatePts(row, idxcourse, 'Pts'..idxcourse..'_total', params.AbdDsq)</text>
       <text col="(largeur_etroite)" align="center" cond="prnCombiSaut.Ptstotalcs.Imprimer == 1 and body:GetCellInt('Clt'..idxcourse, row) &lt;=0">''</text>
       <lua>else</lua>
       <text col="(largeur_etroite)" align="center" cond="prnColonne.Clt[idxcourse].Imprimer == 1">EvaluateClt(body:GetCellInt('Clt'..idxcourse, row, -1))</text>
@@ -1327,14 +1327,14 @@
       <text col="(largeur_etroite)" align="center" cond="prnColonne.Pts[idxcourse].Imprimer == 1">
         <font color="(rgbx)" size_step="1" cond="string.find(selection, 'G') and string.find(params.Presentation,'transparent')"/>
         <font color="red" size_step="1" cond="string.find(selection, 'G') and not string.find(params.Presentation,'transparent')"/>
-        <font color="(colorpodium)" cond="string.find(selection,'Pts'..idxcourse..'G') and string.find(selection, 'Z')"/>							EvaluatePts(row, idxcourse, 'Pts'..idxcourse, params.AbdDsq)</text>
+        <font color="(colorpodium)" cond="string.find(selection,'Pts'..idxcourse..'G') and string.find(selection, 'Z')"/>EvaluatePts(row, idxcourse, 'Pts'..idxcourse, params.AbdDsq)</text>
       <lua>for run = 1, arCourses[idxcourse].Nb_run do</lua>
       <text col="(largeur_large)" align="center" cond="prnColonne.Tpsrun[idxcourse].Imprimer == 1">
         <font color="(rgbx)" cond="string.find(params.Presentation,'transparent')"/>
-        <!-- <font color="red" cond="not string.find(params.Presentation,'transparent') and string.find(selection, 'Pts'..idxcourse..'_run'..run)"/> -->									EvaluateTps(row, 'Tps'..idxcourse..'_run'..run, params.AbdDsq)</text>
+        <!-- <font color="red" cond="not string.find(params.Presentation,'transparent') and string.find(selection, 'Pts'..idxcourse..'_run'..run)"/> -->		EvaluateTps(row, 'Tps'..idxcourse..'_run'..run, params.AbdDsq)</text>
       <text col="(largeur_etroite)" align="center" cond="prnColonne.Ptsrun[idxcourse].Imprimer == 1">
         <font color="(rgbx)" size_step="1" cond="string.find(params.Presentation,'transparent') and string.find(selection, 'Pts'..idxcourse..'_run'..run)"/>
-        <font color="red" size_step="1" cond="not string.find(params.Presentation,'transparent') and string.find(selection, 'Pts'..idxcourse..'_run'..run)"/>								EvaluatePts(row, idxcourse, 'Pts'..idxcourse..'_run'..run, params.AbdDsq)</text>
+        <font color="red" size_step="1" cond="not string.find(params.Presentation,'transparent') and string.find(selection, 'Pts'..idxcourse..'_run'..run)"/>	EvaluatePts(row, idxcourse, 'Pts'..idxcourse..'_run'..run, params.AbdDsq)</text>
       <text col="(largeur_etroite)" align="center" cond="prnColonne.Diffrun[idxcourse].Imprimer == 1">
         <font adjust="both"/>EvaluateDiff(body:GetCellInt('Tps'..idxcourse..'_run'..run..'_diff', row))</text>
       <text col="(largeur_etroite)" align="center" cond="prnColonne.Cltrun[idxcourse].Imprimer == 1">
@@ -1343,7 +1343,7 @@
       <lua>end</lua>
       <text col="(largeur_etroite)" align="center" cond="code_discipline ~= 'CS' and prnColonne.Ptstotal[idxcourse].Imprimer == 1">
         <font color="red" size_step="1" cond="string.find(body:GetCell('Selection'..idxcourse, row), 'Pts'..idxcourse..'_total') and not string.find(params.Presentation,'transparent')"/>
-        <font weight="bold" color="(rgbx)" cond="string.find(body:GetCell('Selection'..idxcourse, row), 'Pts'..idxcourse..'_total') and string.find(params.Presentation,'transparent')"/>						EvaluatePts(row, idxcourse, 'Pts'..idxcourse..'_total', params.AbdDsq)</text>
+        <font weight="bold" color="(rgbx)" cond="string.find(body:GetCell('Selection'..idxcourse, row), 'Pts'..idxcourse..'_total') and string.find(params.Presentation,'transparent')"/>EvaluatePts(row, idxcourse, 'Pts'..idxcourse..'_total', params.AbdDsq)</text>
       <text col="(largeur_large)" align="center" font_weight="bold" cond="bloc1_last == i and prnBloc1['EtapeClt'].Imprimer == 1 and body:GetCellDouble('Pts_bloc1', row) &gt;= 0">
         <background color="LtYellow" mode="solid"/>EvaluateClt(body:GetCellInt('Clt_bloc1', row, -1))</text>
       <text col="(largeur_large)" align="center" font_weight="bold" cond="bloc1_last == i and prnBloc1['EtapeClt'].Imprimer == 1 and body:GetCellDouble('Pts_bloc1', row) &lt; 0">
