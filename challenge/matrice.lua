@@ -2270,7 +2270,7 @@ function Calculer(panel_name, indice_filtrage)		-- fonction de calcul du résulta
 										runData[idxrun].Pts = 0;
 									end
 								end
-								if runData[idxrun].Clt < raceData.Bestclt then
+								if runData[idxrun].Pts > raceData.Bestpts then
 									raceData.Bestrun = idxrun;
 									raceData.Bestclt = runData[idxrun].Clt;
 									raceData.Bestpts = runData[idxrun].Pts;
@@ -8042,7 +8042,7 @@ function OnConfiguration(cparams)
 	else
 		return false;
 	end
-	scrip_version = '5.99';
+	scrip_version = '6.00';
 	-- vérification de l'existence d'une version plus récente du script.
 	-- Ex de retour : LiveDraw=5.94,Matrices=5.92,TimingReport=4.2
 	if app.GetVersion() >= '4.4c' then 		-- début d'implementation de la fonction UpdateRessource
@@ -8068,7 +8068,7 @@ function OnConfiguration(cparams)
 	matrice.dlgPosit.x = 1;
 	matrice.dlgPosit.y = 1;
 	base = base or sqlBase.Clone();
-	code_coureur_pour_debug = "FFS2689743";		-- provoque tous les affichages pour débug propres à ce Code_coureur
+	code_coureur_pour_debug = "FFS270008";		-- provoque tous les affichages pour débug propres à ce Code_coureur
 	matrice.debug = false;
 	if matrice.debug == false then
 		code_coureur_pour_debug = '';
