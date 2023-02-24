@@ -51,28 +51,47 @@ function OnTimerRunning(evt);
 	dlgTableau:GetWindowName('sequence'):SetValue('Demande de maintien de la connexion');
 end
 
-function OnExport()
-	tDraw:OrderBy('Dossard, Rang_tirage');
+function OnExport(tTable)
+	local chaine = 'Code;CodeFIS;Bib;Name;Surname;Identity;Nation;YoB;Cat.;Club;FIS Points\n';
+	if draw.prepare_qualifie then
+		tTable:OrderBy('ECSL_points DESC');
+		for i = tTable:GetNbRows() -1, 0, -1 do
+			if tTable:GetCell('TG', i) ~= 'QLF' then
+				tTable:RemoveRowAt(i);
+			end
+		end
+		chaine = 'Code;CodeFIS;Name;Surname;Identity;Nation;YoB;Cat.;Club;FIS Points;QLF\n';
+	else
+		tTable:OrderBy('Dossard, Rang_tirage');
+	end
 	local filename = app.GetPath()..app.GetPathSeparator()..'tmp'..app.GetPathSeparator()..string.sub(tEpreuve:GetCell('Fichier_transfert',0), 4)..'_racers.csv';
 	local f = io.open(filename, 'w')
 	if f == nil then 
-		return
+		local msg = 'Merci de fermer le fichier ouvert dans Excel.';
+		app.GetAuiFrame():MessageBox(msg, "Exportation des coureurs ", msgBoxStyle.OK+msgBoxStyle.ICON_INFORMATION);
+		return;
 	end
-	local chaine = 'Code;CodeFIS;Bib;Name;Surname;Identity;Nation;YoB;Cat.;Club;FIS Points\n'
 	f:write(chaine);
-	for i = 0, tDraw:GetNbRows() -1 do
-		local pts = string.gsub(tDraw:GetCell('FIS_pts', i),"%.",",");
-		chaine = string.sub(tDraw:GetCell('Code_coureur', i), 4);
-		chaine = chaine..';'..tDraw:GetCell('Code_coureur', i);
-		chaine = chaine..';'..tDraw:GetCell('Dossard', i);
-		chaine = chaine..';'..tDraw:GetCell('Nom', i);
-		chaine = chaine..';'..tDraw:GetCell('Prenom', i);
-		chaine = chaine..';'..tDraw:GetCell('Nom', i)..' '..tDraw:GetCell('Prenom', i);
-		chaine = chaine..';'..tDraw:GetCell('Nation', i);
-		chaine = chaine..';'..tDraw:GetCell('An', i);
-		chaine = chaine..';'..tDraw:GetCell('Categ', i);
-		chaine = chaine..';'..tDraw:GetCell('Club', i);
-		chaine = chaine..';'..pts..'\n';
+	for i = 0, tTable:GetNbRows() -1 do
+		local pts = string.gsub(tTable:GetCell('FIS_pts', i),"%.",",");
+		chaine = string.sub(tTable:GetCell('Code_coureur', i), 4);
+		chaine = chaine..';'..tTable:GetCell('Code_coureur', i);
+		if not draw.prepare_qualifie then
+			chaine = chaine..';'..tTable:GetCell('Dossard', i);
+		end
+		chaine = chaine..';'..tTable:GetCell('Nom', i);
+		chaine = chaine..';'..tTable:GetCell('Prenom', i);
+		chaine = chaine..';'..tTable:GetCell('Nom', i)..' '..tTable:GetCell('Prenom', i);
+		chaine = chaine..';'..tTable:GetCell('Nation', i);
+		chaine = chaine..';'..tTable:GetCell('An', i);
+		chaine = chaine..';'..tTable:GetCell('Categ', i);
+		chaine = chaine..';'..tTable:GetCell('Club', i);
+		chaine = chaine..';'..pts;
+		if draw.prepare_qualifie then
+			chaine = chaine..';'..tTable:GetCell('TG', i)..'-'..string.format( "%02d", tostring(i+1));
+		end
+		chaine = chaine..'\n';
+			
 		f:write(chaine);
 	end
 	f:close();
@@ -656,6 +675,34 @@ function OnPrintNation()
 	
 end
 
+function OnPrepareQualifies()
+	draw.prepare_qualifie = true;
+	tDraw_QLF = tDraw:Copy();
+	tDraw_QLF:OrderBy('ECSL_points DESC');
+	local pris = 0;
+	local rank= -1;
+	for i = 0, tDraw_QLF:GetNbRows() -1 do
+		if tDraw_QLF:GetCellInt('WCSL_points', i) > 0 then
+			tDraw_QLF:SetCell('TG', i, 'WC');
+		elseif tDraw_QLF:GetCellInt('ECSL_points', i) > 0 then
+			if pris <= 45 then
+				pris = pris + 1;
+			end
+			if pris == 45 and i < tDraw_QLF:GetNbRows() -1 then
+				if tDraw_QLF:GetCellInt('ECSL_points', i) == tDraw_QLF:GetCellInt('ECSL_points', i + 1 ) then
+					pris = pris - 1;
+				end
+			end
+			if pris > 45 then
+				tDraw_QLF:SetCell('TG', i, 'NQLF');
+			else
+				tDraw_QLF:SetCell('TG', i, 'QLF');
+			end
+		end
+	end
+
+end
+
 function OnPrintFinale()
 	-- Creation du Report
 	local estce = 0;
@@ -665,7 +712,7 @@ function OnPrintFinale()
 		node_attr = 'id',
 		node_value = 'parti_finale',
 		base = base,
-		body = tDraw,
+		body = tDraw_QLF,
 		margin_first_top = 250,
 		margin_first_left = 80,
 		margin_first_right = 80,
@@ -2050,12 +2097,16 @@ function OnCellSelected(evt)
 	menuOutils:Enable(btnDecalerGroupeHaut:GetId(), true);
 	local t = grid_tableau:GetTable();
 	local colName = t:GetColumnName(t:GetVisibleColumnsIndex(col));
+	local code_coureur = t:GetCell('Code_coureur', row);
 	grid_tableau:SelectRow(row);
+	if colName == 'Code_coureur' then
+		local link = "https://www.fis-ski.com/DB/general/biographies.html?fiscode="..string.sub(code_coureur, 4) .."&status=&search=true";
+		app.LaunchDefaultBrowser(link);
+	end
 	if col > 0 and col < grid_tableau:GetNumberCols() -2 then
 		return;
 	end
 	local rang_tirage_selected = t:GetCellInt('Rang_tirage', row);
-	local code_coureur = t:GetCell('Code_coureur', row);
 	local nom = t:GetCell('Nom', row);
 	local prenom = t:GetCell('Prenom', row);
 	local nation = t:GetCell('Nation', row);
@@ -2301,11 +2352,12 @@ function TraitementtDrawG4()
 	end
 	-- adv.Alert('Sortie de TraitementtDrawG4\n');
 	tDrawG4:RemoveAllRows();
-	if draw.nb_pris_ecsl == 30 then
-		draw.ajouter_groupe = 1;
-	else
-		draw.ajouter_groupe = 0;
-	end
+	-- if draw.nb_pris_ecsl == 30 then
+		-- draw.ajouter_groupe = 1;
+	-- else
+		-- draw.ajouter_groupe = 1;
+	-- end
+	draw.ajouter_groupe = 1;
 		
 end
 
@@ -2651,6 +2703,7 @@ Groupe 6 On poursuit selon les points FIS.
 		end
 		-- adv.Alert('3 - rajouter_pts_fis = '..rajouter_pts_fis..', current_group = '..current_group);
 	end
+	
 	tDrawG6:OrderBy('FIS_pts');
 	current_group = current_group + draw.ajouter_groupe;
 	if draw.bolEstCE and draw.nb_pris_ecsl < 30 then
@@ -2681,14 +2734,18 @@ Groupe 6 On poursuit selon les points FIS.
 			end
 		end
 	end
-	if tDrawG4:GetNbRows() > 0 then
-		if draw.bolVitesse then
-			if current_group < 3 then
-				current_group = 3;
-			end
-		end
-		TraitementtDrawG4();
-	end
+	-- if tDrawG4:GetNbRows() > 0 then
+		-- if draw.bolVitesse then
+			-- if current_group < 3 then
+				-- current_group = 3;
+			-- end
+		-- end
+		-- adv.Alert('on va traiter tDrawG4');
+		-- TraitementtDrawG4();
+		-- if not draw.bolVitesse then
+			-- current_group = current_group + 1;
+		-- end
+	-- end
 	tDrawG6:OrderBy('FIS_pts');			-- on continue avec les points FIS
 	if not draw.bolEstCE then
 		current_group = 0;			-- les groupes de tirages son définis cidessous
@@ -3233,7 +3290,9 @@ function OnAfficheTableau()
 
 	dlgTableau:Bind(eventType.MENU, 
 		function(evt)
+			OnPrepareQualifies();
 			OnPrintFinale();
+			tDraw:OrderBy('Rang_tirage');
 		end, btnPrintFinale);
 
 	dlgTableau:Bind(eventType.MENU, OnAide, btnAideCE);
@@ -3602,7 +3661,11 @@ function OnAfficheTableau()
 	dlgTableau:Bind(eventType.MENU, 
 		function(evt)
 			if tDraw:GetNbRows() > 0 then
-				OnExport();
+				if draw.prepare_qualifie then
+					OnExport(tDraw_QLF);
+				else
+					OnExport(tDraw);
+				end
 			end
 		end, btnExporter);
 
@@ -3759,7 +3822,7 @@ function main(params_c)
 	draw.height = display:GetSize().height - 50;
 	draw.x = 0;
 	draw.y = 0;
-	scrip_version = "5.63"; -- 4.92 pour 2022-2023
+	scrip_version = "5.67"; -- 4.92 pour 2022-2023
 	local imgfile = './res/40x16_dbl_coche.png';
 	if not app.FileExists(imgfile) then
 		app.GetAuiFrame():MessageBox(
@@ -3809,14 +3872,26 @@ function main(params_c)
 	tResultat_Info_Tirage = base:GetTable('Resultat_Info_Tirage');
 	if tResultat_Info_Tirage == nil then
 		CreateTableResultat_Info_Tirage();
+		app.GetAuiFrame():MessageBox(
+			"La base de donnée a nécessité l'ajout d'une table'.\nLe script va se fermer automatiquement.\nVous devrez quitter complètement skiFFS et relancer le programme.", 
+			"Création de la table Resultat_Info_Tirage",
+			msgBoxStyle.OK + msgBoxStyle.ICON_INFORMATION); 
+		return true;
 	else
-		if tResultat_Info_Tirage:GetIndexColumn("Pts_info") < 0 then
-			local cmd = "ALTER TABLE Resultat_Info_Tirage ADD COLUMN TG CHAR(10) NULL";
-			base:Query(cmd);
-			cmd = "ALTER TABLE Resultat_Info_Tirage ADD COLUMN Racer_info CHAR(10) NULL";
-			base:Query(cmd);
-			cmd = "ALTER TABLE Resultat_Info_Tirage ADD COLUMN Pts_info CHAR(3) NULL";
-			base:Query(cmd);
+		if tResultat_Info_Tirage:GetIndexColumn("Pts_info") < 0 or tResultat_Info_Tirage:GetIndexColumn("Racer_info") < 0 or tResultat_Info_Tirage:GetIndexColumn("TG") < 0 then
+			local cmd = '';
+			if tResultat_Info_Tirage:GetIndexColumn("TG") < 0 then
+				cmd = "ALTER TABLE Resultat_Info_Tirage ADD COLUMN TG CHAR(10) NULL";
+				base:Query(cmd);
+			end
+			if tResultat_Info_Tirage:GetIndexColumn("Racer_info") < 0 then
+				cmd = "ALTER TABLE Resultat_Info_Tirage ADD COLUMN Racer_info CHAR(10) NULL";
+				base:Query(cmd);
+			end
+			if tResultat_Info_Tirage:GetIndexColumn("Pts_info") < 0 then
+				cmd = "ALTER TABLE Resultat_Info_Tirage ADD COLUMN Pts_info CHAR(3) NULL";
+				base:Query(cmd);
+			end
 			app.GetAuiFrame():MessageBox(
 				"La base de donnée a nécessité la modification d'une table'.\nLe script va se fermer automatiquement.\nVous devrez quitter complètement skiFFS et relancer le programme.", 
 				"Téléchargement d'une image supplémentaire",
