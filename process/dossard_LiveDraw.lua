@@ -2180,6 +2180,14 @@ function OnCellContext(evt)
 			evt:SetCellContext({ 
 			align_horz = wndStyle.ALIGN_CENTER_HORIZONTAL
 			});
+		elseif colName == 'Code_coureur' then
+			local fnt = font.Create();
+			fnt:SetWeight(fontWeight.BOLD);
+			fnt:SetUnderlined(true);
+			evt:SetCellContext({
+				font = fnt,
+				text_color = color.BLUE
+			});
 		elseif colName == 'Action' then
 			evt:SetCellContext({ 
 				bitmaps = { { image = './res/16x16_minus.png'}}
@@ -3822,7 +3830,7 @@ function main(params_c)
 	draw.height = display:GetSize().height - 50;
 	draw.x = 0;
 	draw.y = 0;
-	scrip_version = "5.67"; -- 4.92 pour 2022-2023
+	scrip_version = "5.68"; -- 4.92 pour 2022-2023
 	local imgfile = './res/40x16_dbl_coche.png';
 	if not app.FileExists(imgfile) then
 		app.GetAuiFrame():MessageBox(
