@@ -52,18 +52,18 @@ function OnTimerRunning(evt);
 end
 
 function OnExport(tTable)
-	local chaine = 'Code;CodeFIS;Bib;Name;Surname;Identity;Nation;YoB;Cat.;Club;FIS Points\n';
-	if draw.prepare_qualifie then
-		tTable:OrderBy('ECSL_points DESC');
+	tTable:OrderBy('Dossard, Rang_tirage');
+	local chaine = 'Code;CodeFIS;Bib;Name;Surname;Identity;Nation;YoB;Cat.;Club;FIS Points';
+	if draw.bolEstCE and draw.prepare_qualifie then
+		chaine = 'Code;CodeFIS;Name;Surname;Identity;Nation;YoB;Cat.;Club;FIS Points;ECSL_points;Rank;QLF';
+		tTable:OrderBy('ECSL_points DESC, FIS_pts');
 		for i = tTable:GetNbRows() -1, 0, -1 do
-			if tTable:GetCell('TG', i) ~= 'QLF' then
+			if tTable:GetCellInt('ECSL_points', i) == 0 then
 				tTable:RemoveRowAt(i);
 			end
 		end
-		chaine = 'Code;CodeFIS;Name;Surname;Identity;Nation;YoB;Cat.;Club;FIS Points;QLF\n';
-	else
-		tTable:OrderBy('Dossard, Rang_tirage');
 	end
+	chaine = chaine..'\n';
 	local filename = app.GetPath()..app.GetPathSeparator()..'tmp'..app.GetPathSeparator()..string.sub(tEpreuve:GetCell('Fichier_transfert',0), 4)..'_racers.csv';
 	local f = io.open(filename, 'w')
 	if f == nil then 
@@ -72,6 +72,7 @@ function OnExport(tTable)
 		return;
 	end
 	f:write(chaine);
+	local order_qlf = 0;
 	for i = 0, tTable:GetNbRows() -1 do
 		local pts = string.gsub(tTable:GetCell('FIS_pts', i),"%.",",");
 		chaine = string.sub(tTable:GetCell('Code_coureur', i), 4);
@@ -88,7 +89,14 @@ function OnExport(tTable)
 		chaine = chaine..';'..tTable:GetCell('Club', i);
 		chaine = chaine..';'..pts;
 		if draw.prepare_qualifie then
-			chaine = chaine..';'..tTable:GetCell('TG', i)..'-'..string.format( "%02d", tostring(i+1));
+			chaine = chaine..';'..tTable:GetCellInt('ECSL_points', i);
+			chaine = chaine..';'..tTable:GetCellInt('ECSL_rank', i);
+			if tTable:GetCell('TG', i) == 'QLF' then
+				order_qlf = order_qlf + 1;
+				chaine = chaine..';'..tTable:GetCell('TG', i)..'-'..string.format( "%02d", tostring(order_qlf));
+			else
+				chaine = chaine..';'..tTable:GetCell('TG', i);
+			end
 		end
 		chaine = chaine..'\n';
 			
@@ -678,12 +686,15 @@ end
 function OnPrepareQualifies()
 	draw.prepare_qualifie = true;
 	tDraw_QLF = tDraw:Copy();
-	tDraw_QLF:OrderBy('ECSL_points DESC');
+	tDraw_QLF:OrderBy('ECSL_points DESC, FIS_pts');
+	local filter = "$(ECSL_points):len() > 0";
+	tDraw_QLF:Filter(filter, true);
 	local pris = 0;
 	local rank= -1;
 	for i = 0, tDraw_QLF:GetNbRows() -1 do
+		local rank = tDraw_QLF:GetCellInt('ECSL_rank', i, -1);
 		if tDraw_QLF:GetCellInt('WCSL_points', i) > 0 then
-			tDraw_QLF:SetCell('TG', i, 'WC');
+			tDraw_QLF:SetCell('TG', i, 'WCSL Top30');
 		elseif tDraw_QLF:GetCellInt('ECSL_points', i) > 0 then
 			if pris <= 45 then
 				pris = pris + 1;
@@ -694,7 +705,7 @@ function OnPrepareQualifies()
 				end
 			end
 			if pris > 45 then
-				tDraw_QLF:SetCell('TG', i, 'NQLF');
+				tDraw_QLF:SetCell('TG', i, 'DNQLF');
 			else
 				tDraw_QLF:SetCell('TG', i, 'QLF');
 			end
@@ -1519,6 +1530,9 @@ function CommandRaceInfo(bolPhased)
 	local turninggates = tEpreuve_Alpine_Manche:GetCellInt("Changement_de_directions",0,0);
 	local heure = ""; local minute = "";
 	local heure_depart = tEpreuve_Alpine_Manche:GetCell("Heure_depart", run-1);
+	if phased == true and draw.time then
+		heure_depart = draw.time;
+	end
 	local x, y = string.find(heure_depart, "%D");  -- tout ce qui n'est pas un chiffre
 	if x ~= nil then  -- position du séparateur
 		heure = string.sub(heure_depart, 1, x-1);
@@ -1526,7 +1540,16 @@ function CommandRaceInfo(bolPhased)
 		minute = string.sub(heure_depart, x+1);
 		minute = string.format("%02d", tonumber(minute) or 0);
 	end
+	local year = tEpreuve:GetCell("Date_epreuve", 0, '%4Y');
+	local month = tEpreuve:GetCell("Date_epreuve", 0, '%2M');
+	local day = tEpreuve:GetCell("Date_epreuve", 0, '%2D');
 	if phased == true then
+		if draw.date then
+			local arDate = draw.date:Split('/');
+			year = arDate[1];
+			month = string.format('%02d', arDate[2]);
+			day = string.format('%02d', arDate[3]);
+		end
 		nodePhase = xmlNode.Create(nodeRaceinfo, xmlType.ELEMENT_NODE, "phase");			
 		nodePhase:AddAttribute("no", 'D');			
 		
@@ -1541,9 +1564,9 @@ function CommandRaceInfo(bolPhased)
 		local gates = tEpreuve_Alpine_Manche:GetCellInt("Nombre_de_portes",0);
 		xmlNode.Create(nodePhase, xmlType.ELEMENT_NODE, "gates", gates);	
 		xmlNode.Create(nodePhase, xmlType.ELEMENT_NODE, "turninggates", turninggates);	
-		xmlNode.Create(nodePhase, xmlType.ELEMENT_NODE, "year", tEpreuve:GetCell("Date_epreuve", 0, '%4Y'));	
-		xmlNode.Create(nodePhase, xmlType.ELEMENT_NODE, "month", tEpreuve:GetCell("Date_epreuve", 0, '%2M'));	
-		xmlNode.Create(nodePhase, xmlType.ELEMENT_NODE, "day", tEpreuve:GetCell("Date_epreuve", 0, '%2D'));	
+		xmlNode.Create(nodePhase, xmlType.ELEMENT_NODE, "year", year);	
+		xmlNode.Create(nodePhase, xmlType.ELEMENT_NODE, "month", month);	
+		xmlNode.Create(nodePhase, xmlType.ELEMENT_NODE, "day", day);	
 		xmlNode.Create(nodePhase, xmlType.ELEMENT_NODE, "hour", heure);	
 		xmlNode.Create(nodePhase, xmlType.ELEMENT_NODE, "minute", minute);	
 		
@@ -1581,9 +1604,9 @@ function CommandRaceInfo(bolPhased)
 					xmlNode.Create(nodeRun, xmlNodeType.ELEMENT_NODE, "gates", gates);	
 					local turninggates = tEpreuve_Alpine_Manche:GetCellInt("Changement_de_directions",run-1,0);
 					xmlNode.Create(nodeRun, xmlNodeType.ELEMENT_NODE, "turninggates", turninggates);	
-					xmlNode.Create(nodeRun, xmlNodeType.ELEMENT_NODE, "year", tEpreuve:GetCell("Date_epreuve", 0, '%4Y'));	
-					xmlNode.Create(nodeRun, xmlNodeType.ELEMENT_NODE, "month", tEpreuve:GetCell("Date_epreuve", 0, '%2M'));	
-					xmlNode.Create(nodeRun, xmlNodeType.ELEMENT_NODE, "day", tEpreuve:GetCell("Date_epreuve", 0, '%2D'));	
+					xmlNode.Create(nodeRun, xmlNodeType.ELEMENT_NODE, "year", year);	
+					xmlNode.Create(nodeRun, xmlNodeType.ELEMENT_NODE, "month", month);	
+					xmlNode.Create(nodeRun, xmlNodeType.ELEMENT_NODE, "day", day);	
 					local heure = ""; local minute = "";
 					local heure_depart = tEpreuve_Alpine_Manche:GetCell("Heure_depart", run-1);
 					local x, y = string.find(heure_depart, "%D");  -- tout ce qui n'est pas un chiffre
@@ -3830,7 +3853,7 @@ function main(params_c)
 	draw.height = display:GetSize().height - 50;
 	draw.x = 0;
 	draw.y = 0;
-	scrip_version = "5.68"; -- 4.92 pour 2022-2023
+	scrip_version = "5.70"; -- 4.92 pour 2022-2023
 	local imgfile = './res/40x16_dbl_coche.png';
 	if not app.FileExists(imgfile) then
 		app.GetAuiFrame():MessageBox(
@@ -4030,6 +4053,15 @@ function main(params_c)
 				end
 			end
 		end
+		pos1, pos2 = string.find(name, 'Date_');
+		if pos1 and pos1 > 0 then
+			local code_evenement = tonumber(string.sub(name, pos2 + 1)) or 0;
+			if code_evenement > 0 then
+				if date_jour > date_epreuve then
+					nodelivedraw:DeleteAttribute(name);
+				end
+			end
+		end
 		pos1, pos2 = string.find(name, 'WCSL_');
 		if pos1 and pos1 > 0 then
 			local code_evenement = tonumber(string.sub(name, pos2 + 1)) or 0;
@@ -4094,7 +4126,18 @@ function main(params_c)
 		dlgConfig:GetWindowName('finale_ce'):SetTable(tOuiNon, 'Choix', 'Choix');
 		dlgConfig:GetWindowName('finale_ce'):SetValue('Non');
 	end
-	
+	if nodelivedraw:HasAttribute('Date_'..draw.code_evenement) then
+		local node_date = nodelivedraw:GetAttribute('Date_'..draw.code_evenement);
+		dlgConfig:GetWindowName('draw_date'):SetValue(node_date);
+	else
+		dlgConfig:GetWindowName('draw_date'):SetValue(tEpreuve:GetCell('Date_epreuve', 0, '%4Y/%2M/%2D'));
+	end
+	if nodelivedraw:HasAttribute('Time_'..draw.code_evenement) then
+		local node_time = nodelivedraw:GetAttribute('Time_'..draw.code_evenement);
+		dlgConfig:GetWindowName('draw_time'):SetValue(node_time);
+		-- dlgConfig:GetWindowName('draw_time'):SetValue(valeur);
+	end
+
 	dlgConfig:Bind(eventType.MENU, 
 		function(evt) 
 			draw.pwd = dlgConfig:GetWindowName('fis_pwd'):GetValue();
@@ -4109,6 +4152,19 @@ function main(params_c)
 			draw.finale_ce = 'Non';
 			if dlgConfig:GetWindowName('finale_ce') then
 				draw.finale_ce = dlgConfig:GetWindowName('finale_ce'):GetValue();
+			end
+			local arDate = dlgConfig:GetWindowName('draw_date'):GetValue();
+			draw.date = arDate.year..'/'..string.format('%02d',arDate.month)..'/'..string.format('%02d', arDate.day);
+			if nodelivedraw:HasAttribute('Date_'..draw.code_evenement) then
+				nodelivedraw:ChangeAttribute('Date_'..draw.code_evenement, draw.date);
+			else
+				nodelivedraw:AddAttribute('Date_'..draw.code_evenement, draw.date);
+			end
+			draw.time = dlgConfig:GetWindowName('draw_time'):GetValue();
+			if nodelivedraw:HasAttribute('Time_'..draw.code_evenement) then
+				nodelivedraw:ChangeAttribute('Time_'..draw.code_evenement, draw.time);
+			else
+				nodelivedraw:AddAttribute('Time_'..draw.code_evenement, draw.time);
 			end
 			dlgConfig:EndModal(idButton.OK) 
 		end, btnSave); 
