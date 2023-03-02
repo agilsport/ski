@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- Menu Editions Activité "Biathlon" !-->
-<!-- version="5.6" !-->
+<!-- version="7.0" !-->
 <!-- calcul de la note poursuite 2éme jour !-->
 <!-- si possible de faire fonctionner les cond="discipline:In('POURS')" dans les menus ??  !-->
 <!-- verifier l'ordre en cas d'axeco !-->
@@ -110,7 +110,7 @@
 		<text col_start="1" align="left">'DELEGUE TECHNIQUE '..entite..':'</text>
 		<text col_start="2" col_end="3" align="left">GetIdentiteOfficiels('TechnicalDelegate')</text>
 		<text col_start="5" align="left" >'Nom du Site :'</text>
-		<text col_start="6" align="left" >$(Pistes.Nom_piste)</text>
+		<text col_start="6" align="left" >$(Epreuve_Nordique.Piste)</text>
 		<text col_start="9" align="left">'Lieu :'</text>
 		<text col_start="10" col_end="0" align="right" >$(Epreuve_Nordique.Lieu)</text>
 	
