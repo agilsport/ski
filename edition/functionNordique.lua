@@ -16,8 +16,8 @@ function GetTitre(type_edition, officiel, discipline)
 	officiel = officiel or 0;
 	discipline = discipline or '';
 	
-	app.GetAuiMessage():AddLine("type_edition="..type_edition);
-	app.GetAuiMessage():AddLine("officiel="..officiel);
+	-- app.GetAuiMessage():AddLine("type_edition="..type_edition);
+	-- app.GetAuiMessage():AddLine("officiel="..officiel);
 	
 	if type_edition == 'Lst_' then
 		if officiel == 1 then
