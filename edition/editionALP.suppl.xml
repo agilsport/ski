@@ -3,14 +3,19 @@
 <edition>
 	<menu>
 		<menu title="Editions Supplémentaires" image="./res/32x32_options.png">
-			<menu title="Edition du Timing Report FIS" image="./res/16x16_fis.png" id="timing_report" lua="./edition/editionTR_FIS.lua" />
 			<menu title="Calcul d'un temps manuel" image="./res/16x16_calc.png" id="temps_manuel" lua="./edition/tempsManuel.lua" />
+			<menu title="Regroupement de coureurs (par critères multiple)" image="./res/16x16_compute.png" lua="./edition/editionRegroupement.lua" />
+			<menu title="Rapport d'accident" image="./res/16x16_pdf.png" action="open ./edition/Rapport_Accident.pdf" />
+		</menu>
+		
+		<menu title="Editions Supplémentaires FIS" image="./res/32x32_options.png">
+			<menu title="Edition du Timing Report FIS" image="./res/16x16_fis.png" id="timing_report" lua="./edition/editionTR_FIS.lua" />
 			<menu title="formulaire d'inscription FIS" image="./res/16x16_fis.png">
 				<menu title="Gestion des officiels" image="./res/16x16_fis.png" impression="0" gestion="1" lua="./edition/entryFIS_ALP.lua" />
 				<menu title="Edition du formulaire" image="./res/16x16_fis.png" impression="1" gestion="0" lua="./edition/entryFIS_ALP.lua" />
 			</menu>
-			<menu title="Rapport d'accident" image="./res/16x16_pdf.png" action="open ./edition/Rapport_Accident.pdf" />
 		</menu>
+		
 		<menu title="Outils - Scripts LUA spécifiques" image="./res/32x32_options.png">
 			<menu title="Double Tirage au sort des dossards (RIS)" origine="edition" image="./res/32x32_ranking.png" lua="./process/dossard_DoubleTirage.lua" />
 			<menu title="Regroupement de coureurs" image="./res/32x32_official.png" lua="./process/regroupementALP.lua" />
@@ -18,6 +23,7 @@
 			<menu title="Marquage des Equipes" origine="edition" image="./res/32x32_ranking.png" lua="./process/marquageEquipe.lua" />
 			<menu title="Résultats du Kandahar Junior" image="./res/16x16_ranking.png" lua="./process/kandahar_junior.lua"/>
 		</menu>
+		
 		<menu title="Coupes d'Europe et FIS" image="./res/32x32_juges.png">
 			<menu title="Tirage en ligne des dossards sur le site de la FIS" origine="edition" image="./res/16x16_ranking.png" lua="./process/dossard_LiveDraw.lua"/>
 			<menu title="Analyse des Performances" image="./res/16x16_calc.png" id="res_performance" lua="./edition/editionPerformances.lua" />

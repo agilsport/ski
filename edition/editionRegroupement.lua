@@ -1,4 +1,4 @@
--- Matrices / Challenges et Combinés pour skiFFS
+-- regroupement de coureurs par critéres pour skiFFS
 dofile('./interface/adv.lua');
 dofile('./interface/interface.lua');
 
@@ -644,8 +644,10 @@ function main(cparams)
 	end
 
 	dlgPosit = {};
-	dlgPosit.width = display:GetSize().width * 3 / 4;
-	dlgPosit.height = display:GetSize().height * 3 / 4;
+	-- dlgPosit.width = display:GetSize().width * 3 / 4;
+	-- dlgPosit.height = display:GetSize().height * 3 / 4;
+	dlgPosit.width = 1900;
+	dlgPosit.height = 1400;
 	dlgPosit.x = (display:GetSize().width - dlgPosit.width) / 2;
 	dlgPosit.y = 50;
 	-- dlgPosit.y = (display:GetSize().height - dlgPosit.height) / 2;
