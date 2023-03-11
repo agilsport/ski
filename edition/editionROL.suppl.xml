@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- Menu Editions Activité "FOND " suplementaire !-->
+<!-- Menu Editions Activité "ROL " suplementaire !-->
 <!-- version="7.4" !-->
-<!-- si possible de faire fonctionne des cond dans les menu -->
-<!-- si possible de fermer des Item par default -->
-<!-- 6.7 mise en place de la fonction page break -->
 
 <edition>
 	<menu>
@@ -53,7 +50,7 @@
 				<!-- <menu title="Gestion des officiels" image="./res/16x16_fis.png" impression="0" gestion="1" lua="./edition/entryFIS_ALP.lua" /> -->
 				<!-- <menu title="Edition du formulaire" image="./res/16x16_fis.png" impression="1" gestion="0" lua="./edition/entryFIS_ALP.lua" /> -->
 			<!-- </menu> -->
-			<menu title="Regroupement de coureurs" image="./res/16x16_compute.png" lua="./edition/editionRegroupement.lua" />
+			<menu title="Regroupement de coureurs (par critères multiple)" image="./res/16x16_compute.png" lua="./edition/editionRegroupement.lua" />
 		</menu>
 						
 		<menu title="Edition UNSS" image="./res/32x32_juges.png">
@@ -72,18 +69,13 @@
 		<background mode="transparent"/>
 		<font name="Calibri" size="14" adjust="max" weight="bold"/>
 		<lua>
+			dofile('./edition/functionNordique.lua');
 			entite = $(Evenement.Code_entite)
 			discipline = $(Epreuve.Code_discipline)
 			type_edition = id:sub(1,4)
-			officiel = tonumber(params.officiel)
+			Officiel = tonumber(params.officiel)
 			Regroupement = $(Epreuve.Code_regroupement)
-			if type_edition == 'Lst_' and discipline ~= 'RELAIS' then
-				Titre = 'Liste de départ \n '..params.title
-			elseif type_edition == 'part' then
-				Titre = 'Liste de Participants \n '..params.title
-			else
-				Titre = title
-			end
+			GetTitre(type_edition, Officiel, discipline);
 			flagQrCode = 0;
 			if params ~= nil and params.Qrcode ~= nil then flagQrCode = params.Qrcode end
 			if $(Epreuve.Sexe) == 'F' then 		
@@ -97,8 +89,8 @@
 			end
 		</lua>	
 		<text row="auto" col="1" align="center">$(Evenement.Nom)</text>
-		<text row="auto" align="center" cond="discipline ~= 'RELAIS'">$(Discipline.Libelle)</text>
-		<text row="auto" align="center" cond="discipline == 'RELAIS'">$(Discipline.Libelle)..' '..SexeEpreuve</text>
+		<text row="auto" align="center" cond="discipline ~= 'RELAIS' and discipline ~= 'PATR' and discipline ~= 'TEA-SP'">$(Discipline.Libelle)</text>
+		<text row="auto" align="center" cond="discipline:In('PATR', 'RELAIS', 'TEA-SP')">$(Discipline.Libelle)..' '..SexeEpreuve</text>
 		<text row="auto" align="center" cond="params.code_epreuve ~= -1">$(Categorie{$(Epreuve.Code_categorie)}.Libelle)..' - '..$(Sexe{$(Epreuve.Sexe)}.Libelle)</text>
 		<text row="auto" align="center" >Titre</text>
 		<row h="0.5cm"/>
@@ -143,7 +135,7 @@
 		<text col_start="1" align="left">'DELEGUE TECHNIQUE '..entite..':'</text>
 		<text col_start="2" col_end="3" align="left">GetIdentiteOfficiels('TechnicalDelegate')</text>
 		<text col_start="5" align="left" >'Nom du Site :'</text>
-		<text col_start="6" align="left" >$(Pistes.Nom_piste)</text>
+		<text col_start="6" align="left" >$(Epreuve_Nordique.Piste)</text>
 		<text col_start="9" align="left">'Lieu :'</text>
 		<text col_start="10" col_end="0" align="right" >$(Epreuve_Nordique.Lieu)</text>
 	
@@ -482,117 +474,6 @@
 			<!-- <text col="12" align="left" label="Club" cond="entite == 'FFS'">$(Club)</text> -->
 			<!-- <text col="6" align="right" label="Points" cond="entite == 'FFS'">$(Point)</text> -->
 			<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
-		</body>
-	</report>
-	
-	<!-- Resultat deq temps des tours inter  -->
-	<report id="res_Tour" title="Résultats Relais " header="1" first_header="0">
-		<paper orientation="landscape" />
-		<lua>
-			bodyrelais = body:Copy(false);
-			for i=0, body:GetNbRows()-1 do
-				CodeCoureur = body:GetCell('Code_coureur', i):sub(1,3);
-				if CodeCoureur == 'EQU' then
-					bodyrelais:AddRow();
-					sqlTable.CopyRow(bodyrelais, bodyrelais:GetNbRows()-1, body, i);
-				end
-			end
-			body = bodyrelais;
-			_context_border = true;
-			entite = $(Evenement.Code_entite);
-			discipline = $(Epreuve.Code_discipline);
-			body:SetCounter('Code_epreuve');
-			NbEquipiers = tonumber($(Epreuve_Nordique.Equipe)) or 2;
-		</lua>
-		<order key="Tps" />
-		
-		<label>
-			<pen border="all" size="1" />
-			<font size="9" adjust="ellipsize"/>
-			<spacing left="10" right="10" top="2" bottom="2" />
-			<row h="auto" />
-			<text col="3" align="center" border="none" >'Clt'</text>
-			<text col="2" align="center" border="none" >'Dos'</text>
-			<text col="10" align="center" border="none" >'Nom - Prénom'</text>
-			<text col="4" align="center" border="none" >'S.'</text>
-			<text col="6" align="center" border="none" >'Tps.'</text>
-			<matrix row="0.4cm" col_start="1" col_end="0" >
-			<font size="9" adjust="ellipsize"/>
-			<spacing left="10" right="10" top="2" bottom="2" />
-			<lua>for n=0,tonumber(NbEquipiers)-1 do
-				j = n+1
-			</lua>
-			<text col="4.4cm" align="center"><background mode="solid" color="yellow" />'Tps tour'..j..'// Tps-Cumul'</text>
-			<lua>end</lua>	
-			</matrix>
-			<row h="0.4cm"/>
-		</label>
-		
-		<body>
-			<call option="color_alternate" file="./edition/options.xml" />
-			<call option="identite" file="./edition/options.xml"/>
-			<font size="9" adjust="ellipsize"/>
-			<spacing left="10" right="10" top="2" bottom="2" />
-			<row h="0.5cm"/>
-			<text col="3" align="center" border="none" >$(Clt)</text>
-			<text col="2" align="right" border="none" >$(Dossard)</text>
-			<text col="10" align="left" border="none">$(Identite)</text> 
-				<lua>
-					if $(Sexe) == 'F' then 		
-						SexeEquipe = 'Féminine';
-					elseif $(Sexe) == 'M' then 		
-						SexeEquipe = 'Masculine';
-					elseif $(Sexe) == 'T' then 		
-						SexeEquipe = 'Mixte';
-					end
-				</lua>
-			<text col="4" align="center" border="none" >SexeEquipe</text>
-			<text col="6" align="center" border="none" >$(Tps)</text>
-			
-			<matrix row="0.4cm" col_start="1" col_end="0" >
-			<font size="9" adjust="ellipsize"/>
-			<spacing left="10" right="10" top="2" bottom="2" />
-				<row h="0.4cm"/>
-					<lua>
-						dofile('./interface/adv.lua');
-						tempsrelayeur1Ms = 0;
-						tempsrelayeur2Ms = 0;
-						tempsRelay = 0;
-						TableResultatEquipe = base:GetTable('Resultat_Equipe')
-							cmd = "Select * From Resultat_Equipe Where Code_evenement = "..$(Evenement.Code)..
-								  " and Code_coureur = '"..$(Code_coureur)..
-								  "' Order By Numero"
-						NbEquipiers1 = base:TableLoad(TableResultatEquipe, cmd):GetNbRows();
-						
-						for m=0, NbEquipiers-1 do
-							TpsEquipier = base:TableLoad(TableResultatEquipe, cmd):GetCell('Tps_chrono', m, "%-1h%-1m%2s.%1f");
-							TpsrelayeurMs = adv.HHMMSSms_To_MS(base:TableLoad(TableResultatEquipe, cmd):GetCell('Tps_chrono', m, "%2h:%2m:%2s.%3f"));
-							
-								cmd1 = "Select * From Resultat_Equipe Where Code_evenement = "..$(Evenement.Code)..
-								  " and Numero = '"..base:TableLoad(TableResultatEquipe, cmd):GetCell('Numero', m)..
-								  "' Order By Tps_chrono"
-								for i=0, base:TableLoad(TableResultatEquipe, cmd1):GetNbRows()-1 do 
-									if base:TableLoad(TableResultatEquipe, cmd1):GetCell('Matric', i) == MatricEquipier then
-										CltEquipier = i+1;
-									end
-								end
-							tempsRelay = tempsRelay + TpsrelayeurMs;
-							tempsRelayForm = app.TimeToString(tempsRelay, "%-1h%-1m%2s.%1f");
-							
-							
-							if params.DossardRelais == 'Lettre' then
-								LettreDossard = $(Dossard)..'-'..base:TableLoad(TableResultatEquipe, cmd):GetCell('Numero', m);
-							else
-								LettreDossard = $(Dossard)..'-'..m+1;
-							end
-					</lua>
-
-						<text col="1.7cm" align="right" >TpsEquipier</text>
-						<text col="1cm" align="right" >CltEquipier</text>
-						<text col="1.7cm" align="right" >tempsRelayForm</text>
-					<lua>end</lua>	
-				<row h="0.4cm"/>
-				</matrix>
 		</body>
 	</report>
 	
@@ -945,7 +826,5 @@
 			<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
 		</body>
 	</report>	
-
-	
 </edition>
 

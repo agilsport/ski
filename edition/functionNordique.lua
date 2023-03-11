@@ -5,6 +5,65 @@ dofile('./interface/interface.lua');
 -- en faisant un dofile('./edition/functionNordique.lua');
 -- et en appelan la fonction souhaiter
 
+function GetTitre(type_edition, officiel, discipline)
+	if discipline:In('PATR', 'RELAIS', 'TEA-SP') then
+		disc = ' (équipe)';
+	else
+		disc = "";
+	end
+	
+	type_edition = type_edition or ''; 
+	officiel = officiel or 0;
+	discipline = discipline or '';
+	
+	app.GetAuiMessage():AddLine("type_edition="..type_edition);
+	app.GetAuiMessage():AddLine("officiel="..officiel);
+	
+	if type_edition == 'Lst_' then
+		if officiel == 1 then
+			Level = ' Officielle'
+		elseif officiel == 0 then	
+			Level = ' Officieuse'
+		else
+			Level = '';
+		end
+		Titre = 'Liste de départ'..disc..''..Level
+	elseif type_edition == 'part' then
+		if officiel == 1 then
+			Level = ' Officielle'
+		elseif officiel == 0 then	
+			Level = ' Officieuse'
+		else
+			Level = '';
+		end
+		Titre = 'Liste de Participants'..disc..''..Level
+	elseif type_edition == 'res_' then
+		if officiel == 1 then
+			Level = ' Officiels'
+		elseif officiel == 0 then	
+			Level = ' Officieux'
+		elseif officiel == -1 then	
+			Level = ' Provisoires';
+			-- Level = ' \n Provisoires';
+		else
+			Level = '';
+		end
+		Titre = 'Résultats'..disc..''..Level
+	else
+		Titre = params.title
+	end
+	
+	if discipline == "PATR" then
+		EntiteEqu = "Patrouille";
+		EntiteRel = "Patrouilleurs";
+	else
+		EntiteEqu = "Equipe";
+		EntiteRel = "Relayeurs";
+	end
+	
+	return Titre;
+end
+
 function GetQualifie_TeamSprint()
 	dlg = wnd.CreateDialog({
 		x = x,
@@ -130,4 +189,23 @@ function GetPenalite_Equipier(Pelalite1, m)
 		Penalite_Equipier = string.sub(Pelalite1 ,21 ,33);
 	end
 	return Penalite_Equipier;
+end
+
+function VerifNbManche()
+	dlg = wnd.CreateDialog({
+		x = x,
+		y = y,
+		width=600, -- widthControl, 
+		height=300, -- heightControl,
+		style=wndStyle.RESIZE_BORDER+wndStyle.CAPTION+wndStyle.CLOSE_BOX,
+		label='Heure Départ Equipier 2 des Team-Sprint', 
+		icon='./res/32x32_agil.png'
+	});
+	local NbMancheActive = base:GetRecord('Epreuve'):GetInt('Nombre_de_manche');
+	app.GetAuiMessage():AddLine("NbMancheActive="..NbMancheActive);
+	if tonumber(NbMancheActive) ~= 3 then
+		if dlg:MessageBox("Confirmation de l\' édition Résultats Finaux team-sprint ?\n\nvous devez aller mettre 3 dans le nombre de phase dans les paramètres de course.", "Edition résultats Team Sprint",msgBoxStyle.OK+msgBoxStyle.ICON_INFORMATION) == msgBoxStyle.OK then
+			return false;
+		end
+	end
 end

@@ -1,5 +1,5 @@
 -- Saisie du rapport d'accident pour skiFFS
---2.4 rectif bug à la fermeture de la boite de dialogue si la course n'a pas de codex
+--2.5
 
 dofile('./interface/adv.lua');
 dofile('./interface/interface.lua');
@@ -10,7 +10,7 @@ end
 
 -- Point Entree Principal
 function main(params)
-	version_script = '2.4';
+	version_script = '2.5';
 	dlgrapport = {}
 	Tablerapport = {}
 	theParams = params;
@@ -400,8 +400,6 @@ function main(params)
 	dlgrapport:Delete();
 
 end
-
-
 
 function LectureNumfichier(NumFichier)
 	local widthMax = display:GetSize().width;

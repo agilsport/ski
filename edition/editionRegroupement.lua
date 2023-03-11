@@ -1,4 +1,7 @@
 -- regroupement de coureurs par critéres pour skiFFS
+	-- version_script = '1.2';
+	-- Permet de créer des regroupement de coureurs par comite club cat distance....
+	-- et d'etalir un resultat
 dofile('./interface/adv.lua');
 dofile('./interface/interface.lua');
 
@@ -634,7 +637,7 @@ end
 
 -- Point Entree Principal
 function main(cparams)
-	version_script = '1.0';
+	version_script = '1.2';
 	bolTemps = true;
 	bolCoureurEquipe = false;
 	if cparams then
