@@ -24,23 +24,26 @@ function main(params)
 	-- local y = math.floor((heightMax-heightControl)/2);
 	
 	base = sqlBase.Clone();
-	
-	Evenement = base:GetTable('Evenement');
-	Resultat = base:GetTable('Resultat');
-	Epreuve = base:GetTable('Epreuve');
-	Discipline = base:GetTable('Discipline');
-	TRapport = base:GetTable('Rap_accident');
-	CodeEvenement = Evenement:GetCell('Code', 0);
-	codex = Evenement:GetCell('Codex', 0);
-	saison = Evenement:GetCell('Code_saison', 0);
+	tEvenement = base:GetTable('Evenement');
+	base:TableLoad(tEvenement, 'Select * From Evenement Where Code = '..params.code_evenement);
+	tResultat = base:GetTable('Resultat');
+	base:TableLoad(tResultat, 'Select * From Resultat Where Code_evenement = '..params.code_evenement);
+	tEpreuve = base:GetTable('Epreuve');
+	base:TableLoad(tEpreuve, 'Select * From Epreuve Where Code_evenement = '..params.code_evenement);
+	tDiscipline = base:GetTable('Discipline');
+	tRapport = base:GetTable('Rap_accident');
+	CodeEvenement = theParams.code_evenement;
+	codex = tEvenement:GetCell('Codex', 0);
+	alert('codex'..codex)
+	saison = tEvenement:GetCell('Code_saison: ', 0);
 	-- on charge la table et on la copie dans une autre table et on l'inserer dans la base pour qu'elle soit detruite quand on sort des editions 
-		Evenement_Officiel = base:GetTable('Evenement_Officiel');
+	Evenement_Officiel = base:GetTable('Evenement_Officiel');
 	base:TableLoad(Evenement_Officiel, "Select * From Evenement_Officiel Where Code_evenement = "..CodeEvenement);
 		
 		-- tOfficielRequired = tOfficiel:Copy(); -->
 		-- tOfficielRequired:SetName('Officiel_Required'); 
 		-- base:AddTable(tOfficielRequired);
-	--alert("Order By="..TRapport:OrderByPrimary());
+	--alert("Order By="..tRapport:OrderByPrimary());
 	
 	dlgrapport = wnd.CreateDialog({	x = 500,	-- decalage / au bord gauche de l'ecran
 									y = 5,  -- decalage / au ht de l'ecran
@@ -49,12 +52,12 @@ function main(params)
 									width=1100, -- widthControl, 
 									height=400, -- heightControl, 
 									style=wndStyle.CAPTION+wndStyle.CLOSE_BOX, -- pour rendre la fenetre rezizable  wndStyle.RESIZE_BORDER+
-								label='Saisie du rapport: '..Evenement:GetCell('Nom', 0), 
+								label='Saisie du rapport: '..tEvenement:GetCell('Nom', 0), 
 								icon='./res/32x32_ffs.png'
 								});
 
 	-- Creation des Controles et Placement des controles par le Template XML ...
-	dlgrapport:LoadTemplateXML({ 	xml = './process/Rapport_accident.xml', 	-- Obligatoire
+	dlgrapport:LoadTemplateXML({ 	xml = './edition/Rapport_accident.xml', 	-- Obligatoire
 										node_name = 'root/panel', 			-- Obligatoire
 										node_attr = 'name', 				-- Facultatif si le node_name est unique ...
 										node_value = 'config_rapport' 		-- Facultatif si le node_name est unique ...
@@ -80,12 +83,12 @@ function main(params)
 --Si il y a deja un rapport d'enregistrer on vas cher la valeur du rapport si on créer un nouveau		
 	if  tonumber(LectNumfichier) == 0 then
 		dlgrapport:GetWindowName('Evt_codex'):SetValue(codex);
-		dlgrapport:GetWindowName('Evt_Name'):SetValue(Evenement:GetCell('Nom', 0));
-		dlgrapport:GetWindowName('Evt_activite'):SetValue(Evenement:GetCell('Code_activite', 0));
-		dlgrapport:GetWindowName('Code_saison'):SetValue(Evenement:GetCell('Code_saison', 0));
-		dlgrapport:GetWindowName('Evt_date'):SetValue(Epreuve:GetCell('Date_epreuve', 0));
-		dlgrapport:GetWindowName('Epreuve_lieu'):SetValue(Evenement:GetCell('Station', 0)..' / '..Evenement:GetCell('Lieu', 0));
-		dlgrapport:GetWindowName('Code_discipline'):SetValue(Epreuve:GetCell('Code_discipline', 0));
+		dlgrapport:GetWindowName('Evt_Name'):SetValue(tEvenement:GetCell('Nom', 0));
+		dlgrapport:GetWindowName('Evt_activite'):SetValue(tEvenement:GetCell('Code_activite', 0));
+		dlgrapport:GetWindowName('Code_saison'):SetValue(tEvenement:GetCell('Code_saison', 0));
+		dlgrapport:GetWindowName('Evt_date'):SetValue(tEpreuve:GetCell('Date_epreuve', 0));
+		dlgrapport:GetWindowName('Epreuve_lieu'):SetValue(tEvenement:GetCell('Station', 0)..' / '..tEvenement:GetCell('Lieu', 0));
+		dlgrapport:GetWindowName('Code_discipline'):SetValue(tEpreuve:GetCell('Code_discipline', 0));
 		dlgrapport:GetWindowName('Evt_dt_name'):SetValue(base:GetOfficiel('TechnicalDelegate', 'Nom'):upper()..' '..base:GetOfficiel('TechnicalDelegate', 'Prenom'):sub(1,1):upper()..base:GetOfficiel('TechnicalDelegate', 'Prenom'):sub(2):lower()..' '..base:GetOfficiel(TechnicalDelegate, 'Nation'):Parenthesis());
 		-- dlgrapport:GetWindowName('Evt_dt_email'):SetValue(base:GetOfficiel('TechnicalDelegate', 'Email'));
 		dlgrapport:GetWindowName('Evt_dt_tel'):SetValue(base:GetOfficiel('TechnicalDelegate', 'Tel_mobile'));
@@ -470,70 +473,70 @@ function Onsave()
 	if dlgrapport:MessageBox("Confirmation l\' enregistrement ?\n\nCette opération vas enregistrer le rapport N° "..dlgrapport:GetWindowName('Num_rapport'):GetValue()..".", "Confirmation de l'enregistrement", msgBoxStyle.YES_NO+msgBoxStyle.ICON_INFORMATION) ~= msgBoxStyle.YES then
 		return;
 	end
-	local r = TRapport:AddRow();
-				TRapport:SetCell('Code_saison', r, tonumber(dlgrapport:GetWindowName('Code_saison'):GetValue()));
-				TRapport:SetCell('Evt_codex', r, dlgrapport:GetWindowName('Evt_codex'):GetValue());
-				TRapport:SetCell('Num_rapport', r, tonumber(dlgrapport:GetWindowName('Num_rapport'):GetValue()));
-				TRapport:SetCell('Code', r, tonumber(Evenement:GetCell('Code', 0)));
-				TRapport:SetCell('Evt_Name', r, dlgrapport:GetWindowName('Evt_Name'):GetValue());
-				TRapport:SetCell('Evt_date', r, Epreuve:GetCell('Date_epreuve', 0, '%4Y/%2M/%2D'));
+	local r = tRapport:AddRow();
+				tRapport:SetCell('Code_saison', r, tonumber(dlgrapport:GetWindowName('Code_saison'):GetValue()));
+				tRapport:SetCell('Evt_codex', r, dlgrapport:GetWindowName('Evt_codex'):GetValue());
+				tRapport:SetCell('Num_rapport', r, tonumber(dlgrapport:GetWindowName('Num_rapport'):GetValue()));
+				tRapport:SetCell('Code', r, tonumber(tEvenement:GetCell('Code', 0)));
+				tRapport:SetCell('Evt_Name', r, dlgrapport:GetWindowName('Evt_Name'):GetValue());
+				tRapport:SetCell('Evt_date', r, tEpreuve:GetCell('Date_epreuve', 0, '%4Y/%2M/%2D'));
 				--alert("date epre"..Epreuve:GetCell('Date_epreuve', 0, '%4Y/%2M/%2D'));
-				TRapport:SetCell('Evt_activite', r, dlgrapport:GetWindowName('Evt_activite'):GetValue());
-				TRapport:SetCell('Epreuve_lieu', r, dlgrapport:GetWindowName('Epreuve_lieu'):GetValue());
-				--TRapport:SetCell('Epreuve_lieu', r, string.EscapeQuote(dlgrapport:GetWindowName('Epreuve_lieu'):GetValue()));  fonction qui met le code asci pour inserer dans la base
-				TRapport:SetCell('Epreuve_piste', r, dlgrapport:GetWindowName('Epreuve_piste'):GetValue());
-				TRapport:SetCell('Code_discipline', r, dlgrapport:GetWindowName('Code_discipline'):GetValue());
-				TRapport:SetCell('Epr_manche', r, dlgrapport:GetWindowName('Epr_manche'):GetValue());
-				TRapport:SetCell('Acc_heure', r, dlgrapport:GetWindowName('Acc_heure'):GetValue());
-				TRapport:SetCell('Coureur_identite', r, dlgrapport:GetWindowName('Coureur_identite'):GetValue());
-				TRapport:SetCell('Code_coureur', r, dlgrapport:GetWindowName('Code_coureur'):GetValue());
-				TRapport:SetCell('Coureur_sexe', r, dlgrapport:GetWindowName('Coureur_sexe'):GetValue());
-				TRapport:SetCell('Coureur_annee', r, dlgrapport:GetWindowName('Coureur_annee'):GetValue());
-				TRapport:SetCell('Coureur_tel', r, dlgrapport:GetWindowName('Coureur_tel'):GetValue());
-				-- TRapport:SetCell('Coureur_Email', r, dlgrapport:GetWindowName('Coureur_Email'):GetValue());
-				TRapport:SetCell('Evt_cond', r, dlgrapport:GetWindowName('Evt_cond'):GetValue());
-				TRapport:SetCell('Epr_temps', r, dlgrapport:GetWindowName('Epr_temps'):GetValue());
-				TRapport:SetCell('Bles_tete', r, dlgrapport:GetWindowName('Bles_tete'):GetValue());
-				TRapport:SetCell('Bles_fracture', r, dlgrapport:GetWindowName('Bles_fracture'):GetValue());
-				TRapport:SetCell('Bles_nuque', r, dlgrapport:GetWindowName('Bles_nuque'):GetValue());
-				TRapport:SetCell('Bles_entorse', r, dlgrapport:GetWindowName('Bles_entorse'):GetValue());
-				TRapport:SetCell('Bles_epaule', r, dlgrapport:GetWindowName('Bles_epaule'):GetValue());
-				TRapport:SetCell('Bles_contusion', r, dlgrapport:GetWindowName('Bles_contusion'):GetValue());
-				TRapport:SetCell('Bles_membre_sup', r, dlgrapport:GetWindowName('Bles_membre_sup'):GetValue());
-				TRapport:SetCell('Epr_manche', r, dlgrapport:GetWindowName('Epr_manche'):GetValue());
-				TRapport:SetCell('Bles_plaie', r, dlgrapport:GetWindowName('Bles_plaie'):GetValue());
-				TRapport:SetCell('Bles_bassin', r, dlgrapport:GetWindowName('Bles_bassin'):GetValue());
-				TRapport:SetCell('Bles_ventre', r, dlgrapport:GetWindowName('Bles_ventre'):GetValue());
-				TRapport:SetCell('Bles_membre_inf', r, dlgrapport:GetWindowName('Bles_membre_inf'):GetValue());
-				TRapport:SetCell('Bles_musculaire', r, dlgrapport:GetWindowName('Bles_musculaire'):GetValue());
-				TRapport:SetCell('Bles_genou', r, dlgrapport:GetWindowName('Bles_genou'):GetValue());
-				TRapport:SetCell('Bles_type_autre', r, dlgrapport:GetWindowName('Bles_type_autre'):GetValue());
-				TRapport:SetCell('Bles_cheville', r, dlgrapport:GetWindowName('Bles_cheville'):GetValue());
-				TRapport:SetCell('Bles_autres', r, dlgrapport:GetWindowName('Bles_autres'):GetValue());
-				TRapport:SetCell('Situation', r, dlgrapport:GetWindowName('Situation'):GetValue());
-				TRapport:SetCell('Evacuation', r, dlgrapport:GetWindowName('Evacuation'):GetValue());
-				TRapport:SetCell('Epr_neige', r, dlgrapport:GetWindowName('Epr_neige'):GetValue());
-				TRapport:SetCell('Evt_dt_name', r, dlgrapport:GetWindowName('Evt_dt_name'):GetValue());
-				-- TRapport:SetCell('Evt_dt_email', r, dlgrapport:GetWindowName('Evt_dt_email'):GetValue());
-				TRapport:SetCell('Evt_dt_tel', r, dlgrapport:GetWindowName('Evt_dt_tel'):GetValue());
-				TRapport:SetCell('Evt_Med_Name', r, dlgrapport:GetWindowName('Evt_Med_Name'):GetValue());
-				-- TRapport:SetCell('Evt_Med_email', r, dlgrapport:GetWindowName('Evt_Med_email'):GetValue());
-				TRapport:SetCell('Evt_Med_Tel', r, dlgrapport:GetWindowName('Evt_Med_Tel'):GetValue());
-				TRapport:SetCell('Evt_Sec_descip', r, dlgrapport:GetWindowName('Evt_Sec_descip'):GetValue());
-				TRapport:SetCell('Evt_Sec_Name', r, dlgrapport:GetWindowName('Evt_Sec_Name'):GetValue());
-				-- TRapport:SetCell('Evt_Sec_email', r, dlgrapport:GetWindowName('Evt_Sec_email'):GetValue());
-				TRapport:SetCell('Evt_Sec_Tel', r, dlgrapport:GetWindowName('Evt_Sec_Tel'):GetValue());
-				TRapport:SetCell('Evt_Tem1_Name', r, dlgrapport:GetWindowName('Evt_Tem1_Name'):GetValue());
-				-- TRapport:SetCell('Evt_Tem1_email', r, dlgrapport:GetWindowName('Evt_Tem1_email'):GetValue());
-				TRapport:SetCell('Evt_Tem1_Tel', r, dlgrapport:GetWindowName('Evt_Tem1_Tel'):GetValue());
-				TRapport:SetCell('Evt_Tem2_Name', r, dlgrapport:GetWindowName('Evt_Tem2_Name'):GetValue());
-				-- TRapport:SetCell('Evt_Tem2_email', r, dlgrapport:GetWindowName('Evt_Tem2_email'):GetValue());
-				TRapport:SetCell('Evt_Tem2_Tel', r, dlgrapport:GetWindowName('Evt_Tem2_Tel'):GetValue());
-				TRapport:SetCell('Evt_Tem3_Name', r, dlgrapport:GetWindowName('Evt_Tem3_Name'):GetValue());
-				-- TRapport:SetCell('Evt_Tem3_email', r, dlgrapport:GetWindowName('Evt_Tem3_email'):GetValue());
-				TRapport:SetCell('Evt_Tem3_Tel', r, dlgrapport:GetWindowName('Evt_Tem3_Tel'):GetValue());
-				TRapport:SetCell('Rap_commentaire', r, dlgrapport:GetWindowName('Rap_commentaire'):GetValue());		
-	base:TableFlush(TRapport, r);
+				tRapport:SetCell('Evt_activite', r, dlgrapport:GetWindowName('Evt_activite'):GetValue());
+				tRapport:SetCell('Epreuve_lieu', r, dlgrapport:GetWindowName('Epreuve_lieu'):GetValue());
+				--tRapport:SetCell('Epreuve_lieu', r, string.EscapeQuote(dlgrapport:GetWindowName('Epreuve_lieu'):GetValue()));  fonction qui met le code asci pour inserer dans la base
+				tRapport:SetCell('Epreuve_piste', r, dlgrapport:GetWindowName('Epreuve_piste'):GetValue());
+				tRapport:SetCell('Code_discipline', r, dlgrapport:GetWindowName('Code_discipline'):GetValue());
+				tRapport:SetCell('Epr_manche', r, dlgrapport:GetWindowName('Epr_manche'):GetValue());
+				tRapport:SetCell('Acc_heure', r, dlgrapport:GetWindowName('Acc_heure'):GetValue());
+				tRapport:SetCell('Coureur_identite', r, dlgrapport:GetWindowName('Coureur_identite'):GetValue());
+				tRapport:SetCell('Code_coureur', r, dlgrapport:GetWindowName('Code_coureur'):GetValue());
+				tRapport:SetCell('Coureur_sexe', r, dlgrapport:GetWindowName('Coureur_sexe'):GetValue());
+				tRapport:SetCell('Coureur_annee', r, dlgrapport:GetWindowName('Coureur_annee'):GetValue());
+				tRapport:SetCell('Coureur_tel', r, dlgrapport:GetWindowName('Coureur_tel'):GetValue());
+				-- tRapport:SetCell('Coureur_Email', r, dlgrapport:GetWindowName('Coureur_Email'):GetValue());
+				tRapport:SetCell('Evt_cond', r, dlgrapport:GetWindowName('Evt_cond'):GetValue());
+				tRapport:SetCell('Epr_temps', r, dlgrapport:GetWindowName('Epr_temps'):GetValue());
+				tRapport:SetCell('Bles_tete', r, dlgrapport:GetWindowName('Bles_tete'):GetValue());
+				tRapport:SetCell('Bles_fracture', r, dlgrapport:GetWindowName('Bles_fracture'):GetValue());
+				tRapport:SetCell('Bles_nuque', r, dlgrapport:GetWindowName('Bles_nuque'):GetValue());
+				tRapport:SetCell('Bles_entorse', r, dlgrapport:GetWindowName('Bles_entorse'):GetValue());
+				tRapport:SetCell('Bles_epaule', r, dlgrapport:GetWindowName('Bles_epaule'):GetValue());
+				tRapport:SetCell('Bles_contusion', r, dlgrapport:GetWindowName('Bles_contusion'):GetValue());
+				tRapport:SetCell('Bles_membre_sup', r, dlgrapport:GetWindowName('Bles_membre_sup'):GetValue());
+				tRapport:SetCell('Epr_manche', r, dlgrapport:GetWindowName('Epr_manche'):GetValue());
+				tRapport:SetCell('Bles_plaie', r, dlgrapport:GetWindowName('Bles_plaie'):GetValue());
+				tRapport:SetCell('Bles_bassin', r, dlgrapport:GetWindowName('Bles_bassin'):GetValue());
+				tRapport:SetCell('Bles_ventre', r, dlgrapport:GetWindowName('Bles_ventre'):GetValue());
+				tRapport:SetCell('Bles_membre_inf', r, dlgrapport:GetWindowName('Bles_membre_inf'):GetValue());
+				tRapport:SetCell('Bles_musculaire', r, dlgrapport:GetWindowName('Bles_musculaire'):GetValue());
+				tRapport:SetCell('Bles_genou', r, dlgrapport:GetWindowName('Bles_genou'):GetValue());
+				tRapport:SetCell('Bles_type_autre', r, dlgrapport:GetWindowName('Bles_type_autre'):GetValue());
+				tRapport:SetCell('Bles_cheville', r, dlgrapport:GetWindowName('Bles_cheville'):GetValue());
+				tRapport:SetCell('Bles_autres', r, dlgrapport:GetWindowName('Bles_autres'):GetValue());
+				tRapport:SetCell('Situation', r, dlgrapport:GetWindowName('Situation'):GetValue());
+				tRapport:SetCell('Evacuation', r, dlgrapport:GetWindowName('Evacuation'):GetValue());
+				tRapport:SetCell('Epr_neige', r, dlgrapport:GetWindowName('Epr_neige'):GetValue());
+				tRapport:SetCell('Evt_dt_name', r, dlgrapport:GetWindowName('Evt_dt_name'):GetValue());
+				-- tRapport:SetCell('Evt_dt_email', r, dlgrapport:GetWindowName('Evt_dt_email'):GetValue());
+				tRapport:SetCell('Evt_dt_tel', r, dlgrapport:GetWindowName('Evt_dt_tel'):GetValue());
+				tRapport:SetCell('Evt_Med_Name', r, dlgrapport:GetWindowName('Evt_Med_Name'):GetValue());
+				-- tRapport:SetCell('Evt_Med_email', r, dlgrapport:GetWindowName('Evt_Med_email'):GetValue());
+				tRapport:SetCell('Evt_Med_Tel', r, dlgrapport:GetWindowName('Evt_Med_Tel'):GetValue());
+				tRapport:SetCell('Evt_Sec_descip', r, dlgrapport:GetWindowName('Evt_Sec_descip'):GetValue());
+				tRapport:SetCell('Evt_Sec_Name', r, dlgrapport:GetWindowName('Evt_Sec_Name'):GetValue());
+				-- tRapport:SetCell('Evt_Sec_email', r, dlgrapport:GetWindowName('Evt_Sec_email'):GetValue());
+				tRapport:SetCell('Evt_Sec_Tel', r, dlgrapport:GetWindowName('Evt_Sec_Tel'):GetValue());
+				tRapport:SetCell('Evt_Tem1_Name', r, dlgrapport:GetWindowName('Evt_Tem1_Name'):GetValue());
+				-- tRapport:SetCell('Evt_Tem1_email', r, dlgrapport:GetWindowName('Evt_Tem1_email'):GetValue());
+				tRapport:SetCell('Evt_Tem1_Tel', r, dlgrapport:GetWindowName('Evt_Tem1_Tel'):GetValue());
+				tRapport:SetCell('Evt_Tem2_Name', r, dlgrapport:GetWindowName('Evt_Tem2_Name'):GetValue());
+				-- tRapport:SetCell('Evt_Tem2_email', r, dlgrapport:GetWindowName('Evt_Tem2_email'):GetValue());
+				tRapport:SetCell('Evt_Tem2_Tel', r, dlgrapport:GetWindowName('Evt_Tem2_Tel'):GetValue());
+				tRapport:SetCell('Evt_Tem3_Name', r, dlgrapport:GetWindowName('Evt_Tem3_Name'):GetValue());
+				-- tRapport:SetCell('Evt_Tem3_email', r, dlgrapport:GetWindowName('Evt_Tem3_email'):GetValue());
+				tRapport:SetCell('Evt_Tem3_Tel', r, dlgrapport:GetWindowName('Evt_Tem3_Tel'):GetValue());
+				tRapport:SetCell('Rap_commentaire', r, dlgrapport:GetWindowName('Rap_commentaire'):GetValue());		
+	base:TableFlush(tRapport, r);
 end
 
 function OnImprim(NumFichier)
@@ -561,12 +564,12 @@ function OnImprim(NumFichier)
 end
 
 function Ondelete()
-alert("Spression du fichier: "..tonumber(Evenement:GetCell('Code', 0)));
+alert("Spression du fichier: "..tonumber(tEvenement:GetCell('Code', 0)));
 
 if dlgrapport:MessageBox("Confirmation de la supprésion ?\n\nCette opération effacera le rapport n°"..LectNumfichier.." de la base de donnée.", "Confirmation mise à jour du rapport", msgBoxStyle.YES_NO+msgBoxStyle.ICON_INFORMATION) ~= msgBoxStyle.YES then
 		return;
 	end
-	cmd = "Delete From Rap_accident Where Code = '"..tonumber(Evenement:GetCell('Code', 0)).."' and Num_rapport = "..tonumber(LectNumfichier);
+	cmd = "Delete From Rap_accident Where Code = '"..tonumber(tEvenement:GetCell('Code', 0)).."' and Num_rapport = "..tonumber(LectNumfichier);
 	base:Query(cmd);
 	dlgrapport:EndModal();
 	cmd = "Select * From Rap_accident Where Code_saison = '"..saison.."' And Evt_codex = '"..codex.."' Order by Num_rapport";	
