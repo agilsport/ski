@@ -1,6 +1,7 @@
 -- Matrices / Challenges et Combinés pour skiFFS
 dofile('./interface/adv.lua');
 dofile('./interface/interface.lua');
+dofile('./edition/functionPG.lua');
 
 function ReplaceTableEnvironnement(t, name)		-- replace la table créée dans l'environnement de la base de donnée pour éviter les memory leaks
 	if type(t) ~= 'userdata' then
@@ -851,10 +852,7 @@ function main(cparams)
 	doc = xmlDocument.Create(XML);
 	listeMinisterielle = {};
 	listeMinisterielle.affichage = false;	
-	
-	
-	
-	scrip_version = "2.3"; 
+	scrip_version = "2.4"; 
 	-- vérification de l'existence d'une version plus récente du script.
 	-- Ex de retour : LiveDraw=5.94,Matrices=5.92,TimingReport=4.2,DoubleTirage=3.2,TirageOptions=3.3,TirageER=1.7,ListeMinisterielle=2.3,KandaHarJunior=2.0
 	if app.GetVersion() >= '4.4c' then 
@@ -898,9 +896,10 @@ function main(cparams)
 	Evenement_Matrice = base:GetTable('Evenement_Matrice');
 	Type_Classement = base:GetTable('Type_Classement');
 	tSexe = {'F', 'M'};
+	wnd.GetParentFrame():Bind(eventType.CURL, OnCurlReturn);
 	AffichagedlgConfiguration();
 end
 
 if not listeMinisterielle then
-	Main()
+	main()
 end
