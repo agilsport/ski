@@ -5,16 +5,72 @@ dofile('./interface/device.lua');
 
 -- Information : Numéro de Version, Nom, Interface
 function device.GetInformation()
-	return { version = 2.7, name = 'TV Liste Fond', class = 'display', interface = {} };
+	return { version = 3.0, name = 'TV Liste Fond', class = 'display', interface = {} };
 end	
 
 -- Configuration du Device
 function device.OnConfiguration(node)
-	wndPresentation.ShowModalConfig(node);
+	--wndPresentation.ShowModalConfig(node);
+		local dlg = wnd.CreateDialog({
+		icon = "./res/16x16_tools.png",
+		label = "Configuration du TV Alpin",
+		width = 500,
+		height = 800
+	});
+	
+	dlg:LoadTemplateXML({ 
+		xml = './device/tv_list_alpin.xml',
+		node_name = 'root/panel',
+		node_attr = 'name',
+		node_value = 'config'
+	});
+	
+	-- Initialisation des Variables 
+	dlg:GetWindowName('finished_delay'):SetRange(1, 100);
+	dlg:GetWindowName('finished_delay'):SetValue(node:GetAttribute('finished_delay', 6));
+
+	dlg:GetWindowName('inter_delay'):SetRange(1, 100);
+	dlg:GetWindowName('inter_delay'):SetValue(node:GetAttribute('inter_delay', 3));
+
+	-- Toolbar Principale ...
+	local tb = dlg:GetWindowName('tb');
+	local btnSave = tb:AddTool("Valider", "./res/32x32_ok.png");
+	tb:AddStretchableSpace();
+	local btnClose = tb:AddTool("Fermer", "./res/vpe32x32_close.png");
+	tb:Realize();
+
+	-- Enregistrement Configuration 
+	function OnSaveConfig(evt)
+	
+		node:ChangeAttribute('finished_delay', dlg:GetWindowName('finished_delay'):GetValue());
+		node:ChangeAttribute('inter_delay', dlg:GetWindowName('inter_delay'):GetValue());
+
+		app.GetXML():SaveFile();
+		dlg:EndModal(idButton.OK);
+	end
+
+	dlg:Bind(eventType.MENU, OnSaveConfig, btnSave); 
+	dlg:Bind(eventType.MENU, function(evt) dlg:EndModal(idButton.CANCEL) end, btnClose);
+
+	-- Lancement de la dialog
+	dlg:Fit();
+	dlg:ShowModal();
+
+	-- Liberation Memoire
+	dlg:Delete();
 end
 
 -- Ouverture
 function device.OnInit(params)
+
+	-- delay ...
+	device.delay_finished = tonumber(params.finished_delay) or 6 ;
+	device.delay_finished = device.delay_finished * 1000;
+	device.delay_inter = tonumber(params.inter_delay) or 3;
+	device.delay_inter = device.delay_inter * 1000;
+	
+	device.tick_passage = -1;
+	device.tick_passage_delay = device.delay_finished;
 
 	-- Connexion Base MySQL "tv"
 	device.dbTV = sqlBase.ConnectMySQL('localhost', 'tv', 'root', '', 3306);
@@ -45,6 +101,7 @@ function device.OnInit(params)
 	local btn_clear = tbNavigation:AddTool("Ecran vide", "./res/32x32_clear.png");
 	local btn_startlist = tbNavigation:AddTool("Liste de Départ", "./res/32x32_order.png");
 	local btn_ranking = tbNavigation:AddTool("Classement", "./res/32x32_ranking.png");
+	local btn_ranking_last = tbNavigation:AddTool("Par ordre d'arrivée", "./res/32x32_competition.png");
 	local btn_Web = tbNavigation:AddTool("Navigateur", "./res/32x32_web.png");
 
 	tbNavigation:AddSeparator();
@@ -59,7 +116,21 @@ function device.OnInit(params)
 	-- Prise des Evenements (Bind)
 	tbNavigation:Bind(eventType.MENU, OnModeClear, btn_clear);
 	tbNavigation:Bind(eventType.MENU, OnModeStartlist, btn_startlist);
-	tbNavigation:Bind(eventType.MENU, OnModeRanking, btn_ranking);
+	tbNavigation:Bind(eventType.MENU, 
+									function(evt)
+										device.mode_last = false;
+										device.tm_running:Start(100);		
+										OnModeRanking();
+									end
+														, btn_ranking);
+	tbNavigation:Bind(eventType.MENU, 
+									function(evt)
+										device.mode_last = true;
+										device.tm_running:Start(100);		
+										OnModeRanking();
+									end
+														, btn_ranking_last);	
+	
 	tbNavigation:Bind(eventType.MENU, OnWebLive, btn_Web);
 
 	-- Prise valeur offset Horloge PC - Horloge Chrono Officielle
@@ -92,6 +163,10 @@ function device.OnInit(params)
 	-- Création des Timer attaché à la frame ...
 	local mainframe = app.GetAuiFrame();
 
+	device.tm_running = timer.Create(mainframe);
+	mainframe:Bind(eventType.TIMER, OnTimerRunning, device.tm_running);
+	device.tm_running:Start(100);
+
 	device.tick_finished = -1;
 
 	app.BindNotify("<bib_next>", device.OnNotifyBibNext);
@@ -115,6 +190,10 @@ function device.OnInit(params)
 	if rc and type(bibNext) == 'table' then
 		device.OnNotifyBibNext('<bib_next>', { bib = bibNext.bib, passage = 0});
 	end
+	
+	app.GetAuiMessage():AddLine("TV Liste Nordique Information :");
+	app.GetAuiMessage():AddLine("=> Manche "..device.raceInfo.Code_manche.." / Nb.Inter = "..device.raceInfo.Nb_inter);
+	app.GetAuiMessage():AddLine("=> Délai Arrivée "..device.delay_finished.." / Délai Inter "..device.delay_inter);
 end
 
 function OnWebLive(evt, params)
@@ -176,7 +255,6 @@ function OnWebLive(evt, params)
 	dlg:Fit();
 	dlg:ShowModal();
 	dlg:Delete();
-	
 end
 
 function OnEditorShown(evt)
@@ -371,7 +449,10 @@ function device.OnNotifyBibTime(key, params)
 		device.BibFinished(bib, time_net, rank, diff);
 	elseif idPassage >= 1 then
 		-- Inter 1, 2 ...
-		if time_net ~= chronoStatus.Abs then
+		-- if time_net ~= chronoStatus.Abs then
+			-- device.BibInter(bib, idPassage, time_net, rank, diff);
+		-- end
+		if time_net ~= chrono.DNS then
 			device.BibInter(bib, idPassage, time_net, rank, diff);
 		end
 	end
@@ -380,14 +461,28 @@ function device.OnNotifyBibTime(key, params)
 		-- Prise des coureurs arrivés ou Abd ou Dsq
 		local filter = '';
 		if device.raceInfo.Code_manche == 1 then
-			filter = "if Tps1 ~= nil and (Tps1 >0 or Tps1 == -500 or Tps1 == -800) then return true else return false end ";
+			if device.mode_last == false then
+				filter = "if Tps1 ~= nil and (Tps1 >0 or Tps1 == -500 or Tps1 == -800) then return true else return false end ";
+			else
+				filter = "if Tps1 ~= nil and Tps1 > 0 then return true else return false end ";
+			end
 		else
-			filter = "if Tps ~= nil and (Tps >0 or Tps == -500 or Tps == -800) then return true else return false end ";
+			if device.mode_last == false then
+				filter = "if Tps ~= nil and (Tps >0 or Tps == -500 or Tps == -800) then return true else return false end ";
+			else
+				filter = "if Tps ~= nil and Tps > 0 then return true else return false end ";
+			end
 		end
 
 		local rc, data = app.SendNotify('<ranking_load>', { filter = filter } );
 		assert(rc and data.ranking ~= nil and app.GetNameSpace(data.ranking) == 'sqlTableGC');
 		device.ranking = data.ranking;
+		if device.mode_last == true then
+			device.ranking:OrderBy('Heure_arrivee_reelle DESC');
+			for row = device.ranking:GetNbRows() -1, 12, -1 do
+				device.ranking:RemoveRowAt(row);
+			end
+		end
 	end
 
 	RefreshMode();
@@ -439,6 +534,49 @@ function device.BibFinished(bib, time_net, rank, diff)
 	end
 end
 
+function device.BibInter(bib, idPassage, time_net, rank, diff)
+	if time_net == nil or time_net == chrono.DNS then return end 
+
+	local row = device.bib_running:GetIndexRow('Dossard', bib) or -1;
+	if row ~= 0 then return end 
+	
+	local bibInfo = nil;
+	if row >= 0 then
+		bibInfo = adv.Filter(device.bib_running, function(t,row) return tonumber(t:GetCell('Dossard',row)) == bib end);
+		assert(bibInfo:GetCell("Dossard",0) == tostring(bib));
+	else
+		bibInfo = device.BibLoad(bib);
+	end
+
+	if bibInfo ~= nil and bibInfo:GetNbRows() > 0 then
+		device.tick_passage = app.GetTickCount();
+		device.tick_passage_delay = device.delay_inter;
+
+		rank = rank or '';
+
+		diff = diff or '';
+		if type(diff) == 'number' then
+			diff = app.TimeToString(diff, '[DIFF]%xs.%2f');
+		end
+
+		columnInfoRanking = columnInfoRanking or 'Nation';
+
+		local cmd = 
+			"Update Running Set "..
+			" State = '"..tostring(idPassage).."' "..
+			",Passage = '"..tostring(idPassage).."' "..
+			",Tick = '"..app.GetTickCount().."' "..
+			",Bib = '"..bibInfo:GetCell("Dossard", 0).."' "..
+			",Identity = '"..string.gsub(bibInfo:GetCell("Identite", 0), "'", "''").."' "..
+			",Team = '"..string.gsub(bibInfo:GetCell(columnInfoRanking, 0),"'","''").."' "..
+			",Time = '"..app.TimeToString(time_net).."' "..
+			",Rank = '"..tostring(rank).."' "..
+			",Diff = '"..diff.."' ";
+		device.dbTV:Query(cmd);
+--		adv.Alert(cmd);
+	end
+end
+
 -- Notification : Nouveau Meilleur Temps
 function device.OnNotifyBestTime(key, params)
 	assert(key == '<best_time>');
@@ -485,6 +623,12 @@ end
 
 -- Fermeture
 function device.OnClose()
+
+	-- Fermeture Timer
+	if device.tm_running ~= nil then
+		device.tm_running:Delete();
+	end
+	
 	-- Fermeture Toolbar 
 	if tbNavigation ~= nil then
 		local mgr = app.GetAuiManager();
@@ -529,10 +673,18 @@ function OnModeRanking()
 	device.mode = 'ranking';
 
 	if device.raceInfo.Code_manche == 1 then
-		modeLabel:SetLabel('ranking-1');
+		if device.mode_last == false then
+			modeLabel:SetLabel('ranking-1');
+		else
+			modeLabel:SetLabel('arrivée-1');
+		end
 		device.dbTV:Query("Update Context Set Mode = 'ranking', Title = '"..GetTitle().."' Where ID = 1");
 	else
-		modeLabel:SetLabel('ranking-2');
+		if device.mode_last == false then
+			modeLabel:SetLabel('ranking-2');
+		else
+			modeLabel:SetLabel('arrivée-2');
+		end
 		device.dbTV:Query("Update Context Set Mode = 'ranking2', Title = '"..GetTitle().."' Where ID = 1");
 	end
 
@@ -544,6 +696,7 @@ function OnModeRanking()
 	else
 		filter = "if Tps ~= nil and (Tps >0 or Tps == -500 or Tps == -800) then return true else return false end ";
 	end
+	
 	local rc, data = app.SendNotify('<ranking_load>', { filter = filter } );
 	assert(rc and data.ranking ~= nil and app.GetNameSpace(data.ranking) == 'sqlTableGC');
 
@@ -567,9 +720,17 @@ function RefreshMode()
 	elseif device.mode == 'ranking' then
 		-- Liste de Résultat
 		if device.raceInfo.Code_manche == 1 then
-			device.ranking:OrderBy('Clt1, Dossard');
+			if device.mode_last == false then
+				device.ranking:OrderBy('Clt1, Dossard');
+			else
+				device.ranking:OrderBy('Heure_arrivee_reelle DESC');
+			end
 		else
-			device.ranking:OrderBy('Clt, Dossard');
+			if device.mode_last == false then
+				device.ranking:OrderBy('Clt, Dossard');
+			else	
+				device.ranking:OrderBy('Heure_arrivee_reelle DESC');
+			end
 		end
 		TvSynchroRanking();
 	end
