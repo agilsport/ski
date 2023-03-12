@@ -163,7 +163,7 @@
 		<matrix col_start="1" col_end="0"> 
 			<col w="1,0.3cm,1"/>
 			<text row="auto" col_start="1" col_end="0" align="Left" cond="commentaire:len() ~= 0" >'Commentaire éventuels:'</text>
-			<text row="auto" col_start="1" col_end="0" style="TE_LEFT|TE_MULTILINE" border="all" cond="commentaire:len() ~= 0" >commentaire</text>
+			<text row="auto" col_start="1" col_end="0" style="TE_LEFT|TE_MULTILINE" border="all" cond="commentaire:len() ~= 0" align="top,right_horizontal" ><spacing left="10" right="10" top="10" bottom="10" />commentaire</text>
 			<!-- <col value="8cm" /> -->
 			<text row="auto" col_start="3" col_end="0" align="left"><font size="14"/>'Le délégué technique'</text>
 			<text row="auto" col_start="3" col_end="0" align="left"><font size="15"/>dt</text>
@@ -184,7 +184,7 @@
 		<matrix row="auto" col_start="1" col_end="0" >
 		
 			<row value="auto" />
-			<lua>if $(Evenement.Code_entite) == 'FFS' and $(Evenement.Code_activite) ~= 'FS' then</lua>
+			<lua>if $(Evenement.Code_entite) == 'FFS' then</lua>
 			<text col="1" align="center">'Inscrits: '..body:GetNbRows()</text>
 			<text col="1" align="center">'Classés: '..body:GetCounterValue('Tps_status', 'ok')</text>
 			<text col="1" align="center">'Absents: '..body:GetCounterValue('Tps_status', 'dns')</text>
@@ -263,21 +263,48 @@
 						tTraduction.en['An'] = 'YB';
 						tTraduction.en['Dos'] = 'Bib';
 						tTraduction.en['Categ'] = 'Categ';
+						tTraduction.en['Clt'] = 'Rank';
 						tTraduction.en['Code'] = 'FIS Number';
 						tTraduction.en['Juge'] = 'Judge';
 						tTraduction.en['Juges'] = 'Judges';
+						tTraduction.en['Ouvreur'] = 'Forerunner';
+						tTraduction.en['Ouvreurs'] = 'Forerunners';
 						tTraduction.en['Identité'] = 'Identity';
+						tTraduction.en['Longueur'] = 'Length';
+						tTraduction.en['Piste'] = 'Ski slope';
+						tTraduction.en['Catégorie'] = 'Race Name';
 						tTraduction.en['Nat'] = 'NSA';
 						tTraduction.en['Nation'] = 'NSA';
 						tTraduction.en['Nom'] = 'Name';
 						tTraduction.en['Points'] = 'Race Points';
+						tTraduction.en['Run'] = 'Run';
 						tTraduction.en['Prénom'] = 'First Name';
 						tTraduction.en['Sexe'] = 'Gender';
 						tTraduction.en['S.'] = 'G.';
+						tTraduction.en['Départ'] = 'Start';
+						tTraduction.en['Arrivée'] = 'Finish';
 						tTraduction.en['Ecart.'] = 'Diff.';
 						tTraduction.en['Note'] = 'Race Points';
-						
-						
+						tTraduction.en['Club'] = 'Club';
+						tTraduction.en['Vertical Drop'] = 'Vertical Drop';
+						tTraduction.en['Codex'] = 'Codex';
+						tTraduction.en['Number of Nations'] = 'Number of Nations';
+						tTraduction.en['Jury'] = 'Jury';
+						tTraduction.en['données techniques'] = 'Technical Data';
+						tTraduction.en['Résultats'] = 'Résult';
+						tTraduction.en['Liste Participant'] = 'Participant List';
+						tTraduction.en['Liste de départ'] = 'Start List';
+						tTraduction.en['Officiels'] = 'Officials';
+						tTraduction.en['Number of Elements'] = 'Number of Elements';
+						tTraduction.en['Number of Features'] = 'Number of Features';
+						tTraduction.en['Conditions de course'] = 'Conditions on course';
+						tTraduction.en['Météo'] = 'Weather';
+						tTraduction.en['Neige'] = 'Snow';
+						tTraduction.en['Vent'] = 'Wind';
+						tTraduction.en['Heure de départ'] = 'Start time';
+						tTraduction.en['Air Temp. Start'] = 'Air Temp. Start';
+						tTraduction.en['Air Temp. Finish'] = 'Air Temp. Finish';
+						tTraduction.en['Décision du Jury'] = 'Jury decision';
 						tTraduction.it = {};
 						tTraduction.it.Dos = '???';
 					end
@@ -296,18 +323,18 @@
 
 	<option id="Signature_FS">	
 		<background mode="transparent"/>
-			<row h="auto"/>
-			<matrix  col_start="1" col_end="0">
-				<col w="0.2cm,2,2,0.2cm,2,2,0.2cm" />
-				<row h="0.7cm"/>
-				<line col_start="1" col_end="0" pen_size="4" border="top" />
-				
-				<text col_start="1" col_end="0" align="left">'Signatures: '</text>
-				<row h="1.5cm"/>
-				<text col_start="2" col_end="3" align="Left" border="all" >'Technical Delegate: '..GetIdentiteOfficiels('TechnicalDelegate')</text>
-				<text col_start="5" col_end="6" align="Left" border="all" ><spacing left="10" right="10" top="2" bottom="2" />'Chief of Results: '..GetIdentiteOfficiels('Chiefofresult')</text>
-				<row h="0.5cm"/>
-			</matrix >
+		<row h="auto"/>
+		<matrix  col_start="1" col_end="0">
+			<col w="0.2cm,2,2,0.2cm,2,2,0.2cm" />
+			<row h="0.7cm"/>
+			<line col_start="1" col_end="0" pen_size="4" border="top" />
+			
+			<text col_start="1" col_end="0" align="left">'Signatures: '</text>
+			<row h="2.5cm" />
+			<text col_start="2" col_end="3" align="top,center_horizontal" border="all" ><spacing left="10" right="10" top="10" bottom="10" />base:GetOfficielAttribute('TechnicalDelegate', Label):MakeUpper()..': '..GetIdentiteOfficiels('TechnicalDelegate')</text>
+			<text col_start="5" col_end="6" align="top,center_horizontal" border="all" ><spacing left="10" right="10" top="10" bottom="10" />base:GetOfficielAttribute('Chiefofresult', Label):MakeUpper()..': '..GetIdentiteOfficiels('Chiefofresult')</text>
+			<row h="0.5cm"/>
+		</matrix >
 	</option>
 	
 </edition>
