@@ -2,7 +2,7 @@
 <root update="0">
   <panel name="config">
     <lua>dofile('./interface/adv.lua');</lua>
-    <lua>CE = params.CE or 'N';</lua>
+    <lua>CE = params.CE or 'N'; CE = 'O'; </lua>
     <padding all="2px"/>
     <col value="1"/>
     <row value="50px"/>
@@ -190,7 +190,60 @@
     <textctrl col_start="3" align="left" name="discipline"/>
     <toolbar row="auto" col_start="1" col_end="0" name="tb" style="TB_FLAT,TB_HORIZONTAL,TB_TEXT"/>
   </panel>
-  <panel id="print">
+	<!-- tDraw:OrderBy(draw.tClefTri[1].Clef); -->
+	<!-- tDrawG1 dans les 15 de la ECSL -->
+	<!-- tDrawG2 les 450 - 200 pts -->
+	<!-- tDrawG3 dans les 30 de la WC -->
+	<!-- tDrawG4 les winner des CC -->
+	<!-- tDrawG5 tous les ECSL  -->
+	<!-- tDrawG6 tous les pts FIS  -->
+   <panel name="backoffice">
+    <lua>dofile('./interface/adv.lua');</lua>
+    <padding all="5px"/>
+    <col value="1"/>
+    <row value="50px"/>
+	<row value="50px"/>
+	
+	<matrix row="auto">
+		<col value="1,1+100px,2,1,1"/>
+		<wndtext row="50px" col_start="3" align="center"><font size="12" /><background mode="solid" color="ltgray"/>'Back Office des COC'</wndtext>
+		<statictext row="auto" font_weight="bold" col_start="2" style="ALIGN_RIGHT" label="Nom du groupe"/>
+		<statictext col_start="3" font_weight="bold"  style="ALIGN_CENTER" label="Clefs de tri appliquée"/>
+		<statictext col_start="4" font_weight="bold"  style="ALIGN_CENTER" label="Clefs de tri disponibles"/>
+		<statictext row="auto" font_weight="bold" col_start="2" style="ALIGN_RIGHT" label="ECSL de 1 à 15 : "/>
+		<textctrl col_start="3" align="left" name="clef_g1" style="TE_READONLY"/>
+		<combobox col_start="4" style="CB_READONLY" name="groupe1" />
+		<statictext row="auto" font_weight="bold" col_start="2" style="ALIGN_RIGHT" label="Groupe 450+ : "/>
+		<textctrl col_start="3" align="left" name="clef_g2" style="TE_READONLY"/>
+		<combobox col_start="4" style="CB_READONLY" name="groupe2" />
+		<statictext row="auto" font_weight="bold" col_start="2" style="ALIGN_RIGHT" label="WCSL Top 30 : "/>
+		<textctrl col_start="3" align="left" name="clef_g3" style="TE_READONLY"/>
+		<combobox col_start="4" style="CB_READONLY" name="groupe3" />
+		<statictext row="auto" font_weight="bold" col_start="2" style="ALIGN_RIGHT" label="COC Winners : "/>
+		<textctrl col_start="3" align="left" name="clef_g4" style="TE_READONLY"/>
+		<combobox col_start="4" style="CB_READONLY" name="groupe4" />
+		<statictext row="auto" font_weight="bold" col_start="2" style="ALIGN_RIGHT" label="Groupe ECSL : "/>
+		<textctrl col_start="3" align="left" name="clef_g5" style="TE_READONLY"/>
+		<combobox col_start="4" style="CB_READONLY" name="groupe5" />
+		<statictext row="auto" font_weight="bold" col_start="2" style="ALIGN_RIGHT" label="Position du 1er 450+ : "/>
+		<textctrl col_start="3" align="left" name="pos_450+"/>
+		<statictext row="auto" font_weight="bold" col_start="2" style="ALIGN_RIGHT" label="Position du 1er COC Winner : "/>
+		<textctrl col_start="3" align="left" name="pos_COC"/>
+		<statictext row="auto" font_weight="bold" col_start="2" style="ALIGN_RIGHT" label="Nombre de ECSL à prendre : "/>
+		<textctrl col_start="3" align="left" name="nb_ECSL"/>
+		<statictext row="auto" font_weight="bold" col_start="2" style="ALIGN_RIGHT" label="Points du TOP x WCSL à indiquer : "/>
+		<textctrl col_start="3" align="left" name="clt_WCSL"/>
+		<statictext row="auto" font_weight="bold" col_start="2" style="ALIGN_RIGHT" label="Nb de QLF pour les finales : "/>
+		<textctrl col_start="3" align="left" name="qlf_Finale"/>
+		<statictext row="auto" font_weight="bold" col_start="2" style="ALIGN_RIGHT" label="Impression du top x en Pts FIS : "/>
+		<textctrl col_start="3" align="left" name="topx_FIS"/>
+	</matrix>
+
+    <row value="50px"/>
+    <toolbar row="auto" col_start="1" col_end="0" name="tbbackoffice" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
+    <row value="1"/>
+  </panel>
+ <panel id="print">
     <lua>dofile('./interface/adv.lua'); </lua>
     <header>
       <spacing all="0"/>
@@ -460,13 +513,12 @@
     </rupture>
     <body>
       <row value="auto"/>
+	  <font size="8" weight="bold"/>
       <background mode="solid" color="green" cond="body:GetCell('TG', row) == 'QLF'"/>
       <background mode="solid" color="white" cond="body:GetCell('TG', row) == 'DNQLF'"/>
       <background mode="solid" color="yellow" cond="string.find(body:GetCell('TG', row),'WC')"/>
-      <text col="4" align="center">
-        <font size="8" weight="bold"/>$(Rang_tirage)</text>
-      <text col="5" align="center">
-        <font size="8" />	$(Code_coureur):sub(4)</text>
+      <text col="4" align="center">$(Rang_tirage)</text>
+      <text col="5" align="center">$(Code_coureur):sub(4)</text>
       <text col="20" align="left" font_weight="bold" font_size_step="1">$(Nom)..' '..$(Prenom)</text>
       <text col="4" align="center">$(An)</text>
       <text col="7" align="center">$(ECSL_points)</text>
@@ -654,7 +706,7 @@
       <font size="10" weight="normal" adjust="ellipsize"/>
       <call option="couleur_alternee" file="./edition/options.xml"/>
       <lua>if params.EstCE == 1 then if row &lt; body:GetNbRows() -2 then row_next = row+1; end</lua>
-      <background mode="solid" color="ltyellow" cond="body:GetCellInt('ECSL_30', row) == 99"/>
+      <background mode="solid" color="ltyellow" cond="body:GetCellInt('ECSL_30', row) == 99 and params.EstFinale == 0"/>
       <lua>end</lua>
       <row value="0.3cm" cond="body:GetCellInt('Groupe_tirage', row) ~= current_group"/>
       <lua>current_group = body:GetCellInt('Groupe_tirage', row)</lua>
