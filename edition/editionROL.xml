@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!--  Menu Editions Activité "FOND" version="7.4"  -->
-	<!-- nettoyage du fichier mise en place de la fonction getidentitecoureur  -->
+<!--  Menu Editions Activité "ROL" version="8.0"  -->
 	<!-- Activation de la fenetre filtrage epreuves pour une edition gerer par un .lua => Option filter="before"  -->
-	<!-- calcul de la note poursuite 2éme jour  -->
+	<!-- calcul de la note poursuite 2éme jour ??? -->
 	<!-- si possible de faire fonctionner les cond="discipline:In('POURS')" dans les <menus> ?? dans <marging> et dans les <options>  -->
 	 <!-- <paper orientation="landscape" cond="Nb_tps_inter >= 4 "/>  -->
-		
 
 <edition>
 	<menu>
@@ -39,12 +37,11 @@
 			<menu title="Par Epreuve:" image="./res/16x16_bib.png" >
 				<menu title="Nom Prénom" image="./res/16x16_bib.png" id="Lst_epr_speaker" officiel="0" speaker="0" />
 				<menu title="Prénom Nom (speaker)" image="./res/16x16_bib.png" id="Lst_epr_speaker" officiel="0" speaker="1" />
-				
 			</menu>
 		</menu>
 		
 		<menu title="Résultats (Jour 1 et Poursuite) " image="./res/32x32_ranking.png">
-			<menu title="Provisoire" image="./res/16x16_ranking.png" id="res_officiel" first_header="0" officiel="0"/>
+			<menu title="Provisoire" image="./res/16x16_ranking.png" id="res_officiel" first_header="0" officiel="-1"/>
 			<menu title="Officieux" image="./res/16x16_ranking.png" id="res_officiel" first_header="0" officiel="0" />
 			<menu title="Officiels" image="./res/16x16_official.png" id="res_officiel" officiel="1" />
 			<menu title="Multi épreuve(poursuite)" image="./res/16x16_juges.png"  id="res_epr2"/>
@@ -68,20 +65,13 @@
 		<background mode="transparent"/>
 		<font name="Calibri" size="14" adjust="max" weight="bold"/>
 		<lua>
+			dofile('./edition/functionNordique.lua');
 			entite = $(Evenement.Code_entite)
 			discipline = $(Epreuve.Code_discipline)
 			type_edition = id:sub(1,4)
-			officiel = tonumber(params.officiel)
+			Officiel = tonumber(params.officiel)
 			Regroupement = $(Epreuve.Code_regroupement)
-			if type_edition == 'Lst_' then
-				Titre = 'Liste de départ \n '..params.title
-			elseif type_edition == 'part' then
-				Titre = 'Liste de Participants \n '..params.title
-			elseif type_edition == 'res_' then
-				Titre = 'Résultats \n '..params.title
-			else
-				Titre = title
-			end
+			GetTitre(type_edition, Officiel, discipline);
 			flagQrCode = 0;
 			if params ~= nil and params.Qrcode ~= nil then flagQrCode = params.Qrcode end
 		</lua>	
@@ -129,7 +119,7 @@
 		<text col_start="1" align="left">'DELEGUE TECHNIQUE '..entite..':'</text>
 		<text col_start="2" col_end="3" align="left">GetIdentiteOfficiels('TechnicalDelegate')</text>
 		<text col_start="5" align="left" >'Nom du Site :'</text>
-		<text col_start="6" align="left" >$(Pistes.Nom_piste)</text>
+		<text col_start="6" align="left" >$(Epreuve_Nordique.Piste)</text>
 		<text col_start="9" align="left">'Lieu :'</text>
 		<text col_start="10" col_end="0" align="right" >$(Epreuve_Nordique.Lieu)</text>
 	
@@ -309,6 +299,10 @@
 
 	<!-- Liste Par Ordre Alpha -->
 	<report id="part_officiel" title="(params.title or '')" header="1" first_header="0" rupture="0">
+		<lua>
+			page_break = page_break or 1;
+			entite = $(Evenement.Code_entite);
+		</lua>
 		<call option="identiteCoureur" file="./edition/options.xml"/>
 		
 		<order key="Identite Asc" />
@@ -335,6 +329,10 @@
 
 	<!-- Liste Par Ordre points -->
 	<report id="part_officiel_points" title="(params.title or '')" header="1" first_header="0" rupture="(params.rupture)">
+		<lua>
+			page_break = page_break or 1;
+			entite = $(Evenement.Code_entite);
+		</lua>
 		<call option="identiteCoureur" file="./edition/options.xml"/>
 		<order key="Point Asc ,Dossard Asc, Identite Asc" />
 		<body>
@@ -467,9 +465,6 @@
 			Regroupement = $(Epreuve.Code_regroupement)
 		</lua>	
 		<!-- <layers> -->
-			<!-- <layer id="bandeauFFS_nordique"> -->
-		<!-- </layer> -->
-		<!-- </layers> -->
 		<!-- <margin left="80" top="320" right="80" bottom="20" cond="Regroupement:In('F','SKI-TOUR')"/> -->
 		<!-- <call option="Affiche_bandeauFFS" cond="editor:GetPageCurrent() == 1 and type_edition == 'res_' or type_edition == 'lst_' and officiel == 1 and Regroupement:In('F','SKI-TOUR')" file="./edition/options.xml"/> -->
 	
@@ -495,7 +490,7 @@
 			<text col="4" align="center" label="CS." >$(Comite)</text>
 			<text col="12" align="left" label="Club" cond="entite == 'FFS'">$(Club)</text>
 			<text col="6" align="right" label="Points" cond="entite == 'FFS'">$(Point)</text>
-			<text col="9" align="right" label="H. Départ" cond="discipline:In('FS','KO-QLF','IND', 'TEA-SP')">$(Heure_depart1, "%2hh%2m:%2s")</text>
+			<text col="9" align="right" label="H. Départ" cond="discipline:In('FS','KO-QLF', 'IND', 'TEA-SP')">$(Heure_depart1, "%2hh%2m:%2s")</text>
 			<text col="11" align="right" label="H. Départ Pours" cond="discipline:In('POURS')">$(Heure_depart2, "%2hh%2m:%2s")</text>
 			<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
 		</body>
@@ -712,7 +707,7 @@
 			<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
 		</body>
 		
-		<end cond="params.title=='Officiels'">
+		<end cond="officiel == 1">
 			<lua>sqlBase.FixationTableRanking(body)</lua>
 			<call option="signature_dt" file="./edition/options.xml" />
 		</end>
@@ -968,7 +963,10 @@
 	
 		<!-- Résultats Skiathlon -->
 	<report id="res_Skiathlon" title="(params.title or '')" header="1" first_header="0" >
-		<lua>Nb_tps_inter = base:GetTable('Epreuve_Nordique'):GetCellInt('Nb_temps_inter', 0, 1) or 2</lua>
+		<lua>
+			Nb_tps_inter = base:GetTable('Epreuve_Nordique'):GetCellInt('Nb_temps_inter', 0, 1) or 2;
+			manche = params.manche or 1;
+		</lua>
 		<!-- <lua>Nb_tps_inter = 2</lua> -->
 		<!-- <lua>Nb_tps_inter = base:GetTable('Epreuve_Alpine_Manche'):GetCellInt('Nb_temps_inter', 0, 1)</lua> -->
 		<!-- <paper orientation="landscape" cond="Nb_tps_inter >= 4 "/> -->
@@ -1085,7 +1083,10 @@
 	
 		<!-- Résultats diff inter -->
 	<report id="res_DiffInter" title="(params.title or '')" header="1" first_header="0" >
-		<lua>Nb_tps_inter = base:GetTable('Epreuve_Nordique'):GetCellInt('Nb_temps_inter', 0, 1) or 1</lua>
+		<lua>
+			Nb_tps_inter = base:GetTable('Epreuve_Nordique'):GetCellInt('Nb_temps_inter', 0, 1) or 1
+			manche = params.manche or 1;
+		</lua>
 		<!-- <paper orientation="landscape" cond="Nb_tps_inter >= 4 "/> -->
 		<!-- création des colonne dans le body -->
 		<column name="Diff_I2_I1" type="chrono" />
@@ -1324,3 +1325,4 @@
 		</body>
 	</report>	
 </edition>
+

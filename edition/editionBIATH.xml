@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- Menu Editions Activité "Biathlon" !-->
-<!-- version="5.6" !-->
+<!-- version="7.1" !-->
 <!-- calcul de la note poursuite 2éme jour !-->
 <!-- si possible de faire fonctionner les cond="discipline:In('POURS')" dans les menus ??  !-->
 <!-- verifier l'ordre en cas d'axeco !-->
 <!-- dans le first header comment on peu eviter c-d-c-d- - -   !-->
 
 <edition>
-	
 	<menu>
 		<menu title="Listes des Participants " image="./res/32x32_juges.png">
 			<menu title="Par Ordre Alphabétique" image="./res/16x16_juges.png" id="part_officiel" />
@@ -33,7 +32,7 @@
 		</menu>
 		
 		<menu title="Résultats (Jour 1 et Poursuite) " image="./res/32x32_ranking.png">
-			<menu title="Provisoire" image="./res/16x16_ranking.png" id="res_officiel" first_header="0" officiel="0"/>
+			<menu title="Provisoire" image="./res/16x16_ranking.png" id="res_officiel" first_header="0" officiel="-1"/>
 			<menu title="Officieux" image="./res/16x16_ranking.png" id="res_officiel" first_header="0" officiel="0" />
 			<menu title="Officiels" image="./res/16x16_official.png" id="res_officiel" officiel="1" />
 			<menu title="Officiels poursuite 2éme Jour" image="./res/16x16_official.png" id="res_off_Pours" officiel="1" />
@@ -46,20 +45,13 @@
 	<!-- header standard !-->
 	<header>
 		<lua>
+			dofile('./edition/functionNordique.lua');
 			entite = $(Evenement.Code_entite)
 			discipline = $(Epreuve.Code_discipline)
 			type_edition = id:sub(1,4)
-			officiel = tonumber(params.officiel)
+			Officiel = tonumber(params.officiel)
 			Regroupement = $(Epreuve.Code_regroupement)
-			if type_edition == 'Lst_' then
-				Titre = 'Liste de départ \n '..params.title
-			elseif type_edition == 'part' then
-				Titre = 'Liste de Participants \n '..params.title
-			elseif type_edition == 'res_' then
-				Titre = 'Résultats \n '..params.title
-			else
-				Titre = title
-			end
+			GetTitre(type_edition, Officiel, discipline);
 			flagQrCode = 0;
 			if params ~= nil and params.Qrcode ~= nil then flagQrCode = params.Qrcode end
 		</lua>	
@@ -110,7 +102,7 @@
 		<text col_start="1" align="left">'DELEGUE TECHNIQUE '..entite..':'</text>
 		<text col_start="2" col_end="3" align="left">GetIdentiteOfficiels('TechnicalDelegate')</text>
 		<text col_start="5" align="left" >'Nom du Site :'</text>
-		<text col_start="6" align="left" >$(Pistes.Nom_piste)</text>
+		<text col_start="6" align="left" >$(Epreuve_Nordique.Piste)</text>
 		<text col_start="9" align="left">'Lieu :'</text>
 		<text col_start="10" col_end="0" align="right" >$(Epreuve_Nordique.Lieu)</text>
 	
@@ -187,7 +179,6 @@
 		<lua>else </lua>
 		<row value="0.4cm" />
 		<lua>end </lua>
-
 	</first_header>
 	
 	<!-- footer standard !-->

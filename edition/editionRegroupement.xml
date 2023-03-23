@@ -22,127 +22,127 @@
 		<row value="10px" />
 		<!-- critère n°1 -->
 		<matrix col_start="1" row="auto">
-			<col value="1,1,2,30px"/>
+			<col value="15px,1,1,1,30px"/>
 			<row value="30px" />
-			<statictext row="auto" col_start="1" align="right" label="Prendre" />
-			<combobox col_start="2" name="prendre1" align="center"/>
-			<combobox col_start="3" name="comboPrendre1" align="center" style="CB_READONLY" />
+			<statictext row="auto" col_start="2" align="right" label="Prendre" />
+			<combobox col_start="3" name="prendre1" align="center"/>
+			<combobox col_start="4" name="comboPrendre1" align="center" style="CB_READONLY" />
 			<statictext row="auto" col_start="2" align="right" label="Catégorie" />
-			<combobox col_start="3" name="comboCateg1" align="center" style="CB_READONLY" />
-			<statictext row="auto" col_start="1" col_end="2" align="right" label="ou né(e)s entre" />
-			<matrix col_start="3" >
+			<combobox col_start="4" name="comboCateg1" align="center" style="CB_READONLY" />
+			<statictext row="auto" col_start="2" col_end="2" align="right" label="ou né(e)s entre" />
+			<matrix col_start="3" col_end="4" >
 				<col value="2,1,2" />
 				<combobox row="auto" col_start="1" name="anneeDebut1" align="center" style="CB_READONLY" />
 				<statictext col_start="2" align="center" label="et" />
 				<combobox col_start="3" name="anneeFin1" align="center" style="CB_READONLY" />
 			</matrix>
 			<row value="10px" />
-			<staticbox row_start="1" row_end="0" col_start="1" col_end="4" label="Critère n°1" />
+			<staticbox row_start="1" row_end="0" col_start="1" col_end="0" label="Critère n°1" />
 		</matrix>
 
 		<row value="10px" />
 		<!-- critère n°2 -->
 		<matrix col_start="1" row="auto">
-			<col value="1,1,2,30px"/>
+			<col value="15px,1,1,1,30px"/>
 			<row value="30px" />
-			<statictext row="auto" col_start="1" align="right" label="Prendre" />
-			<combobox col_start="2" name="prendre2" align="center"/>
-			<combobox col_start="3" name="comboPrendre2" align="center" style="CB_READONLY" />
+			<statictext row="auto" col_start="2" align="right" label="Prendre" />
+			<combobox col_start="3" name="prendre2" align="center"/>
+			<combobox col_start="4" name="comboPrendre2" align="center" style="CB_READONLY" />
 			<statictext row="auto" col_start="2" align="right" label="Catégorie" />
-			<combobox col_start="3" name="comboCateg2" align="center" style="CB_READONLY" />
-			<statictext row="auto" col_start="1" col_end="2" align="right" label="ou né(e)s entre" />
-			<matrix col_start="3" >
+			<combobox col_start="4" name="comboCateg2" align="center" style="CB_READONLY" />
+			<statictext row="auto" col_start="2" col_end="2" align="right" label="ou né(e)s entre" />
+			<matrix col_start="3" col_end="4" >
 				<col value="2,1,2" />
 				<combobox row="auto" col_start="1" name="anneeDebut2" align="center" style="CB_READONLY" />
 				<statictext col_start="2" align="center" label="et" />
 				<combobox col_start="3" name="anneeFin2" align="center" style="CB_READONLY" />
 			</matrix>
 			<row value="10px" />
-			<staticbox row_start="1" row_end="0" col_start="1" col_end="4" label="Critère n°2" />
+			<staticbox row_start="1" row_end="0" col_start="1" col_end="0" label="Critère n°2" />
 		</matrix>
 
 		<!-- critère n°3 -->
 		<matrix col_start="2" row="auto" row_start="-3">
-			<col value="1,1,2,30px"/>
+			<col value="15px,1,1,1,30px"/>
 			<row value="30px" />
-			<statictext row="auto" col_start="1" align="right" label="Prendre" />
-			<combobox col_start="2" name="prendre3" align="center"/>
-			<combobox col_start="3" name="comboPrendre3" align="center" style="CB_READONLY" />
+			<statictext row="auto" col_start="2" align="right" label="Prendre" />
+			<combobox col_start="3" name="prendre3" align="center"/>
+			<combobox col_start="4" name="comboPrendre3" align="center" style="CB_READONLY" />
 			<statictext row="auto" col_start="2" align="right" label="Catégorie" />
-			<combobox col_start="3" name="comboCateg3" align="center" style="CB_READONLY" />
-			<statictext row="auto" col_start="1" col_end="2" align="right" label="ou né(e)s entre" />
-			<matrix col_start="3" >
+			<combobox col_start="4" name="comboCateg3" align="center" style="CB_READONLY" />
+			<statictext row="auto" col_start="2" col_end="2" align="right" label="ou né(e)s entre" />
+			<matrix col_start="3" col_end="4" >
 				<col value="2,1,2" />
 				<combobox row="auto" col_start="1" name="anneeDebut3" align="center" style="CB_READONLY" />
 				<statictext col_start="2" align="center" label="et" />
 				<combobox col_start="3" name="anneeFin3" align="center" style="CB_READONLY" />
 			</matrix>
 			<row value="10px" />
-			<staticbox row_start="1" row_end="0" col_start="1" col_end="4" label="Critère n°3" />
+			<staticbox row_start="1" row_end="0" col_start="1" col_end="0" label="Critère n°3" />
 		</matrix>
 
 		<!-- critère n°4 -->
 		<matrix col_start="2" row="auto" row_start="-2">
-			<col value="1,1,2,30px"/>
+			<col value="15px,1,1,1,30px"/>
 			<row value="30px" />
-			<statictext row="auto" col_start="1" align="right" label="Prendre" />
-			<combobox col_start="2" name="prendre4" align="center"/>
-			<combobox col_start="3" name="comboPrendre4" align="center" style="CB_READONLY" />
+			<statictext row="auto" col_start="2" align="right" label="Prendre" />
+			<combobox col_start="3" name="prendre4" align="center"/>
+			<combobox col_start="4" name="comboPrendre4" align="center" style="CB_READONLY" />
 			<statictext row="auto" col_start="2" align="right" label="Catégorie" />
-			<combobox col_start="3" name="comboCateg4" align="center" style="CB_READONLY" />
-			<statictext row="auto" col_start="1" col_end="2" align="right" label="ou né(e)s entre" />
-			<matrix col_start="3" >
+			<combobox col_start="4" name="comboCateg4" align="center" style="CB_READONLY" />
+			<statictext row="auto" col_start="2" col_end="2" align="right" label="ou né(e)s entre" />
+			<matrix col_start="3" col_end="4" >
 				<col value="2,1,2" />
 				<combobox row="auto" col_start="1" name="anneeDebut4" align="center" style="CB_READONLY" />
 				<statictext col_start="2" align="center" label="et" />
 				<combobox col_start="3" name="anneeFin4" align="center" style="CB_READONLY" />
 			</matrix>
 			<row value="10px" />
-			<staticbox row_start="1" row_end="0" col_start="1" col_end="4" label="Critère n°4" />
+			<staticbox row_start="1" row_end="0" col_start="1" col_end="0" label="Critère n°4" />
 		</matrix>
 
 		<!-- critère n°5 -->
 		<matrix col_start="3" row="auto" row_start="-5">
-			<col value="1,1,2,30px"/>
+			<col value="15px,1,1,1,30px"/>
 			<row value="30px" />
-			<statictext row="auto" col_start="1" align="right" label="Prendre" />
-			<combobox col_start="2" name="prendre5" align="center"/>
-			<combobox col_start="3" name="comboPrendre5" align="center" style="CB_READONLY" />
+			<statictext row="auto" col_start="2" align="right" label="Prendre" />
+			<combobox col_start="3" name="prendre5" align="center"/>
+			<combobox col_start="4" name="comboPrendre5" align="center" style="CB_READONLY" />
 			<statictext row="auto" col_start="2" align="right" label="Catégorie" />
-			<combobox col_start="3" name="comboCateg5" align="center" style="CB_READONLY" />
-			<statictext row="auto" col_start="1" col_end="2" align="right" label="ou né(e)s entre" />
-			<matrix col_start="3" >
+			<combobox col_start="4" name="comboCateg5" align="center" style="CB_READONLY" />
+			<statictext row="auto" col_start="2" col_end="2" align="right" label="ou né(e)s entre" />
+			<matrix col_start="3" col_end="4" >
 				<col value="2,1,2" />
 				<combobox row="auto" col_start="1" name="anneeDebut5" align="center" style="CB_READONLY" />
 				<statictext col_start="2" align="center" label="et" />
 				<combobox col_start="3" name="anneeFin5" align="center" style="CB_READONLY" />
 			</matrix>
 			<row value="10px" />
-			<staticbox row_start="1" row_end="0" col_start="1" col_end="4" label="Critère n°5" />
+			<staticbox row_start="1" row_end="0" col_start="1" col_end="0" label="Critère n°5" />
 		</matrix>
 
 		<!-- critère n°6 -->
 		<matrix col_start="3" row="auto" row_start="-4">
-			<col value="1,1,2,30px"/>
+			<col value="15px,1,1,1,30px"/>
 			<row value="30px" />
-			<statictext row="auto" col_start="1" align="right" label="Prendre" />
-			<combobox col_start="2" name="prendre6" align="center"/>
-			<combobox col_start="3" name="comboPrendre6" align="center" style="CB_READONLY" />
+			<statictext row="auto" col_start="2" align="right" label="Prendre" />
+			<combobox col_start="3" name="prendre6" align="center"/>
+			<combobox col_start="4" name="comboPrendre6" align="center" style="CB_READONLY" />
 			<statictext row="auto" col_start="2" align="right" label="Catégorie" />
-			<combobox col_start="3" name="comboCateg6" align="center" style="CB_READONLY" />
-			<statictext row="auto" col_start="1" col_end="2" align="right" label="ou né(e)s entre" />
-			<matrix col_start="3" >
+			<combobox col_start="4" name="comboCateg6" align="center" style="CB_READONLY" />
+			<statictext row="auto" col_start="2" col_end="2" align="right" label="ou né(e)s entre" />
+			<matrix col_start="3" col_end="4" >
 				<col value="2,1,2" />
 				<combobox row="auto" col_start="1" name="anneeDebut6" align="center" style="CB_READONLY" />
 				<statictext col_start="2" align="center" label="et" />
 				<combobox col_start="3" name="anneeFin6" align="center" style="CB_READONLY" />
 			</matrix>
 			<row value="10px" />
-			<staticbox row_start="1" row_end="0" col_start="1" col_end="4" label="Critère n°6" />
+			<staticbox row_start="1" row_end="0" col_start="1" col_end="0" label="Critère n°6" />
 		</matrix>
 		<row value="10px" />
 		<staticbox row_start="1" row_end="0" col_start="1" col_end="0" label="Paramètres généraux" />
-		<toolbar row="50px" col_start="1" col_end="0" name="tbedit" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT" />
+		<toolbar row="auto" col_start="1" col_end="0" name="tbedit" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT" />
 		<row value="30px" />
 	</panel>
 	<report id="print" >
@@ -211,7 +211,7 @@
 			<text col_start="3" align="center" >'S.'</text>
 			<text col_start="4" align="center" >'An'</text>
 			<text col_start="5" align="center" >'Cat'</text>
-			<text col_start="6" align="center" >'C.r.'</text>
+			<text col_start="6" align="center" >'Cs.'</text>
 			<text col_start="7" align="center" >'Identité'</text>
 			<text col_start="8" align="center" >'Clt'</text>
 			<text col_start="9" align="center" cond="params.TpsPts == 'T'">'Temps'</text>

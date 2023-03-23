@@ -25,4 +25,26 @@
 </panel>
 
 
+<panel name="config">
+	<col w="2"/>
+	<col w="3"/>
+
+	<padding all="2px"/>
+
+	<staticbox row="auto" col_start="1" col_end="0" label="Coureur en Course">
+		<col w="2,1" />
+
+		<row h="auto" />
+		<statictext col_start="1" align="right" label="Délai passage Arrivée en secondes" />
+		<spinctrl col_start="2" name="finished_delay"/>
+
+		<row h="auto" />
+		<statictext col_start="1" align="right" label="Délai passage Inter en secondes" />
+		<spinctrl col_start="2" name="inter_delay"/>
+	</staticbox>
+
+	<toolbar row="auto" col_start="1" col_end="0" name="tb" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT" />
+</panel>
+
+
 </root>

@@ -24,9 +24,10 @@
 
 		<menu title="Résultats" image="./res/32x32_ranking.png">
 			<menu title="D'une Manche" image="./res/16x16_ranking.png" id="res_manche" choix_manche="1"/>
-			<menu title="Résultats Officieux" image="./res/16x16_ranking.png" id="res_officiel" officiel="0"/>
+			<menu title="Résultats Officieux" image="./res/16x16_ranking.png" id="res_officiel" officiel="0" first_header="0" />
+			<menu title="Résultats Officieux (avec Clt/Cat)" image="./res/16x16_ranking.png" Clt_cat="1" id="res_officiel" officiel="0" first_header="0" />
 			<!-- <menu title="Calcul de la Pénalité" image="./res/16x16_calc.png" language="en" action="penalite" /> -->
-			<menu title="Résultats Officiels" image="./res/16x16_official.png" id="res_officiel" officiel="1"/>
+			<menu title="Résultats Officiels" image="./res/16x16_official.png" id="res_officiel" officiel="1" first_header="1"  />
 			<menu title="Résultats Esprit Racing" image="./res/16x16_official.png">
 				<menu title="Résultats Officiels" image="./res/16x16_official.png" id="res_er" officiel="1"/>
 				<menu title="Présentation par Groupes de Catégories à la suite les uns des autres" image="./res/16x16_official.png" filter="after" officiel="0" id="res_er_groupe"/>
@@ -672,11 +673,15 @@
 	</report>
 
 	<!-- Résultats Officiels -->
-	<report id="res_officiel" title="(params.title)">
+	<report id="res_officiel" title="(params.title)" first_header="(params.first_header or '1')">
+		<call option="identiteOfficiel" file="./edition/options.xml"/>
 		<column name="Tps_status">chrono.Status(body:GetCellInt('Tps', row))</column>
-		<lua>body:SetCounter('Tps_status')</lua>
-		<lua>entite = $(Evenement.Code_entite)</lua>
-		<lua>nb_manche = nb_manche or 1</lua>
+		<lua>
+			body:SetCounter('Tps_status');
+			entite = $(Evenement.Code_entite);
+			nb_manche = nb_manche or 1;
+			Clt_cat = tonumber(params.Clt_cat) or 0;
+		</lua>
 
 		<order key="Tps, Dossard Desc" />
 		
@@ -698,10 +703,11 @@
 			<row value="auto"/>
 			<text col="4" align="center" label="Clt" font_weight="bold" font_size_step="1">$(Clt)</text>
 			<text col="4" align="center" label="Dos" font_style="italic">$(Dossard)</text>
+			<text col="4" align="center" label="Clt / Cat/ S." cond="Clt_cat == 1"><font size_step="-1" cond="group=='body'"/>$(Cltc)..' /'..$(Categ)..' /'..$(Sexe)..' '</text>
 			<text col="7" align="center" label="Code"><font size="8" cond="group =='body'"/>$(Code_coureur):sub(4)</text>
 			<text col="16" align="left" cond="$(Critere) == 'DSQ'" label="Nom - Prénom" font_weight="bold">$(Identite)..'  **'</text> 
 			<text col="16" align="left" cond="$(Critere) ~= 'DSQ'" label="Nom - Prénom" font_weight="bold">$(Identite)</text> 
-			<text col="2" align="center" label="S." cond="entite == 'FFS'">$(Sexe)</text>
+			<text col="2" align="center" label="S." cond="entite == 'FFS' and Clt_cat ~= 1">$(Sexe)</text>
 			<text col="4" align="center" label="An">$(An)</text>
 			<text col="4" align="center" label="Nat." cond="entite == 'FIS'" font_style="italic">$(Nation)</text>
 			<!-- <image col_start="0" adjust="height" align="right" border="0" cond="entite == 'FIS'"><background mode="transparent"/>app.ImageNation($(Nation))</image>  -->
