@@ -133,11 +133,7 @@
 			<text row_start="1" row_end="0" col_start="3" align="center" >SexeEquipe</text>
 			<lua>			
 				for m=0, NbEquipiers-1 do
-					if params.DossardRelais == 'Lettre' then
-						LettreDossard = $(Dossard)..'-'..base:GetEquipier($(Code_coureur), m+1, 'Numero');
-					else
-						LettreDossard = $(Dossard)..'/'..m+1;
-					end
+					LettreDossard = $(Dossard)..'/'..m+1;
 			</lua>																
 			<text row_start='(m+1)' col_start="4" align="left" >LettreDossard..' - '..base:GetEquipier($(Code_coureur), m+1, 'Nom')..' '..base:GetEquipier($(Code_coureur), m+1, 'Prenom'):sub(1,1):upper()..base:GetEquipier($(Code_coureur), m+1, 'Prenom'):sub(2):lower()</text>
 			<text row_start='(m+1)' col_start="5" align="center" >base:GetEquipier($(Code_coureur), m+1, 'Categ')..' '..base:GetEquipier($(Code_coureur), m+1, 'Sexe'):Parenthesis()</text>
@@ -145,7 +141,7 @@
 			<text row_start='(m+1)' col_start="7" align="center" >base:GetEquipier($(Code_coureur), m+1, 'Point')</text>
 			<lua>end</lua>  
 			<text row_start="1" row_end="0" col_start="8" align="right" >$(Point)</text>
-			<row value="0.6cm"/>
+			<row value="0.4cm"/>
 		</body>
 	</report>	
 </edition>
