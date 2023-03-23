@@ -3132,8 +3132,6 @@ function LitMatrice()	-- lecture des variables et affectation des valeurs dans l
 	matrice.comboResultatPar = matrice.comboResultatPar or GetValue("comboResultatPar", 'Sans objet');
 	local chaine = "$(Sexe):In('"..matrice.comboSexe.."')";
 	matrice.Cle_filtrage = matrice.Cle_filtrage or GetValue("Cle_filtrage", chaine);
-	matrice.tGroupesCalcul = {};
-	matrice.tResultatsGroupes = {};
 	
 	-- local chaine_er = "and %$%(Groupe%):In%('TOUS'%)";
 	-- local chaine_categ = "and %$%(Categ%):In%('TOUS'%)";
@@ -3158,18 +3156,15 @@ function LitMatrice()	-- lecture des variables et affectation des valeurs dans l
 		end
 	end
 	if selectionresultatpar > 0 then
+		matrice.tGroupesCalcul = {};
+		matrice.tResultatsGroupes = {};
 		matrice.col_resultat_par = tColResultatPar[selectionresultatpar];
 		local parcol = tColResultatPar[selectionresultatpar];
-		 cmd = "Select Code_coureur, "..parcol.." From Resultat Where Code_evenement in ("..matrice.Evenement_selection..") And Sexe = '"..matrice.comboSexe.."' Group By Code_coureur, "..parcol;
+		cmd = "Select Code_coureur, "..parcol.." From Resultat Where Code_evenement in ("..matrice.Evenement_selection..") And Sexe = '"..matrice.comboSexe.."' Group By Code_coureur, "..parcol;
 		local tGroupes = base:TableLoad(cmd)
 		tGroupes:SetCounter(parcol);
 		for i = 0, tGroupes:GetCounter(parcol):GetNbRows() -1 do 
 			table.insert(matrice.tGroupesCalcul, {ColGroupe = parcol, Groupe = tGroupes:GetCounter(parcol):GetCell(0,i), Nombre = tGroupes:GetCounter(parcol):GetCellInt(1,i), Filtre = matrice.Cle_filtrage.." and $("..parcol.."):In('"..tGroupes:GetCounter(parcol):GetCell(0,i).."')"});
-		end
-		 cmd = "Select Code_coureur, "..parcol.." From Resultat Where Code_evenement in ("..matrice.Evenement_selection..") And Sexe = '"..matrice.comboSexe.."' Group By Code_coureur, "..parcol;
-		local tGroupes = base:TableLoad(cmd)
-		tGroupes:SetCounter(parcol);
-		for i = 0, tGroupes:GetCounter(parcol):GetNbRows() -1 do
 			local filtre = matrice.Cle_filtrage.." and $("..parcol.."):In('"..tGroupes:GetCounter(parcol):GetCell(0,i).."')"
 			table.insert(matrice.tResultatsGroupes, 
 				{ColRegroupement = parcol, 
@@ -3178,6 +3173,9 @@ function LitMatrice()	-- lecture des variables et affectation des valeurs dans l
 				}
 			);
 		end
+		-- for i = 1, #matrice.tResultatsGroupes do
+			-- adv.Alert('matrice.tResultatsGroupes[i].ColRegroupement = '..matrice.tResultatsGroupes[i].ColRegroupement..', matrice.tResultatsGroupes[i].Nombre = '..matrice.tResultatsGroupes[i].Nombre..', matrice.tResultatsGroupes[i].Filtre = '..matrice.tResultatsGroupes[i].Filtre);
+		-- end
 	end
 
 	matrice.comboTpsDuDernier = matrice.comboTpsDuDernier or GetValue("comboTpsDuDernier", "Non");
@@ -4597,10 +4595,11 @@ function AffichedlgConfigurationSupport()	-- boîte de dialogue des paramètres de
 end
 
 function OnSavedlgCopycolonnes();	-- lecture et modification des colonnes pour chaque coureur pour toutes les courses de la matrice  
-	local coldestination = dlgCopycolonnes:GetWindowName('copycoldestination'):GetValue()
+	local colsource = dlgCopycolonnes:GetWindowName('copycolsource'):GetValue();
+	local coldestination = dlgCopycolonnes:GetWindowName('copycoldestination'):GetValue();
+	adv.Alert('matrice.copySource = '..tostring(matrice.copySource));
 	if matrice.copySource then	-- on recopie le contenu de la colonne source de la course dans la colonne destination dans toutes les courses de la matrice
-		base:TableLoad(Resultat, 'Select * From Resultat Where Code_evenement = '..matrice.copySource);
-		local colsource = dlgCopycolonnes:GetWindowName('copycolsource'):GetValue();
+		base:TableLoad(tResultat, 'Select * From Resultat Where Code_evenement = '..matrice.copySource);
 		for i = 1, tResultat:GetNbRows() -1 do
 			local code_coureur = tResultat:GetCell('Code_coureur', i);
 			local valeur = tResultat:GetCell(colsource, i);
@@ -4610,6 +4609,7 @@ function OnSavedlgCopycolonnes();	-- lecture et modification des colonnes pour c
 			if matrice.debug == true then
 				adv.Alert(cmd);
 			end
+			adv.Alert('cmd1 = '..cmd);
 			base:Query(cmd);
 		end
 	end
@@ -4629,6 +4629,7 @@ function OnSavedlgCopycolonnes();	-- lecture et modification des colonnes pour c
 		if chaine:len() > 0 then
 			cmd = 'Update Resultat Set '..destination.." = '"..mettre.."' "..
 				' Where Code_evenement In('..matrice.Evenement_selection..") and categ In('"..chaine.."')";
+			adv.Alert('cmd2 = '..cmd);
 			base:Query(cmd);
 		end
 		return;
@@ -4640,6 +4641,7 @@ function OnSavedlgCopycolonnes();	-- lecture et modification des colonnes pour c
 		if matrice.debug == true then
 			adv.Alert(cmd);
 		end
+		adv.Alert('cmd3 = '..cmd);
 		base:Query(cmd);
 	elseif (copycoldestination ~= destination) or (copydata:len() == 0 and mettre:len() == 0) then
 		if app.GetAuiFrame():MessageBox(
@@ -4649,6 +4651,7 @@ function OnSavedlgCopycolonnes();	-- lecture et modification des colonnes pour c
 			) == msgBoxStyle.YES then
 			local cmd = 'Update Resultat Set '..coldestination.." = NULL "..
 				' Where Code_evenement In('..matrice.Evenement_selection..') ';
+			adv.Alert('cmd4 = '..cmd);
 			base:Query(cmd);
 		end
 	end
@@ -4675,8 +4678,8 @@ function OnChangeCourseCopycolonnes()
 	dlgCopycolonnes:GetWindowName('copydata'):Enable(false);
 	base:TableLoad(tEvenement, "Select * From Evenement Where Code = "..tonumber(dlgCopycolonnes:GetWindowName('copycoursecode'):GetValue())..' And Not Code_activite = "CHA-CMB"');
 	if tEvenement:GetNbRows() > 0 then
-		dlgCopycolonnes:GetWindowName('copycoursetitre'):SetValue(Evenement:GetCell('Nom', 0));
-		matrice.copySource = Evenement:GetCell('Code', 0);
+		dlgCopycolonnes:GetWindowName('copycoursetitre'):SetValue(tEvenement:GetCell('Nom', 0));
+		matrice.copySource = tEvenement:GetCell('Code', 0);
 		dlgCopycolonnes:GetWindowName('copycolsource'):Enable(true);
 		dlgCopycolonnes:GetWindowName('copydata'):Enable(true);
 	else
@@ -6081,13 +6084,14 @@ function BuildTableRanking(indice_filtrage)
 		end
 	end
 	local cmd = '';
-	if matrice.comboResultatPar == 'Sans objet' then
-		cmd = 'Select Code_coureur, Sexe From Resultat Where Code_evenement in('..matrice.Evenement_selection..') Group By Code_coureur, Sexe';
-	else
-		cmd = 'Select Code_coureur, Sexe, Categ, Groupe From Resultat Where Code_evenement in('..matrice.Evenement_selection..') Group By Code_coureur, Sexe, Categ, Groupe';
+	local col_resultat_par = '';
+	if indice_filtrage == 0 then
+		cmd = 'Select Code_coureur,Sexe From Resultat Where Code_evenement in('..matrice.Evenement_selection..') Group By Code_coureur, Sexe';
+	else 
+		 col_resultat_par = matrice.tGroupesCalcul[indice_filtrage].ColGroupe; 
+		cmd = 'Select Code_coureur, Sexe, '..col_resultat_par..' From Resultat Where Code_evenement in('..matrice.Evenement_selection..') Group By Code_coureur, Sexe, '..col_resultat_par;
 	end
 	tMatrice_Ranking = base:TableLoad(cmd);
-	tMatrice_Ranking:OrderBy('Code_coureur');
 	local filter = "$(Sexe):In('"..matrice.comboSexe.."')";
 	tMatrice_Ranking:Filter(filter, true);
 	local sexe = ' Hommes';
@@ -6095,8 +6099,8 @@ function BuildTableRanking(indice_filtrage)
 		sexe = ' Dames';
 	end
 	if indice_filtrage > 0 then
-		local col_resultat_par = matrice.tGroupesCalcul[indice_filtrage].ColGroupe; 
-		local filter = "$("..col_resultat_par.."):In('"..matrice.tGroupesCalcul[indice_filtrage].Groupe.."')";
+		col_resultat_par = matrice.tGroupesCalcul[indice_filtrage].ColGroupe; 
+		filter = "$("..col_resultat_par.."):In('"..matrice.tGroupesCalcul[indice_filtrage].Groupe.."')";
 		tMatrice_Ranking:Filter(filter, true);
 		matrice.TitreAdd = '\nClassement '..matrice.tGroupesCalcul[indice_filtrage].Groupe..sexe;
 	end
@@ -6256,10 +6260,16 @@ function BuildTableRanking(indice_filtrage)
 						tMatrice_Ranking:SetCell('Club_long', row, club);
 					end
 				end
-				if row_course == tMatrice_Courses:GetNbRows() -1 then
+				if tMatrice_Ranking:GetCell('Groupe', row):len() == 0 then
 					tMatrice_Ranking:SetCell('Groupe', row, tResultat:GetCell('Groupe', r));
+				end
+				if tMatrice_Ranking:GetCell('Equipe', row):len() == 0 then
 					tMatrice_Ranking:SetCell('Equipe', row, tResultat:GetCell('Equipe', r));
+				end
+				if tMatrice_Ranking:GetCell('Critere', row):len() == 0 then
 					tMatrice_Ranking:SetCell('Critere', row, tResultat:GetCell('Critere', r));
+				end
+				if row_course == tMatrice_Courses:GetNbRows() -1 then
 					tMatrice_Ranking:SetCell('Dossard', row, tResultat:GetCellInt('Dossard', r));
 					tMatrice_Ranking:SetCell('Point', row, tResultat:GetCellDouble('Point', r));
 				end
@@ -8042,7 +8052,7 @@ function OnConfiguration(cparams)
 	else
 		return false;
 	end
-	scrip_version = '6.00';
+	scrip_version = '6.1';
 	-- vérification de l'existence d'une version plus récente du script.
 	-- Ex de retour : LiveDraw=5.94,Matrices=5.92,TimingReport=4.2
 	if app.GetVersion() >= '4.4c' then 		-- début d'implementation de la fonction UpdateRessource
