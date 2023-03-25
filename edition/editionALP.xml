@@ -24,9 +24,9 @@
 
 		<menu title="Résultats" image="./res/32x32_ranking.png">
 			<menu title="Résultats Officiels" image="./res/16x16_official.png" >
-				<menu title="Résultats Officiels" image="./res/16x16_official.png" id="res_officiel" officiel="1" first_header="1"  />
-				<menu title="Résultats Officiels avec Clt/Categ" image="./res/16x16_ranking.png" Clt_cat="1" id="res_officiel" officiel="1" first_header="1" />
-				<menu title="Résultats Officiels avec Rupture par Catégories" filter="before" image="./res/16x16_ranking.png" id="res_categ"/>
+				<menu title="Résultats Officiels" image="./res/16x16_official.png" id="res_officiel" filter="after" officiel="1" first_header="1"  />
+				<menu title="Résultats Officiels avec Clt/Categ" image="./res/16x16_ranking.png" filter="after" Clt_cat="1" id="res_officiel" officiel="1" first_header="1" />
+				<menu title="Résultats Officiels avec Rupture par Catégories" filter="after" image="./res/16x16_ranking.png" id="res_categ"/>
 				<!-- <menu title="Présentation par Groupes de Catégories à la suite les uns des autres" image="./res/16x16_official.png" filter="after" officiel="0" id="res_er_groupe"/> -->
 				<menu title="Résultats Officiels Esprit Racing" image="./res/16x16_official.png">
 					<menu title="Présentation traditionnelle du résultat" image="./res/16x16_official.png" id="res_er" officiel="1"/>
