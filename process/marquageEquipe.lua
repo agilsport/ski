@@ -19,18 +19,18 @@ function CreateEquipe();
 end
 
 function CreatetEquipe_Club();
-	tEquipe_club = sqlTable.Create("Equipe_Club");
-	tEquipe_club:AddColumn({ name = "Matric", label = "Matric", type = sqlType.LONG });
-	tEquipe_club:AddColumn({ name = "Type_equipe", label = "Type_equipe", type = sqlType.CHAR, size = 5 });
-	tEquipe_club:AddColumn({ name = "Code_equipe", label = "Code_equipe", type = sqlType.LONG, style = sqlStyle.NULL });
-	tEquipe_club:SetPrimary('Matric, Type_equipe');
-	tEquipe_club:SetName('Equipe_Club');
-	local strCreate = tEquipe_club:GetStringCreate(base);
+	tEquipe_Club = sqlTable.Create("Equipe_Club");
+	tEquipe_Club:AddColumn({ name = "Matric", label = "Matric", type = sqlType.LONG });
+	tEquipe_Club:AddColumn({ name = "Type_equipe", label = "Type_equipe", type = sqlType.CHAR, size = 5 });
+	tEquipe_Club:AddColumn({ name = "Code_equipe", label = "Code_equipe", type = sqlType.LONG, style = sqlStyle.NULL });
+	tEquipe_Club:SetPrimary('Matric, Type_equipe');
+	tEquipe_Club:SetName('Equipe_Club');
+	local strCreate = tEquipe_Club:GetStringCreate(base);
 	if strCreate then
 		base:Query(strCreate);
 	end
-	ReplaceTableEnvironnement(tEquipe_club, 'Equipe_Club');
-	tEquipe_club = base:GetTable('Equipe_Club');
+	ReplaceTableEnvironnement(tEquipe_Club, 'Equipe_Club');
+	tEquipe_Club = base:GetTable('Equipe_Club');
 end
 
 function OnMarquage(colonne);
@@ -39,7 +39,7 @@ function OnMarquage(colonne);
 	local type_equipe = dlgConfig:GetWindowName('comboTypeEquipe'):GetValue();
 
 	local cmd = "SELECT ec.Code_equipe, e.*, c.*"..
-				" FROM Equipe_club ec"..
+				" FROM Equipe_Club ec"..
 				" LEFT JOIN Equipe e ON ec.Type_equipe = e.Type_equipe AND ec.Code_equipe = e.Id"..
 				" LEFT JOIN Club c ON c.Matric = ec.Matric"..
 				" Where ec.Type_equipe = '"..type_equipe.."'"..
@@ -49,6 +49,7 @@ function OnMarquage(colonne);
 		local club = tEquipe_Marquage:GetCell('Nom_reduit', i);
 		local nom_equipe = tEquipe_Marquage:GetCell('Nom', i);
 		local cmd = "Update Resultat Set "..col_equipe..' = "'..nom_equipe..'" Where Club = "'..club..'" And Code_evenement In('..courses..')';
+		adv.Alert(cmd);
 		base:Query(cmd);
 	end
 end
