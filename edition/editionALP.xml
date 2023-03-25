@@ -23,16 +23,21 @@
 		</menu>
 
 		<menu title="Résultats" image="./res/32x32_ranking.png">
-			<menu title="D'une Manche" image="./res/16x16_ranking.png" id="res_manche" choix_manche="1"/>
-			<menu title="Résultats Officieux" image="./res/16x16_ranking.png" id="res_officiel" officiel="0" first_header="0" />
-			<menu title="Résultats Officieux (avec Clt/Cat)" image="./res/16x16_ranking.png" Clt_cat="1" id="res_officiel" officiel="0" first_header="0" />
-			<!-- <menu title="Calcul de la Pénalité" image="./res/16x16_calc.png" language="en" action="penalite" /> -->
-			<menu title="Résultats Officiels" image="./res/16x16_official.png" id="res_officiel" officiel="1" first_header="1"  />
-			<menu title="Résultats Esprit Racing" image="./res/16x16_official.png">
-				<menu title="Résultats Officiels" image="./res/16x16_official.png" id="res_er" officiel="1"/>
-				<menu title="Présentation par Groupes de Catégories à la suite les uns des autres" image="./res/16x16_official.png" filter="after" officiel="0" id="res_er_groupe"/>
+			<menu title="Résultats Officiels" image="./res/16x16_official.png" >
+				<menu title="Résultats Officiels" image="./res/16x16_official.png" id="res_officiel" officiel="1" first_header="1"  />
+				<menu title="Résultats Officiels avec Clt/Categ" image="./res/16x16_ranking.png" Clt_cat="1" id="res_officiel" officiel="1" first_header="1" />
+				<menu title="Résultats Officiels avec Rupture par Catégories" filter="before" image="./res/16x16_ranking.png" id="res_categ"/>
+				<!-- <menu title="Présentation par Groupes de Catégories à la suite les uns des autres" image="./res/16x16_official.png" filter="after" officiel="0" id="res_er_groupe"/> -->
+				<menu title="Résultats Officiels Esprit Racing" image="./res/16x16_official.png">
+					<menu title="Présentation traditionnelle du résultat" image="./res/16x16_official.png" id="res_er" officiel="1"/>
+					<menu title="Présentation par Groupe de Catégories à la suite les uns des autres" image="./res/16x16_official.png" filter="after" id="res_er_groupe"/>
+				</menu>
 			</menu>
-			<menu title="Résultats Par Catégories (filtrage des coureurs apres le calcul des points)" filter="after" image="./res/16x16_ranking.png" id="res_categ" choix_clt_max="1"/>
+			<menu title="Résultats Officieux" image="./res/16x16_ranking.png">
+				<menu title="Résultats Officieux" image="./res/16x16_ranking.png" id="res_officiel" officiel="0" first_header="0" />
+				<menu title="Résultats Officieux (avec Clt/Cat)" image="./res/16x16_ranking.png" Clt_cat="1" id="res_officiel" officiel="0" first_header="0" />
+			</menu>
+			<menu title="D'une Manche" image="./res/16x16_ranking.png" id="res_manche" choix_manche="1"/>
 			<menu title="Meilleurs Temps" image="./res/16x16_ranking.png" id="res_best" />
 			<menu title="Multi-Passages" image="./res/16x16_official.png" id="res_passage" choix_manche="1" mode_lap="2" />
 		</menu>
@@ -44,7 +49,6 @@
 			<menu title="Factures inscriptions" image="./res/16x16_text.png" lua="./edition/facture.lua"  />		
 		</menu>
 	</menu>
-
 	<!-- footer standard !-->
 	<footer>
 		<background mode="transparent"/>
@@ -703,7 +707,7 @@
 			<row value="auto"/>
 			<text col="4" align="center" label="Clt" font_weight="bold" font_size_step="1">$(Clt)</text>
 			<text col="4" align="center" label="Dos" font_style="italic">$(Dossard)</text>
-			<text col="4" align="center" label="Clt / Cat/ S." cond="Clt_cat == 1"><font size_step="-1" cond="group=='body'"/>$(Cltc)..' /'..$(Categ)..' /'..$(Sexe)..' '</text>
+			<text col="5" align="center" label="Clt/Cat" cond="Clt_cat == 1"><font weight="bold" cond="$(Cltc):len() &gt; 0 and body:GetCellInt('Cltc', row) &lt; 4" />$(Cltc)..'/'..$(Categ)</text>
 			<text col="7" align="center" label="Code"><font size="8" cond="group =='body'"/>$(Code_coureur):sub(4)</text>
 			<text col="16" align="left" cond="$(Critere) == 'DSQ'" label="Nom - Prénom" font_weight="bold">$(Identite)..'  **'</text> 
 			<text col="16" align="left" cond="$(Critere) ~= 'DSQ'" label="Nom - Prénom" font_weight="bold">$(Identite)</text> 
@@ -839,11 +843,8 @@
 	<report id="res_er_groupe" title="Résultats par Groupes de Catégories">
 		<lua>entite = $(Evenement.Code_entite);
 			body:SetRanking('Cltc', 'Tps', 'Reserve');
-			if base:GetTable('Epreuve'):GetNbRows() == 1 then
-				params.officiel = '1';
-			end
 		</lua>
-		<lua>nb_manche = nb_manche or 1;</lua>
+		<lua>nb_manche = base:GetTable('Epreuve'):GetCellInt('Nombre_de_manche', 0, 1)</lua>
 		<lua>clt_max = params.clt_max or 9999;
 			groupe = 'Présentation par Groupes de Catégories';</lua>
 
@@ -859,11 +860,7 @@
 					else
 						sexe = '  Hommes';
 					end
-					if $(Groupe):len() == 0 then
-						groupe = 'Coureurs hors groupes';
-					else
-						groupe = 'Groupe de catégories : '..$(Groupe)..sexe;
-					end
+					groupe = 'Groupe de catégories : '..$(Groupe)..sexe;
 				</lua>
 				<text row="auto" col="1" >groupe</text>
 				<!-- <text row="auto" col="1" >cat..'- '..$(Categorie{cat}.Libelle)</text> -->
@@ -887,7 +884,7 @@
 				<!-- <image col_start="0" adjust="height" align="right" border="0" cond="entite == 'FIS'"><background mode="transparent"/>app.ImageNation($(Nation))</image>  -->
 
 				<text col="3" align="center" label="CS" cond="entite == 'FFS'">$(Comite)</text>
-				<text col="12" label="Club" cond="entite == 'FFS'">$(Club)</text>
+				<text col="12" align="center" label="Club" cond="entite == 'FFS'">$(Club)</text>
 				<lua>if nb_manche &gt;1 then </lua>
 					<lua>for m=1,nb_manche do</lua>
 						<lua>if group == 'body' then</lua>
@@ -900,7 +897,7 @@
 				<lua>end</lua>
 				<text col="6" align="right" label="Tps.Tot" font_weight="bold" font_size_step="1">$(Tps)</text> 
 				<text col="5" align="right" label="Ecart" font_style="italic">$(Diff)</text> 
-				<text col="5" align="right" label="Note" font_weight="bold" cond="base:GetTable('Epreuve'):GetNbRows() == 1">$(Note)</text> 
+				<text col="5" align="right" label="Note" font_weight="bold" >$(Note)</text> 
 				<text col="4" align="right" label="Perf." font_weight="bold" >$(Perf)</text> 
 
 			<lua>end</lua>
