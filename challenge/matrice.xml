@@ -166,7 +166,9 @@
     <pen border="0"/>
     <col value="2,1,1,2"/>
     <row value="50px"/>
-    <statictext row="auto" col_start="2" label="Code Entité de la liste"/>
+    <statictext row="auto" col_start="1" col_end="0" style="ALIGN_CENTER" label="Les points ne seront pas recalculés apreèsle filtrage des coureurs"/>
+    <row value="50px"/>
+	<statictext row="auto" col_start="2" label="Code Entité de la liste"/>
     <combobox col_start="3" name="comboListe0Entite" style="CB_READONLY"/>
     <statictext row="auto" col_start="2" label="Choix du classement"/>
     <combobox col_start="3" name="comboListe0Classement" style="CB_READONLY"/>
@@ -176,6 +178,8 @@
     <textctrl col_start="3" name="numPtsBas"/>
     <statictext row="auto" col_start="2" label="Limite haute de points"/>
     <textctrl col_start="3" name="numPtsHaut"/>
+    <statictext row="auto" col_start="2" label="Recalcul après filtrage"/>
+    <combotable col_start="3" name="comboRecalculFiltrePoints" style="CB_READONLY"/>
     <row value="10px"/>
     <staticbox row_start="1" row_end="0" col_start="1" col_end="0" label="Filtrage supplémentaire des concurrents par points"/>
     <row value="50px"/>

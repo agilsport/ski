@@ -215,22 +215,21 @@ function OnChangecomboBloc(rowcourse)	-- lors du changement de bloc pour une cou
 end
 
 function OnChangecomboClassement();		-- en cas de changement du contenu du combo comboListe1Classement si on imprime les points de la liste n°1
-	do return end
-	dlgFiltrePoint:GetWindowName('comboListe1Classement'):Clear();
-	dlgFiltrePoint:GetWindowName('comboListe'):Clear();
+	-- dlgFiltrePoint:GetWindowName('comboListe0Classement'):Clear();
+	-- dlgFiltrePoint:GetWindowName('comboListe0'):Clear();
 	local typeclassement = 'FAU';
 	if matrice.comboActivite == 'ALP' then
-		if entite == "FIS" then
+		if matrice.comboEntite == "FIS" then
 			typeclassement = 'IAU';
 		end
 	end
-	local filter = 'Seasoncode = '..matrice.Saison.." And Type_classement = '"..typeclassement.."'";
-	tListe = base:TableLoad('Liste', filter);
+	local cmd = "Select * From Liste Where Seasoncode = "..matrice.Saison.." and Type_classement = '"..typeclassement.."'";
+	base:TableLoad(tListe, cmd);
 	tListe:OrderBy('Code_liste');
 	for i = 0, tListe:GetNbRows()-1 do
-		dlgFiltrePoint:GetWindowName('comboListe'):Append(tListe:GetCell('Commentaire', i));
+		dlgFiltrePoint:GetWindowName('comboListe0'):Append(tListe:GetCell('Code_liste', i));
 	end
-	dlgFiltrePoint:GetWindowName('comboListe'):SetValue(tListe:GetCell('Commentaire', 0));
+	dlgFiltrePoint:GetWindowName('comboListe0'):SetValue(matrice.comboListe0);
 end
 
 function OnChangecomboEntite()
@@ -390,7 +389,6 @@ end
 function CreateMatriceRanking(indice_filtrage)	-- création de la table tMatrice_Ranking sans tenir compte des filtres avec tous les coureurs inscrits aux courses de la matrice
 	BuildTableRanking(indice_filtrage);
 	tMatrice_Ranking:OrderBy('Code_coureur');
-	
 	-- application du filtre de FilterConcurrentDialog
 	-- ex de matrice.Cle_filtrage = $(Groupe):In('ER')
 	
@@ -452,6 +450,22 @@ function GetPtsListe(Code_coureur, index, row)
 			pts.GS = tClassement_Listex:GetCellDouble('Pts_GS', r, 999.99);
 			pts.SG = tClassement_Listex:GetCellDouble('Pts_SG', r, 999.99);
 			pts.DH = tClassement_Listex:GetCellDouble('Pts_DH', r, 999.99);
+			pts.mini = math.min(pts.SL, pts.GS, pts.SG, pts.DH);
+			if index == 0 and matrice.comboListe0:len() > 1 then
+				if string.find(matrice.comboListe0Classement, 'Slalom') then
+					pts.last_discipline = pts.SL;
+				elseif string.find(matrice.comboListe0Classement, 'Geant') then
+					pts.last_discipline = pts.GS;
+				elseif string.find(matrice.comboListe0Classement, 'Super') then
+					pts.last_discipline = pts.SG;
+				elseif string.find(matrice.comboListe0Classement, 'Descente') then
+					pts.last_discipline = pts.DH;
+				else
+					pts.mini = math.min(pts.SL, pts.GS, pts.SG, pts.DH);
+					pts.last_discipline = pts.mini;
+				end
+			end
+			tMatrice_Ranking:SetCell('Pts_last_discipline', row, pts.mini);
 			clt.SL = tClassement_Listex:GetCellInt('Clt_SL', r, 999999);
 			clt.GS = tClassement_Listex:GetCellInt('Clt_GS', r, 999999);
 			clt.SG = tClassement_Listex:GetCellInt('Clt_SG', r, 999999);
@@ -1877,20 +1891,28 @@ function Calculer(panel_name, indice_filtrage)		-- fonction de calcul du résulta
 	if matrice.comboListe2 and tonumber(matrice.comboListe2) > 0 then
 		BuildClassementListe(matrice.comboListe2, 2);
 	end
-	if matrice.numPtsMaxi < 9999 then
-		BuildClassementListe(matrice.last_liste, 0);
 		-- élimination des coureurs hors de la plage numPtsMini / numPtsMaxi si cette plage existe avec récupération des points FIS ou FFS 
-		local delete = nil; 
-		for idxcoureur = tMatrice_Ranking:GetNbRows() -1, 0, -1 do
-			local code_coureur = tMatrice_Ranking:GetCell('Code_coureur', idxcoureur);
-			GetPtsListe(code_coureur, 0, idxcoureur);
-			local pts = tMatrice_Ranking:GetCellDouble('Pts_last_discipline', idxcoureur, -1);
-			delete = false;
-			if pts < matrice.numPtsMaxi then
-				delete = true;
-			end
-			if delete == true then
-				tMatrice_Ranking:RemoveRowAt(idxcoureur);
+	if matrice.comboRecalculFiltrePoints == 'Oui' then
+		if matrice.comboListe0:len() > 1  then
+			if matrice.numPtsBas > 0 or matrice.numPtsHaut > 0 and matrice.comboListe0 > 0 then
+				BuildClassementListe(matrice.comboListe0, 0);
+				local delete = false; 
+				for idxcoureur = tMatrice_Ranking:GetNbRows() -1, 0, -1 do
+					local code_coureur = tMatrice_Ranking:GetCell('Code_coureur', idxcoureur);
+					local nom = tMatrice_Ranking:GetCell('Identite', idxcoureur);
+					GetPtsListe(code_coureur, 0, idxcoureur);
+					local pts = tMatrice_Ranking:GetCellDouble('Pts_last_discipline', idxcoureur, -1);
+					delete = false;
+					if matrice.numPtsBas > 0 and pts < matrice.numPtsBas then
+						delete = true;
+					end
+					if matrice.numPtsHaut > 0 and pts > matrice.numPtsHaut then
+						delete = true;
+					end
+					if delete == true then
+						tMatrice_Ranking:RemoveRowAt(idxcoureur);
+					end
+				end
 			end
 		end
 	end
@@ -2453,6 +2475,31 @@ function Calculer(panel_name, indice_filtrage)		-- fonction de calcul du résulta
 			end
 			if delete == true then
 				tMatrice_Ranking:RemoveRowAt(idxcoureur);
+			end
+		end
+	end
+
+	if matrice.comboRecalculFiltrePoints == 'Non' then
+		if matrice.comboListe0:len() > 1 then
+			if matrice.numPtsBas > 0 or matrice.numPtsHaut > 0 then
+				BuildClassementListe(matrice.comboListe0, 0);
+				local delete = false; 
+				for idxcoureur = tMatrice_Ranking:GetNbRows() -1, 0, -1 do
+					local code_coureur = tMatrice_Ranking:GetCell('Code_coureur', idxcoureur);
+					local nom = tMatrice_Ranking:GetCell('Identite', idxcoureur);
+					GetPtsListe(code_coureur, 0, idxcoureur);
+					local pts = tMatrice_Ranking:GetCellDouble('Pts_last_discipline', idxcoureur, -1);
+					delete = false;
+					if matrice.numPtsBas > 0 and pts < matrice.numPtsBas then
+						delete = true;
+					end
+					if matrice.numPtsHaut > 0 and pts > matrice.numPtsHaut then
+						delete = true;
+					end
+					if delete == true then
+						tMatrice_Ranking:RemoveRowAt(idxcoureur);
+					end
+				end
 			end
 		end
 	end
@@ -3119,6 +3166,12 @@ function LitMatrice()	-- lecture des variables et affectation des valeurs dans l
 	matrice.comboActivite = matrice.comboActivite or GetValue("comboActivite", "ALP");
 	matrice.comboEntite = matrice.comboEntite or GetValue("comboEntite", "FFS");
 	matrice.comboGarderInfQuota = matrice.comboGarderInfQuota or GetValue("comboGarderInfQuota", "Non");
+	matrice.combListe0Entite = matrice.combListe0Entite or GetValue('combListe0Entite', matrice.comboEntite);
+	matrice.comboListe0Classement = matrice.comboListe0Classement or GetValue('comboListe0Classement', '');
+	matrice.comboListe0 = matrice.comboListe0 or GetValue('comboListe0', '');
+	matrice.comboRecalculFiltrePoints = matrice.comboRecalculFiltrePoints or GetValue('comboRecalculFiltrePoints', 'Non');
+	matrice.numPtsBas = matrice.numPtsBas or GetValueNumber('numPtsBas', 0)
+	matrice.numPtsHaut = matrice.numPtsHaut or GetValueNumber('numPtsHaut', 0)
 	matrice.comboListe1 = matrice.comboListe1 or GetValue('comboListe1', nil);
 	matrice.comboListe2 = matrice.comboListe2 or GetValue('comboListe2', nil);
 	matrice.comboListe1Classement = matrice.comboListe1Classement or GetValue('comboListe1Classement', nil);
@@ -5042,17 +5095,19 @@ end
 function OnSavedlgFiltrePoint(raz)
 	matrice.combListe0Entite = nil; matrice.comboListe0Classement = nil; matrice.comboListe0 = nil;
 	matrice.numPtsBas = nil; matrice.numPtsHaut = nil;
-	local cmd = "Delete From Evenement_Matrice Where Code_evenement = "..matrice.code_evenement.." And Cle In('comboListe0Entite', 'comboListe0Classement', 'comboListe0', 'numPtsBas', 'numPtsHaut')";
+	local cmd = "Delete From Evenement_Matrice Where Code_evenement = "..matrice.code_evenement.." And Cle In('comboListe0Entite', 'comboListe0Classement', 'comboListe0', 'numPtsBas', 'numPtsHaut', 'comboRecalculFiltrePoints')";
 	base:Query(cmd);
 	if raz == false then
-		local idxtypeclassement = dlgFiltrePoint:GetWindowName('comboListe0Classement'):GetSelection();
-		local classement = tType_Classement:GetCell('Code',idxtypeclassement);
-		local idxliste = dlgFiltrePoint:GetWindowName('comboListe0'):GetSelection();
-		local liste = Liste:GetCellInt('Code_liste', idxliste);
-		AddRowEvenement_Matrice('comboListe0Classement', classement);
-		AddRowEvenement_Matrice('comboListe0', liste);
-		AddRowEvenement_Matrice('numPtsBas', dlgFiltrePoint:GetWindowName('numPtsBas'):GetValue());
-		AddRowEvenement_Matrice('numPtsHaut', dlgFiltrePoint:GetWindowName('numPtsHaut'):GetValue());
+		matrice.comboListe0Classement = dlgFiltrePoint:GetWindowName('comboListe0Classement'):GetValue();
+		matrice.comboListe0 = dlgFiltrePoint:GetWindowName('comboListe0'):GetValue();
+		matrice.numPtsBas = tonumber(dlgFiltrePoint:GetWindowName('numPtsBas'):GetValue()) or 0;
+		matrice.numPtsHaut = tonumber(dlgFiltrePoint:GetWindowName('numPtsHaut'):GetValue()) or 0;
+		matrice.comboRecalculFiltrePoints = dlgFiltrePoint:GetWindowName('comboRecalculFiltrePoints'):GetValue();
+		AddRowEvenement_Matrice('comboListe0Classement', matrice.comboListe0Classement);
+		AddRowEvenement_Matrice('comboListe0', matrice.comboListe0 );
+		AddRowEvenement_Matrice('numPtsBas', matrice.numPtsBas);
+		AddRowEvenement_Matrice('numPtsHaut', matrice.numPtsHaut);
+		AddRowEvenement_Matrice('comboRecalculFiltrePoints', matrice.comboRecalculFiltrePoints);
 	end
 	RempliTableauMatrice();
 end
@@ -5075,7 +5130,8 @@ function AffichedlgVisuFiltrexPoints()		-- boîte de dialogue de filtrage des cou
 		node_value = 'configplagepoints' 		-- Facultatif si le node_name est unique ...
 	});
 
-
+	dlgFiltrePoint:GetWindowName('comboRecalculFiltrePoints'):SetTable(tOuiNon, 'Choix', 'Choix');
+	dlgFiltrePoint:GetWindowName('comboRecalculFiltrePoints'):SetValue(matrice.comboRecalculFiltrePoints);
 	-- Toolbar 
 	local tbconfigplagepoints = dlgFiltrePoint:GetWindowName('tbconfigplagepoints');
 	tbconfigplagepoints:AddStretchableSpace();
@@ -5087,13 +5143,7 @@ function AffichedlgVisuFiltrexPoints()		-- boîte de dialogue de filtrage des cou
 	tbconfigplagepoints:AddStretchableSpace();
 
 	tbconfigplagepoints:Realize();
-
 	-- Initialisation des controles et affectation des variables
-	matrice.combListe0Entite = GetValue('combListe0Entite', matrice.comboEntite);
-	matrice.comboListe0Classement = GetValue('comboListe0Classement', '');
-	matrice.comboListe0 = GetValue('comboListe0', '');
-	matrice.numPtsBas = GetValueNumber('numPtsBas', 0)
-	matrice.numPtsHaut = GetValueNumber('numPtsHaut', 0)
 	dlgFiltrePoint:GetWindowName('comboListe0Entite'):Append('FFS');
 	dlgFiltrePoint:GetWindowName('comboListe0Entite'):Append('FIS');
 	if matrice.combListe0Entite then
@@ -5144,7 +5194,6 @@ function AffichedlgVisuFiltrexPoints()		-- boîte de dialogue de filtrage des cou
 end
 
 function PopulateComboClassementEtListe(dlg, idx)	-- fonction commune pour AffichedlgColonne et AffichedlgVisuFiltrexPoints
-	do return end
 	local dialog = nil;
 	local comboliste = nil;
 	local matricecomboclassement = nil;
@@ -5208,6 +5257,9 @@ function PopulateComboClassementEtListe(dlg, idx)	-- fonction commune pour Affic
 	for i = 0, tType_Classement:GetNbRows()-1 do
 		dialog:GetWindowName(comboclassement):Append(tType_Classement:GetCell('Libelle', i));
 	end
+	if matrice.comboEntite == 'FIS' then
+		dialog:GetWindowName(comboclassement):Append('les meilleurs points');
+	end
 	if matricecomboclassement then
 		local r = tType_Classement:GetIndexRow('Code', matricecomboclassement);
 		if r >= 0 then
@@ -5222,9 +5274,22 @@ function PopulateComboClassementEtListe(dlg, idx)	-- fonction commune pour Affic
 	local typeclassement = '';
 	if matrice.comboActivite == 'ALP' then
 		if matricecomboentite == "FIS" then
+			-- adv.Alert('FIS tListe:GetNbRows() = '..tListe:GetNbRows());
 			typeclassement = 'IAU';
+			dialog:GetWindowName('comboListe'..idx):Clear();
+			matrice['comboListe'..idx] = matrice['comboListe'..idx] or 0;
+			for i = 0, tListe:GetNbRows() -1 do
+				dialog:GetWindowName('comboListe'..idx):Append(tListe:GetCell('Code_liste', i));
+			end
+			dialog:GetWindowName('comboListe'..idx):SetSelection(matrice['comboListe'..idx]);
 		else
 			typeclassement = 'FAU';
+			dialog:GetWindowName('comboListe'..idx):Clear();
+			matrice['comboListe'..idx] = matrice['comboListe'..idx] or 0;
+			for i = 0, tListe:GetNbRows() -1 do
+				dialog:GetWindowName('comboListe'..idx):Append(tListe:GetCell('Code_liste', i));
+			end
+			dialog:GetWindowName('comboListe'..idx):SetSelection(matrice['comboListe'..idx]);
 		end
 	else
 	end
@@ -6150,6 +6215,7 @@ function BuildTableRanking(indice_filtrage)
 	tMatrice_Ranking:AddColumn({ name = 'Pts_vitesse', label = 'Pts_vitesse', type = sqlType.DOUBLE, style = sqlStyle.NULL});
 	tMatrice_Ranking:AddColumn({ name = 'Clt_technique', label = 'Clt_technique', type = sqlType.LONG, style = sqlStyle.NULL});
 	tMatrice_Ranking:AddColumn({ name = 'Pts_technique', label = 'Pts_technique', type = sqlType.DOUBLE, style = sqlStyle.NULL});
+	tMatrice_Ranking:AddColumn({ name = 'Pts_mini', label = 'Pts_mini', type = sqlType.DOUBLE, style = sqlStyle.NULL});
 	tMatrice_Ranking:AddColumn({ name = 'Clt_liste1', label = 'Clt_liste1', type = sqlType.LONG, style = sqlStyle.NULL});
 	tMatrice_Ranking:AddColumn({ name = 'Pts_liste1', label = 'Pts_liste1', type = sqlType.DOUBLE, style = sqlStyle.NULL});
 	tMatrice_Ranking:AddColumn({ name = 'Clt_liste2', label = 'Clt_liste2', type = sqlType.LONG, style = sqlStyle.NULL});
@@ -6219,7 +6285,7 @@ function BuildTableRanking(indice_filtrage)
 		local codex = tMatrice_Courses:GetCell('Codex', row_course);
 		local cmd = 'Select * From Resultat Where Code_evenement = '..code_evenement..' Order By Code_coureur';
 		base:TableLoad(tResultat, cmd);
-		if indice_filtrage == 0 and matrice.Cle_filtrage then
+		if matrice.Cle_filtrage then
 			tResultat:Filter(matrice.Cle_filtrage, true);
 		end
 		for row = 0, tMatrice_Ranking:GetNbRows() -1 do
@@ -7034,6 +7100,8 @@ function OnSavedlgColonne()		-- lecture et écritue des variables pour les colonn
 		matrice.imprimerColonnes = matrice.imprimerColonnes..separator..chaine;
 	end
 	AddRowEvenement_Matrice('imprimerColonnes', matrice.imprimerColonnes);
+	AddRowEvenement_Matrice('comboListe0', matrice.comboListe0);
+	AddRowEvenement_Matrice('comboListe0Classement', matrice.comboListe0Classement);
 	local idxtypeclassement = nil;
 	if dlgColonne:GetWindowName('chk12'):GetValue() == true then 
 		AddRowEvenement_Matrice('comboListe1', dlgColonne:GetWindowName('comboListe1'):GetValue());
@@ -8052,7 +8120,7 @@ function OnConfiguration(cparams)
 	else
 		return false;
 	end
-	scrip_version = '6.1';
+	scrip_version = '6.2';
 	-- vérification de l'existence d'une version plus récente du script.
 	-- Ex de retour : LiveDraw=5.94,Matrices=5.92,TimingReport=4.2
 	if app.GetVersion() >= '4.4c' then 		-- début d'implementation de la fonction UpdateRessource
