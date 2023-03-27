@@ -23,21 +23,15 @@
 		</menu>
 
 		<menu title="Résultats" image="./res/32x32_ranking.png">
-			<menu title="Résultats Officiels" image="./res/16x16_official.png" >
-				<menu title="Résultats Officiels" image="./res/16x16_official.png" id="res_officiel" filter="after" officiel="1" first_header="1"  />
-				<menu title="Résultats Officiels avec Clt/Categ" image="./res/16x16_ranking.png" filter="after" Clt_cat="1" id="res_officiel" officiel="1" first_header="1" />
-				<menu title="Résultats Officiels avec Rupture par Catégories" filter="after" image="./res/16x16_ranking.png" id="res_categ"/>
-				<!-- <menu title="Présentation par Groupes de Catégories à la suite les uns des autres" image="./res/16x16_official.png" filter="after" officiel="0" id="res_er_groupe"/> -->
-				<menu title="Résultats Officiels Esprit Racing" image="./res/16x16_official.png">
-					<menu title="Présentation traditionnelle du résultat" image="./res/16x16_official.png" id="res_er" officiel="1"/>
-					<menu title="Présentation par Groupe de Catégories à la suite les uns des autres" image="./res/16x16_official.png" filter="after" id="res_er_groupe"/>
-				</menu>
-			</menu>
-			<menu title="Résultats Officieux" image="./res/16x16_ranking.png">
-				<menu title="Résultats Officieux" image="./res/16x16_ranking.png" id="res_officiel" officiel="0" first_header="0" />
-				<menu title="Résultats Officieux (avec Clt/Cat)" image="./res/16x16_ranking.png" Clt_cat="1" id="res_officiel" officiel="0" first_header="0" />
-			</menu>
+			<menu title="Résultats Officiels" image="./res/16x16_official.png" id="res_officiel" officiel="1"/>
+			<menu title="Résultats Officieux" image="./res/16x16_ranking.png" id="res_officiel" officiel="0"/>
+			<menu title="Résultats Officieux (mention du Clt Par Catégories)" image="./res/16x16_ranking.png" par_categ="1" id="res_officiel" officiel="0"/>
+			<menu title="Résultats avec Rupture par Catégorie" image="./res/16x16_ranking.png" id="res_categ" officiel="0"/>
 			<menu title="D'une Manche" image="./res/16x16_ranking.png" id="res_manche" choix_manche="1"/>
+			<menu title="Résultats Esprit Racing" image="./res/16x16_official.png">
+				<menu title="Résultats Officiels" image="./res/16x16_official.png" id="res_er" officiel="1"/>
+				<menu title="Présentation par Groupes de Catégories à la suite les uns des autres" image="./res/16x16_official.png" filter="after" officiel="0" id="res_er_groupe"/>
+			</menu>
 			<menu title="Meilleurs Temps" image="./res/16x16_ranking.png" id="res_best" />
 			<menu title="Multi-Passages" image="./res/16x16_official.png" id="res_passage" choix_manche="1" mode_lap="2" />
 		</menu>
@@ -49,6 +43,7 @@
 			<menu title="Factures inscriptions" image="./res/16x16_text.png" lua="./edition/facture.lua"  />		
 		</menu>
 	</menu>
+
 	<!-- footer standard !-->
 	<footer>
 		<background mode="transparent"/>
@@ -89,7 +84,7 @@
 		<text row="auto" col="1" align="center">$(Evenement.Nom)</text>
 		<text row="auto" align="center">$(Discipline.Libelle)</text>
 		<text row="auto" align="center" cond="id == 'res_er'">groupe</text>
-		<text row="auto" align="center" cond="id ~= 'res_er' and id ~= 'res_er_groupe' and base:GetTable('Epreuve'):GetNbRows() ~= 1">'Résultats Scratch Toutes Catégories'</text>
+		<text row="auto" align="center" cond="id ~= 'res_er' and id ~= 'res_er_groupe' and id ~= 'res_categ' and base:GetTable('Epreuve'):GetNbRows() ~= 1">'Résultats Scratch Toutes Catégories'</text>
 		<text row="auto" align="center" cond="id ~= 'res_er' and base:GetTable('Epreuve'):GetNbRows() == 1">$(Categorie{$(Epreuve.Code_categorie)}.Libelle)..' - '..$(Sexe{$(Epreuve.Sexe)}.Libelle)</text>
 		<text row="auto" align="center" cond="title" >title</text>
 		<text row="auto" align="center" cond="title_filter">title_filter</text>
@@ -677,14 +672,17 @@
 	</report>
 
 	<!-- Résultats Officiels -->
-	<report id="res_officiel" title="(params.title)" first_header="(params.first_header or '1')">
-		<call option="identiteOfficiel" file="./edition/options.xml"/>
+	<report id="res_officiel" title="(params.title)">
 		<column name="Tps_status">chrono.Status(body:GetCellInt('Tps', row))</column>
-		<lua>
-			body:SetCounter('Tps_status');
-			entite = $(Evenement.Code_entite);
-			nb_manche = nb_manche or 1;
-			Clt_cat = tonumber(params.Clt_cat) or 0;
+		<lua>body:SetCounter('Tps_status')</lua>
+		<lua>entite = $(Evenement.Code_entite)</lua>
+		<lua>nb_manche = nb_manche or 1;
+			par_categ = params.par_categ or "0";
+			if string.find(title, 'Officiel') then
+				title = 'Résultats Officiels';
+			elseif string.find(title, 'Officieux') then
+				title = 'Résultats Officieux';
+			end
 		</lua>
 
 		<order key="Tps, Dossard Desc" />
@@ -706,12 +704,12 @@
 	
 			<row value="auto"/>
 			<text col="4" align="center" label="Clt" font_weight="bold" font_size_step="1">$(Clt)</text>
+			<text col="6" align="center" cond="par_categ == '1'" label="Clt/Categ" font_weight="bold" font_size_step="1">$(Cltc)..'/'..$(Categ)</text>
 			<text col="4" align="center" label="Dos" font_style="italic">$(Dossard)</text>
-			<text col="5" align="center" label="Clt/Cat" cond="Clt_cat == 1"><font weight="bold" cond="$(Cltc):len() &gt; 0 and body:GetCellInt('Cltc', row) &lt; 4" />$(Cltc)..'/'..$(Categ)</text>
 			<text col="7" align="center" label="Code"><font size="8" cond="group =='body'"/>$(Code_coureur):sub(4)</text>
 			<text col="16" align="left" cond="$(Critere) == 'DSQ'" label="Nom - Prénom" font_weight="bold">$(Identite)..'  **'</text> 
 			<text col="16" align="left" cond="$(Critere) ~= 'DSQ'" label="Nom - Prénom" font_weight="bold">$(Identite)</text> 
-			<text col="2" align="center" label="S." cond="entite == 'FFS' and Clt_cat ~= 1">$(Sexe)</text>
+			<text col="2" align="center" label="S." cond="entite == 'FFS'">$(Sexe)</text>
 			<text col="4" align="center" label="An">$(An)</text>
 			<text col="4" align="center" label="Nat." cond="entite == 'FIS'" font_style="italic">$(Nation)</text>
 			<!-- <image col_start="0" adjust="height" align="right" border="0" cond="entite == 'FIS'"><background mode="transparent"/>app.ImageNation($(Nation))</image>  -->
@@ -738,7 +736,7 @@
 			<text col="6" align="right" label="Tps.Tot" font_weight="bold" font_size_step="1">$(Tps)</text> 
 			<text col="5" align="right" label="Ecart" font_style="italic">$(Diff)</text> 
 			<text col="5" align="right" label="Note" font_weight="bold" cond="params.officiel=='1' and base:GetTable('Epreuve'):GetNbRows() == 1">$(Note)</text> 
-			<text col="5" align="right" label="Perf." font_weight="bold" cond="params.officiel=='1' and entite == 'FIS'">$(Perf)</text> 
+			<text col="5" align="right" label="Perf." font_weight="bold" cond="entite == 'FIS' and params.officiel=='1'">$(Perf)</text> 
 			<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
 		</body>
 		<end>
@@ -829,7 +827,7 @@
 			<text col="6" align="right" label="Tps.Tot" font_weight="bold" font_size_step="1">$(Tps)</text> 
 			<text col="5" align="right" label="Ecart" font_style="italic">$(Diff)</text> 
 			<text col="5" align="right" label="Note" font_weight="bold" cond="params.officiel=='1' and base:GetTable('Epreuve'):GetNbRows() == 1">$(Note)</text> 
-			<text col="5" align="right" label="Perf." font_weight="bold" cond="params.officiel=='1' and entite == 'FIS'">$(Perf)</text> 
+			<text col="5" align="right" label="Perf." font_weight="bold" cond="entite == 'FIS'">$(Perf)</text> 
 			<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
 		</body>
 		<end>
@@ -843,8 +841,11 @@
 	<report id="res_er_groupe" title="Résultats par Groupes de Catégories">
 		<lua>entite = $(Evenement.Code_entite);
 			body:SetRanking('Cltc', 'Tps', 'Reserve');
+			if base:GetTable('Epreuve'):GetNbRows() == 1 then
+				params.officiel = '1';
+			end
 		</lua>
-		<lua>nb_manche = base:GetTable('Epreuve'):GetCellInt('Nombre_de_manche', 0, 1)</lua>
+		<lua>nb_manche = nb_manche or 1;</lua>
 		<lua>clt_max = params.clt_max or 9999;
 			groupe = 'Présentation par Groupes de Catégories';</lua>
 
@@ -860,7 +861,11 @@
 					else
 						sexe = '  Hommes';
 					end
-					groupe = 'Groupe de catégories : '..$(Groupe)..sexe;
+					if $(Groupe):len() == 0 then
+						groupe = 'Coureurs hors groupes';
+					else
+						groupe = 'Groupe de catégories : '..$(Groupe)..sexe;
+					end
 				</lua>
 				<text row="auto" col="1" >groupe</text>
 				<!-- <text row="auto" col="1" >cat..'- '..$(Categorie{cat}.Libelle)</text> -->
@@ -884,7 +889,7 @@
 				<!-- <image col_start="0" adjust="height" align="right" border="0" cond="entite == 'FIS'"><background mode="transparent"/>app.ImageNation($(Nation))</image>  -->
 
 				<text col="3" align="center" label="CS" cond="entite == 'FFS'">$(Comite)</text>
-				<text col="12" align="center" label="Club" cond="entite == 'FFS'">$(Club)</text>
+				<text col="12" label="Club" cond="entite == 'FFS'">$(Club)</text>
 				<lua>if nb_manche &gt;1 then </lua>
 					<lua>for m=1,nb_manche do</lua>
 						<lua>if group == 'body' then</lua>
@@ -897,7 +902,7 @@
 				<lua>end</lua>
 				<text col="6" align="right" label="Tps.Tot" font_weight="bold" font_size_step="1">$(Tps)</text> 
 				<text col="5" align="right" label="Ecart" font_style="italic">$(Diff)</text> 
-				<text col="5" align="right" label="Note" font_weight="bold" >$(Note)</text> 
+				<text col="5" align="right" label="Note" font_weight="bold" cond="base:GetTable('Epreuve'):GetNbRows() == 1">$(Note)</text> 
 				<text col="4" align="right" label="Perf." font_weight="bold" >$(Perf)</text> 
 
 			<lua>end</lua>
@@ -906,8 +911,13 @@
 	
 	
 	<!-- Résultats Par Catégories -->
-	<report id="res_categ" title="Résultats par Catégories" first_header="0">
-		<lua>entite = $(Evenement.Code_entite)</lua>
+	<report id="res_categ" title="Résultats Officieux Par Catégories" first_header="1">
+		<lua>entite = $(Evenement.Code_entite);
+			if entite == 'FIS' then
+				title = "Résultats Officiels Par Catégories";
+				params.officiel = '1';
+			end
+		</lua>
 		<lua>nb_manche = base:GetTable('Epreuve'):GetCellInt('Nombre_de_manche', 0, 1)</lua>
 		<lua>clt_max = params.clt_max or 9999</lua>
 
@@ -954,8 +964,8 @@
 				<lua>end</lua>
 				<text col="6" align="right" label="Tps.Tot" font_weight="bold" font_size_step="1">$(Tps)</text> 
 				<text col="5" align="right" label="Ecart" font_style="italic">$(Diff)</text> 
-				<text col="5" align="right" label="Note" font_weight="bold" cond = "base:GetTable('Epreuve'):GetNbRows() == 1">$(Note)</text> 
-				<text col="4" align="right" label="Perf." font_weight="bold" >$(Perf)</text> 
+				<text col="5" align="right" label="Note" font_weight="bold" cond = "entite == 'FIS'">$(Note)</text> 
+				<text col="4" align="right" label="Perf." font_weight="bold" cond="entite == 'FIS'" >$(Perf)</text> 
 
 			<lua>end</lua>
 		</body>
@@ -1039,7 +1049,6 @@
 				scratch = {};
 				u18 = {};
 				u18_scratch = {};
-				coureur_erreur = {};
 				for i = 0, body:GetCounterCount('Comite') -1 do
 					if body:GetCounter('Comite'):GetCell(0,i):len() > 0 then
 						comite[body:GetCounter('Comite'):GetCell(0,i)] = {};
@@ -1078,11 +1087,6 @@
 						u18_scratch.clt = body:GetCell('Clt', i)
 					end
 					if body:GetCell('Nation', i) == 'FRA' then
-						if comitelu:len() == 0 then
-							comitelu = '??';
-							body:SetCell('Comite', i, '**');
-							table.insert(coureur_erreur, {Identite = body:GetCell('Identite', i), Comite = comitelu, Categ = body:GetCell('Categ', i), Annee = body:GetCell('An', i)});
-						end
 						comite[comitelu] = comite[comitelu] or {};
 						if body:GetCell('Categ', i) == 'U18' then
 							fra_u18 = fra_u18 + 1;
@@ -1097,14 +1101,6 @@
 							end
 						else
 							fra_else = fra_else + 1;
-							if not comite[comitelu].fra_else then
-								comite[comitelu].fra_else = 0;
-								comite[comitelu].fra_u18 = 0;
-								comite[comitelu].fra_else = 0;
-								comite[comitelu].u18_an1 = 0;
-								comite[comitelu].u18_an2 = 0;
-								comite[comitelu].total = 0;
-							end
 							comite[comitelu].fra_else = comite[comitelu].fra_else + 1;
 						end
 						an = body:GetCellInt('An', i);
@@ -1190,16 +1186,6 @@
 						<text col_start="5" align="center">comite[body:GetCounter('Comite'):GetCell(0,i)].total</text>
 					<lua>end</lua>
 				<lua>end</lua>
-				<lua>if #coureur_erreur &gt; 0 then
-					for i = 1, #coureur_erreur do </lua>
-						<text row="auto" col_start="1" align="center">'Erreur sur '..coureur_erreur[i].Identite</text>
-						<text col_start="2" align="center">'Comité : '..coureur_erreur[i].Comite</text>
-						<text col_start="3" align="center">'Catégorie : '..coureur_erreur[i].Categ</text>
-						<text col_start="4" align="center">'Année : '..coureur_erreur[i].Annee</text>
-						<text col_start="5" align="center">''</text>
-				<lua>
-					end end
-				</lua>
 			</matrix>
 		</end>
 	</report>
