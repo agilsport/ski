@@ -108,10 +108,11 @@ function ReplaceTableEnvironnement(t, name)		-- replace la table créée dans l'en
 end
 
 function OnCurlReturn(evt)
-	-- Ex de retour : LiveDraw=5.94,Matrices=5.92,TimingReport=4.2,DoubleTirage=3.2,TirageOptions=3.3,TirageER=1.7,ListeMinisterielle=2.3,KandaHarJunior=2.0,MarquageEquipe=2.0
+	-- Ex de retour : LiveDraw=5.94,Matrices=5.92,TimingReport=4.2,DoubleTirage=3.2,TirageOptions=3.3,TirageER=1.7,ListeMinisterielle=2.3,KandaHarJunior=2.0,MarquageEquipe=2.0,Regroupement=2.0
 	local tNomSVersionDoc = {};
 	table.insert(tNomSVersionDoc, 'process/LiveDraw_versions.rtf');
 	table.insert(tNomSVersionDoc, 'challenge/Matrice_versions.rtf');
+	table.insert(tNomSVersionDoc, '');
 	table.insert(tNomSVersionDoc, '');
 	table.insert(tNomSVersionDoc, '');
 	table.insert(tNomSVersionDoc, '');
@@ -125,9 +126,9 @@ function OnCurlReturn(evt)
 		local tVersions = tChaine[indice_return];	-- Matrices=5.92
 		local tversionScript = tVersions:Split('=');
 		local last_version = tversionScript[2];
-		if last_version > scrip_version then
+		if tonumber(last_version) > tonumber(script_version) then
 			if app.GetAuiFrame():MessageBox(
-				"Vous utilisez la version "..scrip_version.." du script et la version "..last_version.." plus récente est disponible.\nVoulez-vous la télécharger ?", 
+				"Vous utilisez la version "..script_version.." du script et la version "..last_version.." plus récente est disponible.\nVoulez-vous la télécharger ?", 
 				"Téléchargement du script",
 				msgBoxStyle.YES_NO + msgBoxStyle.NO_DEFAULT + msgBoxStyle.ICON_INFORMATION
 				) == msgBoxStyle.YES then
@@ -146,7 +147,7 @@ function OnCurlReturn(evt)
 				local reponse = app.AutoUpdateResource('https://agilsport.fr/bta_alpin/UpdateScript.zip');
 				-- local url = ' https://agilsport.fr/bta_alpin/UpdateScript.zip';
 				-- Telechargement(url, 'UpdateScript.zip');
-				scrip_version = last_version;
+				script_version = last_version;
 				if dlgConfig then
 					dlgConfig:EndModal(idButton.CANCEL);
 				end

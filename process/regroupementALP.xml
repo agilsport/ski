@@ -2,7 +2,7 @@
 <!-- Regroupement de coureurs -->
 <!-- <background mode="gradient_line_vert" color_start="white" color_end="ltgray" /> -->
 <root title="Regroupement de coureurs">
-  <config titre="Regroupement de coureurs" comboColEquipe="0" comboPrendre="0" comboPtsTps="2" comboAbdDsq="0" coefManche="100" nb_filles="1" nb_garcons="2" comboGarderEquipe="0" comboEquipeBis="1"/>
+  <config titre="Regroupement de coureurs" comboPrendre="0" coursef1="0" courseg1="0" coursef1_filtre="" courseg1_filtre="" coursef2="0" courseg2="0" coursef2_filtre="" courseg2_filtre="" coursef3="0" courseg3="0" coursef3_filtre="" courseg3_filtre="" coursef4="0" courseg4="0" coursef4_filtre="" courseg4_filtre="" comboColEquipe="0" comboPtsTps="2" comboAbdDsq="0" coefManche="50" nb_filles="1" nb_garcons="1" comboGarderEquipe="0" comboEquipeBis="0"/>
   <panel name="config">
     <lua>dofile('./interface/adv.lua');
 		dofile('./edition/functionPG.lua');

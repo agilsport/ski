@@ -74,7 +74,7 @@ function AfficheDialogScratch()
 		height = params.height,
 		x = params.x,
 		y = params.y,
-		label='Configuration du Regroupement Mixte', 
+		label='Configuration du Regroupement Mixte - version '..script_version, 
 		icon='./res/32x32_ffs.png'
 		});
 	dlgConfigScratch:LoadTemplateXML({ 
@@ -370,7 +370,7 @@ function AfficheDialogSexe()
 		height = params.height,
 		x = params.x,
 		y = params.y,
-		label='Configuration du Regroupement par sexe', 
+		label='Configuration du Regroupement par sexe - version '..script_version, 
 		icon='./res/32x32_ffs.png'
 		});
 	dlgConfig:LoadTemplateXML({ 
@@ -381,6 +381,7 @@ function AfficheDialogSexe()
 		node_value = 'config',
 		niveau = params.code_niveau
 	});
+	wnd.GetParentFrame():Bind(eventType.CURL, OnCurlReturn);
 
 	-- Toolbar Principale ...
 	local tbconfig = dlgConfig:GetWindowName('tbconfig');
@@ -388,6 +389,8 @@ function AfficheDialogSexe()
 	local btnSave = tbconfig:AddTool("Lancer le calcul", "./res/vpe32x32_save.png");
 	tbconfig:AddSeparator();
 	local btnScratch = tbconfig:AddTool("Regroupement Mixte", "./res/32x32_param.png");
+	tbconfig:AddSeparator();
+	local btnRAZ = tbconfig:AddTool("RAZ des paramètres", "./res/32x32_clear.png");
 	tbconfig:AddSeparator();
 	local btnClose = tbconfig:AddTool("Quitter", "./res/32x32_exit.png");
 	tbconfig:AddStretchableSpace();
@@ -428,14 +431,14 @@ function AfficheDialogSexe()
 
 	dlgConfig:GetWindowName('comboPrendre'):Clear();
 	dlgConfig:GetWindowName('comboPrendre'):Append('Classement général');
-	-- dlgConfig:GetWindowName('comboPrendre'):Append('Classement général PLUS meilleure manche');
-	-- dlgConfig:GetWindowName('comboPrendre'):Append('Classement général OU meilleure manche');
+	dlgConfig:GetWindowName('comboPrendre'):Append('Classement général PLUS meilleure manche');
+	dlgConfig:GetWindowName('comboPrendre'):Append('Classement général OU meilleure manche');
 	dlgConfig:GetWindowName('comboPrendre'):SetSelection(params.comboPrendre);
 
 	params.comboprendre = {};
 	table.insert(params.comboprendre, 'Classement général');
-	-- table.insert(params.comboprendre, 'Classement général PLUS meilleure manche');
-	-- table.insert(params.comboprendre, 'Classement général OU meilleure manche');
+	table.insert(params.comboprendre, 'Classement général PLUS meilleure manche');
+	table.insert(params.comboprendre, 'Classement général OU meilleure manche');
 	
 	dlgConfig:GetWindowName('comboPtsTps'):Clear();
 	dlgConfig:GetWindowName('comboPtsTps'):Append('Points Coupe du Monde');
@@ -461,18 +464,33 @@ function AfficheDialogSexe()
 		function(evt) 
 			params.comboPtsTps = dlgConfig:GetWindowName('comboPtsTps'):GetSelection();
 			if params.comboPtsTps > 0 then
-				dlgConfig:GetWindowName('comboAbdDsq'):SetSelection(1);
-				dlgConfig:GetWindowName('coefManche'):SetValue(100);
-				dlgConfig:GetWindowName('coefManche'):Enable(false);
+				dlgConfig:GetWindowName('coefManche'):Enable(true);
 				dlgConfig:GetWindowName('comboGarderEquipe'):SetSelection(0);
 				dlgConfig:GetWindowName('comboGarderEquipe'):Enable(false);
+				if dlgConfig:GetWindowName('comboPtsTps'):GetSelection() == 2 then
+					dlgConfig:GetWindowName('comboPrendre'):SetSelection(0);
+				end
 			else
-				dlgConfig:GetWindowName('coefManche'):Enable(true);
+				dlgConfig:GetWindowName('coefManche'):Enable(false);
 				dlgConfig:GetWindowName('comboAbdDsq'):Enable(true);
-				dlgConfig:GetWindowName('comboGarderEquipe'):Enable(false);
+				dlgConfig:GetWindowName('comboGarderEquipe'):Enable(true);
 			end
 		end, dlgConfig:GetWindowName('comboPtsTps')); 
 
+	dlgConfig:Bind(eventType.COMBOBOX, 
+		function(evt) 
+			params.comboPrendre = dlgConfig:GetWindowName('comboPtsTps'):GetSelection();
+			if dlgConfig:GetWindowName('comboPtsTps'):GetSelection() == 2 then
+				dlgConfig:GetWindowName('comboPrendre'):SetSelection(0);
+			end
+			if dlgConfig:GetWindowName('comboPrendre'):GetSelection() > 0 then
+				dlgConfig:GetWindowName('coefManche'):Enable(true);
+			else 
+				dlgConfig:GetWindowName('coefManche'):Enable(false);
+			end
+		end, dlgConfig:GetWindowName('comboPrendre')); 
+
+	wnd.GetParentFrame():Bind(eventType.CURL, OnCurlReturn);
 	for i = 1, 4 do
 		dlgConfig:Bind(eventType.TEXT, 
 			function(evt) 
@@ -591,6 +609,57 @@ function AfficheDialogSexe()
 		
 	dlgConfig:Bind(eventType.MENU, 
 		function(evt) 
+			params.comboColEquipe = 0;
+			params.comboPtsTps = 2;
+			params.comboPrendre = 0;
+			params.comboAbdDsq = 0;
+			params.coefManche = 50;
+			params.nb_filles = 1;
+			params.nb_garcons = 1;
+			params.comboGarderEquipe = 0;
+			params.comboEquipeBis = 0;
+			
+			for i = 1, 4 do
+				params['coursef'..i] = 0;
+				params['courseg'..i] = 0;
+				params['coursef'..i..'_filtre'] = '';
+				params['courseg'..i..'_filtre'] = '';
+				dlgConfig:GetWindowName('coursef'..i):SetValue('');
+				dlgConfig:GetWindowName('coursef'..i..'_nom'):SetValue('');
+				dlgConfig:GetWindowName('courseg'..i):SetValue('');
+				dlgConfig:GetWindowName('courseg'..i..'_nom'):SetValue('');
+				params.nodeConfig:ChangeAttribute('coursef'..i, 0);
+				params.nodeConfig:ChangeAttribute('courseg'..i, 0);
+				params.nodeConfig:ChangeAttribute('coursef'..i..'_filtre', '');
+				params.nodeConfig:ChangeAttribute('courseg'..i..'_filtre', '');
+			end
+
+			-- params.nodeConfig:ChangeAttribute('titre', '');
+			params.nodeConfig:ChangeAttribute('comboColEquipe', params.comboColEquipe);
+			params.nodeConfig:ChangeAttribute('comboPtsTps', params.comboPtsTps);
+			params.nodeConfig:ChangeAttribute('comboPtsTps', params.comboPtsTps);
+			params.nodeConfig:ChangeAttribute('comboAbdDsq', params.comboAbdDsq);
+			params.nodeConfig:ChangeAttribute('coefManche', params.coefManche);
+			params.nodeConfig:ChangeAttribute('nb_filles', params.nb_filles);
+			params.nodeConfig:ChangeAttribute('nb_garcons', params.nb_garcons);
+			params.nodeConfig:ChangeAttribute('comboGarderEquipe', params.comboGarderEquipe);
+			params.nodeConfig:ChangeAttribute('comboEquipeBis', params.comboEquipeBis);
+			params.doc:SaveFile();
+
+			dlgConfig:GetWindowName('comboColEquipe'):SetSelection(params.comboColEquipe);
+			dlgConfig:GetWindowName('comboPtsTps'):SetSelection(params.comboPtsTps);
+			dlgConfig:GetWindowName('comboPtsTps'):SetSelection(params.comboPtsTps);
+			dlgConfig:GetWindowName('comboAbdDsq'):SetValue(params.comboAbdDsq);
+			dlgConfig:GetWindowName('coefManche'):SetValue(params.coefManche);
+			dlgConfig:GetWindowName('nb_filles'):SetValue(params.nb_filles);
+			dlgConfig:GetWindowName('nb_garcons'):SetValue(params.nb_garcons);
+			dlgConfig:GetWindowName('comboGarderEquipe'):SetSelection(params.comboGarderEquipe);
+			dlgConfig:GetWindowName('comboEquipeBis'):SetSelection(params.comboEquipeBis);
+
+		 end,  btnRAZ);
+
+	dlgConfig:Bind(eventType.MENU, 
+		function(evt) 
 			bouton = idButton.CANCEL;
 			dlgConfig:EndModal();
 		 end,  btnClose);
@@ -645,7 +714,7 @@ function OnPrint()
 		margin_right = 100,
 		margin_bottom = 100,
 		paper_orientation = 'portrait',
-		params = {Version = params.version, TypeRegroupement = params.type_regroupement, Titre = params.titre, CoursesIn = params.courses_in, NbCourses = tRegroupement_Courses:GetNbRows(), NbCoursesFilles = params.nb_courses_filles, NbFilles = params.nb_filles, NbCoursesGarcons = params.nb_courses_garcons, NbGarcons = params.nb_garcons, PtsTps = params.comboPtsTps, Prendre = params.comboprendre[params.comboPrendre + 1]} 
+		params = {Version = script_version, TypeRegroupement = params.type_regroupement, Titre = params.titre, CoursesIn = params.courses_in, NbCourses = tRegroupement_Courses:GetNbRows(), NbCoursesFilles = params.nb_courses_filles, NbFilles = params.nb_filles, NbCoursesGarcons = params.nb_courses_garcons, NbGarcons = params.nb_garcons, PtsTps = params.comboPtsTps, Prendre = params.comboprendre[params.comboPrendre + 1]} 
 	});
 	-- report:SetZoom(10)
 end
@@ -1432,7 +1501,31 @@ function main(params_c)
 	params.x = (display:GetSize().width - params.width) / 2;
 	params.y = 0;
 	params.debug = false;
-	params.version = "2.1";
+	script_version = "2.2";
+	if app.GetVersion() >= '5.0' then 
+		-- vérification de l'existence d'une version plus récente du script.
+		-- Ex de retour : LiveDraw=5.94,Matrices=5.92,TimingReport=4.2
+		indice_return = 10;
+		local url = 'https://agilsport.fr/bta_alpin/versionsPG.txt'
+		version = curl.AsyncGET(wnd.GetParentFrame(), url);
+	else
+		app.GetAuiFrame():MessageBox(
+			"Vous devez mettre à jour le logiciel avec\nla dernière version stable (téléchargement -> Logiciel).", 
+			"Mise à jour du logiciel",
+			msgBoxStyle.OK + msgBoxStyle.ICON_INFORMATION); 
+		return true;
+	end
+
+	local updatefile = './tmp/updatesPG.txt';
+	if app.FileExists(updatefile) then
+		local f = io.open(updatefile, 'r')
+		for lines in f:lines() do
+			alire = lines;
+		end
+		io.close(f);
+		app.RemoveFile(updatefile);
+		app.LaunchDefaultEditor('./'..alire);
+	end
 	base = base or sqlBase.Clone();
 	tPlace_Valeur = base:GetTable('Place_Valeur');
 	tEvenement = base:GetTable('Evenement');
