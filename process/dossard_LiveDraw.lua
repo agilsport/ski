@@ -155,7 +155,8 @@ function OnExport(tTable)
 end
 
 function OnClose()
-
+	local cmd = "Update Resultat Set Reserve = Null Where Code_evenement = "..draw.code_evenement;
+	base:Query(cmd);
 	if draw.socket ~= nil then
 		draw.socket:Close();
 		Error("CONNEXION SERVEUR FIS KO ...");
@@ -715,7 +716,7 @@ function OnPrintDoubleTirage(groupe)
 			margin_right = 100,
 			margin_bottom = 100,
 			paper_orientation = 'portrait',
-			params = {Nom = params.evenementNom, tableDossards1 = params.tableDossards1, tableDossards2 = params.tableDossards2, Draw = 1, Version = scrip_version, NbGroupe1 = 0, Entite = draw.code_entite }
+			params = {Nom = params.evenementNom, tableDossards1 = params.tableDossards1, tableDossards2 = params.tableDossards2, Draw = 1, Version = script_version, NbGroupe1 = 0, Entite = draw.code_entite }
 		});
 	else
 		if not report then
@@ -736,7 +737,7 @@ function OnPrintDoubleTirage(groupe)
 				margin_right = 100,
 				margin_bottom = 100,
 				paper_orientation = 'portrait',
-				params = {Nom = params.evenementNom, tableDossards1 = params.tableDossards1, tableDossards2 = params.tableDossards2, Draw = 1, Version = scrip_version, NbGroupe1 = 0, Entite = draw.code_entite}
+				params = {Nom = params.evenementNom, tableDossards1 = params.tableDossards1, tableDossards2 = params.tableDossards2, Draw = 1, Version = script_version, NbGroupe1 = 0, Entite = draw.code_entite}
 			});
 		end
 		editor = report:GetEditor();
@@ -759,7 +760,7 @@ function OnPrintDoubleTirage(groupe)
 			margin_right = 100,
 			margin_bottom = 100,
 			paper_orientation = 'portrait',
-			params = {Nom = params.evenementNom, tableDossards1 = params.tableDossards1, tableDossards2 = params.tableDossards2, Draw = 2, Version = scrip_version, NbGroupe1 = params.nb_groupe1, Entite = draw.code_entite}
+			params = {Nom = params.evenementNom, tableDossards1 = params.tableDossards1, tableDossards2 = params.tableDossards2, Draw = 2, Version = script_version, NbGroupe1 = params.nb_groupe1, Entite = draw.code_entite}
 		});
 	end
 end
@@ -956,7 +957,7 @@ function OnPrintBibo(groupe)
 		margin_right = 80,
 		margin_bottom = 80,
 		paper_orientation = 'portrait',
-		params = {Evenement_nom = tEvenement:GetCell('Nom', 0), Version = scrip_version, NbGroupe1 = draw.nb_groupe_1, EstCE = estCE}
+		params = {Evenement_nom = tEvenement:GetCell('Nom', 0), Version = script_version, NbGroupe1 = draw.nb_groupe_1, EstCE = estCE}
 	});
 end
 
@@ -993,7 +994,7 @@ function OnPrintTop75()
 		margin_right = 80,
 		margin_bottom = 80,
 		paper_orientation = 'portrait',
-		params = {Title = title ,Evenement_nom = tEvenement:GetCell('Nom', 0), EstCE = estce, EstVitesse = vitesse, Rupture = 'Nation', Version = scrip_version}
+		params = {Title = title ,Evenement_nom = tEvenement:GetCell('Nom', 0), EstCE = estce, EstVitesse = vitesse, Rupture = 'Nation', Version = script_version}
 	});
 	
 end
@@ -2985,15 +2986,27 @@ Groupe 6 On poursuit selon les points FIS.
 						end
 					else
 						if pts > 0 then
-							if pts <= draw.ptsFIS15 then
-								current_group = 1;
-							elseif pts <= draw.ptsFIS30 then
-								current_group = 2;
+							if draw.code_niveau == 'NC' then		-- Championnats de France
+								if pts <= draw.ptsFIS15 then
+									current_group = 1;
+								elseif pts <= draw.ptsFIS30 then
+									current_group = 2;
+								else
+									current_group = 3;
+								end
+							else
+								if pts <= draw.ptsFIS15 then
+									current_group = 1;
+								else
+									current_group = 2;
+								end
+							end
+						else
+							if draw.code_niveau == 'NC' then
+								current_group = 4;
 							else
 								current_group = 3;
 							end
-						else
-							current_group = 4;
 						end
 					end
 				end
@@ -3053,7 +3066,7 @@ function OnRowSelected(evt)
 end
 
 function CreatePanelCoureur()
-	local xlabel = 'Recherche des coureurs - discipline de la course : '..draw.discipline..' - version '..scrip_version..' du script  -  course n° '..draw.code_evenement..' - CODEX : '..tEvenement:GetCell('Codex', 0);
+	local xlabel = 'Recherche des coureurs - discipline de la course : '..draw.discipline..' - version '..script_version..' du script  -  course n° '..draw.code_evenement..' - CODEX : '..tEvenement:GetCell('Codex', 0);
 	panel_coureur = wnd.CreatePanel({ parent = app.GetAuiFrame() });
 	panel_coureur:LoadTemplateXML({ 
 		xml = './process/dossard_LiveDraw.xml',
@@ -3102,7 +3115,7 @@ function OnAfficheTableau()
 		parentFrame:Bind(eventType.SOCKET, OnSocketLive, draw.socket);
 	end
 -- Création Dialog 
-	draw.label_dialog = 'Tableau des coureurs - discipline de la course : '..draw.discipline..' - version '..scrip_version..' du script  -  course n° '..draw.code_evenement..' - CODEX : '..tEvenement:GetCell('Codex', 0);
+	draw.label_dialog = 'Tableau des coureurs - discipline de la course : '..draw.discipline..' - version '..script_version..' du script  -  course n° '..draw.code_evenement..' - CODEX : '..tEvenement:GetCell('Codex', 0);
 	dlgTableau = wnd.CreateDialog(
 		{
 		width = draw.width,
@@ -3362,7 +3375,7 @@ function OnAfficheTableau()
 	-- end
 	menuOutils:Enable(btnTirageVitesse1530:GetId(), false);
 	if draw.bolVitesse then
-		if draw.bolEstCE or draw.bolEstNC == true then
+		if draw.bolEstCE or draw.bolEstNC or draw.code_niveau == 'NC' then
 			menuOutils:Enable(btnTirageVitesse1530:GetId(), true);
 		end
 	end
@@ -4032,7 +4045,7 @@ function main(params_c)
 	draw.height = display:GetSize().height - 50;
 	draw.x = 0;
 	draw.y = 0;
-	scrip_version = "5.74"; -- 4.92 pour 2022-2023
+	script_version = "5.75"; -- 4.92 pour 2022-2023
 	local imgfile = './res/40x16_dbl_coche.png';
 	if not app.FileExists(imgfile) then
 		app.GetAuiFrame():MessageBox(
@@ -4316,7 +4329,7 @@ function main(params_c)
 		height = draw.height,
 		x = draw.x,
 		y = draw.y,
-		label='Informations de connexion - version du script : '..scrip_version , 
+		label='Informations de connexion - version du script : '..script_version , 
 		icon='./res/32x32_fis.png'
 		});
 	
