@@ -15,12 +15,15 @@
 			<combobox col="1" name="comboTarget" style="CB_READONLY"/>
 		</staticbox>
 
-		<staticbox row="auto" col_start="1" col_end="0" label="F.F.S.">
+		<staticbox row="auto" col_start="1" col_end="0" label="F.F.S">
 			<statictext row="auto" col="1" style="ALIGN_RIGHT" label="Hostname" />
 			<textctrl col="1" name="ffs_hostname" />
 
 			<statictext row="auto" col_start="1" style="ALIGN_RIGHT" label="Cocher pour faire un test" />
 			<checkbox col_start="2" style="CHK_2STATE,ALIGN_LEFT" name="ffs_test" />
+			
+			<statictext row="auto" col_start="1" style="ALIGN_RIGHT" label="Cocher pour bloquer les envois live" />
+			<checkbox col_start="2" label="Sauf envoi message" style="CHK_2STATE,ALIGN_LEFT" name="ffs_envoi" />
 		</staticbox>
 
 		<staticbox row="auto" col_start="1" col_end="0" label="F.I.S.">

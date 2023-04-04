@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Menu Editions Activité "FOND " Discipline Relais / patrouille / team-sprint !-->
-<!-- version="2.2" !-->
+<!-- Menu Editions Activité "FOND, ROL " Discipline Relais / patrouille / team-sprint !-->
+<!-- version="2.3" !-->
 <edition>
 	<menu>
 		<menu title="Outils " image="./res/32x32_snow_esf.png">	
@@ -329,14 +329,16 @@
 			<text col_start="22" col_end="23" align="right" border="none" >'Tps. Rel.'</text>
 			<text col_start="24" col_end="26" align="right" border="none" >'Ecart. Rel.'</text>
 			<row h="auto" />
-			<text col_start="2" col_end="19" align="center"><background mode="solid" color="yellow" />'Relayeurs'</text>
+			<text col_start="2" col_end="21" align="center"><background mode="solid" color="yellow" />'Relayeurs'</text>
+			<text col_start="22" col_end="26" align="center"><background mode="solid" color="green" />'Relais'</text>
 			<row h="auto" />
 			<text col_start="2" col_end="8" align="left">'Dos - Code   Identité'</text>
 			<text col_start="9" col_end="10" align="left">'Categ.(S.)'</text>
 			<text col_start="11" col_end="15" align="left">'Club  (CS.)'</text>
-			<text col_start="16" col_end="16" align="center">'Clt. '</text>
-			<text col_start="17" col_end="19" align="center">'Tps. Relayeur'</text>
-			<text col_start="20" col_end="21" align="center">'Tps.Cumul'</text>
+			<text col_start="16" col_end="18" align="center">'Tps. (Clt.) '</text>
+			<text col_start="19" col_end="21" align="center">'Ecart Relayeur'</text>
+			<text col_start="22" col_end="24" align="center">'Tps.Cumul(Clt.) '</text>
+			<text col_start="25" col_end="26" align="center">'Ecart(Clt.) '</text>
 			<row h="0.4cm"/>
 		</label>	
 
@@ -359,6 +361,7 @@
 				elseif $(Sexe) == 'T' then 		
 					SexeEquipe = 'Mixte';
 				end
+				DossardRelais = params.DossardRelais;
 			</lua>
 			<text row_start="1" row_end="1" col_start="1" col_end="1" align="left" border="none" >$(Clt)</text>
 			<text row_start="1" row_end="1" col_start="2" col_end="2" align="left" border="none" >$(Dossard)</text>
@@ -371,17 +374,27 @@
 			<text row_start="1" row_end="1" col_start="22" col_end="23" align="right" border="none" >$(Tps)</text>
 			<text row_start="1" row_end="1" col_start="24" col_end="26" align="right" border="none" >$(Diff)</text>
 
-			<text row_start="2" row_end="2" col_start="2" col_end="19" align="center"><background mode="solid" color="yellow" />''</text>
+			<text row_start="2" row_end="2" col_start="2" col_end="21" align="center"><background mode="solid" color="yellow" />''</text>
 			<!-- <text row_start="2" row_end="2" col_start="4" col_end="14" align="center" border="none" >''</text> -->
 			<lua>					
 				for m=0, NbEquipiers-1 do
+					DosNum = m+1;
+					if DossardRelais == 'Lettre' then
 			</lua>
-					<text row_start='(m+3)' col_start="2" col_end="8" align="left" label="('Identité Relayeur '..m+1)">$(Dossard)..'-'..base:GetEquipier($(Code_coureur), m+1, 'Numero')..' - '..base:GetEquipier($(Code_coureur), m+1, 'Nom')..' '..base:GetEquipier($(Code_coureur), m+1, 'Prenom'):sub(1,1):upper()..base:GetEquipier($(Code_coureur), m+1, 'Prenom'):sub(2):lower()..' '..base:GetEquipier($(Code_coureur), m+1, 'Sexe'):Parenthesis()</text>
+						<text row_start='(m+3)' col_start="2" col_end="8" align="left" label="('Identité Relayeur '..m+1)">$(Dossard)..'-'..base:GetEquipier($(Code_coureur), m+1, 'Numero')..' - '..base:GetEquipier($(Code_coureur), m+1, 'Nom')..' '..base:GetEquipier($(Code_coureur), m+1, 'Prenom'):sub(1,1):upper()..base:GetEquipier($(Code_coureur), m+1, 'Prenom'):sub(2):lower()..' '..base:GetEquipier($(Code_coureur), m+1, 'Sexe'):Parenthesis()</text>			LettreDossard = $(Dossard)..'-'..base:GetEquipier($(Code_coureur), m+1, 'Numero');
+				<lua>		
+					else
+				</lua>		
+						<text row_start='(m+3)' col_start="2" col_end="8" align="left" label="('Identité Relayeur '..m+1)">$(Dossard)..'-'..DosNum..' - '..base:GetEquipier($(Code_coureur), m+1, 'Nom')..' '..base:GetEquipier($(Code_coureur), m+1, 'Prenom'):sub(1,1):upper()..base:GetEquipier($(Code_coureur), m+1, 'Prenom'):sub(2):lower()..' '..base:GetEquipier($(Code_coureur), m+1, 'Sexe'):Parenthesis()</text>
+				<lua>
+					end
+				</lua>
 					<text row_start='(m+3)' col_start="9" col_end="10"  align="left" label="('categ Relayeur '..m+1)">base:GetEquipier($(Code_coureur), m+1, 'Categ')..' '..base:GetEquipier($(Code_coureur), m+1, 'Sexe'):Parenthesis()</text>
 					<text row_start='(m+3)' col_start="11" col_end="15" align="left" label="('club Relayeur '..m+1)">base:GetEquipier($(Code_coureur), m+1, 'Club')..' '..base:GetEquipier($(Code_coureur), m+1, 'Comite'):Parenthesis()</text>
-					<text row_start='(m+3)' col_start="16" col_end="16" align="right" label="('Clt Rel'..m+1)" >body:GetCell('Clt'..code_manche..'_lap'..m+1,row)</text>
-					<text row_start='(m+3)' col_start="17" col_end="19" align="right" label="('Tps Relayeur '..m+1)" >body:GetCell('Tps'..code_manche..'_lap'..m+1, row)</text>
-					<text row_start='(m+3)' col_start="20" col_end="21" align="right" label="('Tps cumul')">body:GetCell('Tps_cumul'..code_manche..'_lap'..m+1, row, '[P10]%-1h%-1m%2s.%1f')</text>
+					<text row_start='(m+3)' col_start="16" col_end="18" align="right" label="('club Relayeur '..m+1)">body:GetCell('Tps'..code_manche..'_lap'..m+1, row)..''..body:GetCell('Clt'..code_manche..'_lap'..m+1,row):Parenthesis()</text>
+					<text row_start='(m+3)' col_start="19" col_end="21" align="right" label="('relayeurs Relayeur '..m+1)">body:GetCell('Diff'..code_manche..'_lap'..m+1,row)</text>
+					<text row_start='(m+3)' col_start="22" col_end="24" align="right" label="('Relay '..m+1)">body:GetCell('Tps_cumul'..code_manche..'_lap'..m+1, row)..''..body:GetCell('Clt_cumul'..code_manche..'_lap'..m+1, row):Parenthesis()</text>
+					<text row_start='(m+3)' col_start="25" col_end="26" align="right" label="('Tps cumul')">body:GetCell('Diff_cumul'..code_manche..'_lap'..m+1, row, '[P10]%-1h%-1m%2s.%1f')</text>
 			<lua>
 				end
 			</lua>
@@ -739,4 +752,3 @@
 	</report>
 	
 </edition>
-
