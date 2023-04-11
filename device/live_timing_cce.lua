@@ -1,11 +1,5 @@
 -- LIVE Timing 
--- version 9.5
--- gestion du biathlon
--- envoi de l'heure de départ de la manche en fond rol et biathlon pour les indiv
--- gestion de l'envoi de l'heure de départ de l'épreuve pour les tps tournants epreuves en nordique
--- gestion des messages en nordique
--- GESTION DES balise style a la place de align
--- xml diff alpin pour avoir acces à la gestions des params point inter
+-- version 9.8
 
 dofile('./interface/interface.lua');
 dofile('./interface/adv.lua');
@@ -20,8 +14,8 @@ end
 -- Information : Numéro de Version, Nom, Interface
 function device.GetInformation()
 	return { 
-		version = 9.5;
-		name = 'Live Timing Async.', 
+		version = 9.8;
+		name = 'Live Timing Nordique Async.', 
 		class = 'network'
 	};
 end	
@@ -57,6 +51,15 @@ function Warning(txt)
 		gridmessage = live.panel:GetWindowName('gridmessage'):AddLineWarning(txt);
 	else
 		adv.Warning(txt);
+	end
+end
+
+function OnTimerRunning();
+	if live.Code_entite == 'FIS' then
+		local nodeRoot = xmlNode.Create(nil, xmlNodeType.ELEMENT_NODE, "livetiming");
+		local nodeKeepalive = xmlNode.Create(nodeRoot, xmlNodeType.ELEMENT_NODE, "keepalive");
+		CreateXML(nodeRoot);
+		Info("Keepalive envoyé");
 	end
 end
 
@@ -144,13 +147,20 @@ function device.OnConfiguration(node)
 	dlg:GetWindowName('fis_port'):SetValue(node:GetAttribute('fis_port'));
 	dlg:GetWindowName('fis_pwd'):SetValue(node:GetAttribute('fis_pwd'));
 
-	dlg:GetWindowName('ffs_hostname'):SetValue("https://live.ffs.fr/live_timing");
+	dlg:GetWindowName('ffs_hostname'):SetValue("http://live.ffs.fr");
 
 	if node:GetAttribute('ffs_test') == "1" then
 		dlg:GetWindowName('ffs_test'):SetValue(true);
 	else
 		dlg:GetWindowName('ffs_test'):SetValue(false);
 	end
+	
+	if node:GetAttribute('ffs_envoi') == "1" then
+		dlg:GetWindowName('ffs_envoi'):SetValue(true);
+	else
+		dlg:GetWindowName('ffs_envoi'):SetValue(false);
+	end
+	
 	dlg:GetWindowName('clubesf_hostname'):SetValue(node:GetAttribute('clubesf_hostname', 'https://technique.clubesf.com/live_timing'));
 	dlg:GetWindowName('perso_hostname'):SetValue(node:GetAttribute('perso_hostname', 'http://localhost/live_timing_cce'));
 
@@ -188,6 +198,13 @@ function device.OnConfiguration(node)
 		else
 			node:ChangeAttribute('ffs_test',  "0");
 		end
+		
+		if dlg:GetWindowName('ffs_envoi'):GetValue() == true then
+			node:ChangeAttribute('ffs_envoi',  "1");
+		else
+			node:ChangeAttribute('ffs_envoi',  "0");
+		end
+		
 		node:ChangeAttribute('clubesf_hostname', dlg:GetWindowName('clubesf_hostname'):GetValue());
 		node:ChangeAttribute('perso_hostname', dlg:GetWindowName('perso_hostname'):GetValue());
 		node:ChangeAttribute('target', dlg:GetWindowName('comboTarget'):GetValue());
@@ -218,12 +235,12 @@ function device.OnInit(params, node)
 		Error("Erreur Chargement Informations Course ...");
 		return;
 	end
-	
+	envoistratlist = false;
 	live = raceInfo;  -- tableau associatif principal
 	live.node = node;
 	local tEvenement = raceInfo.tables.Evenement;
 	local tEpreuve = raceInfo.tables.Epreuve;
-	--local tEpreuvePassage = raceInfo.tables.Epreuve_Passage;
+	local tEpreuvePassage = raceInfo.tables.Epreuve_Passage;
 	local tPistes = raceInfo.tables.Pistes;
 	local tEpreuve_Nordique = raceInfo.tables.Epreuve_Nordique;
 	if tEvenement == nil or tEpreuve == nil or tPistes == nil or tEpreuve_Nordique == nil then
@@ -235,6 +252,7 @@ function device.OnInit(params, node)
 	live.Code_entite = tEvenement:GetCell("Code_entite",0);
 	live.Code_activite = tEvenement:GetCell("Code_activite",0);
 	live.Code_evenement = tEvenement:GetCellInt("Code",0);
+	live.category = tEpreuve:GetCell('Code_regroupement',0);
 	
 	if live.Code_entite == 'ESF' then
 		local rc, dataForerunner = app.SendNotify('<forerunner_load>');
@@ -275,11 +293,11 @@ function device.OnInit(params, node)
 			live.codex = live.codex:Split("%.");
 			live.codex = live.codex[1];
 		elseif live.Code_entite == 'FFS' then
-			if tEvenement:GetCell("Code_activite", 0) == 'ALP' then
+			-- if tEvenement:GetCell("Code_activite", 0) == 'ALP' then
 				live.codex = tEpreuve:GetCell('Fichier_transfert', 0);
-			else
-				live.codex = tEvenement:GetCell("Codex", 0);
-			end
+			-- else
+				-- live.codex = tEvenement:GetCell("Codex", 0);
+			-- end
 			live.comite = tEvenement:GetCell("Station", 0);
 			live.station = tEvenement:GetCell("Station", 0);
 		end
@@ -295,17 +313,18 @@ function device.OnInit(params, node)
 	-- attributs du Node XML 
 	if live.target == 'FFS' then
 		live.pwd = '';
-		live.hostname = node:GetAttribute('ffs_hostname', 'https://live.ffs.fr/live_timing');
+		live.hostname = node:GetAttribute('ffs_hostname', 'http://live.ffs.fr');
 		live.targetName = 'Live FFS';
 		live.directory = app.GetPath()..app.GetPathSeparator()..'live_timing'..app.GetPathSeparator()..'ffs';
 		if live.Code_activite == 'FOND' or live.Code_activite == 'BIATH' or live.Code_activite == 'ROL' then
-			live.web = 'https://live.ffs.fr/live_timing/live_cc.php?codex='..live.codex;
+			live.web = 'http://live.ffs.fr/live_cc.php?codex='..live.codex;
 		else
-			live.web = 'https://live.ffs.fr/live_timing/live.php?codex='..live.codex;
+			live.web = 'http://live.ffs.fr/live.php?codex='..live.codex;
 		end
 		if live.node:GetAttribute('ffs_test') == '1' then
 			live.web = live.web..'&test=1';
 		end
+
 	elseif live.target == 'FIS' then
 			live.hostname = node:GetAttribute('fis_hostname', 'live.fisski.com');
 			live.port = node:GetAttribute('fis_port');
@@ -340,17 +359,18 @@ function device.OnInit(params, node)
 				Error("Pas de Connexion au Web-FFS actuellement ! Live non autorisé ...");
 				return;
 			end
-			live.hostname = node:GetAttribute('ffs_hostname', 'https://live.ffs.fr/live_timing');
+			live.hostname = node:GetAttribute('ffs_hostname', 'http://live.ffs.fr');
 			live.targetName = 'Live FFS';
 			live.directory = app.GetPath()..app.GetPathSeparator()..'live_timing/ffs';
 			if live.Code_activite == 'FOND' or live.Code_activite == 'BIATH' or live.Code_activite == 'ROL' then
-				live.web = 'https://live.ffs.fr/live_timing/live_cc.php?codex='..live.codex;
+				live.web = 'http://live.ffs.fr/live_cc.php?codex='..live.codex;
 			else
-				live.web = 'https://live.ffs.fr/live_timing/live.php?codex='..live.codex;
+				live.web = 'http://live.ffs.fr/live.php?codex='..live.codex;
 			end
 			if live.node:GetAttribute('ffs_test') == '1' then
 				live.web = live.web..'&test=1';
 			end
+
 		elseif live.Code_entite == 'FIS' then
 			live.hostname = node:GetAttribute('fis_hostname', 'live.fisski.com');
 			live.port = node:GetAttribute('fis_port');
@@ -361,8 +381,21 @@ function device.OnInit(params, node)
 			live.web = 'live.fis-ski.com/lv-'..string.lower(string.sub(live.Code_activite,1,2))..live.codex..'.htm';
 		end
 	end
+
+	if live.Code_entite ~= 'FIS' then
+		if live.node:GetAttribute('ffs_envoi') == '1' then
+			live.ActiveEnvois = true;
+			-- adv.Alert("Blocage des envoi Actif !!!");
+		end
+	end
 	
 	if live.method == 'socket' then
+		if live.category == 'CE' then
+			live.category = 'EC';
+		end
+		if live.category == 'F' then
+			live.category = 'NC';
+		end
 		if tEpreuve:GetCell("Sexe", 0) == "M" and live.port == "Automatique" then
 			live.port = '1550';
 		end
@@ -417,13 +450,18 @@ function device.OnInit(params, node)
 	menuSend:AppendSeparator();
 	btn_raceinfo = menuSend:Append({label="Envoi des Informations Course", image ="./res/32x32_tools.png"});
 	menuSend:AppendSeparator();
-	btn_scheduled = menuSend:Append({label="Envoi des Heures de Départ sur le calendrier FIS", image ="./res/32x32_clock.png"});
+	btn_scheduled = menuSend:Append({label="Envoi des Heures de Départ", image ="./res/32x32_clock.png"});
 	menuSend:AppendSeparator();
 	btn_saisie_meteo = menuSend:Append({label = "Saisie des infos météo", image = "./res/32x32_cloud_blue.png"});
 	btn_envoi_meteo = menuSend:Append({label = "Envoi des infos météo", image = "./res/32x32_cloud_blue.png"});
 	menuSend:AppendSeparator();
 	btn_saisie_Inter = menuSend:Append({label = "Gestion des infos pour les points Intermédiaires", image = "./res/32x32_cloud_blue.png"});
 	tb:SetDropdownMenu(btn_send:GetId(), menuSend);
+	local btn_reset_socket = tb:AddTool('Reset de la connexion FIS', './res/32x32_satellite.png');
+	tb:AddSeparator();
+	if live.method ~= 'socket' then
+		tb:EnableTool(btn_reset_socket:GetId(), false);
+	end
 
 	-- tb:AddStretchableSpace();
 	live.counterSequence = wnd.CreateStaticText({parent = tb, label = "Trame 0/0", style = wndStyle.ALIGN_LEFT});
@@ -457,19 +495,28 @@ function device.OnInit(params, node)
 	panel:Bind(eventType.MENU, OnSendMeteo, btn_envoi_meteo);
 	panel:Bind(eventType.MENU, OnSaisieMeteo, btn_saisie_meteo);
 	
+	panel:Bind(eventType.MENU, OnResetSocket, btn_reset_socket);
 	panel:Bind(eventType.MENU, OnSaisieInter, btn_saisie_Inter);
-	
 	panel:Bind(eventType.MENU, OnSendMessage, btn_message);
 	panel:Bind(eventType.MENU, OnSendRunChrono, btn_send_run);
 	panel:Bind(eventType.MENU, OnSendAll, btn_send_all);
 	panel:Bind(eventType.MENU, OnWebLive, btn_web);
-	
+	-- création du timer pour la commande keepalive
+
+	live.timer = timer.Create(panel);
+	panel:Bind(eventType.TIMER, OnTimerRunning, live.timer);
+	live.timer:Start(480000);	-- toutes les 8 minutes (8x60x1000ms) on envoie une commande keepalive
+	if live.ActiveEnvois == true then
+		adv.Alert("Blocage des envoi Actif !!!");
+	end
+	-- fin insert RoL depuis origine
 	if live.method == 'socket' then
 		-- Method : SOCKET IP 
 		parentFrame = wnd.GetParentFrame();
 		live.socket = socketClient.Open(parentFrame, live.hostname, live.port);
 		live.socket_state = false;
 		parentFrame:Bind(eventType.SOCKET, OnSocketLive, live.socket);
+		-- parentFrame:Bind(eventType.SOCKET, OnSocketLive);
 		
 	elseif live.method == 'post' then
 		-- Method : POST Asynchrone
@@ -494,7 +541,7 @@ function device.OnInit(params, node)
 
 		float = true, 
 		floating_position = {600, 120},
-		floating_size = {450, 250},
+		floating_size = {500, 250},
 		dockable = false
 	});
 	mgr:Update();
@@ -710,6 +757,11 @@ function OnSendInter(evt)
 	if live.state == false then
 		Error("Feu au Rouge : Aucune Action possible ...");
 		return;
+	else
+		if live.ActiveEnvois == true then
+			Warning("Action non Autoriser : avec cette interface vous pouvais juste envoyer des messages ...");
+			return;
+		end
 	end
 
 	local grid_Ligne = dlg:GetWindowName('grid_Inter');
@@ -767,6 +819,10 @@ function device.OnClose()
 		mgr:DeletePane(live.panel);
 	end
 
+	if live.timer ~= nil then
+		live.timer:Delete();
+	end
+	
 	if tWeather ~= nil then tWeather:Delete(); end
 	if tWind ~= nil then tWind:Delete(); end
 	if tSnowCondition ~= nil then tSnowCondition:Delete(); end
@@ -775,12 +831,16 @@ end
 -- fonctions des événements concernant les séquences
 function IncrementationSequenceSend()
 	live.sequence_send = live.sequence_send + 1;
-	live.node:ChangeAttribute('send', live.sequence_send);
+	live.node:ChangeAttribute('send_'..live.codex, live.sequence_send);
+	app.GetXML():SaveFile();
+
 	RefreshCounterSequence();
 end
 
 function SaveSequenceAck()
-	live.node:ChangeAttribute('ack', live.sequence_ack);
+	live.node:ChangeAttribute('ack_'..live.codex, live.sequence_ack);
+	app.GetXML():SaveFile();
+
 	RefreshCounterSequence();
 end
 
@@ -821,17 +881,26 @@ end
 
 -- Envoi Packet 
 function SendNextPacket()
-
 	if live.sequence_ack == live.sequence_send then
+		-- Info('Tout est Acquitté ...'..live.sequence_ack..' :'..live.sequence_send);
 		return; -- Tout est Acquitté ...
 	end
+	
+	-- if live.sequence_last_send ~= nil and live.sequence_ack < live.sequence_last_send then
+		-- return -- la dernière séquence envoyée n'a pas encore été acquittée.
+	-- end
 
-	if live.sequence_last_send ~= nil and live.sequence_ack < live.sequence_last_send then
-		return -- la dernière séquence envoyée n'a pas encore été acquittée.
-	end
+	if live.method == 'socket' then
+		-- Verification de l'état du Socket ..
+		if live.socket_state == false then
+			Info('Demande de réinitialisation ...');
+			DoResetSocket();
+			return;
+		end
+	end	
 	
 	local sequence_next = live.sequence_ack + 1;
-	
+	-- Info('j\'envoi sequence_next: '..sequence_next);
 	-- Lecture du Xml ...
 	local xmlFile = live.directory..'/live'..live.codex..'_'..tostring(sequence_next)..'.xml';
 	local doc = xmlDocument.Create(xmlFile);
@@ -849,12 +918,19 @@ function SendNextPacket()
 	live.sequence_last_send = sequence_next;
 end
 
+
 -- Event Curl Asynchrone
 function OnCurlLive(evt)
 	if evt:GetInt() == 1 then
 		ReadAckXML(evt:GetString());
 	else
-		adv.Alert('Erreur CURL :'..evt:GetString():sub(1,80));
+		-- Info('evt:GetString():len(): '..evt:GetString():len());
+		if evt:GetString():len() == 0 then
+			Warning('Connexion perdu !!! ');
+			
+		else
+			adv.Alert('Erreur CURL :'..evt:GetString():sub(1,80));
+		end
 	end
 end
 
@@ -874,9 +950,13 @@ function OnSocketLive(evt)
 		Success("CONNEXION SERVEUR FIS OK ...");
 		live.socket_state = true;
 		InitLive();
-	elseif evt.GetSocketEvent() == socketNotify.LOST then
+	elseif evt:GetSocketEvent() == socketNotify.LOST then
 		-- LOST
-		Warning("CONNEXION FIS PERDUE ...");
+		Warning("CONNEXION INTERNET / FIS PERDUE ...");
+		Warning("REINITIALISEZ LES CONNEXIONS !!!");
+		live.socket_state = false;
+	else 
+		Warning("REINITIALISEZ TOUTES LES CONNEXIONS !!!");
 		live.socket_state = false;
 	end
 end
@@ -884,10 +964,9 @@ end
 function InitLive()
 	
 	local tEpreuve = live.tables.Epreuve;
-	-- live.sequence_ack = tEpreuve:GetCellInt("Fis_live_ack", 0, 0);
-	-- live.sequence_send = tEpreuve:GetCellInt("Fis_live_send", 0, 0);
-	live.sequence_ack = tonumber(live.node:GetAttribute('ack')) or 0;
-	live.sequence_send = tonumber(live.node:GetAttribute('send')) or 0;
+	live.sequence_ack = tonumber(live.node:GetAttribute('ack_'..live.codex)) or 0;
+	live.sequence_send = tonumber(live.node:GetAttribute('send_'..live.codex)) or 0;
+
 	RefreshCounterSequence();
 	
 	-- Est ce que tout a été acquitté ?
@@ -919,6 +998,11 @@ function OnReset(evt)
 	if live.state == false then
 		Error("Feu au Rouge : Aucune Action possible ...");
 		return;
+	else
+		if live.ActiveEnvois == true then
+			Warning("Action non Autoriser : avec cette interface vous pouvais juste envoyer des messages ...");
+			return;
+		end
 	end
 	
 	local msg = "Confirmation RAZ ?\n\n"..
@@ -938,6 +1022,38 @@ function OnReset(evt)
 	CommandClear();
 end
 
+function OnResetSocket(evt)
+	local msg = "Confirmation de la réinitialisation de la connexion :\n\n"..
+		"La connexion avec la FIS sera interronpue puis réinitialisée.\n"..
+		"Vous devrez éventuellent renvoyer les informations manquantes à la FIS.";
+	if live.panel:MessageBox(
+		msg, 
+		"Reset de la connexion avec la FIS", 
+		msgBoxStyle.YES_NO+msgBoxStyle.ICON_INFORMATION
+	) ~= msgBoxStyle.YES then
+		return;
+	end
+
+	Info('Demande de réinitialisation ....');
+	DoResetSocket();
+end
+
+function DoResetSocket()
+	-- on ferme le socket
+	if live.socket ~= nil then
+		live.socket:Close();
+	end
+
+	live.socket_state = false;
+	live.sequence_last_send = nil;
+	parentFrame = wnd.GetParentFrame();
+	live.socket = socketClient.Open(parentFrame, live.hostname, live.port);
+
+	if live.socket ~= nil then
+		parentFrame:Bind(eventType.SOCKET, OnSocketLive, live.socket);
+	end
+end
+
 function OnWebLive(evt)
 	app.LaunchDefaultBrowser(live.web);
 end
@@ -947,6 +1063,11 @@ function OnSendAll(evt)
 	if live.state == false then
 		Error("Feu au Rouge : Aucune Action possible ...");
 		return;
+	else
+		if live.ActiveEnvois == true then
+			Warning("Action non Autoriser : avec cette interface vous pouvais juste envoyer des messages ...");
+			return;
+		end
 	end
 	
 	-- if live.Code_manche < live.Nb_manche then
@@ -971,6 +1092,11 @@ function OnSendRaceInfo(evt)
 	if live.state == false then
 		Error("Feu au Rouge : Aucune Action possible ...");
 		return;
+	else
+		if live.ActiveEnvois == true then
+			Warning("Action non Autoriser : avec cette interface vous pouvais juste envoyer des messages ...");
+			return;
+		end
 	end
 	CommandRaceInfo(live.Code_manche, false)
 end
@@ -980,16 +1106,25 @@ function OnSendScheduled(evt)
 	if live.state == false then
 		Error("Feu au Rouge : Aucune Action possible ...");
 		return;
+	else
+		if live.ActiveEnvois == true then
+			Warning("Action non Autoriser : avec cette interface vous pouvais juste envoyer des messages ...");
+			return;
+		end
 	end
-	CommandScheduled()
+	CommandScheduled(live.Code_manche)
 end
-
 
 -- Envoi des Temps de Manche 
 function OnSendRunChrono(evt)
 	if live.state == false then
 		Error("Feu au Rouge : Aucune Action possible ...");
 		return;
+	else
+		if live.ActiveEnvois == true then
+			Warning("Action non Autoriser : avec cette interface vous pouvais juste envoyer des messages ...");
+			return;
+		end
 	end
 	live.endrun = true;
 	DoSendRunChrono(live.Code_manche);
@@ -1108,11 +1243,15 @@ function DoSendRunChrono(activerun)
 
 end
 
-
 function OnSendMeteo()
 	if live.state == false then
 		Error("Feu au Rouge : Aucune Action possible ...");
 		return;
+	else
+		if live.ActiveEnvois == true then
+			Warning("Action non Autoriser : avec cette interface vous pouvais juste envoyer des messages ...");
+			return;
+		end
 	end
 	
 	CommandRaceMeteo();
@@ -1187,7 +1326,13 @@ function DoSendStartList(run)
 	if live.state == false then
 		Error("Feu au Rouge : Aucune Action possible ...");
 		return false;
+	else
+		if live.ActiveEnvois == true then
+			Warning("Action non Autoriser : avec cette interface vous pouvais juste envoyer des messages ...");
+			return;
+		end
 	end
+	envoistratlist = true;
 	local msg = "L'envoi de la liste de départ pour la manche "..run.." supprimera tous les temps de la manche.\nConfirmer-vous l'envoi ?";
 	if live.panel:MessageBox(msg, "Confirmation Envoi", msgBoxStyle.YES_NO+msgBoxStyle.ICON_INFORMATION) ~= msgBoxStyle.YES then
 		return false;
@@ -1207,6 +1352,7 @@ function DoSendStartList(run)
 		CommandRaceInfo(run, true);
 	end
 	CommandStartList(run);
+	envoistratlist = false;
 	return true;
 end
 
@@ -1356,7 +1502,7 @@ function NodeRaceEventBibTime(bib, passage, total_time, total_diff, total_rank, 
 	total_rank = tonumber(total_rank) or 0;
 	medal = medal or '';
 	Penalite = Penalite or '';
-Info('Envoi info bib envoyés ...'..Penalite);	
+	Info('Envoi info bib envoyés ...'..Penalite);	
 	if passage == nil or bib <= 0 then 
 		return nil;
 	end
@@ -1428,19 +1574,19 @@ end
 
 function CommandClear()
 	-- Remise à  Zéro des compteurs 
-	if live.OnNotifyRunErase ~= true then
+	-- if live.OnNotifyRunErase ~= true then
 	live.sequence_send = 0;
 	live.sequence_ack = 0;
-	end
-	live.node:ChangeAttribute('send', live.sequence_send);
-	live.node:ChangeAttribute('ack', live.sequence_ack);
+	-- end
+	live.node:ChangeAttribute('send_'..live.codex, live.sequence_send);
+	live.node:ChangeAttribute('ack_'..live.codex, live.sequence_ack);
 	live.sequence_last_send = nil;
 	local nodeRoot = xmlNode.Create(nil, xmlType.ELEMENT_NODE, "livetiming");
 	local nodeCommand = xmlNode.Create(nodeRoot, xmlType.ELEMENT_NODE, "command");
 	local nodeClear = xmlNode.Create(nodeCommand, xmlType.ELEMENT_NODE, "clear");
 	CreateXML(nodeRoot);
 	Info("CommandClear envoyée");
-	live.OnNotifyRunErase = false;
+	-- live.OnNotifyRunErase = false;
 	if site_distant then
 		local params_distant = {};
 		params_distant.Nom = live.tables.Evenement:GetCell('Nom', 0);
@@ -1456,6 +1602,7 @@ function CommandClear()
 		ToDoSiteDistant(params_distant); 
 	end
 end
+
 function CommandEndRun()
 	local nodeRoot = xmlNode.Create(nil, xmlType.ELEMENT_NODE, "livetiming");
 	local nodeCommand = xmlNode.Create(nodeRoot, xmlType.ELEMENT_NODE, "command");
@@ -1601,7 +1748,7 @@ function CommandRaceInfo(activerun, bolPlusStartList)
 	local tEvenement = live.tables.Evenement;
 	local tPistes = live.tables.Pistes;
 	local tEpreuve = live.tables.Epreuve;
-	--local tEpreuvePassage = live.tables.Epreuve_Passage;
+	local tEpreuvePassage = live.tables.Epreuve_Passage;
 	local tEpreuveAlpine = live.tables.Epreuve_Alpine;
 	local tEpreuve_Nordique = live.tables.Epreuve_Nordique;
 	local tEpreuveAlpineManche = live.tables.Epreuve_Alpine_Manche;
@@ -1611,13 +1758,12 @@ function CommandRaceInfo(activerun, bolPlusStartList)
 		
 	-- Génération des balises 
 	local nodeRaceinfo = xmlNode.Create(nil, xmlType.ELEMENT_NODE, "raceinfo");
-	
 	xmlNode.Create(nodeRaceinfo, xmlType.ELEMENT_NODE, "event", tEvenement:GetCell('Nom',0));	
 	xmlNode.Create(nodeRaceinfo, xmlType.ELEMENT_NODE, "name", tEpreuve:GetCell("Code_discipline", 0)..' '..tEpreuve:GetCell("Sexe", 0));			
 	xmlNode.Create(nodeRaceinfo, xmlType.ELEMENT_NODE, "slope", tPistes:GetCell('Nom_piste',0));			
 	xmlNode.Create(nodeRaceinfo, xmlType.ELEMENT_NODE, "discipline", tEpreuve:GetCell("Code_discipline", 0));			
 	xmlNode.Create(nodeRaceinfo, xmlType.ELEMENT_NODE, "gender", tEpreuve:GetCell("Sexe", 0));			
-	xmlNode.Create(nodeRaceinfo, xmlType.ELEMENT_NODE, "category", tEpreuve:GetCell("Code_regroupement", 0));			
+	xmlNode.Create(nodeRaceinfo, xmlType.ELEMENT_NODE, "category", live.category);			
 	xmlNode.Create(nodeRaceinfo, xmlType.ELEMENT_NODE, "place", tEvenement:GetCell('Station',0));			
 	xmlNode.Create(nodeRaceinfo, xmlType.ELEMENT_NODE, "tempunit", 'c');			
 	xmlNode.Create(nodeRaceinfo, xmlType.ELEMENT_NODE, "longunit", 'm');			
@@ -1844,34 +1990,34 @@ function CommandScheduled()
 		local tEpreuveAlpineManche = live.tables.Epreuve_Alpine_Manche;
 		local heure = ""; local minute = ""; local stringtime = "";
 		if tEpreuveAlpineManche ~= nil then
-			for i = 1, live.Nb_manche do
-				local heure_depart = tEpreuveAlpineManche:GetCell("Heure_depart", i-1);
-				if heure_depart == "" then
-					return
-				end
-				local x, y = string.find(heure_depart, "%D");  -- tout ce qui n'est pas un chiffre
-				if x ~= nil then  -- position du séparateur
-					heure = string.sub(heure_depart, 1, x-1);
-					heure = string.format("%02d", tonumber(heure) or 0);
-					minute = string.sub(heure_depart, x+1);
-					minute = string.format("%02d", tonumber(minute) or 0);
-					stringtime = heure..":"..minute;
-					local nodeCommand = xmlNode.Create(nil, xmlType.ELEMENT_NODE, "command");
-					local nodeScheduled = xmlNode.Create(nodeCommand, xmlType.ELEMENT_NODE, "scheduled");
-					nodeScheduled:AddAttribute("runno", i);
-					-- nodeScheduled Childs ...
-					xmlNode.Create(nodeScheduled, xmlType.ELEMENT_NODE, "year", tEpreuve:GetCell("Date_epreuve", 0, '%4Y'));	
-					xmlNode.Create(nodeScheduled, xmlType.ELEMENT_NODE, "month", tEpreuve:GetCell("Date_epreuve", 0, '%2M'));	
-					xmlNode.Create(nodeScheduled, xmlType.ELEMENT_NODE, "day", tEpreuve:GetCell("Date_epreuve", 0, '%2D'));	
-					xmlNode.Create(nodeScheduled, xmlType.ELEMENT_NODE, "cettime", stringtime);
-					xmlNode.Create(nodeScheduled, xmlType.ELEMENT_NODE, "loctime", stringtime);
-					-- Regroupement <scheduled> et <command>
-					local nodeRoot = xmlNode.Create(nil, xmlType.ELEMENT_NODE, "livetiming");
-					nodeRoot:AddChild(nodeCommand);
-					CreateXML(nodeRoot);
-					Info("Tag scheduled envoyé pour la manche "..i.." = "..stringtime);
-				end
+			local heure_depart = tEpreuveAlpineManche:GetCell("Heure_depart", run-1);
+			if heure_depart == "" then
+				heure_depart = '00:00';
 			end
+			local x, y = string.find(heure_depart, "%D");  -- tout ce qui n'est pas un chiffre
+			if x == nil then  -- position du séparateur
+				return;
+			else
+				heure = string.sub(heure_depart, 1, x-1);
+				heure = string.format("%02d", tonumber(heure) or 0);
+				minute = string.sub(heure_depart, x+1);
+				minute = string.format("%02d", tonumber(minute) or 0);
+				stringtime = heure..":"..minute;
+			end
+			local nodeCommand = xmlNode.Create(nil, xmlNodeType.ELEMENT_NODE, "command");
+			local nodeScheduled = xmlNode.Create(nodeCommand, xmlNodeType.ELEMENT_NODE, "scheduled");
+			nodeScheduled:AddAttribute("runno", run);
+			-- nodeScheduled Childs ...
+			xmlNode.Create(nodeScheduled, xmlType.ELEMENT_NODE, "year", tEpreuve:GetCell("Date_epreuve", 0, '%4Y'));	
+			xmlNode.Create(nodeScheduled, xmlType.ELEMENT_NODE, "month", tEpreuve:GetCell("Date_epreuve", 0, '%2M'));	
+			xmlNode.Create(nodeScheduled, xmlType.ELEMENT_NODE, "day", tEpreuve:GetCell("Date_epreuve", 0, '%2D'));	
+			xmlNode.Create(nodeScheduled, xmlType.ELEMENT_NODE, "cettime", stringtime);
+			xmlNode.Create(nodeScheduled, xmlType.ELEMENT_NODE, "loctime", stringtime);
+			-- Regroupement <scheduled> et <command>
+			local nodeRoot = xmlNode.Create(nil, xmlNodeType.ELEMENT_NODE, "livetiming");
+			nodeRoot:AddChild(nodeCommand);
+			CreateXML(nodeRoot);
+			Info("Tag scheduled envoyé pour la manche "..run.." = "..stringtime);
 		end
 	end
 end
@@ -1908,6 +2054,11 @@ function OnNotifyBibDelete(key, params)
 	if live.state == false then
 		Error("Feu au Rouge : Aucune Action possible ...");
 		return;
+	else
+		if live.ActiveEnvois == true then
+			Warning("Action non Autoriser : avec cette interface vous pouvais juste envoyer des messages ...");
+			return;
+		end
 	end
 	
 	local bib = tonumber(params.bib) or 0;
@@ -1920,6 +2071,11 @@ function OnNotifyBibInsert(key, params)
 	if live.state == false then
 		Error("Feu au Rouge : Aucune Action possible ...");
 		return;
+	else
+		if live.ActiveEnvois == true then
+			Warning("Action non Autoriser : avec cette interface vous pouvais juste envoyer des messages ...");
+			return;
+		end
 	end
 	
 	CommandBibInsert(params.bib, params.passage); 
@@ -1930,6 +2086,11 @@ function OnNotifyBibNext(key, params)
 	if live.state == false then
 		Error("Feu au Rouge : Aucune Action possible ...");
 		return;
+	else
+		if live.ActiveEnvois == true then
+			Warning("Action non Autoriser : avec cette interface vous pouvais juste envoyer des messages ...");
+			return;
+		end
 	end
 	CommandBibNext(params.bib, params.passage); 
 end
@@ -1939,6 +2100,11 @@ function OnNotifyBibPassageAdd(key, params)
 	if live.state == false then
 		Error("Feu au Rouge : Aucune Action possible ...");
 		return;
+	else
+		if live.ActiveEnvois == true then
+			Warning("Action non Autoriser : avec cette interface vous pouvais juste envoyer des messages ...");
+			return;
+		end
 	end
 
 	if app.GetAuiFrame():GetModeChrono() == 'net_time' then
@@ -1958,6 +2124,11 @@ function OnNotifyBibPassageUpdate(key, params) -- correction en changeant le tem
 	if live.state == false then
 		Error("Feu au Rouge : Aucune Action possible ...");
 		return;
+	else
+		if live.ActiveEnvois == true then
+			Warning("Action non Autoriser : avec cette interface vous pouvais juste envoyer des messages ...");
+			return;
+		end
 	end
 --	CommandBibPassageUpdate(params);
 end
@@ -1967,6 +2138,11 @@ function OnNotifyBibTime(key, params)
 	if live.state == false then
 		Error("Feu au Rouge : Aucune Action possible ...");
 		return;
+	else
+		if live.ActiveEnvois == true then
+			Warning("Action non Autoriser : avec cette interface vous pouvais juste envoyer des messages ...");
+			return;
+		end
 	end
 
 	if live.method == 'post' then
