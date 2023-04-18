@@ -1129,9 +1129,6 @@ function GetSetData()
 	if params.codex:sub(1,3) ~= 'FRA' then
 		params.place_comite_organisateur = 0;
 		params.place_club_organisateur = 0;
-		if params.calculette == 0 then
-			GetNbPlacesARepartir();
-		end
 	end
 	if params.nb_places_a_repartir then
 		params.nb_francais_maxi = params.nb_places_a_repartir;
@@ -1283,7 +1280,7 @@ function main(params_c)
 	params.x = 0;
 	params.y = 0;
 	params.recalcul = false;
-	script_version = 1.4; -- 4.92 pour 2022-2023
+	script_version = 1.5; -- 4.92 pour 2022-2023
 	indice_return = 11;
 	local msg = '';
 	if app.GetVersion() >= '5.0' then 
