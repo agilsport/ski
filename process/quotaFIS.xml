@@ -93,6 +93,7 @@
 				<textctrl row_start="8" col_start="6" style="TE_CENTER" name="difference"/>
 				<matrix row_start="2" row_end="7" col_start="2" col_end="4">
 					<col value="1" />
+					<wndtext row="120px" align="center" cond="params.filter:len() ~= 0">'Filtre utilisé pour le filtrage des coureurs :\n'..params.filter</wndtext>
 					<toolbar row="70px" name="tbconfig" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
 					<row value="1"/>
 				</matrix>

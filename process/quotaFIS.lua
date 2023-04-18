@@ -828,7 +828,7 @@ function AfficheCalculs()
 		dlgConfig:GetWindowName('comite'..i):SetValue(comite);
 		dlgConfig:GetWindowName('quota_base'..i):SetValue(tTableComite[i].Quota_base..'%');
 		somme_quota_base = somme_quota_base + tTableComite[i].Quota_base;
-
+		tTableComite[i].Quota_base2 = tTableComite[i].Quota_calcule * 100 / params.a_repartir;
 		dlgConfig:GetWindowName('quota_base2'..i):SetValue(Round(tTableComite[i].Quota_base2, 2)..'%');
 		somme_quota_base2 = somme_quota_base2 + tTableComite[i].Quota_base2;
 		-- dlgConfig:GetWindowName('quota_base2'..i):SetValue(tTableComite[i].Place_theorique2);
@@ -865,10 +865,9 @@ function AfficheCalculs()
 		local tbconfig = dlgConfig:GetWindowName('tbconfig');
 		tbconfig:AddStretchableSpace();
 		local btnPrint = tbconfig:AddTool("Imprimer le résultat", "./res/32x32_printer.png");
-		tbconfig:AddSeparator();
+		tbconfig:AddStretchableSpace();
 		local btnClose = tbconfig:AddTool("Quitter", "./res/32x32_exit.png");
-		tbconfig:AddSeparator();
-		
+		tbconfig:AddStretchableSpace();
 		btnBackOffice = tbconfig:AddTool("Back Office", "./res/32x32_configuration.png");
 		tbconfig:AddStretchableSpace();
 
