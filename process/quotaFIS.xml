@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <root>
 	<panel name="config">
-		<lua>dofile('./interface/adv.lua');</lua>
+		<lua>dofile('./interface/adv.lua');
+		</lua>
 		<padding all="3px"/>
 		<col value="1"/>
 		<font color="black" size="9" weight="bold"/>
@@ -9,8 +10,8 @@
 			<col value="1,200px,200px,200px,200px,200px,1"/>
 			<background mode="solid" color="ltgray"/><font size="11"/>
 			<padding all="1px"/>
-			<textctrl row="70px" col_start="2" col_end="4" style="TE_CENTER|TE_READONLY|TE_MULTILINE" name="race_name" />
-			<wndtext col_start="5" align="center">'le '..params.Date..'\n'..params.Station</wndtext>
+			<textctrl row="70px" col_start="2" col_end="5" style="TE_CENTER|TE_READONLY|TE_MULTILINE" name="race_name" />
+			<wndtext col_start="6" align="center">'le '..params.Date..'\n'..params.Station</wndtext>
 			<row value="5px"/>
 		</matrix>
 		<row value="5px"/>
@@ -28,23 +29,23 @@
 				<textctrl col_start="3" style="TE_CENTER|TE_READONLY" name="etrangers"/>
 				<statictext col_start="4" style="ALIGN_RIGHT" font_weight="bold" label="Nb.français maxi: "/>
 				<textctrl col_start="5" style="TE_CENTER|TE_READONLY" name="nb_francais_maxi"/>
+				<background mode="solid" color="ltgray"/><font size="11"/>
+				<wndtext col_start="6" row_start="-1" row_end="0" align="center">'Codex : \n'..params.Codex</wndtext>
 
 			</matrix>
 			<row value="5px" />
 			<matrix row="auto" col_start="1">
-				<col value="1,200px,200px,200px,200px,200px,200px,200px,1"/>
+				<col value="1,200px,200px,200px,200px,200px,1"/>
 				<padding all="1px"/>
 				<pen border="all" size="1"/>
 				<!-- <font color="black" size_step="1" weight="bold"/> -->
 				<background color="LtGray" mode="solid"/>
 				<wndtext row="60px" col_start="2" align="center">"Comité"</wndtext>
 				<wndtext col_start="3" align="center">"Quotas\nde base"</wndtext>
-				<wndtext col_start="4" align="center">"Quotas\naffinés"</wndtext>
+				<wndtext col_start="4" align="center">"Quotas\neffectifs"</wndtext>
 				<wndtext col_start="5" align="center">"Inscrits"</wndtext>
 				<wndtext col_start="6" align="center">"Quotas\ncalculés"</wndtext>
-				<wndtext col_start="7" align="center">"Utilisation du \nquota de base en %"</wndtext>
-				<lua>for ligne = 1, #params.tableau do
-					if params.tableau[ligne].Quota_base > 0 then
+				<lua>for ligne = 1, params.lignes do
 						status = params.tableau[ligne].Status;
 						participation = params.tableau[ligne].Participation</lua>
 						<background color="(params.RGB[1])" mode="transparent" cond="status == 0 or participation == 0"/>
@@ -58,12 +59,10 @@
 						<background color="(params.RGB[2][2])" mode="solid" cond="status == 1"/>
 						<font color="white" weight="bold" cond="status == 1"/>
 						<textctrl col_start="6" style="TE_CENTER" name="('quota_calcule'..ligne)"/>
-						<textctrl col_start="7" style="TE_CENTER" name="('pourcent'..ligne)"/>
-				<lua>end
-				end</lua>
+				<lua>end</lua> -->
 			</matrix>
 			<matrix row_start="0" row="auto" col_start="1">
-				<col value="1,200px,200px,200px,200px,200px,200px,200px,1"/>
+				<col value="1,200px,200px,200px,200px,200px,1"/>
 				<row value="auto" count="8"/>
 				<padding all="1px"/>
 				<pen border="all" size="1"/>
@@ -92,9 +91,13 @@
 				<textctrl row_start="7" col_start="6" style="TE_CENTER" name="total"/>
 								
 				<textctrl row_start="8" col_start="6" style="TE_CENTER" name="difference"/>
-				<toolbar row_start="1" row_end="0" col_start="7" name="tbconfig" style="TB_FLAT|TB_VERTICAL|TB_TEXT"/>
-				<row value="1"/>
+				<matrix row_start="2" row_end="7" col_start="2" col_end="4">
+					<col value="1" />
+					<toolbar row="70px" name="tbconfig" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
+					<row value="1"/>
+				</matrix>
 			</matrix>
+
 			<row value="1"/>
 		</matrix>
 	</panel>
@@ -105,20 +108,23 @@
 		<row value="10px"/>
 		<background mode="solid" color="ltgray"/>
 		<matrix row="auto">
-			<col value="1,200px,200px,200px,1"/>
+			<col value="1,200px,200px,200px,60px,1"/>
 			<row value="10px"/>
 			<pen size="1" border="all"/>
 			<!-- <padding all="1px"/> -->
-			<wndtext row="100px" col_start="2" col_end="4" font_weight="bold" font_size="11" align="center">"Gestion des valeurs de configuration\nCode regroupement des courses : "..params.regroupement</wndtext>
-			<!-- <row value="10px"/> -->
+			<wndtext row="50px" col_start="2" col_end="4" font_size="11" font_weight="bold" align="center">"Gestion des valeurs de configuration\nChoix du Code Regroupement pour le BackOffice"</wndtext>
+			<wndtext row="35px" col_start="2" col_end="3" font_size="11" font_weight="bold" align="right">"Sélectionnez le code regroupement : "</wndtext>
+			<combobox col_start="4" font_size="10" font_weight="bold" style="CB_READONLY" name="combo_regroupement" />	
+		</matrix>s
+		<row value="10px"/>
+		<!-- <row value="10px"/> -->
+		<matrix row="auto">
+			<col value="1,200px,200px,200px,60px,1"/>
+			<pen size="1" border="all"/>
+			<padding all="2px"/>
 			<wndtext row="50px" col_start="2" font_weight="bold" font_size="11" align="center">"Comité"</wndtext>
 			<wndtext col_start="3" font_weight="bold" font_size="11" align="center">"Ancien quota"</wndtext>
 			<wndtext col_start="4" font_weight="bold" font_size="11" align="center">"Nouveau quota"</wndtext>
-		</matrix>s
-		<!-- <row value="10px"/> -->
-		<matrix row="auto">
-			<col value="1,200px,200px,200px,1"/>
-			<padding all="2px"/>
 			<lua>for ligne = 1, #params.tableau do</lua>
 					<background color="LtGray" mode="transparent"/>
 					<font color="black" weight="normal"/>
@@ -141,6 +147,67 @@
 		</matrix>
 		<row value="1"/>
 	</panel>
+	<panel name="get_valeur">
+		<lua>dofile('./interface/adv.lua');</lua>
+		<!-- <padding all="3px"/> -->
+		<col value="1"/>
+		<row value="10px"/>
+		<background mode="solid" color="ltgray"/>
+		<matrix row="auto">
+			<col value="1,200px,200px,60px,1"/>
+			<row value="10px"/>
+			<pen size="1" border="all"/>
+			<!-- <padding all="1px"/> -->
+			<wndtext row="50px" col_start="2" col_end="3" font_weight="bold" font_size="11" align="center">"Prise de la valeur des places à répartir"</wndtext>
+			<row value="10px"/>
+			<wndtext row="35px" col_start="2" font_weight="bold" font_size="10" align="center">"Places à répartir :"</wndtext>
+			<textctrl col_start="3" style="TE_LEFT" font_weight="bold" font_size="10" name="val_140" />
+			<toolbar row="auto" col_start="2" col_end="4" name="tbgetvalue" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
+			<!-- <row value="10px"/> -->
+		</matrix>
+		<!-- <row value="10px"/> -->
+		<row value="1"/>
+	</panel>
+	<panel name="calculatrice">
+		<lua>dofile('./interface/adv.lua');</lua>
+		<!-- <padding all="3px"/> -->
+		<col value="1"/>
+		<row value="10px"/>
+		<matrix row="auto">
+			<col value="1,100px,200px,200px,200px,200px,80px,1"/>
+			<padding all="2px"/>
+			<pen size="1" border="all"/>
+			<background mode="solid" color="ltgray"/>
+			<wndtext row="60px" col_start="2" col_end="6" font_size="11" font_weight="bold" align="center">"Calculatrice de Quota\nChoix du Code Regroupement pour le calcul"</wndtext>
+			<wndtext row="35px" col_start="2" col_end="5" font_size="11" font_weight="bold" align="right">"Sélectionnez le code regroupement : "</wndtext>
+			<combobox col_start="6" font_size="10" font_weight="bold" style="CB_READONLY" name="combo_regroupement" ><background mode="solid" color="white"/></combobox>
+			<wndtext row="40px" col_start="2" col_end="5" font_weight="bold" font_size="11" align="right">"Saisir le nombre de places à répartir : "</wndtext>
+			<textctrl col_start="6" style="TE_CENTER" font_weight="bold" name="a_repartir"><background mode="solid" color="white"/></textctrl>
+			<wndtext row="50px" col_start="2" font_weight="bold" font_size="11" align="center">"Comité"</wndtext>
+			<wndtext col_start="3" font_weight="bold" font_size="11" align="center">"Quota de base"</wndtext>
+			<wndtext col_start="4" font_weight="bold" font_size="11" align="center">"Quota maximum"</wndtext>
+			<wndtext col_start="5" font_weight="bold" font_size="11" align="center">"Places demandées"</wndtext>
+			<wndtext col_start="6" font_weight="bold" font_size="11" align="center">"Places obtenues"</wndtext>
+			<lua>for i = 1, #params.tableau do</lua>
+					<background color="LtGray" mode="transparent"/>
+					<font color="black" weight="normal"/>
+					<checkbox row="auto" col_start="2" border="all" name="('chk'..(i-1))" style="CHK_2STATE|ALIGN_RIGHT"/>
+					<textctrl col_start="3" style="TE_CENTER|TE_READONLY" name="('quota_base'..i)"/>
+					<textctrl font_weight="bold" col_start="4" style="TE_CENTER" name="('quota_maximum'..i)" ><background mode="transparent" color="white"/>'?'</textctrl>
+					<textctrl font_weight="bold" col_start="5" style="TE_CENTER" name="('places_demandees'..i)" ><background mode="transparent" color="white"/>'?'</textctrl>
+					<textctrl font_weight="bold" col_start="6" style="TE_CENTER|TE_READONLY" name="('places_obtenues'..i)" ><background mode="transparent" color="white"/>'?'</textctrl>
+			<lua>end</lua>
+			<background mode="solid" color="ltgray"/>
+			<wndtext row="35px" col_start="2" font_weight="bold" font_size="11" align="center">"Total"</wndtext>
+			<textctrl col_start="3" style="TE_CENTER" name="total_base" />
+			<textctrl col_start="4" font_weight="bold" style="TE_CENTER" name="total_base2" />
+			<textctrl col_start="5" font_weight="bold" style="TE_CENTER" name="total_places_demandees" />
+			<textctrl col_start="6" font_weight="bold" style="TE_CENTER" name="total_places_obtenues" />
+			<toolbar row_start="1" row_end="0" col_start="7" name="tbbackoffice" style="TB_FLAT|TB_VERTICAL|TB_TEXT"/>
+		</matrix>
+		<row value="5px"/>
+		<row value="1"/>
+	</panel>
 	<panel id="print">
 		<lua>dofile('./interface/adv.lua'); </lua>
 		<lua>dofile('./edition/functionPG.lua'); </lua>
@@ -149,14 +216,14 @@
 			<padding all="0"/>
 			<pen border="none"/>
 			<font name="Calibri" size="12" adjust="width" weight="bold"/>
-			<col value="1,2cm,2cm,2cm,2cm,2cm,2cm,2cm,1"/>
-			<text row="2cm" col_start="2" col_end="7" align="center">params.Titre</text>
+			<col value="1,2cm,2cm,2cm,2cm,2cm,1"/>
+			<text row="2cm" col_start="2" col_end="6" align="center">params.Titre</text>
 			<text row="0.3cm"/>
  		</header>
 		<footer/>
 		<first_header />
 		<end>
-			<col value="1,2cm,2cm,2cm,2cm,2cm,2cm,2cm,1"/>
+			<col value="1,2cm,2cm,2cm,2cm,2cm,1"/>
 			<pen border="all" size="1"/>
 			<font name="Calibri" size="9" adjust="width" weight="bold" color="black"/>
 			<background color="ltgray" mode="solid"/>
@@ -183,30 +250,91 @@
 
 			<text row="0.5cm" col_start="5" align="center" >'Total'</text>
 			<text col_start="6" align="center" >params.Total_General</text>
+
+			<background mode="transparent"/>
+			<pen border="none"/>
+			<text row="auto" col_start="2" col_end="6" align="center">''</text>
+			<lua>txt = app.GetName()..' Version '..app.GetVersion()..' / FFS / Agil Informatique  /  Philippe Guérindon  '..os.date(' / Edition du %d-%m-%Y à %H:%M:%S')</lua>
+			<font name="Calibri" size="8" adjust="width"/>
+			<text row="auto" col_start="1" col_end="0" font_size_step="1" align="center">txt</text>
 		</end>
 		<layers/>
 		<label>
-			<col value="1,2cm,2cm,2cm,2cm,2cm,2cm,2cm,1"/>
+			<col value="1,2cm,2cm,2cm,2cm,2cm,1"/>
 			<pen border="all" size="1"/>
 			<background color="ltgray" mode="solid"/>
 			<font name="Calibri" size="9" adjust="width" weight="bold" color="black"/>
 			<text row="1cm" col_start="2" align="center">"Comité"</text>
 			<text col_start="3" align="center">"Quotas\nde base"</text>
-			<text col_start="4" align="center">"Quotas\naffinés"</text>
+			<text col_start="4" align="center">"Quotas\neffectifs"</text>
 			<text col_start="5" align="center">"Inscrits"</text>
 			<text col_start="6" align="center">"Quotas\ncalculés"</text>
-			<text col_start="7" align="center">"% du quota\nde base"</text>
 		</label>
 		<body>
 			<pen border="all" size="1"/>
-			<col value="1,2cm,2cm,2cm,2cm,2cm,2cm,2cm,1"/>
+			<col value="1,2cm,2cm,2cm,2cm,2cm,1"/>
 			<font name="Calibri" size="9" adjust="width" weight="bold"/>
 			<text row="0.5cm" col_start="2" align="center"><background mode="solid" color="(params.RGB[1])" cond="body:GetCellInt('Status', row) ~= 1"/><background mode="solid" color="(params.RGB[2][1])" cond="body:GetCellInt('Status', row) == 1"/>$(Comite)</text>
 			<text col_start="3" align="center"><background mode="solid" color="(params.RGB[1])" cond="body:GetCellInt('Status', row) ~= 1"/><background mode="solid" color="(params.RGB[2][1])" cond="body:GetCellInt('Status', row) == 1"/>$(Quota_base)..'%'</text>
 			<text col_start="4" align="center"><background mode="solid" color="(params.RGB[1])" cond="body:GetCellInt('Status', row) ~= 1"/><background mode="solid" color="(params.RGB[2][1])" cond="body:GetCellInt('Status', row) == 1"/>Round(body:GetCellDouble('Quota_base2', row), 2)..'%'</text>
 			<text col_start="5" align="center"><background mode="solid" color="(params.RGB[1])" cond="body:GetCellInt('Status', row) ~= 1"/><background mode="solid" color="(params.RGB[2][1])" cond="body:GetCellInt('Status', row) == 1"/>$(Participation)</text>
 			<text col_start="6" align="center"><background mode="solid" color="(params.RGB[1])" cond="body:GetCellInt('Status', row) ~= 1"/><background mode="solid" color="(params.RGB[2][2])" cond="body:GetCellInt('Status', row) == 1"/><font color="white" cond="body:GetCellInt('Status', row) == 1"/>$(Quota_calcule)</text>
-			<text col_start="7" align="center"><background mode="solid" color="(params.RGB[1])" cond="body:GetCellInt('Status', row) ~= 1"/><background mode="solid" color="(params.RGB[2][2])" cond="body:GetCellInt('Status', row) == 1"/><font color="white" cond="body:GetCellInt('Status', row) == 1"/>$(Pourcent)</text>
+		</body>
+	</panel>
+	<panel id="printcalculette">
+		<lua>dofile('./interface/adv.lua'); </lua>
+		<lua>dofile('./edition/functionPG.lua'); </lua>
+		<header>
+			<spacing all="0"/>
+			<padding all="0"/>
+			<pen border="none"/>
+			<font name="Calibri" size="12" adjust="width" weight="bold"/>
+			<col value="1,2cm,2cm,2cm,2cm,2cm,1"/>
+			<text row="2cm" col_start="2" col_end="6" align="center">params.Titre</text>
+			<text row="0.3cm"/>
+ 		</header>
+		<footer/>
+		<first_header />
+		<layers/>
+		<end>
+			<col value="1,2cm,2cm,2cm,2cm,2cm,1"/>
+			<pen border="all" size="1"/>
+			<background color="ltgray" mode="solid"/>
+			<font name="Calibri" size="12" adjust="width" weight="bold" color="black"/>
+			<text row="0.7cm" col_start="2" align="right">"Totaux : "</text>
+			<text col_start="3" align="center">params.Total_base..'%'</text>
+			<text col_start="4" align="center">params.Total_base2..'%'</text>
+			<text col_start="5" align="center">params.Total_participation</text>
+			<text col_start="6" align="center">params.Total_calcule</text>
+			<background mode="transparent"/>
+			<pen border="none"/>
+			<text row="auto" col_start="2" col_end="6" align="center">''</text>
+			<lua>txt = app.GetName()..' Version '..app.GetVersion()..' / FFS / Agil Informatique  /  Philippe Guérindon  '..os.date(' / Edition du %d-%m-%Y à %H:%M:%S')</lua>
+			<font name="Calibri" size="8" adjust="width"/>
+			<text row="auto" col_start="1" col_end="0" font_size_step="1" align="center">txt</text>
+		</end>
+		<label>
+			<col value="1,2cm,2cm,2cm,2cm,2cm,1"/>
+			<pen border="all" size="1"/>
+			<background color="ltgray" mode="solid"/>
+			<font name="Calibri" size="12" adjust="width" weight="bold" color="black"/>
+			<text row="1cm" col_start="2" align="center">"Comité"</text>
+			<text col_start="3" align="center">"Quotas\nde base"</text>
+			<text col_start="4" align="center">"Quotas\neffectifs"</text>
+			<text col_start="5" align="center">"Places\ndemandées"</text>
+			<text col_start="6" align="center">"Quotas\ncalculés"</text>
+		</label>
+		<body>
+			<pen border="all" size="1"/>
+			<col value="1,2cm,2cm,2cm,2cm,2cm,1"/>
+			<font name="Calibri" size="10" adjust="width" weight="bold"/>
+			<lua>if tonumber($(Participation)) ~= 0 then</lua>
+				<text row="0.7cm" col_start="2" align="center">$(Comite)</text>
+				<text col_start="3" align="center">$(Quota_base)..'%'</text>
+				<text col_start="4" align="center">$(Quota_base2)..'%'</text>
+				<text col_start="5" align="center">$(Participation)</text>
+				<text col_start="6" align="center">Round(body:GetCellDouble('Quota_calcule', row),0)</text>
+			<lua>end</lua>
 		</body>
 	</panel>
 </root>
