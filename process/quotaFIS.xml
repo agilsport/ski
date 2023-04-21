@@ -58,7 +58,8 @@
 						<textctrl col_start="5" style="TE_CENTER" name="('participation'..ligne)"/>
 						<background color="(params.RGB[2][2])" mode="solid" cond="status == 1"/>
 						<font color="white" weight="bold" cond="status == 1"/>
-						<textctrl col_start="6" style="TE_CENTER" name="('quota_calcule'..ligne)"/>
+						<textctrl col_start="6" style="TE_CENTER|TE_READONLY" cond="participation == 0" name="('quota_calcule'..ligne)"/>
+						<textctrl col_start="6" style="TE_CENTER" cond="participation ~= 0" name="('quota_calcule'..ligne)"/>
 				<lua>end</lua> -->
 			</matrix>
 			<matrix row_start="0" row="auto" col_start="1">
@@ -81,19 +82,19 @@
 				<textctrl row_start="1" col_start="3" style="TE_CENTER|TE_READONLY" name="somme_quota_base"/>
 				<textctrl row_start="1" col_start="4" style="TE_CENTER|TE_READONLY" name="somme_quota_base2"/>
 				<textctrl row_start="1" col_start="5" style="TE_CENTER|TE_READONLY" name="somme_participation"/>
-				<textctrl row_start="1" col_start="6" style="TE_CENTER|TE_READONLY" name="somme_quota_calcule"/>
+				<textctrl row_start="1" col_start="6" style="TE_CENTER" name="somme_quota_calcule"/>
 
 				<textctrl row_start="2" col_start="6" style="TE_CENTER" name="cr_orga"/>
 				<textctrl row_start="3" col_start="6" style="TE_CENTER" name="club_orga"/>
 				<textctrl row_start="4" col_start="6" style="TE_CENTER" name="wild_cards"/>
-				<textctrl row_start="5" col_start="6" style="TE_CENTER|TE_READONLY" font_weight="bold" name="equipe"/>
+				<textctrl row_start="5" col_start="6" style="TE_CENTER" font_weight="bold" name="equipe"/>
 				<textctrl row_start="6" col_start="6" style="TE_CENTER|TE_READONLY" name="etrangers2"/>			
 				<textctrl row_start="7" col_start="6" style="TE_CENTER" name="total"/>
 								
 				<textctrl row_start="8" col_start="6" style="TE_CENTER" name="difference"/>
 				<matrix row_start="2" row_end="7" col_start="2" col_end="4">
 					<col value="1" />
-					<wndtext row="120px" align="center" cond="params.filter:len() ~= 0">'Filtre utilisé pour le filtrage des coureurs :\n'..params.filter</wndtext>
+					<wndtext row="80px" align="center" cond="params.filter:len() ~= 0">'Filtre utilisé pour le filtrage des coureurs :\n'..params.filter</wndtext>
 					<toolbar row="70px" name="tbconfig" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
 					<row value="1"/>
 				</matrix>
@@ -182,21 +183,21 @@
 			<wndtext row="60px" col_start="2" col_end="6" font_size="11" font_weight="bold" align="center">"Calculatrice de Quota\nChoix du Code Regroupement pour le calcul"</wndtext>
 			<wndtext row="35px" col_start="2" col_end="5" font_size="11" font_weight="bold" align="right">"Sélectionnez le code regroupement : "</wndtext>
 			<combobox col_start="6" font_size="10" font_weight="bold" style="CB_READONLY" name="combo_regroupement" ><background mode="solid" color="white"/></combobox>
-			<wndtext row="40px" col_start="2" col_end="5" font_weight="bold" font_size="11" align="right">"Saisir le nombre de places à répartir : "</wndtext>
+			<wndtext row="40px" col_start="2" col_end="5" font_weight="bold" font_size="11" align="right">"Saisir le nombre total de places allouées à répartir : "</wndtext>
 			<textctrl col_start="6" style="TE_CENTER" font_weight="bold" name="a_repartir"><background mode="solid" color="white"/></textctrl>
-			<wndtext row="50px" col_start="2" font_weight="bold" font_size="11" align="center">"Comité"</wndtext>
+			<wndtext row="40px" col_start="2" font_weight="bold" font_size="11" align="center">"Comité"</wndtext>
 			<wndtext col_start="3" font_weight="bold" font_size="11" align="center">"Quota de base"</wndtext>
-			<wndtext col_start="4" font_weight="bold" font_size="11" align="center">"Quota maximum"</wndtext>
+			<textctrl col_start="4" font_weight="bold" font_size="11" style="TE_READONLY|TE_CENTER" name="label_quota" />
 			<wndtext col_start="5" font_weight="bold" font_size="11" align="center">"Places demandées"</wndtext>
 			<wndtext col_start="6" font_weight="bold" font_size="11" align="center">"Places obtenues"</wndtext>
 			<lua>for i = 1, #params.tableau do</lua>
 					<background color="LtGray" mode="transparent"/>
 					<font color="black" weight="normal"/>
-					<checkbox row="auto" col_start="2" border="all" name="('chk'..(i-1))" style="CHK_2STATE|ALIGN_RIGHT"/>
+					<checkbox row="auto" col_start="2" border="all" name="('chk'..i)" style="CHK_2STATE|ALIGN_RIGHT"/>
 					<textctrl col_start="3" style="TE_CENTER|TE_READONLY" name="('quota_base'..i)"/>
 					<textctrl font_weight="bold" col_start="4" style="TE_CENTER" name="('quota_maximum'..i)" ><background mode="transparent" color="white"/>'?'</textctrl>
 					<textctrl font_weight="bold" col_start="5" style="TE_CENTER" name="('places_demandees'..i)" ><background mode="transparent" color="white"/>'?'</textctrl>
-					<textctrl font_weight="bold" col_start="6" style="TE_CENTER|TE_READONLY" name="('places_obtenues'..i)" ><background mode="transparent" color="white"/>'?'</textctrl>
+					<textctrl font_weight="bold" col_start="6" style="TE_CENTER" name="('places_obtenues'..i)" ><background mode="transparent" color="white"/>'?'</textctrl>
 			<lua>end</lua>
 			<background mode="solid" color="ltgray"/>
 			<wndtext row="35px" col_start="2" font_weight="bold" font_size="11" align="center">"Total"</wndtext>
@@ -204,6 +205,8 @@
 			<textctrl col_start="4" font_weight="bold" style="TE_CENTER" name="total_base2" />
 			<textctrl col_start="5" font_weight="bold" style="TE_CENTER" name="total_places_demandees" />
 			<textctrl col_start="6" font_weight="bold" style="TE_CENTER" name="total_places_obtenues" />
+			<wndtext row="40px" col_start="4" col_end="5" font_weight="bold" font_size="9" align="right">'Dont places réservées (Club, EQ) : '</wndtext>
+			<textctrl col_start="6" font_weight="bold" style="TE_CENTER" name="places_ffs" ><background color="white" mode="transparent" /></textctrl>
 			<toolbar row_start="1" row_end="0" col_start="7" name="tbbackoffice" style="TB_FLAT|TB_VERTICAL|TB_TEXT"/>
 		</matrix>
 		<row value="5px"/>
@@ -291,7 +294,7 @@
 			<pen border="none"/>
 			<font name="Calibri" size="12" adjust="width" weight="bold"/>
 			<col value="1,2cm,2cm,2cm,2cm,2cm,1"/>
-			<text row="2cm" col_start="2" col_end="6" align="center">params.Titre</text>
+			<text row="2.5cm" col_start="2" col_end="6" align="center">params.Titre</text>
 			<text row="0.3cm"/>
  		</header>
 		<footer/>
@@ -307,6 +310,10 @@
 			<text col_start="4" align="center">params.Total_base2..'%'</text>
 			<text col_start="5" align="center">params.Total_participation</text>
 			<text col_start="6" align="center">params.Total_calcule</text>
+			<text row="0.7cm" col_start="2" col_end="5" align="right">"Places réservées Club - FFS : "</text>
+			<text col_start="6" align="center">params.Places_ffs</text>
+			<text row="0.7cm" col_start="2" col_end="5" align="right">"Total réparti : "</text>
+			<text col_start="6" align="center">params.Total_reparti</text>
 			<background mode="transparent"/>
 			<pen border="none"/>
 			<text row="auto" col_start="2" col_end="6" align="center">''</text>
