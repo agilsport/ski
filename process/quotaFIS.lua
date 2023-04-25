@@ -37,6 +37,7 @@ function OnSaveBackOffice()
 	local place_comite_sav = params.place_comite_organisateur;
 	local place_club_sav = params.place_club_organisateur;
 	local wild_card_sav = params.wild_card;
+	local place_variable_sav = params.place_variable;
 	local comite_origine = params.equipe_Comite_origine;
 	local total = 0;
 	for i = 1, #tTableComite do
@@ -58,45 +59,49 @@ function OnSaveBackOffice()
 				comite = 'PY';
 			end
 			local new_value = tonumber(dlgBackOffice:GetWindowName('new_quota_base'..i):GetValue()) or 0;
-			if new_value > 0 then
-				if tquotaComitex then
-					node_hommesx:ChangeAttribute(comite, new_value);
-					node_hommesx:ChangeAttribute(comite, new_value)
-				else
-					tTableComite[i].Quota_base = new_value;
-					tquotaComite[comite] = new_value;
-					tTableComite[i].Quota_base2 = 0;
-					tTableComite[i].Place_gagnee = 0;
-					tTableComite[i].Place_Rendue = 0;
-					tTableComite[i].Place_theorique2 = 0;
-					tTableComite[i].Maxi_theorique = 0;
-					tTableComite[i].Maxi_theorique2 = 0;
-					tTableComite[i].Quota_calcule = 0;
-					tTableComite[i].Status = 1;
-					node_hommes:ChangeAttribute(comite, new_value);
-				end
+			if tquotaComitex then
+				node_hommesx:ChangeAttribute(comite, new_value);
+				node_hommesx:ChangeAttribute(comite, new_value)
+			else
+				tTableComite[i].Quota_base = new_value;
+				tquotaComite[comite] = new_value;
+				tTableComite[i].Quota_base2 = 0;
+				tTableComite[i].Place_gagnee = 0;
+				tTableComite[i].Place_Rendue = 0;
+				tTableComite[i].Place_theorique2 = 0;
+				tTableComite[i].Maxi_theorique = 0;
+				tTableComite[i].Maxi_theorique2 = 0;
+				tTableComite[i].Quota_calcule = 0;
+				tTableComite[i].Status = 1;
+				node_hommes:ChangeAttribute(comite, new_value);
 			end
+
 		end
 		local place_comite_organisateur = tonumber(dlgBackOffice:GetWindowName('place_comite_organisateur'):GetValue()) or 0;
 		local place_club_organisateur = tonumber(dlgBackOffice:GetWindowName('place_club_organisateur'):GetValue()) or 0;
 		local wild_card = tonumber(dlgBackOffice:GetWindowName('wild_card'):GetValue()) or 0;
 		local comite_origine = dlgBackOffice:GetWindowName('comboComiteOrigine'):GetSelection();
+		local place_variable = dlgBackOffice:GetWindowName('comboVariable'):GetSelection();
 		if tquotaComitex then
 			node_hommesx:ChangeAttribute(comite, new_value);
 			node_hommesx:ChangeAttribute(comite, new_value)
 			node_hommesx:ChangeAttribute('COMITE', place_comite_organisateur);
 			node_hommesx:ChangeAttribute('CLUB', place_club_organisateur);
 			node_hommesx:ChangeAttribute('WILDCARD', wild_card);
+			node_hommesx:ChangeAttribute('VARIABLE', place_variable);
 			params.place_comite_organisateur = place_comite_sav;
 			params.place_club_organisateur =place_club_sav;
 			params.wild_card = wild_card_sav;
 			params.equipe_Comite_origine = comite_origine;
+			params.place_variable = place_variable;
 		else
-			params.place_comite_organisateur = place_comite_organisateur;
+			node.place_comite_organisateur = place_comite_organisateur;
 			node_hommes:ChangeAttribute('COMITE', place_comite_organisateur);
-			params.place_club_organisateur = place_club_organisateur;
+			node.place_club_organisateur = place_club_organisateur;
 			node_hommes:ChangeAttribute('CLUB', place_club_organisateur);
-			params.wild_card = wild_card;
+			node.wild_card = wild_card;
+			params.place_variable = place_variable;
+			node_hommes:ChangeAttribute('VARIABLE', params.place_variable);
 			node_hommes:ChangeAttribute('WILDCARD', params.wild_card);
 			params.equipe_Comite_origine = comite_origine;
 			node_hommes:ChangeAttribute('ORIGINE', params.equipe_Comite_origine);
@@ -111,6 +116,7 @@ function OnSaveBackOffice()
 				params.place_comite_organisateur = place_comite_sav;
 				params.place_club_organisateur = place_club_sav;
 				params.wild_card = wild_card_sav;
+				params.place_variable = place_variable_sav;
 				params.equipe_Comite_origine = comite_origine;
 			end
 			return true;
@@ -178,8 +184,6 @@ function CalculeQuotaCalculette(a_repartir)
 	for index = 1, #tTableComite do
 		local comite = tTableComite[index].Comite;
 		tTableComite[index].Maxi_theorique = tTableComite[index].Quota_calcule;
-		-- tComiteSav[comite] = {};
-		-- tComiteSav[comite].Maxi_theorique = tTableComite[index].Maxi_theorique;
 		calcul = calcul + tTableComite[index].Maxi_theorique;
 		tTableComite[index].Quota_calcule = 0;
 		-- adv.Alert('passage 4 '..tTableComite[index].Comite..', Quota_calcule = '..tTableComite[index].Quota_calcule..', somme Quota_calcule = '..calcul);
@@ -250,16 +254,22 @@ function OnAfficheBackOffice()
 		dlgBackOffice:GetWindowName('comboComiteOrigine'):Append('Non');
 		dlgBackOffice:GetWindowName('comboComiteOrigine'):Append('Oui');
 		
+		dlgBackOffice:GetWindowName('comboVariable'):Clear();
+		dlgBackOffice:GetWindowName('comboVariable'):Append('Non');
+		dlgBackOffice:GetWindowName('comboVariable'):Append('Oui');
+		
 		if params.code_regroupement == params.code_regroupementx then
-			dlgBackOffice:GetWindowName('place_comite_organisateur'):SetValue(params.place_comite_organisateur);
-			dlgBackOffice:GetWindowName('place_club_organisateur'):SetValue(params.place_club_organisateur);
-			dlgBackOffice:GetWindowName('wild_card'):SetValue(params.wild_card);
+			dlgBackOffice:GetWindowName('place_comite_organisateur'):SetValue(node.place_comite_organisateur);
+			dlgBackOffice:GetWindowName('place_club_organisateur'):SetValue(node.place_club_organisateur);
+			dlgBackOffice:GetWindowName('wild_card'):SetValue(node.wild_card);
 			dlgBackOffice:GetWindowName('comboComiteOrigine'):SetSelection(params.equipe_Comite_origine);
+			dlgBackOffice:GetWindowName('comboVariable'):SetSelection(params.place_variable);
 		elseif tquotaComitex then
 			dlgBackOffice:GetWindowName('place_comite_organisateur'):SetValue(params.place_comite_organisateurx);
 			dlgBackOffice:GetWindowName('place_club_organisateur'):SetValue(params.place_club_organisateurx);
 			dlgBackOffice:GetWindowName('wild_card'):SetValue(params.wild_cardx);
 			dlgBackOffice:GetWindowName('comboComiteOrigine'):SetSelection(params.equipe_Comite_originex);
+			dlgBackOffice:GetWindowName('comboVariable'):SetSelection(params.place_variablex);
 		end
 	end
 -- Création Dialog 
@@ -283,6 +293,7 @@ function OnAfficheBackOffice()
 		place_comite = params.place_comite_organisateur,
 		regroupement = params.code_regroupement,
 		place_club = params.place_club_organisateur,
+		proprtionnelle = params.place_variable,
 		wild_card = params.wild_card,
 		node_value = 'backoffice'
 	});
@@ -452,9 +463,7 @@ function GetParticipationComites()
 			dlgGetQuotaComites:GetWindowName('quota_base'..i):SetValue(tTableComite[i].Quota_base);
 			if dlgGetQuotaComites:GetWindowName('chk'..i):GetValue() == true then
 				dlgGetQuotaComites:GetWindowName('quota_maximum'..i):SetValue(Round(tTableComite[i].Maxi_theorique,2));
-				if tTableComite[i].Quota_calcule > 0 then
-					dlgGetQuotaComites:GetWindowName('places_obtenues'..i):SetValue(tTableComite[i].Quota_calcule);
-				end
+				dlgGetQuotaComites:GetWindowName('places_obtenues'..i):SetValue(tTableComite[i].Quota_calcule);
 			end
 		end	
 		local somme_maxi_theorique = 0;
@@ -474,10 +483,14 @@ function GetParticipationComites()
 				somme_places_obtenues = somme_places_obtenues + place_obtenue;
 			end
 		end	
+		-- params.a_repartir = tonumber(dlgGetQuotaComites:GetWindowName('a_repartir'):GetValue()) or 0;
+		-- params.nb_equipe = tonumber(dlgGetQuotaComites:GetWindowName('places_ffs'):GetValue()) or 0;
+		local difference = params.a_repartir - somme_places_obtenues;
 		dlgGetQuotaComites:GetWindowName('total_base'):SetValue(somme_quota_base);
-		dlgGetQuotaComites:GetWindowName('total_base2'):SetValue(Round(somme_quota_maxi, 0));
+		dlgGetQuotaComites:GetWindowName('total_base2'):SetValue(Round(somme_quota_maxi, 2));
 		dlgGetQuotaComites:GetWindowName('total_places_obtenues'):SetValue(somme_places_obtenues);
 		dlgGetQuotaComites:GetWindowName('total_places_demandees'):SetValue(somme_places_demandees);
+		dlgGetQuotaComites:GetWindowName('difference'):SetValue(difference);
 	end
 -- Création Dialog 
 	params.label_dialog = 'Calculette de quota FIS (Philippe Guérindon)';
@@ -589,13 +602,18 @@ function GetParticipationComites()
 					app.GetAuiFrame():MessageBox(msg, "Saisir les valeurs initiales du calcul", msgBoxStyle.OK+msgBoxStyle.ICON_WARNING)
 					return;
 				end
+				if dlgGetQuotaComites:GetWindowName('chk'..i):GetValue() == false then
+					dlgGetQuotaComites:GetWindowName('quota_maximum'..i):SetValue('');
+					dlgGetQuotaComites:GetWindowName('places_demandees'..i):SetValue('');
+					dlgGetQuotaComites:GetWindowName('places_obtenues'..i):SetValue('');
+				end
 				local comite = tTableComite[i].Comite;
-				params.a_repartir = params.a_repartir or 0;
-				params.place_comite_organisateur = 0;
-				params.wild_card = 0;
-				params.place_club_organisateur = params.place_club_organisateur or 0;
-				params.nb_equipe = params.nb_equipe or 0;
-				local a_repartir = params.a_repartir - (params.place_comite_organisateur + params.place_club_organisateur + params.wild_card  + params.nb_equipe);
+				local total_a_repartir = tonumber(dlgGetQuotaComites:GetWindowName('a_repartir'):GetValue()) or 0;
+				params.nb_equipe = tonumber(dlgGetQuotaComites:GetWindowName('places_ffs'):GetValue()) or 0;
+				params.nb_places_a_repartir = total_a_repartir - params.nb_equipe;
+				local nb_iteration = 1;
+				local difference = 0;
+				local a_repartir = params.nb_places_a_repartir;
 				local nb_iteration = 1;
 				local difference = 0;
 				while true do
@@ -640,11 +658,12 @@ function GetParticipationComites()
 
 	dlgGetQuotaComites:Bind(eventType.MENU, 
 		function(evt)
-			params.a_repartir = tonumber(dlgGetQuotaComites:GetWindowName('a_repartir'):GetValue()) or 0;
+			local total_a_repartir = tonumber(dlgGetQuotaComites:GetWindowName('a_repartir'):GetValue()) or 0;
 			params.nb_equipe = tonumber(dlgGetQuotaComites:GetWindowName('places_ffs'):GetValue()) or 0;
+			params.nb_places_a_repartir = total_a_repartir - params.nb_equipe;
 			local nb_iteration = 1;
 			local difference = 0;
-			local a_repartir = params.a_repartir - (params.place_comite_organisateur + params.place_club_organisateur + params.wild_card  + params.nb_equipe);
+			local a_repartir = params.nb_places_a_repartir;
 			while true do
 				difference = CalculeQuotaCalculette(a_repartir);
 				if math.abs(difference) > 2 then
@@ -676,7 +695,6 @@ function GetParticipationComites()
 			-- adv.Alert('num somme_demandees = '..params.somme_places_demandees..', somme_maxi_theorique = '..params.somme_maxi_theorique);
 			-- params.nb_inscrits = params.a_repartir;
 			if params.somme_places_demandees > params.somme_maxi_theorique then
-				params.nb_places_a_repartir = params.a_repartir;
 				GetSetData()
 				params.recalcul = false;
 				-- for i = 1, #tTableComite do
@@ -874,6 +892,18 @@ function OnPrintCalculs()
 end
 
 function AfficheCalculs()
+	function OnDisplayTotalReparti()
+		params.somme_quota_calcule = tonumber(dlgConfig:GetWindowName('somme_quota_calcule'):GetValue()) or 0;
+		params.place_comite_organisateur = tonumber(dlgConfig:GetWindowName('cr_orga'):GetValue()) or 0;
+		params.place_club_organisateur = tonumber(dlgConfig:GetWindowName('club_orga'):GetValue()) or 0;
+		params.wild_card = tonumber(dlgConfig:GetWindowName('wild_cards'):GetValue()) or 0;
+		params.nb_equipe = tonumber(dlgConfig:GetWindowName('equipe'):GetValue()) or 0;
+		params.total_general = params.somme_quota_calcule + params.nb_etrangers + params.place_comite_organisateur + params.place_club_organisateur + params.wild_card + params.nb_equipe ;
+		dlgConfig:GetWindowName('total'):SetValue(params.total_general);
+		local difference = params.valeur_140 - params.total_general;
+		dlgConfig:GetWindowName('difference'):SetValue(difference);
+	end
+	
 	function OnDisplayQuotaCalcule()
 		params.somme_quota_calcule = 0;
 		for index = 1, #tTableComite do
@@ -1027,7 +1057,9 @@ function AfficheCalculs()
 	if not params.recalcul then
 		local tbconfig = dlgConfig:GetWindowName('tbconfig');
 		tbconfig:AddStretchableSpace();
-		local btnPrint = tbconfig:AddTool("Imprimer le résultat", "./res/32x32_printer.png");
+		local btnPrint = tbconfig:AddTool("Imprimer", "./res/32x32_printer.png");
+		tbconfig:AddStretchableSpace();
+		local btnRecalculer = tbconfig:AddTool("Recalculer", "./res/32x32_calc.png");
 		tbconfig:AddStretchableSpace();
 		local btnClose = tbconfig:AddTool("Quitter", "./res/32x32_exit.png");
 		tbconfig:AddStretchableSpace();
@@ -1052,12 +1084,84 @@ function AfficheCalculs()
 				dlgConfig:GetWindowName('quota_calcule'..i));
 		end
 
+		for i = 1, #tTableComite do
+			dlgConfig:Bind(eventType.TEXT, 
+				function(evt)
+					local participation = tonumber(dlgConfig:GetWindowName('participation'..i):GetValue()) or 0;
+					tTableComite[i].Participation = participation;
+					local somme_participation = 0;
+					for index = 1, #tTableComite do
+						somme_participation = somme_participation + tTableComite[index].Participation;
+						dlgConfig:GetWindowName('quota_base2'..index):SetValue('');
+					end
+					dlgConfig:GetWindowName('somme_participation'):SetValue(somme_participation);
+					dlgConfig:GetWindowName('somme_quota_base2'):SetValue('');
+					dlgConfig:GetWindowName('francais'):SetValue(somme_participation);
+					dlgConfig:GetWindowName('inscrits'):SetValue(somme_participation + params.nb_etrangers);
+				end,
+				dlgConfig:GetWindowName('participation'..i));
+		end
+
+		dlgConfig:Bind(eventType.TEXT, 
+			function(evt)
+				OnDisplayTotalReparti();
+			end,
+			dlgConfig:GetWindowName('cr_orga'));
+
+		dlgConfig:Bind(eventType.TEXT, 
+			function(evt)
+				OnDisplayTotalReparti();
+			end,
+			dlgConfig:GetWindowName('club_orga'));
+
+		dlgConfig:Bind(eventType.TEXT, 
+			function(evt)
+				OnDisplayTotalReparti();
+			end,
+			dlgConfig:GetWindowName('wild_cards'));
+
 		dlgConfig:Bind(eventType.MENU, 
 			function(evt) 
 				OnPrintCalculs();
 				dlgConfig:EndModal(idButton.OK);
 			end, btnPrint); 
+			
+		dlgConfig:Bind(eventType.MENU, 
+			function(evt) 
+				local nb_francais = 0;
+				for i = 1, #tTableComite do
+					local comite = tTableComite[i].Comite;
+					local participation = tonumber(dlgConfig:GetWindowName('participation'..i):GetValue()) or 0;
+					nb_francais = nb_francais + participation;
+					tTableComite[i].Participation = participation;
+					tTableComite[i].Quota_base = tquotaComite[comite];
+					tTableComite[i].Quota_base2 = 0;
+					tTableComite[i].Quota_calcule = 0;
+					tTableComite[i].Status = 1;;
+					tTableComite[i].Representation = 0;
+					tTableComite[i].Place_theorique2 = 0;
+					tTableComite[i].Maxi_theorique = 0;
+					tTableComite[i].Place_gagnee = 0;
+					tTableComite[i].Maxi_theorique2 = 0;
+				end
+				params.place_comite_organisateur = tonumber(dlgConfig:GetWindowName('cr_orga'):GetValue()) or 0;
+				params.place_club_organisateur = tonumber(dlgConfig:GetWindowName('club_orga'):GetValue()) or 0;
+				params.wild_card = tonumber(dlgConfig:GetWindowName('wild_cards'):GetValue()) or 0;
+				params.nb_francais = nb_francais;
+				tTableComitex = tTableComite;
+				params.recalcul = true
+				GetSetData();
+				AfficheCalculs();
+				somme_quota_base2 = 0;
+				for index = 1, #tTableComite do
+					dlgConfig:GetWindowName('quota_base2'..index):SetValue(Round(tTableComite[index].Quota_base2, 2)..'%');
+					somme_quota_base2 = somme_quota_base2 + tTableComite[index].Quota_base2;
+				end
+				dlgConfig:GetWindowName('somme_quota_base2'):SetValue(somme_quota_base2..'%');
+			end, btnRecalculer); 
+			
 		wnd.GetParentFrame():Bind(eventType.CURL, OnCurlReturn);
+		
 		dlgConfig:Bind(eventType.MENU, 
 			function(evt) 
 				OnAfficheBackOffice();
@@ -1110,6 +1214,7 @@ function LectureNodeHommes(node)
 end
 
 function GetQuotaComites(node_hommes)
+	node = {};
 	local attribute = node_hommes:GetAttributes();
 	while attribute ~= nil do
 		local name = attribute:GetName();
@@ -1127,6 +1232,8 @@ function GetQuotaComites(node_hommes)
 			params.equipe_Comite_origine = value
 		elseif name == 'filter' then
 			params.filter = value
+		elseif name == 'VARIABLE' then
+			params.place_variable = value;
 		end
 		tquotaComite[name] = value
 		attribute = attribute:GetNext();
@@ -1136,7 +1243,14 @@ function GetQuotaComites(node_hommes)
 	-- les valeurs ci-dessous sont indiquées pour 140 français sans étrangers.
 	params.place_club_organisateur = params.place_club_organisateur or 0;
 	params.wild_card = params.wild_card or 0;
+	params.place_variable = params.place_variable or 0;
 	params.equipe_Comite_origine = params.equipe_Comite_origine or 0;
+
+	node.place_comite_organisateur = params.place_comite_organisateur;
+	node.place_club_organisateur = params.place_club_organisateur;
+	node.wild_card = params.wild_card;
+	node.place_variable = params.place_variable;
+	node.equipe_Comite_origine = params.equipe_Comite_origine;
 end
 
 function CalculeQuota(a_repartir)
@@ -1225,7 +1339,7 @@ function CalculeQuota(a_repartir)
 	--				dans ce cas, Place_Rendue = Maxi_theorique - Participation. Place rendue = valeur décimale
 	--				dans ce cas, Place_gagnee = -1
 	-- les comités ayant Place_gagnee = 0 doivent recevoir une fraction des places rendues selon leur pourcentage de représentativité.
---	table.insert(tTableComitex, {Comite = 'AP', Quota_base = 0, Quota_base2 = 0, Representation = 0, Place_gagnee = -1, Place_theorique2 = 0,Participation = 0, Maxi_theorique = 0, Maxi_theorique2 = 0, Quota_calcule = 0, Quota_calculette = 0, Place_Rendue = 0, Pourcent = 0, Status = 1});
+--	table.insert(tTableComitex, {Comite = 'AP', Quota_base = 0, Quota_base2 = 0, Representation = 0, Place_gagnee = -1, Place_theorique2 = 0,Participation = 0, Maxi_theorique = 0, Maximum = 0, Maxi_theorique2 = 0, Quota_calcule = 0, Quota_calculette = 0, Place_Rendue = 0, Pourcent = 0, Status = 1});
 	params.somme_quota_base2 = 0;
 	for index = 1, #tTableComitex do
 		delta_a_rajouter = 0;
@@ -1289,7 +1403,7 @@ end
 function NettoietTableComite(index)
 -- table.insert(tTableComite, {Comite = 'MJ', Quota_base = 0, Quota_base2 = 0, 
 -- Representation = 0, Place_gagnee = -1, Place_theorique2 = 0,Participation = 0, 
--- Maxi_theorique = 0, Maxi_theorique2 = 0, Quota_calcule = 0, Quota_calculette = 0, Place_Rendue = 0, 
+-- Maxi_theorique = 0, Maximum = 0, Maxi_theorique2 = 0, Quota_calcule = 0, Quota_calculette = 0, Place_Rendue = 0, 
 -- Pourcent = 0, Status = 1});
 	tTableComite[index].Quota_base2 = 0;
 	tTableComite[index].Representation = 0;
@@ -1302,47 +1416,51 @@ function NettoietTableComite(index)
 end
 
 function GetSetData()
-	params.somme_quota_base = params.somme_quota_base or 0;
+	params.somme_quota_base = 0;
 	for index = #tTableComitex, 1, -1 do
 		params.somme_quota_base = params.somme_quota_base + tTableComitex[index].Quota_base;
 	end
 	-- params.somme_quota_base = 0;
-	params.place_comite_organisateur = params.place_comite_organisateur or 0;
-	params.place_club_organisateur = params.place_club_organisateur or 0;
-	params.wild_card = params.wild_card or 0;
-	params.nb_equipe = params.nb_equipe or 0;
-	if params.codex:sub(1,3) ~= 'FRA' then
+	if params.nb_places_a_repartir then
+		params.nb_francais_maxi = params.nb_places_a_repartir + params.nb_equipe;
+		params.nb_etrangers = 0;
 		params.place_comite_organisateur = 0;
 		params.place_club_organisateur = 0;
-	end
-	if params.nb_places_a_repartir then
-		params.nb_francais_maxi = params.nb_places_a_repartir;
-		params.nb_etrangers = 0;
+		params.wild_card = 0;
+		params.a_repartir = params.nb_places_a_repartir;
 	else
+		params.place_comite_organisateur = node.place_comite_organisateur;
+		params.place_club_organisateur = node.place_club_organisateur;
+		params.wild_card = node.wild_card;
 		if tRanking:GetNbRows() >= 140 then
 			params.nb_francais_maxi = 140 - params.nb_etrangers;
 		else
 			params.nb_francais_maxi = tRanking:GetNbRows() - params.nb_etrangers;
 		end
 	end
-	params.a_repartir =  params.nb_francais_maxi - (params.place_comite_organisateur + params.place_club_organisateur + params.wild_card  + params.nb_equipe);
+	if params.codex:sub(1,3) ~= 'FRA' then
+		params.place_comite_organisateur = 0;
+		params.place_club_organisateur = 0;
+		params.wild_card = 0;
+	end
+	if params.place_variable == 0 then
+		params.a_repartir = params.nb_francais_maxi - (params.place_comite_organisateur + params.place_club_organisateur + params.wild_card  + params.nb_equipe);
+	else
+		params.place_comite_organisateur = math.ceil(params.place_comite_organisateur * params.nb_francais_maxi / 140);
+		params.place_club_organisateur = math.ceil(params.place_club_organisateur * params.nb_francais_maxi / 140);
+		params.wild_card = math.ceil(params.wild_card * params.nb_francais_maxi / 140);
+		params.a_repartir = params.nb_francais_maxi - (params.place_comite_organisateur + params.place_club_organisateur + params.wild_card  + params.nb_equipe);
+	end
 	-- adv.Alert('GetSetData à répartir = '..params.a_repartir);
 	nb_iteration = 1;
 	local difference = 0;
 	local a_repartir = params.a_repartir;
-	local multiplicateur = -1;
+	local multiplicateur = 1;
 	while true do
-		-- adv.Alert('\n - début de boucle, nb_iteration = '..nb_iteration..', a_repartir = '..a_repartir..', difference = '..difference..', difference_sav = '..tostring(difference_sav));
+		-- adv.Alert('\n - début de boucle, nb_iteration = '..nb_iteration..', a_repartir = '..a_repartir);
 		difference = CalculeQuota(a_repartir);
-		if not difference_sav then
-			difference_sav = difference;
-		elseif 
-			math.abs(difference_sav) > math.abs(difference) then
-			multiplicateur = multiplicateur * -1;
-			difference_sav = difference;
-		end
-		if math.abs(difference) < 0.2 or math.abs(difference) > 3 then
-			-- adv.Alert('sortie de boucle avec math.abs(difference) = '..math.abs(difference));
+		if math.abs(difference) < 0.1 or math.abs(difference) > 3 then
+			-- adv.Alert('sortie de boucle sur itération '..nb_iteration..' avec math.abs(difference) = '..math.abs(difference));
 			break;
 		end
 		if nb_iteration == 20 then
@@ -1358,42 +1476,42 @@ function GetSetData()
 			tTableComitex[index].Status = 1;
 		end
 		nb_iteration = nb_iteration + 1;
-		a_repartir = a_repartir + (0.1 * multiplicateur);
-		-- if difference > 0 then
-			-- a_repartir = a_repartir - 0.1;
-		-- else
-			-- a_repartir = a_repartir + 0.1;
-		-- end
+		if not difference_sav then
+			difference_sav = difference
+			a_repartir = a_repartir + 0.5;
+		else
+			a_repartir = a_repartir - 0.1;
+		end
 		-- adv.Alert('\nfin de la boucle while, après CalculeQuota nb_iteration = '..nb_iteration..', différence = '..difference..', à repartir tour suivant = '..a_repartir);
 	end
 end
 
 function SettTableComite();
 	tTableComite = {};
-	table.insert(tTableComite, {Comite = 'AP', Quota_base = 0, Quota_base2 = 0, Representation = 0, Place_gagnee = -1, Place_theorique2 = 0,Participation = 0, Maxi_theorique = 0, Maxi_theorique2 = 0, Quota_calcule = 0, Quota_calculette = 0, Place_Rendue = 0, Pourcent = 0, Status = 1});
-	table.insert(tTableComite, {Comite = 'AU', Quota_base = 0, Quota_base2 = 0, Representation = 0, Place_gagnee = -1, Place_theorique2 = 0,Participation = 0, Maxi_theorique = 0, Maxi_theorique2 = 0, Quota_calcule = 0, Quota_calculette = 0, Place_Rendue = 0, Pourcent = 0, Status = 1});
-	table.insert(tTableComite, {Comite = 'CA', Quota_base = 0, Quota_base2 = 0, Representation = 0, Place_gagnee = -1, Place_theorique2 = 0,Participation = 0, Maxi_theorique = 0, Maxi_theorique2 = 0, Quota_calcule = 0, Quota_calculette = 0, Place_Rendue = 0, Pourcent = 0, Status = 1});
-	table.insert(tTableComite, {Comite = 'CO', Quota_base = 0, Quota_base2 = 0, Representation = 0, Place_gagnee = -1, Place_theorique2 = 0,Participation = 0, Maxi_theorique = 0, Maxi_theorique2 = 0, Quota_calcule = 0, Quota_calculette = 0, Place_Rendue = 0, Pourcent = 0, Status = 1});
-	table.insert(tTableComite, {Comite = 'DA', Quota_base = 0, Quota_base2 = 0, Representation = 0, Place_gagnee = -1, Place_theorique2 = 0,Participation = 0, Maxi_theorique = 0, Maxi_theorique2 = 0, Quota_calcule = 0, Quota_calculette = 0, Place_Rendue = 0, Pourcent = 0, Status = 1});
-	table.insert(tTableComite, {Comite = 'IF', Quota_base = 0, Quota_base2 = 0, Representation = 0, Place_gagnee = -1, Place_theorique2 = 0,Participation = 0, Maxi_theorique = 0, Maxi_theorique2 = 0, Quota_calcule = 0, Quota_calculette = 0, Place_Rendue = 0, Pourcent = 0, Status = 1});
-	table.insert(tTableComite, {Comite = 'MB', Quota_base = 0, Quota_base2 = 0, Representation = 0, Place_gagnee = -1, Place_theorique2 = 0,Participation = 0, Maxi_theorique = 0, Maxi_theorique2 = 0, Quota_calcule = 0, Quota_calculette = 0, Place_Rendue = 0, Pourcent = 0, Status = 1});
-	table.insert(tTableComite, {Comite = 'MJ', Quota_base = 0, Quota_base2 = 0, Representation = 0, Place_gagnee = -1, Place_theorique2 = 0,Participation = 0, Maxi_theorique = 0, Maxi_theorique2 = 0, Quota_calcule = 0, Quota_calculette = 0, Place_Rendue = 0, Pourcent = 0, Status = 1});
-	table.insert(tTableComite, {Comite = 'MV', Quota_base = 0, Quota_base2 = 0, Representation = 0, Place_gagnee = -1, Place_theorique2 = 0,Participation = 0, Maxi_theorique = 0, Maxi_theorique2 = 0, Quota_calcule = 0, Quota_calculette = 0, Place_Rendue = 0, Pourcent = 0, Status = 1});
-	table.insert(tTableComite, {Comite = 'SA', Quota_base = 0, Quota_base2 = 0, Representation = 0, Place_gagnee = -1, Place_theorique2 = 0,Participation = 0, Maxi_theorique = 0, Maxi_theorique2 = 0, Quota_calcule = 0, Quota_calculette = 0, Place_Rendue = 0, Pourcent = 0, Status = 1});
+	table.insert(tTableComite, {Comite = 'AP', Quota_base = 0, Quota_base2 = 0, Representation = 0, Place_gagnee = -1, Place_theorique2 = 0,Participation = 0, Maxi_theorique = 0, Maximum = 0, Maxi_theorique2 = 0, Quota_calcule = 0, Quota_calculette = 0, Place_Rendue = 0, Pourcent = 0, Status = 1});
+	table.insert(tTableComite, {Comite = 'AU', Quota_base = 0, Quota_base2 = 0, Representation = 0, Place_gagnee = -1, Place_theorique2 = 0,Participation = 0, Maxi_theorique = 0, Maximum = 0, Maxi_theorique2 = 0, Quota_calcule = 0, Quota_calculette = 0, Place_Rendue = 0, Pourcent = 0, Status = 1});
+	table.insert(tTableComite, {Comite = 'CA', Quota_base = 0, Quota_base2 = 0, Representation = 0, Place_gagnee = -1, Place_theorique2 = 0,Participation = 0, Maxi_theorique = 0, Maximum = 0, Maxi_theorique2 = 0, Quota_calcule = 0, Quota_calculette = 0, Place_Rendue = 0, Pourcent = 0, Status = 1});
+	table.insert(tTableComite, {Comite = 'CO', Quota_base = 0, Quota_base2 = 0, Representation = 0, Place_gagnee = -1, Place_theorique2 = 0,Participation = 0, Maxi_theorique = 0, Maximum = 0, Maxi_theorique2 = 0, Quota_calcule = 0, Quota_calculette = 0, Place_Rendue = 0, Pourcent = 0, Status = 1});
+	table.insert(tTableComite, {Comite = 'DA', Quota_base = 0, Quota_base2 = 0, Representation = 0, Place_gagnee = -1, Place_theorique2 = 0,Participation = 0, Maxi_theorique = 0, Maximum = 0, Maxi_theorique2 = 0, Quota_calcule = 0, Quota_calculette = 0, Place_Rendue = 0, Pourcent = 0, Status = 1});
+	table.insert(tTableComite, {Comite = 'IF', Quota_base = 0, Quota_base2 = 0, Representation = 0, Place_gagnee = -1, Place_theorique2 = 0,Participation = 0, Maxi_theorique = 0, Maximum = 0, Maxi_theorique2 = 0, Quota_calcule = 0, Quota_calculette = 0, Place_Rendue = 0, Pourcent = 0, Status = 1});
+	table.insert(tTableComite, {Comite = 'MB', Quota_base = 0, Quota_base2 = 0, Representation = 0, Place_gagnee = -1, Place_theorique2 = 0,Participation = 0, Maxi_theorique = 0, Maximum = 0, Maxi_theorique2 = 0, Quota_calcule = 0, Quota_calculette = 0, Place_Rendue = 0, Pourcent = 0, Status = 1});
+	table.insert(tTableComite, {Comite = 'MJ', Quota_base = 0, Quota_base2 = 0, Representation = 0, Place_gagnee = -1, Place_theorique2 = 0,Participation = 0, Maxi_theorique = 0, Maximum = 0, Maxi_theorique2 = 0, Quota_calcule = 0, Quota_calculette = 0, Place_Rendue = 0, Pourcent = 0, Status = 1});
+	table.insert(tTableComite, {Comite = 'MV', Quota_base = 0, Quota_base2 = 0, Representation = 0, Place_gagnee = -1, Place_theorique2 = 0,Participation = 0, Maxi_theorique = 0, Maximum = 0, Maxi_theorique2 = 0, Quota_calcule = 0, Quota_calculette = 0, Place_Rendue = 0, Pourcent = 0, Status = 1});
+	table.insert(tTableComite, {Comite = 'SA', Quota_base = 0, Quota_base2 = 0, Representation = 0, Place_gagnee = -1, Place_theorique2 = 0,Participation = 0, Maxi_theorique = 0, Maximum = 0, Maxi_theorique2 = 0, Quota_calcule = 0, Quota_calculette = 0, Place_Rendue = 0, Pourcent = 0, Status = 1});
 	if node_hommes:HasAttribute('PY') then
-		table.insert(tTableComite, {Comite = 'PY', Quota_base = 0, Quota_base2 = 0, Representation = 0, Place_gagnee = -1, Place_theorique2 = 0,Participation = 0, Maxi_theorique = 0, Maxi_theorique2 = 0, Quota_calcule = 0, Quota_calculette = 0, Place_Rendue = 0, Pourcent = 0, Status = 1});
+		table.insert(tTableComite, {Comite = 'PY', Quota_base = 0, Quota_base2 = 0, Representation = 0, Place_gagnee = -1, Place_theorique2 = 0,Participation = 0, Maxi_theorique = 0, Maximum = 0, Maxi_theorique2 = 0, Quota_calcule = 0, Quota_calculette = 0, Place_Rendue = 0, Pourcent = 0, Status = 1});
 	else
-		table.insert(tTableComite, {Comite = 'PO', Quota_base = 0, Quota_base2 = 0, Representation = 0, Place_gagnee = -1, Place_theorique2 = 0,Participation = 0, Maxi_theorique = 0, Maxi_theorique2 = 0, Quota_calcule = 0, Quota_calculette = 0, Place_Rendue = 0, Pourcent = 0, Status = 1});
-		table.insert(tTableComite, {Comite = 'PE', Quota_base = 0, Quota_base2 = 0, Representation = 0, Place_gagnee = -1, Place_theorique2 = 0,Participation = 0, Maxi_theorique = 0, Maxi_theorique2 = 0, Quota_calcule = 0, Quota_calculette = 0, Place_Rendue = 0, Pourcent = 0, Status = 1});
+		table.insert(tTableComite, {Comite = 'PO', Quota_base = 0, Quota_base2 = 0, Representation = 0, Place_gagnee = -1, Place_theorique2 = 0,Participation = 0, Maxi_theorique = 0, Maximum = 0, Maxi_theorique2 = 0, Quota_calcule = 0, Quota_calculette = 0, Place_Rendue = 0, Pourcent = 0, Status = 1});
+		table.insert(tTableComite, {Comite = 'PE', Quota_base = 0, Quota_base2 = 0, Representation = 0, Place_gagnee = -1, Place_theorique2 = 0,Participation = 0, Maxi_theorique = 0, Maximum = 0, Maxi_theorique2 = 0, Quota_calcule = 0, Quota_calculette = 0, Place_Rendue = 0, Pourcent = 0, Status = 1});
 	end
 	if node_hommes:HasAttribute('GI') then
-		table.insert(tTableComite, {Comite = 'GI', Quota_base = 0, Quota_base2 = 0, Representation = 0, Place_gagnee = -1, Place_theorique2 = 0,Participation = 0, Maxi_theorique = 0, Maxi_theorique2 = 0, Quota_calcule = 0, Quota_calculette = 0, Place_Rendue = 0, Pourcent = 0, Status = 1});
+		table.insert(tTableComite, {Comite = 'GI', Quota_base = 0, Quota_base2 = 0, Representation = 0, Place_gagnee = -1, Place_theorique2 = 0,Participation = 0, Maxi_theorique = 0, Maximum = 0, Maxi_theorique2 = 0, Quota_calcule = 0, Quota_calculette = 0, Place_Rendue = 0, Pourcent = 0, Status = 1});
 	else
-		table.insert(tTableComite, {Comite = 'BO', Quota_base = 0, Quota_base2 = 0, Representation = 0, Place_gagnee = -1, Place_theorique2 = 0,Participation = 0, Maxi_theorique = 0, Maxi_theorique2 = 0, Quota_calcule = 0, Quota_calculette = 0, Place_Rendue = 0, Pourcent = 0, Status = 1});
-		table.insert(tTableComite, {Comite = 'FZ', Quota_base = 0, Quota_base2 = 0, Representation = 0, Place_gagnee = -1, Place_theorique2 = 0,Participation = 0, Maxi_theorique = 0, Maxi_theorique2 = 0, Quota_calcule = 0, Quota_calculette = 0, Place_Rendue = 0, Pourcent = 0, Status = 1});
-		table.insert(tTableComite, {Comite = 'CE', Quota_base = 0, Quota_base2 = 0, Representation = 0, Place_gagnee = -1, Place_theorique2 = 0,Participation = 0, Maxi_theorique = 0, Maxi_theorique2 = 0, Quota_calcule = 0, Quota_calculette = 0, Place_Rendue = 0, Pourcent = 0, Status = 1});
-		table.insert(tTableComite, {Comite = 'LY', Quota_base = 0, Quota_base2 = 0, Representation = 0, Place_gagnee = -1, Place_theorique2 = 0,Participation = 0, Maxi_theorique = 0, Maxi_theorique2 = 0, Quota_calcule = 0, Quota_calculette = 0, Place_Rendue = 0, Pourcent = 0, Status = 1});
-		table.insert(tTableComite, {Comite = 'OU', Quota_base = 0, Quota_base2 = 0, Representation = 0, Place_gagnee = -1, Place_theorique2 = 0,Participation = 0, Maxi_theorique = 0, Maxi_theorique2 = 0, Quota_calcule = 0, Quota_calculette = 0, Place_Rendue = 0, Pourcent = 0, Status = 1});
+		table.insert(tTableComite, {Comite = 'BO', Quota_base = 0, Quota_base2 = 0, Representation = 0, Place_gagnee = -1, Place_theorique2 = 0,Participation = 0, Maxi_theorique = 0, Maximum = 0, Maxi_theorique2 = 0, Quota_calcule = 0, Quota_calculette = 0, Place_Rendue = 0, Pourcent = 0, Status = 1});
+		table.insert(tTableComite, {Comite = 'FZ', Quota_base = 0, Quota_base2 = 0, Representation = 0, Place_gagnee = -1, Place_theorique2 = 0,Participation = 0, Maxi_theorique = 0, Maximum = 0, Maxi_theorique2 = 0, Quota_calcule = 0, Quota_calculette = 0, Place_Rendue = 0, Pourcent = 0, Status = 1});
+		table.insert(tTableComite, {Comite = 'CE', Quota_base = 0, Quota_base2 = 0, Representation = 0, Place_gagnee = -1, Place_theorique2 = 0,Participation = 0, Maxi_theorique = 0, Maximum = 0, Maxi_theorique2 = 0, Quota_calcule = 0, Quota_calculette = 0, Place_Rendue = 0, Pourcent = 0, Status = 1});
+		table.insert(tTableComite, {Comite = 'LY', Quota_base = 0, Quota_base2 = 0, Representation = 0, Place_gagnee = -1, Place_theorique2 = 0,Participation = 0, Maxi_theorique = 0, Maximum = 0, Maxi_theorique2 = 0, Quota_calcule = 0, Quota_calculette = 0, Place_Rendue = 0, Pourcent = 0, Status = 1});
+		table.insert(tTableComite, {Comite = 'OU', Quota_base = 0, Quota_base2 = 0, Representation = 0, Place_gagnee = -1, Place_theorique2 = 0,Participation = 0, Maxi_theorique = 0, Maximum = 0, Maxi_theorique2 = 0, Quota_calcule = 0, Quota_calculette = 0, Place_Rendue = 0, Pourcent = 0, Status = 1});
 	end
 	params.nb_equipe = 0;
 	-- adv.Alert('SettTableComite - type(params.equipe_Comite_origine) = '..type(params.equipe_Comite_origine)..', params.equipe_Comite_origine = '..params.equipe_Comite_origine);
@@ -1469,7 +1587,7 @@ function main(params_c)
 	params.x = 0;
 	params.y = 0;
 	params.recalcul = false;
-	script_version = 1.6; -- 4.92 pour 2022-2023
+	script_version = 1.8; -- 4.92 pour 2022-2023
 	indice_return = 11;
 	local msg = '';
 	if app.GetVersion() >= '5.0' then 
