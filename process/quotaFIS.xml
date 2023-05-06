@@ -52,10 +52,10 @@
 						<background color="(params.RGB[2][1])" mode="solid" cond="status == 1"/>
 						<!-- <background color="LtYellow" mode="solid" cond="status == 1"/> -->
 						<font color="black" weight="bold"/>
-						<textctrl row="auto" col_start="2" style="TE_CENTER" font_weight="bold" name="('comite'..ligne)"/>
-						<textctrl col_start="3" style="TE_CENTER" name="('quota_base'..ligne)"/>
-						<textctrl col_start="4" style="TE_CENTER" name="('quota_base2'..ligne)"/>
-						<textctrl col_start="5" style="TE_CENTER" name="('participation'..ligne)"/>
+						<textctrl row="auto" col_start="2" style="TE_CENTER|TE_READONLY" font_weight="bold" name="('comite'..ligne)"/>
+						<textctrl col_start="3" style="TE_CENTER|TE_READONLY" name="('quota_base'..ligne)"/>
+						<textctrl col_start="4" style="TE_CENTER|TE_READONLY" name="('quota_base2'..ligne)"/>
+						<textctrl col_start="5" style="TE_CENTER|TE_READONLY" name="('participation'..ligne)"/>
 						<background color="(params.RGB[2][2])" mode="solid" cond="status == 1"/>
 						<font color="white" weight="bold" cond="status == 1"/>
 						<textctrl col_start="6" style="TE_CENTER|TE_READONLY" cond="participation == 0" name="('quota_calcule'..ligne)"/>
@@ -241,17 +241,17 @@
 			<text col_start="5" align="center">params.Inscrits</text>
 			<text col_start="6" align="center">params.Total_Calcule</text>
 			
-			<text row="0.5cm" col_start="5" align="center" >'Places CR'</text>
-			<text col_start="6" align="center" >params.Place_CR</text>
+			<text row="0.5cm" col_start="5" align="center" cond="params.Place_CR ~= 0">'Places CR'</text>
+			<text col_start="6" align="center" cond="params.Place_CR ~= 0">params.Place_CR</text>
 			
-			<text row="0.5cm" col_start="5" align="center" >"Places Club"</text>
-			<text col_start="6" align="center">params.Place_Club</text>
+			<text row="0.5cm" col_start="5" align="center" cond="params.Place_Club ~= 0">"Places Club"</text>
+			<text col_start="6" align="center" cond="params.Place_Club ~= 0">params.Place_Club</text>
 
-			<text row="0.5cm" col_start="5" align="center" >"Wild Cards"</text>
-			<text col_start="6" align="center" >params.Place_WC</text>
+			<text row="0.5cm" col_start="5" align="center" cond="params.Place_WC ~= 0">"Wild Cards"</text>
+			<text col_start="6" align="center" cond="params.Place_WC ~= 0">params.Place_WC</text>
 			
-			<text row="0.5cm" col_start="5" align="center" >"Nb 'Equipe'"</text>
-			<text col_start="6" align="center" >params.Nb_Equipe</text>
+			<text row="0.5cm" col_start="5" align="center" cond="params.Nb_Equipe ~= 0">"Nb 'Equipe'"</text>
+			<text col_start="6" align="center" cond="params.Nb_Equipe ~= 0">params.Nb_Equipe</text>
 			
 			<text row="0.5cm" col_start="5" align="center" >"Etrangers"</text>
 			<text col_start="6" align="center" >params.Etrangers</text>
