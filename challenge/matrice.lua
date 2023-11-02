@@ -2813,7 +2813,7 @@ function LitMatriceCourses(bolcalculer);	-- lecture des courses figurant dans la
 		return false;
 	end
 	RempliTableauMatrice();
-	local cmd = 'Select * from Epreuve Where Code_evenement In('..matrice.Evenement_selection..') Order By Nombre_de_manche DESC';
+	cmd = 'Select * from Epreuve Where Code_evenement In('..matrice.Evenement_selection..') Order By Nombre_de_manche DESC';
 	tEpreuve = base:TableLoad(cmd);
 	local nb_manche_max = tEpreuve:GetCellInt('Nombre_de_manche', 0);
 	local cmd = "Select Ev.Code, 0 Ordre, Repeat(' ',2) Flag_param, Ev.Nom, Ev.Code_saison, Ep.Date_epreuve, Ep.Code_epreuve, Ep.Code_discipline, Repeat(' ',10) Discipline_alpine, 0 Participation, 0 Facteur_f, Ep.Nombre_de_manche, Ev.Station, Ev.Codex, Ev.Code_liste, 0 Bloc, 0 Obligatoire, 0 Prise, 0 Skip, 0 Coef_course, 0 Coef_manche, 0 Best_time, 0 Tps_maxi, 0 Diff_maxi, 0 Last_time, 0 Last_clt, 0 Nb_col, 0 Col_start";
@@ -3078,7 +3078,7 @@ end
 function CreateTablesCombo()
 
 	tOuiNon = sqlTable.Create('_OuiNon');
-	tOuiNon:AddColumn({ name = 'Choix', label = 'Choix', type = sqlType.CHAR , width = 3});
+	tOuiNon:AddColumn({ name = 'Choix', label = 'Choix', type = sqlType.TEXT , width = 3, style = sqlType.NULL});
 	local row = tOuiNon:AddRow()
 	tOuiNon:SetCell('Choix', row , 'Oui');
 	local row = tOuiNon:AddRow()
@@ -3087,7 +3087,7 @@ function CreateTablesCombo()
 	
 	tColResultatPar = {};
 	tResultatPar = sqlTable.Create('_ResultatPar');
-	tResultatPar:AddColumn({ name = 'Choix', label = 'Choix', type = sqlType.CHAR , width =10});
+	tResultatPar:AddColumn({ name = 'Choix', label = 'Choix', type = sqlType.TEXT , width =10, style = sqlType.NULL});
 	local row = tResultatPar:AddRow()
 	tResultatPar:SetCell('Choix', row , 'Sans objet');
 	local row = tResultatPar:AddRow()
@@ -3146,6 +3146,20 @@ function CreateTypeClassement()
 end
 
 function LitMatrice()	-- lecture des variables et affectation des valeurs dans les contrôles
+	local cmd = 'Select * from EpreuveEvenement_Challenge Where Code_evenement = '..matrice.code_evenement;
+	tEpreuveEvenement_Challenge	= base:TableLoad(cmd);
+	if tEpreuveEvenement_Challenge:GetNbRows() > 0 then
+		local cmd = "Delete From Evenement_Matrice Where Code_evenement = "..matrice.code_evenement.." And Cle = 'Evenement_selection'";
+		base:Query(cmd);
+		local chaine = '';
+		local separateur = '';
+		for i = 0, tEpreuveEvenement_Challenge:GetNbRows() - 1 do
+			chaine = chaine ..separateur..tEpreuveEvenement_Challenge:GetCellInt('Ev_Code', i);
+			separateur = ',';
+		end
+		-- on fait un replace de Evenement_selection dans la table Evenement_Matrice
+		AddRowEvenement_Matrice('Evenement_selection', chaine);
+	end
 	matrice.configFiltre = 1;
 	matrice.numTypeCritere = 0;
 	-- on charge toutes les lignes de la table Evenement_Matrice pour le matrice.code_evenement donné
@@ -3594,6 +3608,7 @@ function AffichedlgCritere1()	-- boîte de dialogue pour un critère de type 1
 		{
 		width = matrice.dlgPosit.width,
 		height = matrice.dlgPosit.height,
+		style=wndStyle.RESIZE_BORDER+wndStyle.CAPTION+wndStyle.CLOSE_BOX,
 		x = matrice.dlgPosit.x,
 		y = matrice.dlgPosit.y,
 		label='Critères simples de calcul par disciplines', 
@@ -3820,6 +3835,7 @@ function AffichedlgCritere2()	-- boîte de dialogue pour un critère de type 2
 		{
 		width = matrice.dlgPosit.width,
 		height = matrice.dlgPosit.height,
+		style=wndStyle.RESIZE_BORDER+wndStyle.CAPTION+wndStyle.CLOSE_BOX,
 		x = matrice.dlgPosit.x,
 		y = matrice.dlgPosit.y,
 		label='Critères simples de calcul par disciplines', 
@@ -4189,6 +4205,7 @@ function AffichedlgCritere4()	-- boîte de dialogue pour un critère de type 3 ou 
 		{
 		width = matrice.dlgPosit.width,
 		height = matrice.dlgPosit.height,
+		style=wndStyle.RESIZE_BORDER+wndStyle.CAPTION+wndStyle.CLOSE_BOX,
 		x = matrice.dlgPosit.x,
 		y = matrice.dlgPosit.y,
 		label='Critères de calculs avec gestion des blocs et des manches indépendantes des blocs', 
@@ -4557,6 +4574,7 @@ function AffichedlgConfigurationSupport()	-- boîte de dialogue des paramètres de
 		{
 		width = matrice.dlgPosit.width,
 		height = matrice.dlgPosit.height,
+		style=wndStyle.RESIZE_BORDER+wndStyle.CAPTION+wndStyle.CLOSE_BOX,
 		x = matrice.dlgPosit.x,
 		y = matrice.dlgPosit.y,
 		label='Courses support (inclusion - exclusion des coureurs du Challenge)', 
@@ -4749,6 +4767,7 @@ function AffichedlgCopycolonnes()	-- affiche la boîte de dialogue pour la copie 
 		{
 		width = matrice.dlgPosit.width,
 		height = matrice.dlgPosit.height,
+		style=wndStyle.RESIZE_BORDER+wndStyle.CAPTION+wndStyle.CLOSE_BOX,
 		x = matrice.dlgPosit.x,
 		y = matrice.dlgPosit.y,
 		label='Copier le contenu des colonnes dans les courses de la matrice', 
@@ -4903,6 +4922,7 @@ function AffichedlgScriptLua()	-- affiche la boîte de dialogue de recherche d'un
 		{
 		width = matrice.dlgPosit.width,
 		height = matrice.dlgPosit.height,
+		style=wndStyle.RESIZE_BORDER+wndStyle.CAPTION+wndStyle.CLOSE_BOX,
 		x = matrice.dlgPosit.x,
 		y = matrice.dlgPosit.y,
 		label='Rechercher un script LUA', 
@@ -4982,6 +5002,7 @@ function AffichedlgInscription()	-- boîte de dialogue pour la création d'une nou
 		{
 		width = matrice.dlgPosit.width,
 		height = matrice.dlgPosit.height,
+		style=wndStyle.RESIZE_BORDER+wndStyle.CAPTION+wndStyle.CLOSE_BOX,
 		x = matrice.dlgPosit.x,
 		y = matrice.dlgPosit.y,
 		label='Générer un fichier Inscription', 
@@ -5117,6 +5138,7 @@ function AffichedlgVisuFiltrexPoints()		-- boîte de dialogue de filtrage des cou
 		{
 		width = matrice.dlgPosit.width,
 		height = matrice.dlgPosit.height,
+		style=wndStyle.RESIZE_BORDER+wndStyle.CAPTION+wndStyle.CLOSE_BOX,
 		x = matrice.dlgPosit.x,
 		y = matrice.dlgPosit.y,
 		label='Plage de points - Sélection des coureurs', 
@@ -5359,6 +5381,7 @@ function AffichedlgTexte()		-- boîte de dialogue pour le choix des textes à impr
 		{
 		width = matrice.dlgPosit.width,
 		height = matrice.dlgPosit.height,
+		style=wndStyle.RESIZE_BORDER+wndStyle.CAPTION+wndStyle.CLOSE_BOX,
 		x = matrice.dlgPosit.x,
 		y = matrice.dlgPosit.y,
 		label='Paramétrage complémentaire de la matrice', 
@@ -5583,6 +5606,7 @@ function AffichedlgAnalyse()
 		{
 		width = matrice.dlgPosit.width,
 		height = matrice.dlgPosit.height,
+		style=wndStyle.RESIZE_BORDER+wndStyle.CAPTION+wndStyle.CLOSE_BOX,
 		x = matrice.dlgPosit.x,
 		y = matrice.dlgPosit.y,
 		label='Analyse des performances', 
@@ -5701,6 +5725,7 @@ function AffichedlgFiltre()	-- boîte de dialogue pour le filtrage des concurrent
 		{
 		width = matrice.dlgPosit.width,
 		height = matrice.dlgPosit.height,
+		style=wndStyle.RESIZE_BORDER+wndStyle.CAPTION+wndStyle.CLOSE_BOX,
 		x = matrice.dlgPosit.x,
 		y = matrice.dlgPosit.y,
 		label='Paramétrage des impressions', 
@@ -5772,6 +5797,7 @@ function AffichedlgColonne()	-- boîte de dialogue pour la sélection des colonnes
 		{
 		width = matrice.dlgPosit.width,
 		height = matrice.dlgPosit.height,
+		style=wndStyle.RESIZE_BORDER+wndStyle.CAPTION+wndStyle.CLOSE_BOX,
 		x = matrice.dlgPosit.x,
 		y = matrice.dlgPosit.y,
 		label='Paramétrage des impressions', 
@@ -5885,6 +5911,7 @@ function AffichedlgColonne2()		-- boîte de dialogue pour le choix des colonnes à
 		{
 		width = matrice.dlgPosit.width,
 		height = matrice.dlgPosit.height,
+		style=wndStyle.RESIZE_BORDER+wndStyle.CAPTION+wndStyle.CLOSE_BOX,
 		x = matrice.dlgPosit.x,
 		y = matrice.dlgPosit.y,
 		label='Paramétrage des impressions', 
@@ -6045,6 +6072,7 @@ function AffichedlgColonne3()		-- boîte de dialogue pour les alignements spécifi
 		{
 		width = matrice.dlgPosit.width,
 		height = matrice.dlgPosit.height,
+		style=wndStyle.RESIZE_BORDER+wndStyle.CAPTION+wndStyle.CLOSE_BOX,
 		x = matrice.dlgPosit.x,
 		y = matrice.dlgPosit.y,
 		label='Paramétrage des alignements spécifiques', 
@@ -6171,33 +6199,33 @@ function BuildTableRanking(indice_filtrage)
 	end
 	ReplaceTableEnvironnement(tMatrice_Ranking, '_tMatrice_Ranking');
 	if matrice.comboEntite == 'FIS' then
-		tMatrice_Ranking:AddColumn({ name = 'Code_FFS', label = 'Code_FFS', type = sqlType.CHAR, width = '15', style = sqlStyle.NULL});
+		tMatrice_Ranking:AddColumn({ name = 'Code_FFS', label = 'Code_FFS', type = sqlType.TEXT, width = 15, style = sqlStyle.NULL});
 	end
  	tMatrice_Ranking:AddColumn({ name = 'Clt', label = 'Clt', type = sqlType.LONG, style = sqlStyle.NULL});
  	tMatrice_Ranking:AddColumn({ name = 'Dossard', label = 'Dossard', type = sqlType.LONG, style = sqlStyle.NULL});
  	tMatrice_Ranking:AddColumn({ name = 'Rang', label = 'Rang', type = sqlType.LONG, style = sqlStyle.NULL});
-	tMatrice_Ranking:AddColumn({ name = 'Nom', label = 'Nom', type = sqlType.CHAR, width = '30', style = sqlStyle.NULL});
-	tMatrice_Ranking:AddColumn({ name = 'Prenom', label = 'Prenom', type = sqlType.CHAR, width = '30', style = sqlStyle.NULL});
- 	tMatrice_Ranking:AddColumn({ name = 'Identite', label = 'Identite', type = sqlType.CHAR, width = '61', style = sqlStyle.NULL});
+	tMatrice_Ranking:AddColumn({ name = 'Nom', label = 'Nom', type = sqlType.TEXT, width = 30, style = sqlStyle.NULL});
+	tMatrice_Ranking:AddColumn({ name = 'Prenom', label = 'Prenom', type = sqlType.TEXT, width = 30, style = sqlStyle.NULL});
+ 	tMatrice_Ranking:AddColumn({ name = 'Identite', label = 'Identite', type = sqlType.TEXT, width = 61, style = sqlStyle.NULL});
 	local colindex = tMatrice_Ranking:GetIndexColumn('Sexe');
 	if colindex < 0 then
-		tMatrice_Ranking:AddColumn({ name = 'Sexe', label = 'Sexe', type = sqlType.CHAR, width = '1', style = sqlStyle.NULL});
+		tMatrice_Ranking:AddColumn({ name = 'Sexe', label = 'Sexe', type = sqlType.TEXT, width = 1, style = sqlStyle.NULL});
       end
 	tMatrice_Ranking:AddColumn({ name = 'An', label = 'An', type = sqlType.LONG, style = sqlStyle.NULL});
 	colindex = tMatrice_Ranking:GetIndexColumn('Categ');
 	if colindex < 0 then
-		tMatrice_Ranking:AddColumn({ name = 'Categ', label = 'Categ', type = sqlType.CHAR, width = '8', style = sqlStyle.NULL});
+		tMatrice_Ranking:AddColumn({ name = 'Categ', label = 'Categ', type = sqlType.TEXT, width = 8, style = sqlStyle.NULL});
       end
-	tMatrice_Ranking:AddColumn({ name = 'Nation', label = 'Nation', type = sqlType.CHAR, width = '3', style = sqlStyle.NULL});
-	tMatrice_Ranking:AddColumn({ name = 'Comite', label = 'Comite', type = sqlType.CHAR, width = '3', style = sqlStyle.NULL});
-	tMatrice_Ranking:AddColumn({ name = 'Club', label = 'Club', type = sqlType.CHAR, width = '30', style = sqlStyle.NULL});
-	tMatrice_Ranking:AddColumn({ name = 'Club_long', label = 'Club', type = sqlType.CHAR, width = '75', style = sqlStyle.NULL});
+	tMatrice_Ranking:AddColumn({ name = 'Nation', label = 'Nation', type = sqlType.TEXT, width = 3, style = sqlStyle.NULL});
+	tMatrice_Ranking:AddColumn({ name = 'Comite', label = 'Comite', type = sqlType.TEXT, width = 3, style = sqlStyle.NULL});
+	tMatrice_Ranking:AddColumn({ name = 'Club', label = 'Club', type = sqlType.TEXT, width = 30, style = sqlStyle.NULL});
+	tMatrice_Ranking:AddColumn({ name = 'Club_long', label = 'Club', type = sqlType.TEXT, width = 75, style = sqlStyle.NULL});
 	colindex = tMatrice_Ranking:GetIndexColumn('Groupe');
 	if colindex < 0 then
-		tMatrice_Ranking:AddColumn({ name = 'Groupe', label = 'Groupe', type = sqlType.CHAR, width = '30', style = sqlStyle.NULL});
+		tMatrice_Ranking:AddColumn({ name = 'Groupe', label = 'Groupe', type = sqlType.TEXT, width = 30, style = sqlStyle.NULL});
       end
-	tMatrice_Ranking:AddColumn({ name = 'Equipe', label = 'Equipe', type = sqlType.CHAR, width = '30', style = sqlStyle.NULL});
-	tMatrice_Ranking:AddColumn({ name = 'Critere', label = 'Critere', type = sqlType.CHAR, width = '30', style = sqlStyle.NULL});
+	tMatrice_Ranking:AddColumn({ name = 'Equipe', label = 'Equipe', type = sqlType.TEXT, width = 30, style = sqlStyle.NULL});
+	tMatrice_Ranking:AddColumn({ name = 'Critere', label = 'Critere', type = sqlType.TEXT, width = 30, style = sqlStyle.NULL});
  	tMatrice_Ranking:AddColumn({ name = 'Point', label = 'Point', type = sqlType.DOUBLE, style = sqlStyle.NULL});
  	tMatrice_Ranking:AddColumn({ name = 'Pts', label = 'Pts', type = sqlType.DOUBLE, style = sqlStyle.NULL});
 
@@ -6232,10 +6260,10 @@ function BuildTableRanking(indice_filtrage)
 		local idxcourse = row + 1;
 		local discipline = tMatrice_Courses:GetCell('Code_discipline', row);
 		tMatrice_Ranking:AddColumn({ name = 'Code_evenement'..idxcourse, label = 'Code_evenement'..idxcourse, type = sqlType.LONG, style = sqlStyle.NULL});
-		tMatrice_Ranking:AddColumn({ name = 'Codex'..idxcourse, label = 'Codex'..idxcourse, type = sqlType.CHAR, width = '15', style = sqlStyle.NULL});
+		tMatrice_Ranking:AddColumn({ name = 'Codex'..idxcourse, label = 'Codex'..idxcourse, type = sqlType.TEXT, width = 15, style = sqlStyle.NULL});
 		tMatrice_Ranking:AddColumn({ name = 'Course_prise'..idxcourse, label = 'Course_prise'..idxcourse, type = sqlType.LONG, style = sqlStyle.NULL});
 		tMatrice_Ranking:AddColumn({ name = 'Manche_prise'..idxcourse, label = 'Manche_prise'..idxcourse, type = sqlType.LONG, style = sqlStyle.NULL});
-		tMatrice_Ranking:AddColumn({ name = 'Selection'..idxcourse, label = 'Selection'..idxcourse, type = sqlType.CHAR, width = '100', style = sqlStyle.NULL});
+		tMatrice_Ranking:AddColumn({ name = 'Selection'..idxcourse, label = 'Selection'..idxcourse, type = sqlType.TEXT, width = 100, style = sqlStyle.NULL});
 		tMatrice_Ranking:AddColumn({ name = 'Clt'..idxcourse, label = 'Clt'..idxcourse, type = sqlType.LONG, style = sqlStyle.NULL});
 		tMatrice_Ranking:AddColumn({ name = 'Tps'..idxcourse, label = 'Tps'..idxcourse, type = sqlType.LONG, style = sqlStyle.NULL});
 		tMatrice_Ranking:AddColumn({ name = 'Tps'..idxcourse..'_diff', label = 'Tps'..idxcourse..'_diff', type = sqlType.LONG, style = sqlStyle.NULL});
@@ -6246,7 +6274,7 @@ function BuildTableRanking(indice_filtrage)
 		tMatrice_Ranking:AddColumn({ name = 'Pts'..idxcourse..'_total', label = 'Pts'..idxcourse..'_total', type = sqlType.DOUBLE, style = sqlStyle.NULL});
 		for idxrun = 1, tMatrice_Courses:GetCellInt('Nombre_de_manche', row) do
 			if discipline == 'CS' and idxrun == 1 then		-- manche de saut
-				tMatrice_Ranking:AddColumn({ name = 'Lng'..idxcourse..'_saut', label = 'Lng'..idxcourse..'_saut', type = sqlType.CHAR, width = '10', style = sqlStyle.NULL});
+				tMatrice_Ranking:AddColumn({ name = 'Lng'..idxcourse..'_saut', label = 'Lng'..idxcourse..'_saut', type = sqlType.TEXT, width = 10, style = sqlStyle.NULL});
 				tMatrice_Ranking:AddColumn({ name = 'Pts'..idxcourse..'_saut'..idxrun, label = 'Pts'..idxcourse..'_saut', type = sqlType.DOUBLE, style = sqlStyle.NULL});
 			end
 			tMatrice_Ranking:AddColumn({ name = 'Clt'..idxcourse..'_run'..idxrun, label = 'Clt'..idxcourse..'_run'..idxrun, type = sqlType.LONG, style = sqlStyle.NULL});
@@ -6449,12 +6477,192 @@ function BtnPrint()
 	end
 end
 
+function AfficheMenuParametres()
+	local menuContext =  menu.Create();
+	local btnCouleurs = menuContext:Append({label="Couleurs des disciplines", image ="./res/32x32_color.png"});
+	dlgConfig:Bind(eventType.MENU, AffichedlgParamColor, btnCouleurs);
+	local btnCouleurPodium = menuContext:Append({label="Couleurs du Podium", image ="./res/32x32_color.png"});
+	dlgConfig:Bind(eventType.MENU, AffichedlgParamColorPodium, btnCouleurPodium);
+	local btnParamAnalyse = menuContext:Append({label="de l'analyse des performances.", image ="./res/32x32_ranking.png"});
+	dlgConfig:Bind(eventType.MENU, AffichedlgAnalyse, btnParamAnalyse);
+	dlgConfig:PopupMenu(menuContext);
+	menuContext:Delete();
+end
+
+function AfficheMenuOutils()
+	local menuContext =  menu.Create();
+
+	local btnOutils = menuContext:Append({label="Coureurs pouvant figurer dans la matrice", image ="./res/16x16_configure.png"});
+	local btnOutils1 = menuContext:Append({label="Inclusion / Exclusion des coureurs", image ="./res/32x32_config.png"});
+	local btnOutils2 = menuContext:Append({label="Effacer / remplir des colonnes", image ="./res/32x32_config.png"});
+	local btnOutils3 = menuContext:Append({label="Rechercher un script LUA", image ="./res/32x32_param.png"});
+	local btnOutils4 = menuContext:Append({label='Créer une nouvelle course', image ="./res/32x32_journal.png"});
+
+	dlgConfig:Bind(eventType.MENU, AffichedlgConfigurationSupport, btnOutils);
+	dlgConfig:Bind(eventType.MENU, AffichedlgConfigurationSupport, btnOutils1);
+	dlgConfig:Bind(eventType.MENU, AffichedlgCopycolonnes, btnOutils2);
+	dlgConfig:Bind(eventType.MENU, AffichedlgScriptLua, btnOutils3);
+	dlgConfig:Bind(eventType.MENU, AffichedlgInscription, btnOutils4);
+	
+	dlgConfig:PopupMenu(menuContext);
+	menuContext:Delete();
+	
+end
+
+function AfficheMenuFiltres()
+	local menuContext =  menu.Create();
+
+	local btnFiltres = menuContext:Append({label="Filtrage des coureurs", image ="./res/32x32_config.png"});
+	local btnFiltreParPoint = menuContext:Append({label="Filtrage des coureurs par points", image ="./res/32x32_config.png"});
+	local btnFiltreRegroupement = menuContext:Append({label="Regroupement des courses", image ="./res/32x32_config.png"});
+
+
+	dlgConfig:Bind(eventType.MENU, 
+		function(evt)
+			if not matrice.Evenement_selection or matrice.Evenement_selection:len() == 0 then
+				dlgConfig:MessageBox(
+					"Il n'y a rien à filtrer, la matrice ne contient aucune course.",
+					"Merci de saisir une course", 
+					msgBoxStyle.OK + msgBoxStyle.ICON_WARNING
+					) ;
+				return
+			end
+			local cmd = 'Select * From Resultat Where Code_evenement In(-1,'..matrice.Evenement_selection..") And Sexe = '"..matrice.comboSexe.."'";
+			base:TableLoad(tResultat, cmd);
+			if tResultat:GetNbRows() > 0 then
+				local filterCmd = wnd.FilterConcurrentDialog({ 
+					sqlTable = tResultat,
+					key = 'cmd'});
+				if type(filterCmd) == 'string' and filterCmd:len() > 1 then
+					matrice.Cle_filtrage = filterCmd;
+					if not string.find(matrice.Cle_filtrage, 'Sexe') then
+						matrice.Cle_filtrage = "$(Sexe):In('"..matrice.comboSexe.."')" ..' and '..matrice.Cle_filtrage;
+					end
+					local cmd = "Delete From Evenement_Matrice Where Code_evenement = "..matrice.code_evenement.." And Cle = 'Cle_filtrage'";
+					base:Query(cmd);
+					AddRowEvenement_Matrice('Cle_filtrage', matrice.Cle_filtrage);
+				else
+					if dlgConfig:MessageBox(
+						"Voulez vous effacer les critères de filtrage\ndes concurrents pour le Challenge ?", 
+						"Attention !!!",
+						msgBoxStyle.YES_NO + msgBoxStyle.NO_DEFAULT + msgBoxStyle.ICON_WARNING
+						) == msgBoxStyle.YES then
+						local cmd = "Delete From Evenement_Matrice Where Code_evenement = "..matrice.code_evenement.." And Cle = 'Cle_filtrage'";
+						base:Query(cmd);
+						matrice.Cle_filtrage = nil;
+					end
+				end
+			end
+		end
+		, btnFiltres);
+
+
+	dlgConfig:Bind(eventType.MENU, AffichedlgRegroupement, btnFiltreRegroupement);
+	dlgConfig:Bind(eventType.MENU, AffichedlgVisuFiltrexPoints, btnFiltreParPoint);
+	
+	dlgConfig:PopupMenu(menuContext);
+	menuContext:Delete();
+	
+end
+
+function AfficheMenuColonnes()
+	local menuContext =  menu.Create();
+
+	local btnColonnes1 = menuContext:Append({label="Colonnes principale à imprimer", image ="./res/32x32_param.png"});
+	local btnColonnes2 = menuContext:Append({label="Choix des colonnes des courses", image ="./res/32x32_param.png"});
+	local btnColonnes3 = menuContext:Append({label="Alignements spéciaux", image ="./res/32x32_param.png"});
+
+	dlgConfig:Bind(eventType.MENU, AffichedlgColonne, btnColonnes1);
+	dlgConfig:Bind(eventType.MENU, AffichedlgColonne2, btnColonnes2);
+	dlgConfig:Bind(eventType.MENU, AffichedlgColonne3, btnColonnes3);
+	
+	dlgConfig:PopupMenu(menuContext);
+	menuContext:Delete();
+	
+end
+
+function AfficheMenuCriteres()
+	local menuContext =  menu.Create();
+
+	local btnCritere1 = menuContext:Append({label="Critères simples de calcul par disciplines", image ="./res/32x32_config.png"});
+	local btnCritere2 = menuContext:Append({label="Critères de calcul par disciplines et par blocs", image ="./res/32x32_param.png"});
+	local btnCritere4 = menuContext:Append({label="Critères de calcul par disciplines, par courses et par manches indépendantes des blocs", image ="./res/32x32_configuration.png"});
+	local btnRAZCritere = menuContext:Append({label="Effacer tous les critères de calcul", image ="./res/32x32_configuration.png"});
+
+	dlgConfig:Bind(eventType.MENU, AffichedlgCritere1, btnCritere1);
+	dlgConfig:Bind(eventType.MENU, AffichedlgCritere2, btnCritere2);
+	dlgConfig:Bind(eventType.MENU, AffichedlgCritere4, btnCritere4);
+	dlgConfig:Bind(eventType.MENU, 
+		function(evt)
+			if dlgConfig:MessageBox(
+				"Voulez vous effacer les critères de calculs ?", 
+				"Attention !!!",
+				msgBoxStyle.YES_NO + msgBoxStyle.NO_DEFAULT + msgBoxStyle.ICON_WARNING
+				) == msgBoxStyle.YES then
+				local cmd = 'Delete From Evenement_Matrice Where Code_evenement = '..matrice.code_evenement.." And Cle Like '%critere%'";
+				base:Query(cmd);
+				matrice.numTypeCritere = 0;		
+			end
+		end
+		, btnRAZCritere);
+
+	dlgConfig:PopupMenu(menuContext);
+	menuContext:Delete();
+end
+
+function AfficheMenuCalculer()
+	local menuContext =  menu.Create();
+
+	local btnCalculer = menuContext:Append({label="Calculer", image="./res/32x32_ranking.png"});
+	local btnAnalyse = menuContext:Append({label="Analyse des performances", image ="./res/32x32_ranking.png"});
+
+	dlgConfig:Bind(eventType.MENU,
+		function(evt)
+			BtnPrint()
+			dlgConfig:EndModal(idButton.OK);
+		end
+		, btnCalculer);
+	dlgConfig:Bind(eventType.MENU,
+		function(evt)
+			matrice.analyseGaucheDiscipline = matrice.analyseGaucheDiscipline or '';
+			matrice.analyseGaucheListe = matrice.analyseGaucheListe or 0;
+			if matrice.analyseGaucheDiscipline == '' or matrice.analyseGaucheListe == 0 then
+				dlgConfig:MessageBox(
+				"Vérifiez la liste support et la discipline dans les\nparamètres de l\'analyse !!!", 
+				"Attention !!!",
+				msgBoxStyle.OK + msgBoxStyle.ICON_WARNING
+				);
+				return false;
+			end
+			BtnPrintAnalyse()
+			dlgConfig:EndModal(idButton.OK);
+		end
+		, btnAnalyse);
+
+	dlgConfig:PopupMenu(menuContext);
+	menuContext:Delete();
+end
+
+function AfficheMenuAide()
+	local menuContext =  menu.Create();
+
+	local btnVersion = menuContext:Append({label="Version", image ="./res/vpe32x32_help.png"});
+	local btnHelp = menuContext:Append({label="Aide", image ="./res/32x32_sos.png"});
+
+	dlgConfig:Bind(eventType.MENU, AfficheVersion, btnVersion);
+	dlgConfig:Bind(eventType.MENU, AfficheAide, btnHelp);
+	
+	dlgConfig:PopupMenu(menuContext);
+	menuContext:Delete();
+end
+
 function AffichedlgConfiguration()
 	-- Creation de la boîte de dialogue principale
 	dlgConfig = wnd.CreateDialog(
 		{
 		width = matrice.dlgPosit.width,
 		height = matrice.dlgPosit.height,
+		style=wndStyle.RESIZE_BORDER+wndStyle.CAPTION+wndStyle.CLOSE_BOX,
 		x = matrice.dlgPosit.x,
 		y = matrice.dlgPosit.y,
 		label='Configuration des paramètres'..matrice.label_matrice, 
@@ -6514,70 +6722,54 @@ function AffichedlgConfiguration()
 	tbedit1:AddSeparator();
 	local btnTxtLogo = tbedit1:AddTool("Compléments", "./res/32x32_layer.png");
 	tbedit1:AddSeparator();
-	local btnParam = tbedit1:AddTool("Paramètres", "./res/32x32_tools.png", "Paramétrages", itemKind.DROPDOWN);
-	local menuParams = menu.Create();
-	local btnCouleurs = menuParams:Append({label="Couleurs des disciplines", image ="./res/32x32_color.png"});
-	menuParams:AppendSeparator();
-	local btnCouleurPodium = menuParams:Append({label="Couleurs du Podium", image ="./res/32x32_color.png"});
-	menuParams:AppendSeparator();
-	local btnParamAnalyse = menuParams:Append({label="de l'analyse des performances.", image ="./res/32x32_ranking.png"});
-	tbedit1:SetDropdownMenu(btnParam:GetId(), menuParams);
+	
+	
+	local strbtnParam = "Couleurs des disciplines"..
+					"\nCouleurs du Podium"..
+					"\nde l'analyse des performances";
+	
+	local btnParam = tbedit1:AddTool("Paramètres", "./res/32x32_tools.png", strbtnParam);
 	tbedit1:AddSeparator();
-	local btnColonnes = tbedit1:AddTool("Param. des colonnes", "./res/32x32_divide_row.png", 'Choix des colonnes', itemKind.DROPDOWN);
-	local menuColonnes = menu.Create();
-	menuColonnes:AppendSeparator();
-	local btnColonnes1 = menuColonnes:Append({label="Colonnes principale à imprimer", image ="./res/32x32_param.png"});
-	menuColonnes:AppendSeparator();
-	local btnColonnes2 = menuColonnes:Append({label="Choix des colonnes des courses", image ="./res/32x32_param.png"});
-	menuColonnes:AppendSeparator();
-	local btnColonnes3 = menuColonnes:Append({label="Alignements spéciaux", image ="./res/32x32_param.png"});
-	tbedit1:SetDropdownMenu(btnColonnes:GetId(), menuColonnes);
+	local strbtnColonnes = "Colonnes principale à imprimer"..
+					"\nChoix des colonnes des courses"..
+					"\nAlignements spéciaux";
+	
+	
+	local btnColonnes = tbedit1:AddTool("Param. des colonnes", "./res/32x32_divide_row.png", strbtnColonnes);
 	tbedit1:AddSeparator();
-	local btnOutils = tbedit1:AddTool("Outils", "./res/32x32_tools.png", "Coureurs pouvant figurer dans la matrice", itemKind.DROPDOWN);
-	local menuOutils = menu.Create();
-	local btnOutils1 = menuOutils:Append({label="Inclusion / Exclusion des coureurs", image ="./res/32x32_config.png"});
-	menuOutils:AppendSeparator();
-	local btnOutils2 = menuOutils:Append({label="Effacer / remplir des colonnes", image ="./res/32x32_config.png"});
-	menuOutils:AppendSeparator();
-	local btnOutils3 = menuOutils:Append({label="Rechercher un script LUA", image ="./res/32x32_param.png"});
-	menuOutils:AppendSeparator();
-	local btnOutils4 = menuOutils:Append({label='Créer une nouvelle course', image ="./res/32x32_journal.png"});
-	tbedit1:SetDropdownMenu(btnOutils:GetId(), menuOutils);
+
+	local strbtnOutils = "Coureurs pouvant figurer dans la matrice"..
+					"\nInclusion / Exclusion des coureurs"..
+					"\nEffacer / remplir des colonnes"..
+					"\nRechercher un script LUA"..
+					"\nCréer une nouvelle course";
+	local btnOutils = tbedit1:AddTool("Outils", "./res/32x32_tools.png", strbtnOutils);
+
 	tbedit1:AddSeparator();
-	local btnFiltrage = tbedit1:AddTool("Filtres", "./res/32x32_tools.png", "Filtres à appliquer", itemKind.DROPDOWN);
-	local menuFiltres = menu.Create();
-	local btnFiltres = menuFiltres:Append({label="Filtrage des coureurs", image ="./res/32x32_config.png"});
-	menuFiltres:AppendSeparator();
-	local btnFiltreParPoint = menuFiltres:Append({label="Filtrage des coureurs par points", image ="./res/32x32_config.png"});
-	menuFiltres:AppendSeparator();
-	local btnFiltreRegroupement = menuFiltres:Append({label="Regroupement des courses", image ="./res/32x32_config.png"});
-	tbedit1:SetDropdownMenu(btnFiltrage:GetId(), menuFiltres);
+	
+	local strBtnFiltres = "Filtrage des coureurs"..
+						"\nFiltrage des coureurs par points"..
+						"\nRegroupement des courses";
+	local btnFiltrage = tbedit1:AddTool("Filtres", "./res/32x32_tools.png", strBtnFiltres);
+
 	tbedit1:AddSeparator();
 	local btnVisuCourses = tbedit1:AddTool("Visu Courses", "./res/32x32_pencil.png");
 	tbedit1:AddSeparator();
-	local btn_parametrage = tbedit1:AddTool("Param. des calculs", "./res/32x32_config.png", "Paramétrage des calculs", itemKind.DROPDOWN);
-	local menuCritere =  menu.Create();
-	local btnCritere1 = menuCritere:Append({label="Critères simples de calcul par disciplines", image ="./res/32x32_config.png"});
-	menuCritere:AppendSeparator();
-	local btnCritere2 = menuCritere:Append({label="Critères de calcul par disciplines et par blocs", image ="./res/32x32_param.png"});
-	menuCritere:AppendSeparator();
-	local btnCritere4 = menuCritere:Append({label="Critères de calcul par disciplines, par courses et par manches indépendantes des blocs", image ="./res/32x32_configuration.png"});
-	menuCritere:AppendSeparator();
-	local btnRAZCritere = menuCritere:Append({label="Effacer tous les critères de calcul", image ="./res/32x32_configuration.png"});
-	tbedit1:SetDropdownMenu(btn_parametrage:GetId(), menuCritere);
-	local btnPrint = tbedit1:AddTool("Calculer", "./res/32x32_ranking.png", "Calculer", itemKind.DROPDOWN);
-	menuPrint =  menu.Create();
-	local btnCalculer = menuPrint:Append({label="Calculer", image="./res/32x32_ranking.png"});
-	menuPrint:AppendSeparator();
-	btnAnalyse = menuPrint:Append({label="Analyse des performances", image ="./res/32x32_ranking.png"});
-	tbedit1:SetDropdownMenu(btnPrint:GetId(), menuPrint);
+	
+	
+	local strbtn_parametrage = "Paramétrage des calculs"..
+							"\nCritères simples de calcul par disciplines"..
+							"\nCritères de calcul par disciplines et par blocs"..
+							"\nCritères de calcul par disciplines, par courses et par manches indépendantes des blocs"..
+							"\nEffacer tous les critères de calcul";
+	local btn_parametrage = tbedit1:AddTool("Param. des calculs", "./res/32x32_config.png", "Paramétrage des calculs");
+
+
+	local btnPrint = tbedit1:AddTool("Calculer", "./res/32x32_ranking.png", "Calculer\nAnalyse des performances");
 	tbedit1:AddSeparator();
 	local btnRetour = tbedit1:AddTool("Sortie", "./res/32x32_exit.png");
 	tbedit1:AddSeparator();
-	local btnVersion = tbedit1:AddTool("Versions", "./res/vpe32x32_help.png", "Versions", itemKind.DROPDOWN);
-	local menuHelp =  menu.Create();
-	local btnHelp = menuHelp:Append({label="Aide", image ="./res/32x32_sos.png"});
-	tbedit1:SetDropdownMenu(btnVersion:GetId(), menuHelp);
+	local btnMenuVersion = tbedit1:AddTool("Versions", "./res/vpe32x32_help.png", "Versions\nAide");
 	tbedit1:AddStretchableSpace();
 	tbedit1:Realize();
 	
@@ -6605,107 +6797,72 @@ function AffichedlgConfiguration()
 			TimerDialogInit();
 			OnSavedlgConfiguration();
 		end, btnSaveEdit);
-	tbedit1:Bind(eventType.MENU, AffichedlgAnalyse, btnParam);
+	tbedit1:Bind(eventType.MENU, AfficheMenuParametres, btnParam);
 	tbedit1:Bind(eventType.MENU, AffichedlgAnalyse, btnParamAnalyse);
 	tbedit1:Bind(eventType.MENU, AffichedlgTexte, btnTxtLogo);
-	tbedit1:Bind(eventType.MENU, AffichedlgConfigurationSupport, btnOutils);
-	tbedit1:Bind(eventType.MENU, AffichedlgConfigurationSupport, btnOutils1);
-	tbedit1:Bind(eventType.MENU, AffichedlgCopycolonnes, btnOutils2);
-	tbedit1:Bind(eventType.MENU, AffichedlgScriptLua, btnOutils3);
-	tbedit1:Bind(eventType.MENU, AffichedlgInscription, btnOutils4);
 	
-	tbedit1:Bind(eventType.MENU, AffichedlgRegroupement, btnFiltreRegroupement);
-	tbedit1:Bind(eventType.MENU, AffichedlgVisuFiltrexPoints, btnFiltreParPoint);
-	tbedit1:Bind(eventType.MENU, AffichedlgColonne, btnColonnes);
-	tbedit1:Bind(eventType.MENU, AffichedlgColonne, btnColonnes1);
-	tbedit1:Bind(eventType.MENU, AffichedlgColonne2, btnColonnes2);
-	tbedit1:Bind(eventType.MENU, AffichedlgColonne3, btnColonnes3);
-	tbedit1:Bind(eventType.MENU, AffichedlgParamColor, btnCouleurs);
-	tbedit1:Bind(eventType.MENU, AffichedlgParamColorPodium, btnCouleurPodium);
-	tbedit1:Bind(eventType.MENU, AffichedlgCritere1, btnCritere1);
-	tbedit1:Bind(eventType.MENU, AffichedlgCritere2, btnCritere2);
-	tbedit1:Bind(eventType.MENU, AffichedlgCritere4, btnCritere4);
-	tbedit1:Bind(eventType.MENU, 
-		function(evt) 
-			matrice.numTypeCritere = matrice.numTypeCritere or 0;
-			if matrice.numTypeCritere < 2 then
-				AffichedlgCritere1();
-			elseif matrice.numTypeCritere < 4 then
-				AffichedlgCritere2();
-			else
-				AffichedlgCritere4();
-			end
-		end
-		, btn_parametrage);
-	tbedit1:Bind(eventType.MENU, 
-		function(evt)
-			local cmd = 'Delete From Evenement_Matrice Where Code_evenement = '..matrice.code_evenement.." And Cle Like '%critere%'";
-			base:Query(cmd);
-		end
-		, btnRAZCritere);
-	tbedit1:Bind(eventType.MENU, 
-		function(evt)
-			if not matrice.Evenement_selection or matrice.Evenement_selection:len() == 0 then
-				dlgConfig:MessageBox(
-					"Il n'y a rien à filtrer, la matrice ne contient aucune course.",
-					"Merci de saisir une course", 
-					msgBoxStyle.OK + msgBoxStyle.ICON_WARNING
-					) ;
-				return
-			end
-			local cmd = 'Select * From Resultat Where Code_evenement In(-1,'..matrice.Evenement_selection..") And Sexe = '"..matrice.comboSexe.."'";
-			base:TableLoad(tResultat, cmd);
-			if tResultat:GetNbRows() > 0 then
-				local filterCmd = wnd.FilterConcurrentDialog({ 
-					sqlTable = tResultat,
-					key = 'cmd'});
-				if type(filterCmd) == 'string' and filterCmd:len() > 1 then
-					matrice.Cle_filtrage = filterCmd;
-					if not string.find(matrice.Cle_filtrage, 'Sexe') then
-						matrice.Cle_filtrage = "$(Sexe):In('"..matrice.comboSexe.."')" ..' and '..matrice.Cle_filtrage;
-					end
-					local cmd = "Delete From Evenement_Matrice Where Code_evenement = "..matrice.code_evenement.." And Cle = 'Cle_filtrage'";
-					base:Query(cmd);
-					AddRowEvenement_Matrice('Cle_filtrage', matrice.Cle_filtrage);
-				else
-					if dlgConfig:MessageBox(
-						"Voulez vous effacer les critères de filtrage\ndes concurrents pour le Challenge ?", 
-						"Attention !!!",
-						msgBoxStyle.YES_NO + msgBoxStyle.NO_DEFAULT + msgBoxStyle.ICON_WARNING
-						) == msgBoxStyle.YES then
-						local cmd = "Delete From Evenement_Matrice Where Code_evenement = "..matrice.code_evenement.." And Cle = 'Cle_filtrage'";
-						base:Query(cmd);
-						matrice.Cle_filtrage = nil;
-					end
+	tbedit1:Bind(eventType.MENU, AfficheMenuOutils, btnOutils);
+
+	
+	tbedit1:Bind(eventType.MENU, AfficheMenuFiltres, btnFiltres);
+
+	
+	tbedit1:Bind(eventType.MENU, AfficheMenuColonnes, btnColonnes);
+
+	tbedit1:Bind(eventType.MENU, AfficheMenuCriteres, btn_parametrage);
+	-- tbedit1:Bind(eventType.MENU, 
+		-- function(evt)
+			-- local cmd = 'Delete From Evenement_Matrice Where Code_evenement = '..matrice.code_evenement.." And Cle Like '%critere%'";
+			-- base:Query(cmd);
+		-- end
+		-- , btnRAZCritere);
+	-- tbedit1:Bind(eventType.MENU, 
+		-- function(evt)
+			-- if not matrice.Evenement_selection or matrice.Evenement_selection:len() == 0 then
+				-- dlgConfig:MessageBox(
+					-- "Il n'y a rien à filtrer, la matrice ne contient aucune course.",
+					-- "Merci de saisir une course", 
+					-- msgBoxStyle.OK + msgBoxStyle.ICON_WARNING
+					-- ) ;
+				-- return
+			-- end
+			-- local cmd = 'Select * From Resultat Where Code_evenement In(-1,'..matrice.Evenement_selection..") And Sexe = '"..matrice.comboSexe.."'";
+			-- base:TableLoad(tResultat, cmd);
+			-- if tResultat:GetNbRows() > 0 then
+				-- local filterCmd = wnd.FilterConcurrentDialog({ 
+					-- sqlTable = tResultat,
+					-- key = 'cmd'});
+				-- if type(filterCmd) == 'string' and filterCmd:len() > 1 then
+					-- matrice.Cle_filtrage = filterCmd;
+					-- if not string.find(matrice.Cle_filtrage, 'Sexe') then
+						-- matrice.Cle_filtrage = "$(Sexe):In('"..matrice.comboSexe.."')" ..' and '..matrice.Cle_filtrage;
+					-- end
+					-- local cmd = "Delete From Evenement_Matrice Where Code_evenement = "..matrice.code_evenement.." And Cle = 'Cle_filtrage'";
+					-- base:Query(cmd);
+					-- AddRowEvenement_Matrice('Cle_filtrage', matrice.Cle_filtrage);
+				-- else
+					-- if dlgConfig:MessageBox(
+						-- "Voulez vous effacer les critères de filtrage\ndes concurrents pour le Challenge ?", 
+						-- "Attention !!!",
+						-- msgBoxStyle.YES_NO + msgBoxStyle.NO_DEFAULT + msgBoxStyle.ICON_WARNING
+						-- ) == msgBoxStyle.YES then
+						-- local cmd = "Delete From Evenement_Matrice Where Code_evenement = "..matrice.code_evenement.." And Cle = 'Cle_filtrage'";
+						-- base:Query(cmd);
+						-- matrice.Cle_filtrage = nil;
+					-- end
 				
-				end
-			end
-		end
-		, btnFiltres);
+				-- end
+			-- end
+		-- end
+		-- , btnFiltres);
 	tbedit1:Bind(eventType.MENU, 
 		function(evt)
 			idxcoursestart = 0;
 			AffichedlgCourses();
 		end
 		, btnVisuCourses);
-	tbedit1:Bind(eventType.MENU,
-		function(evt)
-			BtnPrint()
-			dlgConfig:EndModal(idButton.OK);
-		end
-		, btnPrint);
-	tbedit1:Bind(eventType.MENU,
-		function(evt)
-			BtnPrint()
-			dlgConfig:EndModal(idButton.OK);
-		end
-		, btnCalculer);
-	tbedit1:Bind(eventType.MENU,
-		function(evt)
-			BtnPrintAnalyse()
-			dlgConfig:EndModal(idButton.OK);
-		end
-		, btnAnalyse);
+	tbedit1:Bind(eventType.MENU, AfficheMenuCalculer, btnPrint);
+	tbedit1:Bind(eventType.MENU, AfficheMenuAide, btnMenuVersion);
 			
 	dlgConfig:Bind(eventType.TEXT, OnChangenumMinimumArrivee, dlgConfig:GetWindowName('numMinimumArrivee'));
 	dlgConfig:Bind(eventType.COMBOBOX, OnChangecomboEntite, dlgConfig:GetWindowName('comboEntite'));
@@ -6741,9 +6898,6 @@ function AffichedlgConfiguration()
 		end,  
 		dlgConfig:GetWindowName('comboActivite'));
 		
-	tbedit1:Bind(eventType.MENU, AfficheVersion, btnVersion);
-	tbedit1:Bind(eventType.MENU, AfficheAide, btnHelp);
-	
 	-- lecture et affichage des données. Les bind feront leur effet
 	
 	LitMatrice();
@@ -6815,6 +6969,7 @@ function AffichedlgParamColor()
 		{
 		width = matrice.dlgPosit.width,
 		height = matrice.dlgPosit.height,
+		style=wndStyle.RESIZE_BORDER+wndStyle.CAPTION+wndStyle.CLOSE_BOX,
 		x = matrice.dlgPosit.x,
 		y = matrice.dlgPosit.y,
 		label='Configuration des couleurs des disciplines', 
@@ -6943,6 +7098,7 @@ function AffichedlgParamColorPodium()
 		{
 		width = matrice.dlgPosit.width,
 		height = matrice.dlgPosit.height,
+		style=wndStyle.RESIZE_BORDER+wndStyle.CAPTION+wndStyle.CLOSE_BOX,
 		x = matrice.dlgPosit.x,
 		y = matrice.dlgPosit.y,
 		label='Configuration des couleurs du podium', 
@@ -7396,6 +7552,7 @@ function AffichedlgCourses()	-- affichage des courses contenues dans matrice.Eve
 		{
 		width = matrice.dlgPosit.width,
 		height = matrice.dlgPosit.height,
+		style=wndStyle.RESIZE_BORDER+wndStyle.CAPTION+wndStyle.CLOSE_BOX,
 		x = matrice.dlgPosit.x,
 		y = matrice.dlgPosit.y,
 		label='Voir les courses du Challenge - Combiné -  il y a actuellement '..tMatrice_Courses:GetNbRows()..' course(s) dans la matrice', 
@@ -7477,6 +7634,7 @@ function OnAjouterCoureur(rowcourse)							-- boîte de dialogue pour donner des 
 		{
 		width = matrice.dlgPosit.width,
 		height = matrice.dlgPosit.height,
+		style=wndStyle.RESIZE_BORDER+wndStyle.CAPTION+wndStyle.CLOSE_BOX,
 		x = matrice.dlgPosit.x,
 		y = matrice.dlgPosit.y,
 		label='Ajout de coureurs absents sur la course n° '..code_course,
@@ -7569,6 +7727,7 @@ function AffichedlgVisuCoursex(rowcourse)	-- affichage du paramétrage de la cour
 		{
 		width = matrice.dlgPosit.width,
 		height = matrice.dlgPosit.height,
+		style=wndStyle.RESIZE_BORDER+wndStyle.CAPTION+wndStyle.CLOSE_BOX,
 		x = matrice.dlgPosit.x,
 		y = matrice.dlgPosit.y,
 		label='Configuration des paramètres de la course n°'..tMatrice_Courses:GetCellInt('Code', rowcourse), 
@@ -8120,7 +8279,7 @@ function OnConfiguration(cparams)
 	else
 		return false;
 	end
-	script_version = '6.3';
+	script_version = '7.0';
 	-- vérification de l'existence d'une version plus récente du script.
 	-- Ex de retour : LiveDraw=5.94,Matrices=5.92,TimingReport=4.2
 	if app.GetVersion() >= '4.4c' then 		-- début d'implementation de la fonction UpdateRessource
@@ -8141,8 +8300,12 @@ function OnConfiguration(cparams)
 
 
 	matrice.dlgPosit = {};
+	-- matrice.dlgPosit.width = display:GetSize().width;
+	-- matrice.dlgPosit.height = display:GetSize().height -30;
+	-- matrice.dlgPosit.x = 1;
+	-- matrice.dlgPosit.y = 1;
 	matrice.dlgPosit.width = display:GetSize().width;
-	matrice.dlgPosit.height = display:GetSize().height -30;
+	matrice.dlgPosit.height = 1080;
 	matrice.dlgPosit.x = 1;
 	matrice.dlgPosit.y = 1;
 	base = base or sqlBase.Clone();
@@ -8155,6 +8318,7 @@ function OnConfiguration(cparams)
 	tEpreuve_Alpine = base:GetTable('Epreuve_Alpine');
 	tEvenement_Challenge = base:GetTable('Evenement_Challenge');
 	tEvenement_Matrice = base:GetTable('Evenement_Matrice');
+	tEpreuveEvenement_Challenge = base:GetTable('EpreuveEvenement_Challenge');
 	tSaison = base:GetTable('Saison');
 	tEntite = base:GetTable('Entite');
 	tCorrespondance = base:GetTable('Correspondance');

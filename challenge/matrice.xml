@@ -70,18 +70,17 @@
       <checkbox col_start="2" name="('chk'..i)" style="CHK_2STATE|ALIGN_LEFT"/>
       <lua>end</lua>
     </matrix>
-    <row value="50px"/>
+    <row value="10px"/>
     <toolbar row="auto" col_start="1" col_end="0" name="tb" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
-    <row value="1"/>
-  </panel>
+   </panel>
   <panel name="matriceconfig">
     <wnd name="statictext" style="ALIGN_RIGHT"/>
     <padding all="3px"/>
     <col value="3,4"/>
-    <row value="30px"/>
+    <row value="20px"/>
     <matrix col_start="1" row="auto">
       <col value="3,4,20px"/>
-      <statictext row="auto" col_start="1" label="Titre"/>
+      <statictext row="60px" col_start="1" label="Titre"/>
       <textctrl col_start="2" name="Titre" style="TE_MULTILINE|TE_READONLY"/>
       <statictext row="auto" col_start="1" label="Saison"/>
       <combotable col_start="2" name="Saison" style="CB_READONLY"/>
@@ -113,7 +112,7 @@
       <combobox col_start="2" name="comboOrientation" style="CB_READONLY"/>
       <statictext row="auto" col_start="1" label="Arrêter les calculs après la course"/>
       <combobox col_start="2" name="numArretCalculApres" style="CB_READONLY"/>
-      <row value="5px"/>
+      <!-- <row value="5px"/> -->
     </matrix>
     <matrix col_start="2" row_start="2">
       <col value="1,1,5px"/>
@@ -151,14 +150,14 @@
         <statictext row="auto" col_start="1" col_end="4" style="ALIGN_CENTER" label="% du temps en plus du vainqueur au-delà duquel on ne peut plus marquer de points."/>
         <textctrl row="auto" col_start="2" name="coefPourcentageMaxiBloc1" align="left"/>
         <textctrl row="auto" row_start="-1" col_start="3" name="coefPourcentageMaxiBloc2"/>
+
         <row value="5px"/>
       </matrix>
     </matrix>
     <row value="10px"/>
     <staticbox row_start="1" row_end="0" col_start="1" col_end="2" label="Paramètres généraux de la matrice"/>
-    <row value="50px"/>
+    <!-- <row value="50px"/> -->
     <toolbar row="auto" col_start="1" col_end="0" name="tbedit1" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
-    <row value="1"/>
   </panel>
   <panel name="configplagepoints">
     <wnd name="statictext" style="ALIGN_RIGHT"/>
@@ -182,15 +181,14 @@
     <combotable col_start="3" name="comboRecalculFiltrePoints" style="CB_READONLY"/>
     <row value="10px"/>
     <staticbox row_start="1" row_end="0" col_start="1" col_end="0" label="Filtrage supplémentaire des concurrents par points"/>
-    <row value="50px"/>
+    <row value="10px"/>
     <toolbar row="auto" col_start="1" col_end="0" name="tbconfigplagepoints" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
-    <row value="1"/>
-  </panel>
+   </panel>
   <panel name="configparamcolor">
     <lua>dofile('./interface/adv.lua');
 			colordisciplines = colordisciplines or params.colordisciplines;
 		</lua>
-    <row value="20px"/>
+    <row value="10px"/>
     <col value="1,1,1"/>
     <matrix row="auto" col_start="2">
       <row value="50px"/>
@@ -212,9 +210,8 @@
     </matrix>
     <row value="10px"/>
     <staticbox row_start="1" row_end="0" col_start="2" col_end="2" label="Paramétrage des couleurs"/>
-    <row value="50px"/>
+    <row value="10px"/>
     <toolbar row="auto" col_start="1" col_end="0" name="tbconfigparam" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
-    <row value="1"/>
   </panel>
   <panel name="configparamcolorpodium">
     <wnd name="statictext" style="ALIGN_RIGHT"/>
@@ -235,11 +232,11 @@
     </matrix>
     <row value="50px"/>
     <staticbox row_start="1" row_end="0" col_start="2" col_end="2" label="Paramétrage des couleurs"/>
+    <row value="10px"/>
     <toolbar row="auto" col_start="1" col_end="0" name="tbconfigparam" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
-    <row value="1"/>
-  </panel>
+   </panel>
   <panel name="texte">
-    <row value="0.5cm"/>
+    <row value="0.3cm"/>
     <col value="2,7,4"/>
     <pen border="0"/>
     <padding all="3px"/>
@@ -285,9 +282,8 @@
     </matrix>
     <row value="15px"/>
     <!-- <staticbox col_start="1" col_end="2" row_start="1" row_end="0" label="Paramétrage supplémentaire des impressions"/> -->
-    <row value="50px"/>
+    <row value="10px"/>
     <toolbar row="auto" col_start="1" col_end="0" name="tbtexte" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
-    <row value="1"/>
   </panel>
   <panel name="configcolonnes">
     <wnd name="statictext" style="ALIGN_RIGHT"/>
@@ -326,10 +322,9 @@
     <combobox col_start="5" name="comboListePrimaute" style="CB_READONLY"/>
     <row value="15px"/>
     <staticbox col_start="1" col_end="6" row_start="1" row_end="0" label="Paramétrage des colonnes"/>
-    <row value="50px"/>
+    <row value="10px"/>
     <toolbar row="auto" col_start="1" col_end="6" name="tbconfigcolonnes" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
-    <row value="1"/>
-  </panel>
+   </panel>
   <panel name="configcolonnes2">
     <wnd name="statictext" style="ALIGN_RIGHT"/>
     <row value="30px"/>
@@ -399,7 +394,6 @@
     <staticbox col_start="1" col_end="0" row_start="1" row_end="0" label="Sélection des colonnes à imprimer"/>
     <row value="10px"/>
     <toolbar row="auto" col_start="1" col_end="0" name="tbconfigcolonnes2" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
-    <row value="1"/>
   </panel>
   <panel name="configcolonnes3">
     <wnd name="statictext" style="ALIGN_RIGHT"/>
@@ -407,7 +401,7 @@
     <pen border="0"/>
     <padding all="2px"/>
     <row value="15px"/>
-    <row value="50px"/>
+    <row value="40px"/>
     <statictext row="auto" col_start="1" label="Nom de la colonne"/>
     <combobox col_start="2" style="CB_READONLY" name="colonne"/>
     <lua>for i = 1, 20 do</lua>
@@ -415,18 +409,17 @@
     <combobox col_start="4" name="('align'..i)"/>
     <row value="auto"/>
     <lua>end</lua>
-    <row value="15px"/>
+    <row value="5px"/>
     <staticbox col_start="1" col_end="0" row_start="2" row_end="0" label="Alignement spéciaux"/>
-    <row value="50px"/>
+    <row value="10px"/>
     <toolbar row="auto" col_start="1" col_end="0" name="tbconfigcolonnes3" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
-    <row value="1"/>
   </panel>
   <panel name="analyse">
     <lua>dofile('./interface/adv.lua');</lua>
     <col value="200px,1,200px"/>
     <pen border="0"/>
     <padding all="5px"/>
-    <row value="15px"/>
+    <row value="5px"/>
     <matrix col_start="2" row="auto">
       <row value="25px"/>
       <col value="1,1,1,2,1+30px,1,1,2,1"/>
@@ -451,9 +444,8 @@
     </matrix>
     <!-- <row value="15px"/> -->
     <!-- <staticbox row_start="1" row_end="0" col_start="1" col_end="0" label="Critères d\'analyse statistique des performances"/> -->
-    <row value="30px"/>
+    <row value="10px"/>
     <toolbar row="auto" col_start="1" col_end="0" name="tbanalyse" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
-    <row value="1"/>
   </panel>
   <panel name="criteretype1">
     <wnd name="statictext" style="ALIGN_RIGHT"/>
@@ -477,9 +469,8 @@
     <lua>end</lua>
     <row value="15px"/>
     <staticbox row_start="1" row_end="0" col_start="1" col_end="0" label="Critères de calculs simples"/>
-    <row value="50px"/>
+    <row value="10px"/>
     <toolbar row="auto" col_start="1" col_end="0" name="tbcriteretype1" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
-    <row value="1"/>
   </panel>
   <panel name="criteretype2">
     <wnd name="statictext" style="ALIGN_RIGHT"/>
@@ -573,8 +564,7 @@
     <staticbox row_start="-2" row_end="0" col_start="2" col_end="4" cond="numTypeCritere &gt; 2 " label="Manches indépendantes des blocs"/>
     <row value="5px"/>
     <toolbar row="auto" col_start="1" col_end="0" name="tbcriteretype2" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
-    <row value="1"/>
-  </panel>
+   </panel>
   <panel name="ajoutercoureurs">
     <pen border="0"/>
     <padding all="2px"/>
@@ -598,7 +588,6 @@
      <toolbar row="auto" col_start="2" col_end="4" name="tbajoutercoureurs" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
     <row value="5px"/>
     <staticbox row_start="1" row_end="0" col_start="2" col_end="4" label="Ajouter des coureurs absents"/>
-    <row value="1"/>
   </panel>
   <panel name="voirlescourses">
     <wnd name="statictext" style="ALIGN_RIGHT"/>
@@ -617,9 +606,8 @@
     <textctrl col_start="5" style="TE_READONLY|TE_LEFT" name="('station'..i)"/>
     <textctrl col_start="6" style="TE_READONLY|TE_LEFT" name="('evenement'..i)"/>
     <lua>end</lua>
-    <row value="50px"/>
+    <row value="10px"/>
     <toolbar row="auto" col_start="1" col_end="0" name="tbvoirlescourses" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
-    <row value="1"/>
   </panel>
   <panel name="coursex">
     <col value="1,2,1"/>
@@ -655,9 +643,8 @@
     <combobox col_start="2" name="comboPrendre" style="TE_READONLY"/>
     <row value="15px"/>
     <staticbox row_start="1" row_end="0" col_start="1" col_end="3" label="Paramétrage propre à la course"/>
-    <row value="50px"/>
+    <row value="10px"/>
     <toolbar row="auto" col_start="1" col_end="3" name="tbcoursex" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
-    <row value="1"/>
   </panel>
   <panel name="coursesupport">
     <wnd name="statictext" style="ALIGN_RIGHT"/>
@@ -686,7 +673,7 @@
       <combobox col_start="2" name="gauchedestination2" style="CB_READONLY"/>
       <combobox row="auto" col_start="1" name="gauchesource3" style="CB_READONLY"/>
       <combobox col_start="2" name="gauchedestination3" style="CB_READONLY"/>
-      <row value="50px"/>
+      <row value="10px"/>
       <staticbox row_start="1" row_end="0" col_start="1" col_end="2" label="Course d\'inclusion"/>
     </matrix>
     <matrix row="auto" row_start="2" col_start="2">
@@ -708,12 +695,11 @@
       <combobox col_start="2" name="droitedestination2" style="CB_READONLY"/>
       <combobox row="auto" col_start="1" name="droitesource3" style="CB_READONLY"/>
       <combobox col_start="2" name="droitedestination3" style="CB_READONLY"/>
-      <row value="50px"/>
+      <row value="10px"/>
       <staticbox row_start="1" row_end="0" col_start="1" col_end="2" label="Course d\'exclusion"/>
     </matrix>
-    <row value="50px"/>
+    <row value="10px"/>
     <toolbar row="auto" col_start="1" col_end="2" name="tbcoursesupport" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
-    <row value="1"/>
   </panel>
   <panel name="copycolonne">
     <lua>dofile('./interface/adv.lua');
@@ -763,7 +749,6 @@
     </matrix>
     <row value="10px"/>
     <toolbar row="auto" col_start="1" col_end="0" name="tbcopycolonne" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
-    <row value="1"/>
   </panel>
   <panel name="scriptlua">
     <wnd name="statictext" style="ALIGN_RIGHT"/>
@@ -781,9 +766,8 @@
     <button col_start="3" name="bscript2" label=".../..."/>
     <row value="15px"/>
     <staticbox row_start="2" row_end="0" col_start="2" col_end="3" label="Recherche des scripts LUA à lancer"/>
-    <row value="50px"/>
+    <row value="10px"/>
     <toolbar row="auto" col_start="1" col_end="0" name="tbscriptlua" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
-    <row value="1"/>
   </panel>
   <panel name="inscription">
     <wnd name="statictext" style="ALIGN_RIGHT"/>
@@ -803,16 +787,14 @@
     <textctrl col_start="3" name="bibo"/>
     <row value="15px"/>
     <staticbox row_start="2" row_end="0" col_start="1" col_end="0" label="Générer un fichier inscription à partir des coureurs du Challenge"/>
-    <row value="50px"/>
+    <row value="10px"/>
     <toolbar row="auto" col_start="1" col_end="0" name="tbinscription" style="TB_FLAT|TB_HORIZONTAL,TB_TEXT"/>
-    <row value="1"/>
   </panel>
   <panel id="printanalyse">
     <lua>dofile('./interface/adv.lua');
 			 dofile('./edition/functionPG.lua'); 
 			 tEvenement_Matrice = base:GetTable('Evenement_Matrice');
 			 tMatrice_Courses = base:GetTable('_Matrice_Courses');
-			 tEvenement_Matrice = base:GetTable('Evenement_Matrice');
 			 analyseGaucheListe = GetValuePG('analyseGaucheListe', 'FAU');
 			 analyseGaucheDiscipline = GetValuePG('analyseGaucheDiscipline', '');
 			 AnalysePerformances(params.Code_evenement);
@@ -985,20 +967,22 @@
     <footer>
       <lua>liste1 = liste1 or ''; liste2 = liste2 or '';</lua>
       <background mode="transparent"/>
-      <font name="Calibri" size="8" adjust="width" weight="normal"/>
+      <font name="Calibri" size="7" adjust="width" weight="normal"/>
       <pen border="none"/>
       <text row="auto" col="1" align="left"/>
       <line col_start="1" col_end="0" pen_size="2" pen_color="dkgray" border="bottom"/>
       <row value="auto"/>
-      <matrix col_start="1">
-        <row value="auto"/>
-        <text col="auto" align="left">app.GetName()..' Version '..app.GetVersion()..' / FFS'</text>
-        <image col="0.4cm" adjust="width" align="left">'./res/32x32_ffs.png'</image>
-        <text col="auto" align="left">' / Agil Informatique'</text>
-        <image col="0.4cm" adjust="width" align="left">'./res/32x32_agil.png'</image>
-        <text col="auto" align="left">'/ Ph.Guérindon '..os.date(' / Edition du %d-%m-%Y à %H:%M:%S')</text>
-        <text col="auto" align="left">'/ version '..params.Version..' des matrices'</text>
-      </matrix>
+      <row value="auto"/>
+       <text col_start="1" col_end="0" align="left">app.GetName()..' Version '..app.GetVersion()..' / FFS / Agil Informatique / Ph.Guérindon '..os.date(' / Edition du %d-%m-%Y à %H:%M:%S')..' / version '..params.Version..' des matrices'</text>
+     <!-- <matrix col_start="1"> -->
+        <!-- <row value="auto"/> -->
+        <!-- <text col="auto" align="left">app.GetName()..' Version '..app.GetVersion()..' / FFS'</text> -->
+        <!-- <image col="0.4cm" adjust="width" align="left">'./res/32x32_ffs.png'</image> -->
+        <!-- <text col="auto" align="left">' / Agil Informatique'</text> -->
+        <!-- <image col="0.4cm" adjust="width" align="left">'./res/32x32_agil.png'</image> -->
+        <!-- <text col="auto" align="left">'/ Ph.Guérindon '..os.date(' / Edition du %d-%m-%Y à %H:%M:%S')</text> -->
+        <!-- <text col="auto" align="left">'/ version '..params.Version..' des matrices'</text> -->
+      <!-- </matrix> -->
       <text align="right">string.format('Page %d/%s',editor:GetPageCurrent(), editor:GetPageCountLabel())</text>
       <line col_start="1" col_end="0" border="top"/>
       <lua>params.PrendreBloc1 = string.gsub(params.PrendreBloc1, 'Idem', 'A la manche');if params.Bloc2 == false then prendre = params.PrendreBloc1..' / bloc 1, '..params.Criteres1 else params.PrendreBloc2 = string.gsub(params.PrendreBloc2, 'Idem', 'A la manche');prendre = params.PrendreBloc1..' / bloc 1 '..params.Criteres1..' +  '..params.PrendreBloc2..' / bloc 2, '..params.Criteres2 end</lua>
@@ -1100,7 +1084,7 @@
 							end</lua>
       </matrix>
       <lua>end</lua>
-      <row value="0.3cm"/>
+      <row value="0.5cm"/>
       <matrix row="auto" col_start="1" col_end="0">
         <background mode="transparent"/>
         <pen border="none"/>

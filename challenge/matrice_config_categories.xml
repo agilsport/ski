@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- abd_dsq_repartent : Oui|Non indique si les ADB et DSQ repartent en manche 2 -->
+<!-- bib_abddsq_ordre : ASC|DESC . ASC : les ABS et DSQ repartent dans l'ordre des dossards. DESC = dans l'ordre inverse des dossards -->
+<!-- abd_dsq_apres_classes : Oui|Non. Oui = ils repartent à la fin après tous les classés. Non = ils repartent à la fin de leur groupe -->
+<!-- Les catégories à l'intérieur des groupes sont indiquées entre parenthèses dans le XML -->
+<root>
+	<default abd_dsq_repartent="Oui" bibo_m1="10" bibo_m2="10" bib_abddsq_ordre="ASC" abd_dsq_apres_classes="Oui">
+		<dames groupe1="'C7','C8','C9','C10','C11','C12','C13'" groupe2="'C4','C5','C6'" groupe3="'U21','U30','C1','C2','C3'"/>
+		<hommes groupe4="'B9','B10','B11','B12','B13'" groupe5="'B7','B8'" groupe6="'A4','A5','A6'" groupe7="'U21','U30','A1','A2','A3'"/>
+	</default>
+	<config bibo_m1="10" bibo_m2="10" abd_dsq_repartent="Oui" bib_abddsq_ordre="ASC" abd_dsq_apres_classes="Oui">
+		<dames groupe1="'C7','C8','C9','C10','C11','C12','C13'" groupe2="'C4','C5','C6'" groupe3="'U21','U30','C1','C2','C3'"/>
+		<hommes groupe4="'B9','B10','B11','B12','B13'" groupe5="'B7','B8'" groupe6="'A4','A5','A6'" groupe7="'U21','U30','A1','A2','A3'"/>
+	</config>
+	<panel name="config">
+		<lua>dofile('./interface/adv.lua'); dofile('./edition/functionPG.lua');</lua>
+		<padding all="5px"/>
+		<col value="1"/>
+		<row value="50px"/>
+		<matrix row="auto">
+			<col value="1,3,5,1"/>
+			<row value="40px"/>
+			<statictext row="auto" col_start="2" style="ALIGN_RIGHT" label="Choix de la manche : "/>
+			<combobox col_start="3" name="manche" style="CB_READONLY"/>
+			<row value="20px"/>
+			<staticbox row_start="1" row_end="0" col_start="2" col_end="3" label="Configuration du tirage"/>
+			<row value="20px"/>
+			<row value="10px"/>
+			<row value="20px"/>
+			<toolbar row="auto" col_start="1" col_end="0" name="tbconfig" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
+		</matrix>
+		<row value="1"/>
+	</panel>
+	<panel name="setup">
+		<lua>dofile('./interface/adv.lua'); dofile('./edition/functionPG.lua');</lua>
+		<padding all="5px"/>
+		<col value="1,50px,1"/>
+		<row value="5px"/>
+		<statictext row="auto" col_start="1" col_end="0" font_weight="bold" style="ALIGN_CENTER" label="Veuillez indiquer les paramètres de votre choix pour les ABD et DSQ.\nVous pouvez constituer jusqu\'à 10 groupes de catégories."/>
+		<row value="10px"/>
+		<matrix col_start="1" col_end="3" row="auto">
+			<row value="30px"/>
+			<col value="150px"/>
+			<statictext row="auto" col="auto" font_weight="bold" style="ALIGN_RIGHT" label="En manche 2 les ABD-DSQ partent :"/>
+			<combobox col="auto" name="bib_abddsq_ordre" style="CB_READONLY"/>
+			<statictext col="auto" font_weight="bold" style="ALIGN_RIGHT" label=" et ils partent : "/>
+			<combobox col="auto" name="abd_dsq_apres_classes" style="CB_READONLY"/>
+		</matrix>
+		<matrix col_start="1" row="auto">
+			<col value="2,100px,1"/>
+			<row value="30px"/>
+			<statictext row="auto" col_start="1" font_weight="bold" style="ALIGN_RIGHT" label="Valeur du BIBO en manche 1 : "/>
+			<textctrl col_start="2" name="bibo_m1"/>
+		</matrix>
+		<matrix col_start="3" row_start="0">
+			<col value="2,100px,1"/>
+			<row value="30px"/>
+			<statictext row="auto" col_start="1" font_weight="bold" style="ALIGN_RIGHT" label="Valeur du BIBO en manche 2 : "/>
+			<textctrl col_start="2" name="bibo_m2"/>
+		</matrix>
+		<matrix col_start="1" row="auto">
+			<row value="30px"/>
+			<col value="1,2,200px"/>
+			<statictext row="auto" col_start="1" font_weight="bold" style="ALIGN_RIGHT" label="N°"/>
+			<statictext col_start="2" font_weight="bold" style="ALIGN_CENTER" label="Groupes Dames"/>
+			<statictext col_start="3" font_weight="bold" style="ALIGN_CENTER" label="Catégories"/>
+			<row value="10px"/>
+			<lua>for i = 1, 10 do</lua>
+			<statictext row="auto" col_start="1" font_weight="bold" style="ALIGN_RIGHT" label="(i)"/>
+			<textctrl col_start="2" name="('groupe_dames'..i)"/>
+			<lua>end</lua>
+			<textctrl row_start="-9" row_end="0" col_start="3" name="categ_dames" style="TE_READONLY|TE_MULTILINE"/>
+		</matrix>
+		<matrix row_start="0" col_start="3">
+			<row value="30px"/>
+			<col value="1,2,200px"/>
+			<statictext row="auto" col_start="1" font_weight="bold" style="ALIGN_RIGHT" label="N°"/>
+			<statictext col_start="2" font_weight="bold" style="ALIGN_CENTER" label="Groupes Hommes"/>
+			<statictext col_start="3" font_weight="bold" style="ALIGN_CENTER" label="Catégories"/>
+			<row value="10px"/>
+			<lua>for i = 1, 10 do</lua>
+			<statictext row="auto" col_start="1" font_weight="bold" style="ALIGN_RIGHT" label="(i)"/>
+			<textctrl col_start="2" name="('groupe_hommes'..i)"/>
+			<lua>end</lua>
+			<textctrl row_start="-9" row_end="0" col_start="3" name="categ_hommes" style="TE_READONLY|TE_MULTILINE"/>
+		</matrix>
+		<row value="20px"/>
+		<staticbox row_start="-1" row_end="0" col_start="1" label="Paramétrage des groupes pour les Dames"/>
+		<staticbox row_start="-1" row_end="0" col_start="3" label="Paramétrage des groupes pour les Hommes"/>
+		<toolbar row="auto" col_start="1" col_end="0" name="tbsetup" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
+		<row value="1"/>
+	</panel>
+</root>
