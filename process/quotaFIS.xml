@@ -14,7 +14,6 @@
 			<wndtext col_start="6" align="center">'le '..params.Date..'\n'..params.Station</wndtext>
 			<row value="5px"/>
 		</matrix>
-		<row value="5px"/>
 		<matrix row="auto">
 			<col value="1"/>
 			<!-- <font color="black" size_step="1" weight="bold"/> -->
@@ -99,8 +98,6 @@
 					<row value="1"/>
 				</matrix>
 			</matrix>
-
-			<row value="1"/>
 		</matrix>
 	</panel>
 	<panel name="backoffice">
@@ -149,7 +146,6 @@
 			<combobox col_start="4" font_weight="bold"  name="comboVariable" style="CB_READONLY"/>	
 			<toolbar row="auto" col_start="2" col_end="4" name="tbbackoffice" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
 		</matrix>
-		<row value="1"/>
 	</panel>
 	<panel name="get_valeur">
 		<lua>dofile('./interface/adv.lua');</lua>
@@ -170,7 +166,6 @@
 			<!-- <row value="10px"/> -->
 		</matrix>
 		<!-- <row value="10px"/> -->
-		<row value="1"/>
 	</panel>
 	<panel name="calculatrice">
 		<lua>dofile('./interface/adv.lua');</lua>
@@ -207,14 +202,12 @@
 			<textctrl col_start="4" font_weight="bold" style="TE_CENTER" name="total_base2" />
 			<textctrl col_start="5" font_weight="bold" style="TE_CENTER" name="total_places_demandees" />
 			<textctrl col_start="6" font_weight="bold" style="TE_CENTER" name="total_places_obtenues" />
-			<wndtext row="40px" col_start="4" col_end="5" font_weight="bold" font_size="9" align="right">'Dont places réservées (Club, EQ) : '</wndtext>
+			<wndtext row="40px" col_start="4" col_end="5" font_weight="bold" font_size="9" align="right">'Plus places réservées : '</wndtext>
 			<textctrl col_start="6" font_weight="bold" style="TE_CENTER" name="places_ffs" ><background color="white" mode="transparent" /></textctrl>
 			<wndtext row="40px" col_start="4" col_end="5" font_weight="bold" font_size="9" align="right">'Différence : '</wndtext>
 			<textctrl col_start="6" font_weight="bold" style="TE_CENTER|TE_READONLY" name="difference" ><background color="white" mode="transparent" /></textctrl>
 			<toolbar row_start="1" row_end="0" col_start="7" name="tbbackoffice" style="TB_FLAT|TB_VERTICAL|TB_TEXT"/>
 		</matrix>
-		<row value="5px"/>
-		<row value="1"/>
 	</panel>
 	<panel id="print">
 		<lua>dofile('./interface/adv.lua'); </lua>
@@ -298,7 +291,7 @@
 			<pen border="none"/>
 			<font name="Calibri" size="12" adjust="width" weight="bold"/>
 			<col value="1,2cm,2cm,2cm,2cm,2cm,1"/>
-			<text row="2.5cm" col_start="2" col_end="6" align="center">params.Titre</text>
+			<text row="auto" col_start="2" col_end="6" align="center">params.Titre</text>
 			<text row="0.3cm"/>
  		</header>
 		<footer/>
@@ -314,7 +307,7 @@
 			<text col_start="4" align="center">params.Total_base2..'%'</text>
 			<text col_start="5" align="center">params.Total_participation</text>
 			<text col_start="6" align="center">params.Total_calcule</text>
-			<text row="0.7cm" col_start="2" col_end="5" align="right">"Places réservées Club - FFS : "</text>
+			<text row="0.7cm" col_start="2" col_end="5" align="right">"Places réservées : "</text>
 			<text col_start="6" align="center">params.Places_ffs</text>
 			<text row="0.7cm" col_start="2" col_end="5" align="right">"Total réparti : "</text>
 			<text col_start="6" align="center">params.Total_reparti</text>
@@ -334,7 +327,7 @@
 			<text col_start="3" align="center">"Quotas\nde base"</text>
 			<text col_start="4" align="center">"Quotas\neffectifs"</text>
 			<text col_start="5" align="center">"Places\ndemandées"</text>
-			<text col_start="6" align="center">"Quotas\ncalculés"</text>
+			<text col_start="6" align="center">"Quotas\nattribués"</text>
 		</label>
 		<body>
 			<pen border="all" size="1"/>
