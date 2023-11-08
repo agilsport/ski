@@ -1235,6 +1235,7 @@ function LectureNodeHommes(node)
 			params.wild_cardx = value;
 		elseif name == 'ORIGINE' then
 			params.equipe_Comite_originex = value;
+			params.equipe_Comite_origine = value;
 		elseif name ~= 'filter' then
 			tquotaComite[name] = value;
 		end
@@ -1245,7 +1246,8 @@ function LectureNodeHommes(node)
 	params.place_comite_organisateurx = params.place_comite_organisateurx or 0;
 	params.place_club_organisateurx = params.place_club_organisateurx or 0;
 	params.wild_cardx = params.wild_cardx or 0;
-	params.equipe_Comite_originex = params.equipe_Comite_originex or 0;
+	params.equipe_Comite_origine = tonumber(params.equipe_Comite_origine) or 0;
+	params.equipe_Comite_originex = tonumber(params.equipe_Comite_originex) or 0;
 end
 
 function GetQuotaComites(node_hommes)
@@ -1557,6 +1559,8 @@ function SettTableComite();
 	end
 	params.nb_equipe = 0;
 	-- adv.Alert('SettTableComite - type(params.equipe_Comite_origine) = '..type(params.equipe_Comite_origine)..', params.equipe_Comite_origine = '..params.equipe_Comite_origine);
+	params.equipe_Comite_origine = tonumber(params.equipe_Comite_origine) or 0;
+	params.equipe_Comite_originex = tonumber(params.equipe_Comite_originex) or 0;
 	if params.calculette == 0 then
 		for i = 0, tRanking:GetNbRows() -1 do
 			local comite = tRanking:GetCell('Comite', i);
