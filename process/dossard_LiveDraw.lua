@@ -475,24 +475,6 @@ function ReadAckXML(stringXml)
 	return false;
 end
 
-function OnLiveState(evt)
-	local tb = dlgTableau:GetWindowName('tbtableau');
-
-	if tb ~= nil then
-		if draw.state == true then
-			draw.state = false;
-			tb:SetToolNormalBitmap(btnMenuCommande, './res/chrono32x32_ko.png');
-		else
-			draw.state = true;
-			tb:SetToolNormalBitmap(btnMenuCommande, './res/chrono32x32_ok.png');
-		end
-		tb:EnableTool(btnMenuSend:GetId(), draw.state);
-		tb:EnableTool(btnSendMessage:GetId(), draw.state);
-		menuCommande:Enable(btnClear:GetId(), draw.state) ;
-		menuCommande:Enable(btn_reset_socket:GetId(), draw.state) ;
-	end
-end
-
 function RefreshCounterSequence()
 	draw.sequence_ack = draw.sequence_ack or 0;
 	draw.sequence_send = draw.sequence_send or 0;
@@ -801,11 +783,15 @@ function OnPrintTableau(orderby)
 	-- Creation du Report
 	local estce = 0;
 	local finale = 0;
+	local wjc = 0;
 	if draw.bolEstCE then
 		estce = 1;
 		if draw.finale_ce == 'Oui' then
 			finale = 1;
 		end
+	end
+	if draw.bolEstNCMJ then
+		wjc = 1;
 	end
 	local vitesse = 0;
 	if draw.bolVitesse then
@@ -818,7 +804,7 @@ function OnPrintTableau(orderby)
 		node_value = 'print_tableau',
 		base = base,
 		body = tDraw,
-		params = {Orderby = orderby, EstCE = estce, EstVitesse = vitesse, EstFinale = finale}
+		params = {Orderby = orderby, EstCE = estce, EstVitesse = vitesse, EstFinale = finale, EstWJC = wjc}
 	});
 	
 end
@@ -826,8 +812,12 @@ end
 function OnPrintNation()
 	-- Creation du Report
 	local estce = 0;
+	local estwjc = 0;
 	if draw.bolEstCE then
 		estce = 1;
+	end
+	if draw.bolEstNCMJ then
+		estwjc = 1;
 	end
 	report = wnd.LoadTemplateReportXML({
 		xml = './process/dossard_LiveDraw.xml',
@@ -836,9 +826,57 @@ function OnPrintNation()
 		node_value = 'parti_factorise',
 		base = base,
 		body = tDraw,
-		params = {EstCE = estce, EstVitesse = vitesse, Rupture = 'Nation'}
+		params = {EstCE = estce, EstWJC = estwjc, EstVitesse = vitesse, Rupture = 'Nation'}
 		});
 	
+end
+
+function OnPrintZKNation()
+	local tDisciplines = draw.wjc_discipline:Split(',');
+	tDrawCopy = tDraw:Copy();
+	tDrawCopy:AddColumn({ name = 'Clt_SL', label = 'Clt SL', type = sqlType.LONG, style = sqlStyle.NULL });
+	tDrawCopy:AddColumn({ name = 'Clt_GS', label = 'Clt GS', type = sqlType.LONG, style = sqlStyle.NULL });
+	tDrawCopy:AddColumn({ name = 'Clt_DH', label = 'Clt DH', type = sqlType.LONG, style = sqlStyle.NULL });
+	for i = 0, tDrawCopy:GetNbRows() -1 do
+		tDrawCopy:SetCellNull('Racer_info', i);
+		local nb_clt = 0;
+		local code_coureur = tDrawCopy:GetCell('Code_coureur', i);
+		for j = 1, #tDisciplines do
+			local discipline = tDisciplines[j];
+			local type_classement = 'IA'..discipline;
+			local cmd = "Select * From Classement_Coureur Where Code_liste = "..draw.code_liste.." And Code_coureur = '"..code_coureur.."' And Type_classement = '"..type_classement.."'";
+			tClassement_Coureur = base:TableLoad(cmd);
+			if tClassement_Coureur:GetNbRows() > 0 then
+				local clt = tClassement_Coureur:GetCellInt('Clt', 0);
+				if clt > 0 then
+					tDrawCopy:SetCell('Clt_'..discipline, i, clt);
+					if clt <= draw.wjc_clt_maxi then
+						nb_clt = nb_clt + 1;
+					end
+				end
+			end
+		end
+		if nb_clt > 1 then
+			tDrawCopy:SetCell('Racer_info', i, 'ZK ???');
+		end
+	end
+	local estce = 0;
+	local estwjc = 0;
+	if draw.bolEstCE then
+		estce = 1;
+	end
+	if draw.bolEstNCMJ then
+		estwjc = 1;
+	end
+	report = wnd.LoadTemplateReportXML({
+		xml = './process/dossard_LiveDraw.xml',
+		node_name = 'root/report',
+		node_attr = 'id',
+		node_value = 'zk',
+		base = base,
+		body = tDrawCopy,
+		params = {EstCE = estce, EstWJC = estwjc, EstVitesse = vitesse, Rupture = 'Nation'}
+		});
 end
 
 function OnPrepareQualifies()
@@ -922,7 +960,7 @@ function OnPrintBibo(groupe)
 		tDraw_Copy:OrderBy('FIS_pts');
 		for i = tDraw_Copy:GetNbRows() -1, 0, -1 do
 			if not draw.bolVitesse then
-				if draw.code_niveau ~= 'NC' then
+				if not draw.bolEstNC then
 					if tDraw_Copy:GetCellInt('Groupe_tirage', i) > 1 then
 						tDraw_Copy:RemoveRowAt(i);
 					end
@@ -1267,7 +1305,7 @@ function ChecktDraw()
 			draw.statut = 'UF';
 		end
 		base:Query("Update Resultat Set Groupe = '"..tDraw:GetCell('Statut', i).."' Where Code_evenement = "..draw.code_evenement.." And Code_coureur = '"..code_coureur.."'");
-		if draw.bolEstCE or draw.code_niveau == 'NC' then
+		if draw.bolEstCE or draw.bolEstNC then
 			if not draw.bolVitesse then
 				if tDraw:GetCellInt('Groupe_tirage', i) == 2 then
 					tDraw:SetCell('Dossard_bibo', i, 1);
@@ -1583,6 +1621,9 @@ function CommandSendList(bolSendDrawOrder)
 			table.insert(tData, {rank = winner_rank, points = winner_points, event = draw.discipline, category = 'COC WINNER', pointsinfo = pts_info});
 			table.insert(tData, {rank = fis_clt, points = fis_pts, event = draw.discipline, category = 'FIS pts', pointsinfo = pts_info});
 		else
+			if draw.bolEstNCMJ then
+				table.insert(tData, {rank = winner_rank, points = winner_points, event = draw.discipline, category = 'ZK', pointsinfo = pts_info});
+			end
 			table.insert(tData, {rank = fis_clt, points = fis_pts, event = draw.discipline, category = 'FIS pts'});
 		end
 		local tCoureur = {standings = tData, racerinfo = tostring(racer_info)};
@@ -1671,9 +1712,13 @@ function CommandRaceInfo(bolPhased)
 	if category == 'F' then
 		category = 'NC';
 	end
+	if category == 'NCM/J' then
+		category = 'WJC';
+	end
+
 	local sexe = tEpreuve:GetCell("Sexe", 0);
 	if sexe ~= 'M' then
-		sexe = 'Women';
+		sexe = 'L';
 	end
 	xmlNode.Create(nodeRaceinfo, xmlType.ELEMENT_NODE, "event", tEvenement:GetCell('Nom',0));	
 	xmlNode.Create(nodeRaceinfo, xmlType.ELEMENT_NODE, "name", tEpreuve:GetCell("Code_discipline", 0));			
@@ -1866,6 +1911,7 @@ end
 
 function OnRAZData(colonne)
 	local txt = '';
+	local msg = '';
 	if colonne == 'Groupe_tirage' then
 		txt = 'groupes de tirage'
 	elseif colonne == 'Rang_tirage' then
@@ -1887,9 +1933,9 @@ function OnRAZData(colonne)
 		txt = 'rangs et les groupes de tirage ainsi que les dossards'
 	end
 	local reponse = nil;
+	msg = "Confirmation RAZ ?\n\n"..
+				"Les "..txt.." seront effacées.";
 	if not draw.skip_question then
-		local msg = "Confirmation RAZ ?\n\n"..
-					"Les "..txt.." seront effacées.";
 		reponse = dlgTableau:MessageBox(
 			msg, 
 			"Information Remise à zéro", 
@@ -2251,25 +2297,6 @@ function OnCellSelected(evt)
 	local row = evt:GetRow();
 	local col = evt:GetCol();
 	draw.row_selected = row;
-	if draw.bolEstCE == true or draw.bolEstNC == true then
-		if draw.bolVitesse == false then
-			if row > 14 then
-				menuOutils:Enable(btnTirageDossardsRestants:GetId(), true);
-			end
-		else
-			if row > draw.prendre_ECSL - 1 then
-				menuOutils:Enable(btnTirageDossardsRestants:GetId(), true);
-			end
-		end
-	else
-		if row > 14 then
-			menuOutils:Enable(btnTirageDossardsRestants:GetId(), true);
-		end
-	end
-	menuOutils:Enable(btnDecalerBas:GetId(), true);
-	menuOutils:Enable(btnDecalerHaut:GetId(), true);
-	menuOutils:Enable(btnDecalerGroupeBas:GetId(), true);
-	menuOutils:Enable(btnDecalerGroupeHaut:GetId(), true);
 	local t = grid_tableau:GetTable();
 	local colName = t:GetColumnName(t:GetVisibleColumnsIndex(col));
 	local code_coureur = t:GetCell('Code_coureur', row);
@@ -2965,7 +2992,7 @@ Groupe 6 On poursuit selon les points FIS.
 				local pts = tDrawG6:GetCellDouble('FIS_pts', i);
 				if not draw.bolEstCE then
 					if not draw.bolVitesse then
-						if draw.code_niveau == 'NC' then		-- Championnats de France
+						if draw.bolEstNC then		-- Championnats de France ou Championnats du Monde Junior
 							if pts <= draw.ptsFIS7 then
 								current_group = 1;
 							elseif pts <= draw.ptsFIS15 then
@@ -2986,7 +3013,7 @@ Groupe 6 On poursuit selon les points FIS.
 						end
 					else
 						if pts > 0 then
-							if draw.code_niveau == 'NC' then		-- Championnats de France
+							if draw.bolEstNC then		-- Championnats de France ou Championnats du Monde junior
 								if pts <= draw.ptsFIS15 then
 									current_group = 1;
 								elseif pts <= draw.ptsFIS30 then
@@ -3002,7 +3029,7 @@ Groupe 6 On poursuit selon les points FIS.
 								end
 							end
 						else
-							if draw.code_niveau == 'NC' then
+							if draw.bolEstNC then
 								current_group = 4;
 							else
 								current_group = 3;
@@ -3107,324 +3134,67 @@ function CreatePanelCoureur()
 		end);
 end
 
-function OnAfficheTableau()
-	if not draw.socket then
-		parentFrame = wnd.GetParentFrame();
-		draw.socket = socketClient.Open(parentFrame, draw.hostname, draw.port);
-		draw.socket_state = false;
-		parentFrame:Bind(eventType.SOCKET, OnSocketLive, draw.socket);
-	end
--- Création Dialog 
-	draw.label_dialog = 'Tableau des coureurs - discipline de la course : '..draw.discipline..' - version '..script_version..' du script  -  course n° '..draw.code_evenement..' - CODEX : '..tEvenement:GetCell('Codex', 0);
-	dlgTableau = wnd.CreateDialog(
-		{
-		width = draw.width,
-		height = draw.height,
-		x = draw.x,
-		y = draw.y,
-		label=draw.label_dialog, 
-		icon='./res/32x32_fis.png'
-		});
-	
-	if draw.bolEstCE then
-		dlgTableau:LoadTemplateXML({ 
-			xml = './process/dossard_LiveDraw.xml',
-			node_name = 'root/panel', 
-			node_attr = 'name', 	
-			node_value = 'gridCE' 
-		});
+function OnLiveState(evt)
+	local tb = dlgTableau:GetWindowName('tbtableau');
+	if draw.state == true then
+		draw.state = false;
+		tb:SetToolNormalBitmap(btnMenuCommande, './res/chrono32x32_ko.png');
 	else
-		dlgTableau:LoadTemplateXML({ 
-			xml = './process/dossard_LiveDraw.xml',
-			node_name = 'root/panel', 
-			node_attr = 'name', 	
-			node_value = 'gridFIS' 
-		});
+		draw.state = true;
+		tb:SetToolNormalBitmap(btnMenuCommande, './res/chrono32x32_ok.png');
 	end
-	
-	draw.timer = timer.Create(dlgTableau);
+	tb:EnableTool(btnMenuSend:GetId(), draw.state);
+	tb:EnableTool(btnSendMessage:GetId(), draw.state);
+end
 
--- Grid 
-	grid_tableau = dlgTableau:GetWindowName('tableau');
-	BuildTablesDraw();
+function AfficheMenuCommande()
+	local menuContext =  menu.Create();
+	local btnState = menuContext:Append({label="Activation ou Désactivation du Live...", image ="./res/32x32_fis.png"});
 
-	local cmd ='Select r.*, rit.* , Repeat(" ",10) Action, Repeat(" ",10) Validation, Concat(Prenom, " ", Nom) Identite, Repeat(" ",7) TG, 0 Pris, 0 Dossard_bibo ';
-	cmd = cmd..'From Resultat r ';
-	cmd = cmd..'Left Join Resultat_Info_Tirage rit On r.Code_evenement = rit.Code_evenement And r.Code_coureur = rit.Code_coureur ';
-	cmd = cmd..'Where r.Code_evenement = '..draw.code_evenement;
-	tDraw = base:TableLoad(cmd);
-	for i = tDraw:GetNbColumns() -1, 0, -1 do
-		local colname = tDraw:GetColumnName(i);
-		if colname == 'Code_coureur' then
-			tDraw:RemoveColumnAt(i);
-		end
-		if colname == 'Code_evenement' then
-			tDraw:RemoveColumnAt(i);
-			break;
-		end
-	end
-	tDraw:SetColumn('Rang_tirage', { label = 'Rang', width = 5 });
-	tDraw:SetColumn('Groupe_tirage', { label = 'Groupe', width = 5 });
-	tDraw:SetColumn('Code_coureur', { label = 'Code', width = 10 });
-	tDraw:SetColumn('Nom', { label = 'Nom', width = 20 });
-	tDraw:SetColumn('Prenom', { label = 'Prenom', width = 12 });
-	tDraw:SetColumn('Nation', { label = 'Nat.', width = 5 });
-	tDraw:SetColumn('ECSL_points', { label = 'ECSL', width = 6 });
-	tDraw:SetColumn('ECSL_rank', { label = 'EC Rk', width = 6 });
-	tDraw:SetColumn('WCSL_points', { label = 'WCSL', width = 6 });
-	tDraw:SetColumn('WCSL_rank', { label = 'WCSL Rk', width = 7 });
-	tDraw:SetColumn('ECSL_overall_points', { label = 'OA Pts', width = 6 });
-	tDraw:SetColumn('ECSL_overall_rank', { label = 'OA Rk', width = 6 });
-	tDraw:SetColumn('Winner_CC', { label = 'COC Win.', width = 6 });
-	tDraw:SetColumn('FIS_pts', { label = 'Pts '..draw.discipline, width = 6 });
-	tDraw:SetColumn('FIS_clt', { label = 'Rk '..draw.discipline, width = 6 });
-	tDraw:SetColumn('FIS_SG_pts', { label = 'Pts SG', width = 6 });
-	tDraw:SetColumn('FIS_SG_clt', { label = 'Rk SG', width = 6 });
-	tDraw:SetColumn('Comite', { label = 'C.R.', width = 6 });
-	tDraw:SetColumn('Club', { label = 'Club', width = 12 });
-	tDraw:SetColumn('Action', { label = 'Supprimer', width = 10});
-	tDraw:SetColumn('Validation', { label = 'CF / UF', width = 8 });
-	tDraw:SetColumn('Statut', { label = 'UF/CF', width = 6 });
-	tDraw:SetPrimary('Code_evenement, Code_coureur');
-	ReplaceTableEnvironnement(tDraw, '_Draw');
-	tDraw:OrderBy('Rang_tirage');
-	
-	if draw.bolEstCE then
-		if not draw.bolVitesse then
-			grid_tableau:Set({
-				table_base = tDraw,
-				columns = 'Dossard, Rang_tirage, Groupe_tirage, Code_coureur, Nom, Prenom, Nation, ECSL_points, ECSL_rank, WCSL_points, WCSL_rank, ECSL_overall_points, Winner_CC, FIS_pts, FIS_clt, Statut, Action, Validation',
-				selection_mode = gridSelectionModes.ROWS,
-				-- focus_cell_highlight = true,
-				label_tracking = true,
-				sortable = true,
-				enable_editing = true
-			});
-		else
-			grid_tableau:Set({
-				table_base = tDraw,
-				columns = 'Dossard, Rang_tirage, Groupe_tirage, Code_coureur, Nom, Prenom, Nation, ECSL_points, ECSL_rank, WCSL_points, WCSL_rank, ECSL_overall_points, Winner_CC, FIS_pts, FIS_clt, FIS_SG_pts, FIS_SG_clt, Statut, Action, Validation',
-				selection_mode = gridSelectionModes.ROWS,
-				-- focus_cell_highlight = true,
-				label_tracking = true,
-				sortable = true,
-				enable_editing = true
-			});
-		end
-	else
-		for i = 0, tDraw:GetNbRows() -1 do
-			tDraw:SetCellNull('ECSL_points', i);
-			tDraw:SetCellNull('ECSL_rank', i);					
-			tDraw:SetCellNull('ECSL_overall_points', i);
-			tDraw:SetCellNull('ECSL_overall_rank', i);
-			tDraw:SetCellNull('WCSL_points', i);
-			tDraw:SetCellNull('WCSL_rank', i);					
-			tDraw:SetCellNull('CC_winner', i);					
-		end
-		grid_tableau:Set({
-			table_base = tDraw,
-			columns = 'Dossard, Rang_tirage, Groupe_tirage, Code_coureur, Nom, Prenom, Nation, Comite, Club, FIS_pts, FIS_clt, Statut, Action, Validation',
-			selection_mode = gridSelectionModes.ROWS,
-			-- focus_cell_highlight = true,
-			label_tracking = true,
-			sortable = true,
-			enable_editing = true
-		});
-	end
+	local btnClear = menuContext:Append({label="RAZ à la FIS", image ="./res/32x32_clear.png"});
+	local btn_reset_socket = menuContext:Append({label="Reset de la connexion à la FIS.", image = "./res/32x32_satellite.png"});
 
-	grid_tableau:AddColumnLabel(3);
-      grid_tableau:AddRowLabel(1, 48);
-
--- Initialisation des Controles
-	
-	tbTableau = dlgTableau:GetWindowName('tbtableau');
-	tbTableau:AddStretchableSpace();
-	btnSendMessage = tbTableau:AddTool("Messages", "./res/32x32_journal.png");
-	tbTableau:AddSeparator();
-		
-	btnMenuCommande = tbTableau:AddTool("Commandes", "./res/chrono32x32_ko.png",'', itemKind.DROPDOWN);
-	menuCommande = menu.Create();
-	menuCommande:AppendSeparator();
-	btnClear = menuCommande:Append({label="RAZ à la FIS", image ="./res/32x32_clear.png"});
-	menuCommande:AppendSeparator();
-	btnState = menuCommande:Append({label="Activation ou Désactivation du Live...", image ="./res/32x32_fis.png"});
-	menuCommande:AppendSeparator();
-	btn_reset_socket = menuCommande:Append({label="Reset de la connexion FIS.", image = "./res/32x32_satellite.png"});
-	tbTableau:SetDropdownMenu(btnMenuCommande:GetId(), menuCommande);	
-	tbTableau:AddSeparator();
-	
-	btnMenuRAZ = tbTableau:AddTool("Menu des RAZ", "./res/32x32_journal.png",'', itemKind.DROPDOWN);
-	tbTableau:AddSeparator();
-	btnOrder = tbTableau:AddTool("Trier le tableau", "./res/32x32_bib.png");
-	tbTableau:AddSeparator();
-	
-	menuRAZ = menu.Create();
-	btnRAZRang = menuRAZ:Append({label="RAZ des rangs", image ="./res/32x32_clear.png"});
-	menuRAZ:AppendSeparator();
-	btnRAZGroupe = menuRAZ:Append({label="RAZ des groupes", image ="./res/32x32_clear.png"});
-	menuRAZ:AppendSeparator();
-	btnRAZAll = menuRAZ:Append({label="RAZ des deux", image ="./res/32x32_clear.png"});
-	menuRAZ:AppendSeparator();
-	btnRAZDossard = menuRAZ:Append({label="RAZ des dossards", image ="./res/32x32_clear.png"});
-	menuRAZ:AppendSeparator();
-	btnRAZDossardSel = menuRAZ:Append({label="RAZ des dossards pour les lignes sélectionnées", image ="./res/32x32_clear.png"});
-	tbTableau:SetDropdownMenu(btnMenuRAZ:GetId(), menuRAZ);
-	tbTableau:AddSeparator();
-
-	btnMenuSend = tbTableau:AddTool("Envois", "./res/32x32_send.png",'', itemKind.DROPDOWN);
-	menuSend = menu.Create();
-	btnSendParticipants = menuSend:Append({label="Envoi des participants", image ="./res/32x32_send.png"});
-	menuSend:AppendSeparator();
-	btnSendTableau = menuSend:Append({label="Envoi du tableau à la FIS", image ="./res/32x32_send.png"});
-	menuSend:AppendSeparator();
-	btnSendDossards = menuSend:Append({label="Envoi de tous les dossards", image ="./res/32x32_send.png"});
-	menuSend:AppendSeparator();
-	btnSendStartList = menuSend:Append({label="Envoi de la liste de départ", image ="./res/32x32_send.png"});
-	menuSend:AppendSeparator();
-	tbTableau:SetDropdownMenu(btnMenuSend:GetId(), menuSend);
-	tbTableau:AddSeparator();
-
-	btnValider = tbTableau:AddTool("Validations", "./res/32x32_send.png",'', itemKind.DROPDOWN);
-	menuValider = menu.Create();
-	btnValiderSelection = menuValider:Append({label="Validation des coureurs filtrés", image ="./res/32x32_down.png"});
-	menuValider:AppendSeparator();
-	btnValiderCoureurs = menuValider:Append({label="Validation globale des coureurs", image ="./res/32x32_dialog_ok.png"});
-	menuValider:AppendSeparator();
-	btnInValiderSelection = menuValider:Append({label="Invalider les coureurs filtrés", image ="./res/32x32_close.png"});
-	menuValider:AppendSeparator();
-	btnInvaliderCoureurs = menuValider:Append({label="Revenir au statut Non Validé", image ="./res/32x32_dialog_ko.png"});
-	menuValider:AppendSeparator();
-	tbTableau:SetDropdownMenu(btnValider:GetId(), menuValider);
-	tbTableau:AddSeparator();
-
-	btnMenuPrint = tbTableau:AddTool("Impressions", "./res/32x32_printer.png",'', itemKind.DROPDOWN);
-	menuPrint = menu.Create();
-	menuPrint:AppendSeparator();
-	btnPrintDoubleTirageBibo = menuPrint:Append({label="Impression du double tirage du BIBO", image ="./res/32x32_printer.png"});
-	menuPrint:AppendSeparator();
-	btnPrintEtiquettesAlpha = menuPrint:Append({label="Impression des étiquettes par ordre alphabétique", image ="./res/32x32_printer.png"});
-	menuPrint:AppendSeparator();
-	btnPrintEtiquettesNation = menuPrint:Append({label="Impression des étiquettes par Nation", image ="./res/32x32_printer.png"});
-	menuPrint:AppendSeparator();
-	btnPrintEtiquettesParpoints = menuPrint:Append({label="Impression des étiquettes par Points", image ="./res/32x32_printer.png"});
-	menuPrint:AppendSeparator();
-	btnPrintTableau = menuPrint:Append({label="Impression du tableau des coureurs", image ="./res/32x32_printer.png"});
-	menuPrint:AppendSeparator();
-	btnPrintNation = menuPrint:Append({label="Impression des coureurs par Nation", image ="./res/32x32_printer.png"});
-	menuPrint:AppendSeparator();
-	btnPrintFinale = menuPrint:Append({label="Qualifiés pour les finales", image ="./res/32x32_printer.png"});
-	menuPrint:AppendSeparator();
-	btnPrintFeuilleTirage = menuPrint:Append({label="Impression de la feuille de tirage", image ="./res/32x32_printer.png"});
-	menuPrint:AppendSeparator();
-	btnPrintTop75 = menuPrint:Append({label="Impression du TOP "..draw.topx_FIS .." en points FIS", image ="./res/32x32_printer.png"});
-	menuPrint:AppendSeparator();
-	tbTableau:SetDropdownMenu(btnMenuPrint:GetId(), menuPrint);
-	tbTableau:AddSeparator();
-
-	btnOutils = tbTableau:AddTool("Outils", "./res/32x32_tools.png",'', itemKind.DROPDOWN);
-	menuOutils = menu.Create();
-	menuOutils:AppendSeparator();
-	btnTirageDossardsBIBO = menuOutils:Append({label="Double tirage à la mêlée du BIBO", image ="./res/32x32_bib.png"});
-	menuOutils:AppendSeparator();
-	btnTirageDossardsRestants = menuOutils:Append({label="Tirage des dossards restants (avec points)", image ="./res/32x32_bib.png"});
-	menuOutils:AppendSeparator();
-	btnTirageDossardsSansPoints = menuOutils:Append({label="Double tirage à la mêlée (sans points)", image ="./res/32x32_bib.png"});
-	menuOutils:AppendSeparator();
-	btnTirageVitesse1530 = menuOutils:Append({label="Double tirage à la mêlée des coureurs du groupe 2 en Vitesse", image ="./res/32x32_bib.png"});
-	menuOutils:AppendSeparator();
-	btnWeb = menuOutils:Append({label="Vers la page FIS de la course", image ="./res/32x32_fis.png"});
-	menuOutils:AppendSeparator();
-	btnDocs = menuOutils:Append({label="Vers la page FIS des documents alpins", image ="./res/32x32_fis.png"});
-	menuOutils:AppendSeparator();
-	btnDecalerBas = menuOutils:Append({label="Décaler les rangs de tirage de +1", image ="./res/32x32_list_add.png"});
-	menuOutils:AppendSeparator();
-	btnDecalerHaut = menuOutils:Append({label="Décaler les rangs de tirage de -1", image ="./res/32x32_list_remove.png"});
-	menuOutils:AppendSeparator();
-	btnDecalerGroupeBas = menuOutils:Append({label="Décaler les groupes de tirage de +1", image ="./res/32x32_down.png"});
-	menuOutils:AppendSeparator();
-	btnDecalerGroupeHaut = menuOutils:Append({label="Décaler les groupes de tirage de -1", image ="./res/32x32_up.png"});
-	menuOutils:AppendSeparator();
-	btnExporter = menuOutils:Append({label="Exporter le tableau (fichier csv)", image ="./res/32x32_csv.png"});
-	menuOutils:AppendSeparator();
-	btnGetECSL = menuOutils:Append({label="Charger un fichier csv ECSL", image ="./res/32x32_startlist.png"});
-	menuOutils:AppendSeparator();
-	btnGetWCSL = menuOutils:Append({label="Charger un fichier csv WCSL", image ="./res/32x32_startlist.png"});
-	menuOutils:AppendSeparator();
-	btnAideCE = menuOutils:Append({label="Aide / ranking en CE", image ="./res/32x32_ranking.png"});
-	menuOutils:AppendSeparator();
-	tbTableau:SetDropdownMenu(btnOutils:GetId(), menuOutils);
-
-	tbTableau:AddSeparator();
-	btnClose = tbTableau:AddTool("Quitter", "./res/32x32_exit.png");
-
-	tbTableau:AddStretchableSpace();
- 	tbTableau:Realize();
-
-	tbTableau:EnableTool(btnMenuSend:GetId(), draw.state);
-	tbTableau:EnableTool(btnSendMessage:GetId(), draw.state);
-	
-	menuCommande:Enable(btnClear:GetId(), draw.state) ;
-	menuCommande:Enable(btn_reset_socket:GetId(), draw.state) ;
-	
-	-- if not draw.row_selected or draw.row_selected == 0 then
-		-- menuOutils:Enable(btnTirageDossardsRestants:GetId(), false);
-		-- menuOutils:Enable(btnDecalerBas:GetId(), false);
-		-- menuOutils:Enable(btnDecalerHaut:GetId(), false);
-		-- menuOutils:Enable(btnDecalerGroupeBas:GetId(), false);
-		-- menuOutils:Enable(btnDecalerGroupeHaut:GetId(), false);
-	-- end
-	menuOutils:Enable(btnTirageVitesse1530:GetId(), false);
-	if draw.bolVitesse then
-		if draw.bolEstCE or draw.bolEstNC or draw.code_niveau == 'NC' then
-			menuOutils:Enable(btnTirageVitesse1530:GetId(), true);
-		end
-	end
-	ChecktDraw();
-	if not draw.bolEstCE then
-		menuPrint:Enable(btnPrintTop75:GetId(), false);
-		menuPrint:Enable(btnPrintFinale:GetId(), false);
-	else
-		if nodelivedraw:HasAttribute('ECSL_'..draw.code_evenement) then
-			local path = nodelivedraw:GetAttribute('ECSL_'..draw.code_evenement);
-			if app.FileExists(path) then
-				ChargeECSL(path);
-			else
-				nodelivedraw:DeleteAttribute('ECSL_'..draw.code_evenement);
-				draw.doc:SaveFile();
-			end
-		end
-		if nodelivedraw:HasAttribute('WCSL_'..draw.code_evenement) then
-			local path = nodelivedraw:GetAttribute('WCSL_'..draw.code_evenement);
-			if app.FileExists(path) then
-				ChargeWCSL(path);
-			else
-				nodelivedraw:DeleteAttribute('WCSL_'..draw.code_evenement);
-				draw.doc:SaveFile();
-			end
-		end
-	end
-	
-	RefreshCounterSequence();
-	-- Prise des Evenements (Bind)
-	grid_tableau:Bind(eventType.GRID_EDITOR_SHOWN, OnGridShown);
-	grid_tableau:Bind(eventType.GRID_CELL_CONTEXT, OnCellContext);
-	grid_tableau:Bind(eventType.GRID_CELL_CHANGED, OnCellChanged);
-	grid_tableau:Bind(eventType.GRID_SELECT_CELL, OnCellSelected);
-	
-	dlgTableau:Bind(eventType.TIMER, OnTimerRunning, draw.timer);
-	draw.timer:Start(480000);	-- toutes les 8 minutes (8x60x1000ms) on envoie une commande keepalive
-
-	dlgTableau:Bind(eventType.MENU, OnResetSocket, btn_reset_socket);
 	dlgTableau:Bind(eventType.MENU, OnLiveState, btnState);
-	dlgTableau:Bind(eventType.MENU, OnLiveState, btnMenuCommande);
-	dlgTableau:Bind(eventType.MENU, OnSendMessage, btnSendMessage);
+	dlgTableau:Bind(eventType.MENU, OnReset, btnClear);
+	dlgTableau:Bind(eventType.MENU, OnResetSocket, btn_reset_socket);
+	
+	dlgTableau:PopupMenu(menuContext);
+	menuContext:Delete();
+end
+
+function AfficheMenuRAZ()
+	local menuContext =  menu.Create();
+	local btnRAZRang = menuContext:Append({label="RAZ des Rangs", image ="./res/32x32_clear.png"});
+	local btnRAZGroupe = menuContext:Append({label="RAZ des Groupes", image ="./res/32x32_clear.png"});
+	local btnRAZAll = menuContext:Append({label="RAZ des deux", image ="./res/32x32_clear.png"});
+	local btnRAZDossard =  menuContext:Append({label="RAZ des Dossards", image ="./res/32x32_clear.png"});
+	local btnRAZDossardSel = menuContext:Append({label="RAZ des Dossards pour les lignes sélectionnées", image ="./res/32x32_clear.png"});
+	
+	dlgTableau:Bind(eventType.MENU, 
+		function(evt)
+			draw.skip_question = false;
+			OnRAZData('Rang_tirage')
+		end
+	, btnRAZRang);
+	dlgTableau:Bind(eventType.MENU, 
+		function(evt)
+			draw.skip_question = false;
+			OnRAZData('Groupe_tirage')
+		end, btnRAZGroupe);
+	dlgTableau:Bind(eventType.MENU, 
+		function(evt)
+			draw.skip_question = false;
+			OnRAZData('All')
+		end
+	, btnRAZAll);
+	
 	dlgTableau:Bind(eventType.MENU, 
 		function(evt)
 			draw.skip_question = false;
 			OnRAZData('Dossard')
 			SendMessage('Board refreshed');
 		end, btnRAZDossard);
-		
+
 	dlgTableau:Bind(eventType.MENU, 
 		function(evt)
 			local rows = grid_tableau:GetSelectedRows();
@@ -3444,22 +3214,136 @@ function OnAfficheTableau()
 			end
 		end
 	, btnRAZDossardSel);
+	
+	dlgTableau:PopupMenu(menuContext);
+	menuContext:Delete();	
+end
+
+function AfficheMenuSend()
+	local menuContext = menu.Create();
+	local btnSendParticipants = menuContext:Append({label="Envoi des participants", image ="./res/32x32_send.png"});
+	local btnSendTableau = menuContext:Append({label="Envoi du tableau à la FIS", image ="./res/32x32_send.png"});
+	local btnSendDossards = menuContext:Append({label="Envoi de tous les dossards", image ="./res/32x32_send.png"});
+	local btnSendStartList = menuContext:Append({label="Envoi de la liste de départ", image ="./res/32x32_send.png"});
 
 	dlgTableau:Bind(eventType.MENU, 
 		function(evt)
-			draw.skip_question = false;
-			OnRAZData('Rang_tirage')
-		end, btnRAZRang);
+			bolSendDrawOrder = false;
+			OnSendTableau(bolSendDrawOrder)
+			SendMessage('Participants list');
+			nodelivedraw:ChangeAttribute('board_status_'..draw.code_evenement, 'participants');
+			draw.doc:SaveFile();
+		end
+		, btnSendParticipants);
+		
 	dlgTableau:Bind(eventType.MENU, 
 		function(evt)
-			draw.skip_question = false;
-			OnRAZData('Groupe_tirage')
-		end, btnRAZGroupe);
+			bolSendDrawOrder = true;
+			OnSendTableau(bolSendDrawOrder)
+			SendMessage('Draw available');
+			nodelivedraw:ChangeAttribute('board_status_'..draw.code_evenement, 'board');
+			draw.doc:SaveFile();
+		end
+		, btnSendTableau);
 	dlgTableau:Bind(eventType.MENU, 
 		function(evt)
-			draw.skip_question = false;
-			OnRAZData('All')
-		end, btnRAZAll);
+			local msg = "Cliquer sur Oui pour Renvoyer tous les dossards à la FIS.";
+			if dlgTableau:MessageBox(
+				msg, "Renvoi des dossards",
+				msgBoxStyle.YES_NO+msgBoxStyle.NO_DEFAULT+msgBoxStyle.ICON_INFORMATION
+			) ~= msgBoxStyle.YES then
+				return;
+			end
+			CommandRenvoyerDossards(false);
+			SendMessage('Draw in progress');
+		end
+		, btnSendDossards);
+	dlgTableau:Bind(eventType.MENU, 
+		function(evt)
+			bolSendDrawOrder = true;
+			CommandSendStartList();
+		end
+		, btnSendStartList);
+
+
+	dlgTableau:PopupMenu(menuContext);
+	menuContext:Delete();	
+end
+
+function AfficheMenuValider()
+	local menuContext = menu.Create();
+	local btnValiderSelection = menuContext:Append({label="Validation des coureurs filtrés", image ="./res/32x32_down.png"});
+	local btnValiderCoureurs = menuContext:Append({label="Validation globale des coureurs", image ="./res/32x32_dialog_ok.png"});
+	local btnInValiderSelection = menuContext:Append({label="Invalider les coureurs filtrés", image ="./res/32x32_close.png"});
+	local btnInvaliderCoureurs = menuContext:Append({label="Revenir au statut Non Validé", image ="./res/32x32_dialog_ko.png"});
+	dlgTableau:Bind(eventType.MENU, 
+		function(evt)
+			CommandValiderCoureurs('CF');
+			SendMessage('Board confirmed, bib drawing in progress');
+		end
+		, btnValiderCoureurs);
+	dlgTableau:Bind(eventType.MENU, 
+		function(evt)
+			CommandValiderCoureurs('UF');
+			SendMessage('Board refreshed');
+		end
+		, btnInvaliderCoureurs);
+	dlgTableau:Bind(eventType.MENU, 
+		function(evt)
+			local t = grid_tableau:GetTable();
+			local indexcol = t:GetVisibleColumnsIndex('Statut');
+			for row = 0, t:GetNbRows() -1 do
+				t:SetCell('Statut', row, 'CF');
+				grid_tableau:RefreshCell(row, indexcol);
+			end
+			grid_tableau:SynchronizeRowsView();
+			base:TableBulkUpdate(tDraw, 'Statut', 'Resultat_Info_Tirage');
+			OnSendTableau(bolSendDrawOrder);
+			SendMessage('Board refreshed');
+		end
+		, btnValiderSelection);
+	dlgTableau:Bind(eventType.MENU, 
+		function(evt)
+			local t = grid_tableau:GetTable();
+			local indexcol = t:GetVisibleColumnsIndex('Statut');
+			for row = 0, t:GetNbRows() -1 do
+				t:SetCell('Statut', row, 'UF');
+				grid_tableau:RefreshCell(row, indexcol);
+			end
+			grid_tableau:SynchronizeRowsView(); -- on est sur la vue
+			base:TableBulkUpdate(tDraw, 'Statut', 'Resultat_Info_Tirage');
+			OnSendTableau(bolSendDrawOrder);
+			SendMessage('Board refreshed');
+		end
+		, btnInValiderSelection);
+
+	dlgTableau:PopupMenu(menuContext);
+	menuContext:Delete();	
+end
+
+function AfficheMenuPrint()
+	local menuContext = menu.Create();
+	local btnPrintDoubleTirageBibo = menuContext:Append({label="Impression du double tirage du BIBO", image ="./res/32x32_printer.png"});
+	local btnPrintEtiquettesAlpha = menuContext:Append({label="Impression des étiquettes par ordre alphabétique", image ="./res/32x32_printer.png"});
+	local btnPrintEtiquettesNation = menuContext:Append({label="Impression des étiquettes par Nation", image ="./res/32x32_printer.png"});
+	local btnPrintEtiquettesParpoints = menuContext:Append({label="Impression des étiquettes par Points", image ="./res/32x32_printer.png"});
+	local btnPrintTableau = menuContext:Append({label="Impression du tableau des coureurs", image ="./res/32x32_printer.png"});
+	local btnPrintNation = menuContext:Append({label="Impression des coureurs par Nation", image ="./res/32x32_printer.png"});
+	local btnPrintFinale = menuContext:Append({label="Qualifiés pour les finales", image ="./res/32x32_printer.png"});
+	local btnPrintFeuilleTirage = menuContext:Append({label="Impression de la feuille de tirage", image ="./res/32x32_printer.png"});
+	local btnPrintTop75 = menuContext:Append({label="Impression du TOP "..draw.topx_FIS .." en points FIS", image ="./res/32x32_printer.png"});
+	local btnPrinGetZK = menuContext:Append({label="Impression des ZK potentiels par Nation", image ="./res/32x32_printer.png"});
+	menuContext:Enable(btnPrintFinale:GetId(), false);
+	menuContext:Enable(btnPrintTop75:GetId(), false);
+	menuContext:Enable(btnPrinGetZK:GetId(), false);
+	if draw.bolEstNCMJ then
+		menuContext:Enable(btnPrinGetZK:GetId(), true);
+	end
+	if draw.bolEstCE then
+		menuContext:Enable(btnPrintTop75:GetId(), true);
+		menuContext:Enable(btnPrintFinale:GetId(), true);
+	end
+
 	dlgTableau:Bind(eventType.MENU, OnPrintBibo, btnPrintFeuilleTirage);
 	dlgTableau:Bind(eventType.MENU, OnPrintTop75, btnPrintTop75);
 	dlgTableau:Bind(eventType.MENU, 
@@ -3469,7 +3353,7 @@ function OnAfficheTableau()
 			draw.print_alone = true;
 			OnPrintDoubleTirage(1);
 			if not draw.bolVitesse then
-				if draw.bolEstCE or draw.code_niveau == 'NC' then
+				if draw.bolEstCE or draw.bolEstNC then
 					OnPrintDoubleTirage(2);
 				end
 			end
@@ -3506,6 +3390,13 @@ function OnAfficheTableau()
 			OnPrintNation();
 		end, btnPrintNation);
 
+	if draw.bolEstNCMJ then
+		dlgTableau:Bind(eventType.MENU, 
+			function(evt)
+				OnPrintZKNation();
+			end, btnPrinGetZK);
+	end
+
 	dlgTableau:Bind(eventType.MENU, 
 		function(evt)
 			OnPrepareQualifies();
@@ -3513,94 +3404,40 @@ function OnAfficheTableau()
 			tDraw:OrderBy('Rang_tirage');
 		end, btnPrintFinale);
 
-	dlgTableau:Bind(eventType.MENU, OnAide, btnAideCE);
-	dlgTableau:Bind(eventType.MENU, 
-		function(evt)
-			draw.skip_question = false;
-			OnOrder();
-		end, btnOrder);
-	dlgTableau:Bind(eventType.MENU, 
-		function(evt)
-			CommandValiderCoureurs('CF');
-			SendMessage('Board confirmed, bib drawing in progress');
+	dlgTableau:PopupMenu(menuContext);
+	menuContext:Delete();	
+end
+
+function AfficheMenuOutils()
+	local menuContext = menu.Create();
+	local btnTirageDossardsBIBO = menuContext:Append({label="Double tirage à la mêlée du BIBO", image ="./res/32x32_bib.png"});
+	local btnTirageDossardsRestants = menuContext:Append({label="Tirage des dossards restants (avec points)", image ="./res/32x32_bib.png"});
+	local btnTirageDossardsSansPoints = menuContext:Append({label="Double tirage à la mêlée (sans points)", image ="./res/32x32_bib.png"});
+	local btnTirageVitesse1530 = menuContext:Append({label="Double tirage à la mêlée des coureurs du groupe 2 en Vitesse", image ="./res/32x32_bib.png"});
+	local btnWeb = menuContext:Append({label="Vers la page FIS de la course", image ="./res/32x32_fis.png"});
+	local btnDecalerBas = menuContext:Append({label="Décaler les rangs de tirage de +1", image ="./res/32x32_list_add.png"});
+	local btnDecalerHaut = menuContext:Append({label="Décaler les rangs de tirage de -1", image ="./res/32x32_list_remove.png"});
+	local btnDecalerGroupeBas = menuContext:Append({label="Décaler les groupes de tirage de +1", image ="./res/32x32_down.png"});
+	local btnDecalerGroupeHaut = menuContext:Append({label="Décaler les groupes de tirage de -1", image ="./res/32x32_up.png"});
+	local btnExporter = menuContext:Append({label="Exporter le tableau (fichier csv)", image ="./res/32x32_csv.png"});
+	local btnGetECSL = menuContext:Append({label="Charger un fichier csv ECSL", image ="./res/32x32_startlist.png"});
+	local btnGetWCSL = menuContext:Append({label="Charger un fichier csv WCSL", image ="./res/32x32_startlist.png"});
+	local btnDocs = menuContext:Append({label="Vers la page FIS des documents alpins", image ="./res/32x32_fis.png"});
+	local btnAideCE = menuContext:Append({label="Aide / ranking en CE", image ="./res/32x32_ranking.png"});
+
+	menuContext:Enable(btnTirageVitesse1530:GetId(), false);
+	menuContext:Enable(btnGetECSL:GetId(), false);
+	menuContext:Enable(btnGetWCSL:GetId(), false);
+	if draw.bolVitesse then
+		if not draw.bolEstCE and not draw.bolEstNC then
+			menuContext:Enable(btnTirageVitesse1530:GetId(), true);
 		end
-		, btnValiderCoureurs);
-	dlgTableau:Bind(eventType.MENU, 
-		function(evt)
-			CommandValiderCoureurs('UF');
-			SendMessage('Board refreshed');
-		end
-		, btnInvaliderCoureurs);
-	dlgTableau:Bind(eventType.MENU, 
-		function(evt)
-			OnReset()
-		end
-		, btnClear);
-	dlgTableau:Bind(eventType.MENU, 
-		function(evt)
-			local t = grid_tableau:GetTable();
-			local indexcol = t:GetVisibleColumnsIndex('Statut');
-			for row = 0, t:GetNbRows() -1 do
-				t:SetCell('Statut', row, 'CF');
-				grid_tableau:RefreshCell(row, indexcol);
-			end
-			grid_tableau:SynchronizeRowsView();
-			base:TableBulkUpdate(tDraw, 'Statut', 'Resultat_Info_Tirage');
-			OnSendTableau(bolSendDrawOrder);
-			SendMessage('Board refreshed');
-		end
-		, btnValiderSelection);
-	dlgTableau:Bind(eventType.MENU, 
-		function(evt)
-			bolSendDrawOrder = true;
-			CommandSendStartList();
-		end
-		, btnSendStartList);
-	dlgTableau:Bind(eventType.MENU, 
-		function(evt)
-			local t = grid_tableau:GetTable();
-			local indexcol = t:GetVisibleColumnsIndex('Statut');
-			for row = 0, t:GetNbRows() -1 do
-				t:SetCell('Statut', row, 'UF');
-				grid_tableau:RefreshCell(row, indexcol);
-			end
-			grid_tableau:SynchronizeRowsView(); -- on est sur la vue
-			base:TableBulkUpdate(tDraw, 'Statut', 'Resultat_Info_Tirage');
-			OnSendTableau(bolSendDrawOrder);
-			SendMessage('Board refreshed');
-		end
-		, btnInValiderSelection);
-	dlgTableau:Bind(eventType.MENU, 
-		function(evt)
-			bolSendDrawOrder = true;
-			OnSendTableau(bolSendDrawOrder)
-			SendMessage('Draw available');
-			nodelivedraw:ChangeAttribute('board_status_'..draw.code_evenement, 'board');
-			draw.doc:SaveFile();
-		end
-		, btnSendTableau);
-	dlgTableau:Bind(eventType.MENU, 
-		function(evt)
-			bolSendDrawOrder = false;
-			OnSendTableau(bolSendDrawOrder)
-			SendMessage('Participants list');
-			nodelivedraw:ChangeAttribute('board_status_'..draw.code_evenement, 'participants');
-			draw.doc:SaveFile();
-		end
-		, btnSendParticipants);
-	dlgTableau:Bind(eventType.MENU, 
-		function(evt)
-			local msg = "Cliquer sur Oui pour Renvoyer tous les dossards à la FIS.";
-			if dlgTableau:MessageBox(
-				msg, "Renvoi des dossards",
-				msgBoxStyle.YES_NO+msgBoxStyle.NO_DEFAULT+msgBoxStyle.ICON_INFORMATION
-			) ~= msgBoxStyle.YES then
-				return;
-			end
-			CommandRenvoyerDossards(false);
-			SendMessage('Draw in progress');
-		end
-		, btnSendDossards);
+	end
+	if draw.bolEstCE then
+		menuContext:Enable(btnGetECSL:GetId(), true);
+		menuContext:Enable(btnGetWCSL:GetId(), true);
+		menuContext:Enable(btnAideCE:GetId(), true);
+	end
 	dlgTableau:Bind(eventType.MENU, 
 		function(evt)
 			-- les coureurs sont du groupe de tirage 1
@@ -3639,7 +3476,7 @@ function OnAfficheTableau()
 			BuildTableTirage(1, tDrawG6:GetNbRows() - 1);
 			OnPrintDoubleTirage(1);
 			if not draw.bolVitesse then
-				if draw.bolEstCE or draw.code_niveau == 'NC' then
+				if draw.bolEstCE or draw.bolEstNC then
 					tDrawG6 = tDraw:Copy();
 					ReplaceTableEnvironnement(tDrawG6, '_DrawG6');
 					tDrawG6:OrderBy('Rang_tirage');
@@ -3898,6 +3735,257 @@ function OnAfficheTableau()
 		function(evt)
 			ReadWCSL();
 		end, btnGetWCSL);
+	
+	dlgTableau:PopupMenu(menuContext);
+	menuContext:Delete();	
+end
+
+function OnAfficheTableau()
+	if not draw.socket then
+		parentFrame = wnd.GetParentFrame();
+		draw.socket = socketClient.Open(parentFrame, draw.hostname, draw.port);
+		draw.socket_state = false;
+		parentFrame:Bind(eventType.SOCKET, OnSocketLive, draw.socket);
+	end
+-- Création Dialog 
+	draw.label_dialog = 'Tableau des coureurs - discipline de la course : '..draw.discipline..' - version '..script_version..' du script  -  course n° '..draw.code_evenement..' - CODEX : '..tEvenement:GetCell('Codex', 0);
+	dlgTableau = wnd.CreateDialog(
+		{
+		width = draw.width,
+		height = draw.height,
+		x = draw.x,
+		y = draw.y,
+		label=draw.label_dialog, 
+		icon='./res/32x32_fis.png'
+		});
+	
+	if draw.bolEstCE then
+		dlgTableau:LoadTemplateXML({ 
+			xml = './process/dossard_LiveDraw.xml',
+			node_name = 'root/panel', 
+			node_attr = 'name', 	
+			node_value = 'gridCE' 
+		});
+	elseif draw.bolEstNC then
+		if not draw.bolEstNCMJ then
+			dlgTableau:LoadTemplateXML({ 
+				xml = './process/dossard_LiveDraw.xml',
+				node_name = 'root/panel', 
+				node_attr = 'name', 	
+				node_value = 'gridFIS' 
+			});
+		else
+			dlgTableau:LoadTemplateXML({ 
+				xml = './process/dossard_LiveDraw.xml',
+				node_name = 'root/panel', 
+				node_attr = 'name', 	
+				node_value = 'gridtableau' 
+			});
+		end
+	else
+		dlgTableau:LoadTemplateXML({ 
+			xml = './process/dossard_LiveDraw.xml',
+			node_name = 'root/panel', 
+			node_attr = 'name', 	
+			node_value = 'gridFIS' 
+		});
+	end
+	
+	draw.timer = timer.Create(dlgTableau);
+
+-- Grid 
+	grid_tableau = dlgTableau:GetWindowName('tableau');
+	assert(grid_tableau ~= nil)
+	BuildTablesDraw();
+
+	local cmd ='Select r.*, rit.* , Repeat(" ",10) Action, Repeat(" ",10) Validation, Concat(Prenom, " ", Nom) Identite, Repeat(" ",7) TG, 0 Pris, 0 Dossard_bibo ';
+	cmd = cmd..'From Resultat r ';
+	cmd = cmd..'Left Join Resultat_Info_Tirage rit On r.Code_evenement = rit.Code_evenement And r.Code_coureur = rit.Code_coureur ';
+	cmd = cmd..'Where r.Code_evenement = '..draw.code_evenement;
+	tDraw = base:TableLoad(cmd);
+	for i = tDraw:GetNbColumns() -1, 0, -1 do
+		local colname = tDraw:GetColumnName(i);
+		if colname == 'Code_coureur' then
+			tDraw:RemoveColumnAt(i);
+		end
+		if colname == 'Code_evenement' then
+			tDraw:RemoveColumnAt(i);
+			break;
+		end
+	end
+	tDraw:SetColumn('Rang_tirage', { label = 'Rang', width = 5 });
+	tDraw:SetColumn('Groupe_tirage', { label = 'Groupe', width = 5 });
+	tDraw:SetColumn('Code_coureur', { label = 'Code', width = 10 });
+	tDraw:SetColumn('Nom', { label = 'Nom', width = 20 });
+	tDraw:SetColumn('Prenom', { label = 'Prenom', width = 12 });
+	tDraw:SetColumn('Nation', { label = 'Nat.', width = 5 });
+	tDraw:SetColumn('ECSL_points', { label = 'ECSL', width = 6 });
+	tDraw:SetColumn('ECSL_rank', { label = 'EC Rk', width = 6 });
+	tDraw:SetColumn('WCSL_points', { label = 'WCSL', width = 6 });
+	tDraw:SetColumn('WCSL_rank', { label = 'WCSL Rk', width = 7 });
+	tDraw:SetColumn('ECSL_overall_points', { label = 'OA Pts', width = 6 });
+	tDraw:SetColumn('ECSL_overall_rank', { label = 'OA Rk', width = 6 });
+	if draw.bolEstNCMJ then
+		tDraw:SetColumn('Winner_CC', { label = 'ZK', width = 6 });
+	else
+		tDraw:SetColumn('Winner_CC', { label = 'COC Win.', width = 6 });
+	end
+	tDraw:SetColumn('FIS_pts', { label = 'Pts '..draw.discipline, width = 6 });
+	tDraw:SetColumn('FIS_clt', { label = 'Rk '..draw.discipline, width = 6 });
+	tDraw:SetColumn('FIS_SG_pts', { label = 'Pts SG', width = 6 });
+	tDraw:SetColumn('FIS_SG_clt', { label = 'Rk SG', width = 6 });
+	tDraw:SetColumn('Comite', { label = 'C.R.', width = 6 });
+	tDraw:SetColumn('Club', { label = 'Club', width = 12 });
+	tDraw:SetColumn('Action', { label = 'Supprimer', width = 10});
+	tDraw:SetColumn('Validation', { label = 'CF / UF', width = 8 });
+	tDraw:SetColumn('Statut', { label = 'UF/CF', width = 6 });
+	tDraw:SetPrimary('Code_evenement, Code_coureur');
+	ReplaceTableEnvironnement(tDraw, '_Draw');
+	tDraw:OrderBy('Rang_tirage');
+
+	if draw.bolEstCE then
+		if not draw.bolVitesse then
+			grid_tableau:Set({
+				table_base = tDraw,
+				columns = 'Dossard, Rang_tirage, Groupe_tirage, Code_coureur, Nom, Prenom, Nation, ECSL_points, ECSL_rank, WCSL_points, WCSL_rank, ECSL_overall_points, Winner_CC, FIS_pts, FIS_clt, Statut, Action, Validation',
+				selection_mode = gridSelectionModes.ROWS,
+				-- focus_cell_highlight = true,
+				label_tracking = true,
+				sortable = true,
+				enable_editing = true
+			});
+		else
+			grid_tableau:Set({
+				table_base = tDraw,
+				columns = 'Dossard, Rang_tirage, Groupe_tirage, Code_coureur, Nom, Prenom, Nation, ECSL_points, ECSL_rank, WCSL_points, WCSL_rank, ECSL_overall_points, Winner_CC, FIS_pts, FIS_clt, FIS_SG_pts, FIS_SG_clt, Statut, Action, Validation',
+				selection_mode = gridSelectionModes.ROWS,
+				-- focus_cell_highlight = true,
+				label_tracking = true,
+				sortable = true,
+				enable_editing = true
+			});
+		end
+	else
+		for i = 0, tDraw:GetNbRows() -1 do
+			tDraw:SetCellNull('ECSL_points', i);
+			tDraw:SetCellNull('ECSL_rank', i);					
+			tDraw:SetCellNull('ECSL_overall_points', i);
+			tDraw:SetCellNull('ECSL_overall_rank', i);
+			tDraw:SetCellNull('WCSL_points', i);
+			tDraw:SetCellNull('WCSL_rank', i);
+			if not draw.bolEstNCMJ then
+				tDraw:SetCellNull('CC_winner', i);
+			end
+		end
+		if not draw.bolEstNCMJ then
+			grid_tableau:Set({
+				table_base = tDraw,
+				columns = 'Dossard, Rang_tirage, Groupe_tirage, Code_coureur, Nom, Prenom, Nation, Comite, Club, FIS_pts, FIS_clt, Statut, Action, Validation',
+				selection_mode = gridSelectionModes.ROWS,
+				-- focus_cell_highlight = true,
+				label_tracking = true,
+				sortable = true,
+				enable_editing = true
+			});
+		else
+			grid_tableau:Set({
+				table_base = tDraw,
+				columns = 'Dossard, Rang_tirage, Groupe_tirage, Code_coureur, Nom, Prenom, Nation, Comite, Club, FIS_pts, FIS_clt, Winner_CC, Statut, Action, Validation',
+				selection_mode = gridSelectionModes.ROWS,
+				-- focus_cell_highlight = true,
+				label_tracking = true,
+				sortable = true,
+				enable_editing = true
+			});
+		end
+	end
+
+	grid_tableau:AddColumnLabel(3);
+    grid_tableau:AddRowLabel(1, 48);
+
+-- Initialisation des Controles
+	
+	tbTableau = dlgTableau:GetWindowName('tbtableau');
+	tbTableau:AddStretchableSpace();
+	btnSendMessage = tbTableau:AddTool("Messages", "./res/32x32_journal.png");
+	tbTableau:AddSeparator();
+		
+	local strbtnMenuCommande = "Activation Désactivation du Live"..
+					"\nRAZ à la FIS"..
+					"\nReset de la connexion à la FIS";
+	
+	btnMenuCommande = tbTableau:AddTool("Commandes", "./res/chrono32x32_ko.png", strbtnMenuCommande);
+	tbTableau:AddSeparator();
+	
+	btnMenuRAZ = tbTableau:AddTool("Menu des RAZ", "./res/32x32_journal.png", "");
+	tbTableau:AddSeparator();
+	btnOrder = tbTableau:AddTool("Trier le tableau", "./res/32x32_bib.png");
+	tbTableau:AddSeparator();
+	btnMenuSend = tbTableau:AddTool("Menu de Envois", "./res/32x32_send.png", "");
+	tbTableau:AddSeparator();
+	btnMenuValider = tbTableau:AddTool("Menu des Validations", "./res/32x32_send.png", strbtnValider);
+	tbTableau:AddSeparator();
+	btnMenuPrint = tbTableau:AddTool("Menu des Impressions", "./res/32x32_send.png", "");
+	tbTableau:AddSeparator();
+	btnMenuOutils = tbTableau:AddTool("Menu des Outils", "./res/32x32_tools.png",'');
+
+	tbTableau:AddSeparator();
+	btnClose = tbTableau:AddTool("Quitter", "./res/32x32_exit.png");
+
+	tbTableau:AddStretchableSpace();
+ 	tbTableau:Realize();
+
+	tbTableau:EnableTool(btnMenuSend:GetId(), draw.state);
+	tbTableau:EnableTool(btnSendMessage:GetId(), draw.state);
+	
+	ChecktDraw();
+	if draw.bolEstCE then
+		if nodelivedraw:HasAttribute('ECSL_'..draw.code_evenement) then
+			local path = nodelivedraw:GetAttribute('ECSL_'..draw.code_evenement);
+			if app.FileExists(path) then
+				ChargeECSL(path);
+			else
+				nodelivedraw:DeleteAttribute('ECSL_'..draw.code_evenement);
+				draw.doc:SaveFile();
+			end
+		end
+		if nodelivedraw:HasAttribute('WCSL_'..draw.code_evenement) then
+			local path = nodelivedraw:GetAttribute('WCSL_'..draw.code_evenement);
+			if app.FileExists(path) then
+				ChargeWCSL(path);
+			else
+				nodelivedraw:DeleteAttribute('WCSL_'..draw.code_evenement);
+				draw.doc:SaveFile();
+			end
+		end
+	end
+	
+	RefreshCounterSequence();
+	-- Prise des Evenements (Bind)
+	grid_tableau:Bind(eventType.GRID_EDITOR_SHOWN, OnGridShown);
+	grid_tableau:Bind(eventType.GRID_CELL_CONTEXT, OnCellContext);
+	grid_tableau:Bind(eventType.GRID_CELL_CHANGED, OnCellChanged);
+	grid_tableau:Bind(eventType.GRID_SELECT_CELL, OnCellSelected);
+	
+	dlgTableau:Bind(eventType.TIMER, OnTimerRunning, draw.timer);
+	draw.timer:Start(480000);	-- toutes les 8 minutes (8x60x1000ms) on envoie une commande keepalive
+
+	-- dlgTableau:Bind(eventType.MENU, OnResetSocket, btn_reset_socket);
+	dlgTableau:Bind(eventType.MENU, AfficheMenuCommande, btnMenuCommande);
+	dlgTableau:Bind(eventType.MENU, AfficheMenuRAZ, btnMenuRAZ);
+	dlgTableau:Bind(eventType.MENU, AfficheMenuSend, btnMenuSend);
+	dlgTableau:Bind(eventType.MENU, AfficheMenuValider, btnMenuValider);
+	dlgTableau:Bind(eventType.MENU, AfficheMenuPrint, btnMenuPrint);
+	dlgTableau:Bind(eventType.MENU, AfficheMenuOutils, btnMenuOutils);
+	
+	dlgTableau:Bind(eventType.MENU, OnSendMessage, btnSendMessage);
+
+	dlgTableau:Bind(eventType.MENU, OnAide, btnAideCE);
+	dlgTableau:Bind(eventType.MENU, 
+		function(evt)
+			draw.skip_question = false;
+			OnOrder();
+		end, btnOrder);
 
 	dlgTableau:Bind(eventType.GRID_FILTER_CHANGED, 
 		function(evt)
@@ -4045,7 +4133,7 @@ function main(params_c)
 	draw.height = display:GetSize().height - 50;
 	draw.x = 0;
 	draw.y = 0;
-	script_version = "5.75"; -- 4.92 pour 2022-2023
+	script_version = "6.0"; -- 6.0 premier version multi plateforme
 	local imgfile = './res/40x16_dbl_coche.png';
 	if not app.FileExists(imgfile) then
 		app.GetAuiFrame():MessageBox(
@@ -4157,11 +4245,11 @@ function main(params_c)
 	ReplaceTableEnvironnement(tTableTirage2, '_TableTirage2');
 	
 	draw.code_liste = tEvenement:GetCellInt("Code_liste", 0)
-	draw.code_niveau = tEpreuve:GetCell('Code_niveau', 0);
 	draw.code_regroupement = tEpreuve:GetCell('Code_regroupement', 0);
 	draw.sexe = tEpreuve:GetCell('Sexe', 0);
 	draw.bolEstCE = false;
 	draw.bolEstNC = false;
+	draw.bolEstNCMJ = false;
 	
 	tOuiNon = sqlTable.Create('_OuiNon');
 	tOuiNon:AddColumn({ name = 'Choix', label = 'Choix', type = sqlType.CHAR , width = 3});
@@ -4171,11 +4259,14 @@ function main(params_c)
 	tOuiNon:SetCell('Choix', row , 'Non');
 	ReplaceTableEnvironnement(tOuiNon, '_OuiNon')
 
-	if draw.code_niveau == 'EC' or draw.code_regroupement == 'CE' then
+	if draw.code_regroupement == 'CE' then
 		draw.bolEstCE = true;
 	end
-	if tEpreuve:GetCell("Code_regroupement", 0) == 'F' then
+	if draw.code_regroupement == 'F' or draw.code_regroupement == 'NCM/J' then
 		draw.bolEstNC = true;
+		if draw.code_regroupement == 'NCM/J' then
+			draw.bolEstNCMJ = true;
+		end
 	end
 	draw.code_saison = tEvenement:GetCell("Code_saison", 0);
 	draw.discipline = tEpreuve:GetCell('Code_discipline', 0);
@@ -4239,6 +4330,19 @@ function main(params_c)
 			draw.qlf_Finale = tonumber(node:GetAttribute('Qlf_Finale')) or 45;
 			draw.topx_FIS = tonumber(node:GetAttribute('Topx_FIS')) or 75;
 			-- SortGroupes(draw.tClefTri, {'Order'});
+		elseif draw.bolEstNCMJ then
+			nodeName = 'root/WJC/ZK';
+			local doc = xmlDocument.Create(xml_tri_default);
+			local node = doc:FindFirst(nodeName);
+			if draw.sexe == 'F' then
+				draw.wjc_clt_maxi = tonumber(node:GetAttribute('F')) or 400;
+			else
+				draw.wjc_clt_maxi = tonumber(node:GetAttribute('M')) or 500;
+			end
+			draw.wjc_discipline = node:GetNodeContent();
+			if draw.wjc_discipline:len() == 0 then
+				draw.wjc_discipline = "'IASL','IAGS', 'IADH'";
+			end
 		end
 	end
 	if tEpreuve:GetCell("Sexe", 0) == "M" then
@@ -4357,13 +4461,13 @@ function main(params_c)
 
 	tbconfig:Realize();
 	local message = app.GetAuiMessage();
-	local titre = 'TIRAGE DES DOSSARDS EN LIGNE SUR LE SITE DE LA FIS\n\nCourse : '..tEvenement:GetCell('Nom', 0)
+	local titre = 'TIRAGE DES DOSSARDS EN LIGNE SUR LE SITE DE LA FIS\n\nCourse : '..tEvenement:GetCell('Nom', 0);
 	dlgConfig:GetWindowName('race_name'):SetValue(titre);
 	dlgConfig:GetWindowName('codex'):SetValue(tEvenement:GetCell('Codex', 0));
 	dlgConfig:GetWindowName('fis_hostname'):SetValue('live.fisski.com');
 	dlgConfig:GetWindowName('fis_port'):SetValue(draw.port);
 	dlgConfig:GetWindowName('fis_pwd'):SetValue(draw.pwd);
-	if draw.bolEstCE then
+	if dlgConfig:GetWindowName('finale_ce') then
 		dlgConfig:GetWindowName('finale_ce'):SetTable(tOuiNon, 'Choix', 'Choix');
 		dlgConfig:GetWindowName('finale_ce'):SetValue(draw.finale_ce);
 	end
