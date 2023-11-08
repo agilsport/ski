@@ -92,8 +92,12 @@ function Shuffle(t, seed)
 end
 
 function Round(num, dec)	-- en entrée un nombre décimal, en sortie un nombre arrondi avec dec chiffres après la virgule.
-	num = tonumber(num) or 0;
-    return math.floor( (num * 10^dec) + 0.5) / (10^dec)
+	local num = tonumber(num) or 0;
+	local val_return = math.floor( (num * 10^dec) + 0.5) / (10^dec);
+	if dec== 0 then
+		val_return = math.floor(val_return);
+	end	
+    return val_return;
 end
 
 function ReplaceTableEnvironnement(t, name)		-- replace la table créée dans l'environnement de la base de donnée pour éviter les memory leaks
@@ -108,10 +112,14 @@ function ReplaceTableEnvironnement(t, name)		-- replace la table créée dans l'en
 end
 
 function OnCurlReturn(evt)
-	-- Ex de retour : LiveDraw=5.94,Matrices=5.92,TimingReport=4.2,DoubleTirage=3.2,TirageOptions=3.3,TirageER=1.7,ListeMinisterielle=2.3,KandaHarJunior=2.0,MarquageEquipe=2.0,Regroupement=2.0
+	-- Ex de retour : LiveDraw=5.94,Matrices=5.92,TimingReport=4.2,DoubleTirage=3.2,TirageOptions=3.3,TirageER=1.7,ListeMinisterielle=2.3,KandaHarJunior=2.0,MarquageEquipe=2.0,Regroupement=2.0,quotaFIS=2.0,coureurListe=1,entryFIS=1.9
 	local tNomSVersionDoc = {};
 	table.insert(tNomSVersionDoc, 'process/LiveDraw_versions.rtf');
 	table.insert(tNomSVersionDoc, 'challenge/Matrice_versions.rtf');
+	table.insert(tNomSVersionDoc, '');
+	table.insert(tNomSVersionDoc, '');
+	table.insert(tNomSVersionDoc, '');
+	table.insert(tNomSVersionDoc, '');
 	table.insert(tNomSVersionDoc, '');
 	table.insert(tNomSVersionDoc, '');
 	table.insert(tNomSVersionDoc, '');
