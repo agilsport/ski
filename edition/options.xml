@@ -12,17 +12,19 @@
 		</matrix>
 	</option>
 
-	<!-- Compteur inscrits - classés -->
+	<!-- Compteur inscrits - classés - DNS1-->
 	<option id="count_partant">
 		<lua>
 			nb_classes = 0; 
+			nb_dns1 = 0; 
 			for row=0, body:GetNbRows()-1 do
 				if body:GetCellInt('Clt', row) > 0 then nb_classes = nb_classes + 1 end
+				if body:GetCellInt('Tps1', row) == -600 then nb_dns1 = nb_dns1 + 1 end
 			end
 		</lua>
 		<matrix row="auto" col_start="1" col_end="0"> 
 			<col value="8cm,1" />"
-			<text row="auto" col_start="2" align="left" cond="entite == 'FIS'"><font size="11"/>'(inscrits : '..body:GetNbRows()..' - classés : '..nb_classes..')'</text>
+			<text row="auto" col_start="2" align="left" cond="entite == 'FIS'"><font size="11"/>'(inscrits : '..body:GetNbRows()..' - classés : '..nb_classes..' - DNS1 : '..nb_dns1..')'</text>
 		</matrix>
 	</option>
 
@@ -163,11 +165,13 @@
 		<matrix col_start="1" col_end="0"> 
 			<col w="1,0.3cm,1"/>
 			<text row="auto" col_start="1" col_end="0" align="Left" cond="commentaire:len() ~= 0" >'Commentaire éventuels:'</text>
-			<text row="auto" col_start="1" col_end="0" style="TE_LEFT|TE_MULTILINE" border="all" cond="commentaire:len() ~= 0" align="top,right_horizontal" ><spacing left="10" right="10" top="10" bottom="10" />commentaire</text>
+			<text row="auto" col_start="1" col_end="0" style="TE_LEFT|TE_MULTILINE" border="all" cond="commentaire:len() ~= 0" align="top,right" ><spacing left="10" right="10" top="10" bottom="10" />commentaire</text>
 			<!-- <col value="8cm" /> -->
 			<text row="auto" col_start="3" col_end="0" align="left"><font size="14"/>'Le délégué technique'</text>
 			<text row="auto" col_start="3" col_end="0" align="left"><font size="15"/>dt</text>
 		</matrix>
+		<!-- <lua>app.GetAuiMessage():AddLine('Ok Signature')</lua> -->
+
 	</option>
 	
 	<!-- option permetant de calculer le nb d'inscrit / classes / abs / abd / dsq / Nt bandeau fixe-->
@@ -337,5 +341,34 @@
 		</matrix >
 	</option>
 	
+	<option id="Infos_Reprimandes">	
+		<background mode="transparent"/>
+		<col w="1.5cm,1" />
+		<row h="0.7cm"/>
+		<line col_start="1" col_end="0" pen_size="4" border="top" />
+		<text col_start="1" col_end="0" align="left">'Infos ou Reprimandes: '</text>
+
+		<spacing left="10" right="10" top="4" bottom="4" />
+		<pen border = "1"/>
+
+		<lua>
+			if nb_manche == 2 and activite:In('FOND, ROL') and discipline == 'POURS' then
+				manche = 2;
+			else
+				manche = 1;
+			end	
+			for i=0, body:GetNbRows()-1 do			
+				if body:GetCell('Dsq'..manche, i) ~= '' then
+		</lua>		
+					<need h="0.5cm" />
+					<row h="0.5cm" />
+					<text col_start="1" align="center" >'Dos: '..body:GetCell('Dossard', i)</text>
+					<text col_start="2" align="center_vertical,right" >body:GetCell('Dsq'..manche, i)</text>
+		<lua>
+				end
+			end
+		</lua>		
+		<pen border = "0"/>
+	</option>
 </edition>
 
