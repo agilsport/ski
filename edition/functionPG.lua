@@ -112,22 +112,22 @@ function ReplaceTableEnvironnement(t, name)		-- replace la table créée dans l'en
 end
 
 function OnCurlReturn(evt)
-	-- Ex de retour : LiveDraw=5.94,Matrices=5.92,TimingReport=4.2,DoubleTirage=3.2,TirageOptions=3.3,TirageER=1.7,ListeMinisterielle=2.3,KandaHarJunior=2.0,MarquageEquipe=2.0,Regroupement=2.0,quotaFIS=2.0,coureurListe=1,entryFIS=1.9
+	-- Ex de retour : LiveDraw=5.94,Matrices=5.92,TimingReport=4.2,DoubleTirage=3.2,TirageOptions=3.3,TirageER=1.7,ListeMinisterielle=2.3,KandaHarJunior=2.0,MarquageEquipe=2.0,Regroupement=2.0,quotaFIS=2.0,coureurListe=1,entryFIS=1.9, youthFIS=1.0
 	local tNomSVersionDoc = {};
-	table.insert(tNomSVersionDoc, 'process/LiveDraw_versions.rtf');
-	table.insert(tNomSVersionDoc, 'challenge/Matrice_versions.rtf');
-	table.insert(tNomSVersionDoc, '');
-	table.insert(tNomSVersionDoc, '');
-	table.insert(tNomSVersionDoc, '');
-	table.insert(tNomSVersionDoc, '');
-	table.insert(tNomSVersionDoc, '');
-	table.insert(tNomSVersionDoc, '');
-	table.insert(tNomSVersionDoc, '');
-	table.insert(tNomSVersionDoc, '');
-	table.insert(tNomSVersionDoc, '');
-	table.insert(tNomSVersionDoc, '');
-	table.insert(tNomSVersionDoc, '');
-	table.insert(tNomSVersionDoc, '');
+	table.insert(tNomSVersionDoc, 'process/LiveDraw_versions.rtf');		-- LiveDraw
+	table.insert(tNomSVersionDoc, 'challenge/Matrice_versions.rtf');	-- Matrices
+	table.insert(tNomSVersionDoc, 'edition/TR_versions.rtf');			-- Timing report									-- Timing Report
+	table.insert(tNomSVersionDoc, '');									-- Double Tirage			
+	table.insert(tNomSVersionDoc, '');									-- Tirage avec Options			
+	table.insert(tNomSVersionDoc, '');									-- Tirage Esprit Racing
+	table.insert(tNomSVersionDoc, '');									-- Listes Ministérielles
+	table.insert(tNomSVersionDoc, '');									-- Kandahar Junior
+	table.insert(tNomSVersionDoc, '');									-- Marquage des équipes
+	table.insert(tNomSVersionDoc, '');									-- Regroupement de coureurs
+	table.insert(tNomSVersionDoc, '');									-- Quotas en FIS
+	table.insert(tNomSVersionDoc, '');									-- Coureurs d'une liste
+	table.insert(tNomSVersionDoc, '');									-- Entry FIS
+	table.insert(tNomSVersionDoc, '');									-- nada
 	if evt:GetInt() == 1 then
 		local chaine = evt:GetString();
 		local tChaine = chaine:Split(',');
@@ -197,8 +197,8 @@ function VerifNodePodium()
 end
 
 function GetStatHandiBody(body)
-	body:SetCounter('Nation');
-	body:SetCounter('Tps_status');
+	-- body:SetCounter('Nation');
+	-- body:SetCounter('Tps_status');
 	tStat = {};
 	tStat[99] = {};
 	tStat[99].Classes = body:GetCounterValue('Tps_status', 'ok')
@@ -224,13 +224,31 @@ function GetStatHandiBody(body)
 end
 
 function GetPointPlaceHandi(clt, nbclt)
-	clt = tonumber(clt) or 0;
 	local pts = 0;
-	local r = tPlace_Valeur:GetIndexRow('Place', clt);
-	if r and r >= 0 then
-		pts = tPlace_Valeur:GetCellDouble('Point', r);
+	clt = tonumber(clt) or 0;
+	if clt <= 0 then
+		return 0;
 	end
-	return pts;
+	if nbclt == 1 then
+		 if clt == 1 then
+			pts = tRanked[1][clt].Pts 	-- idx = nombre de classés, i = classement
+			return pts;
+		end
+	elseif nbclt == 2 then
+		if clt < 3 then
+			pts = tRanked[2][clt].Pts 	-- idx = nombre de classés, i = classement
+			return pts
+		end
+	else
+		if clt > 0 then
+			local r = tPlace_Valeur:GetIndexRow('Place', clt);
+			if r and r >= 0 then
+				pts = tPlace_Valeur:GetCellDouble('Point', r);
+			end
+			return pts;
+		end
+	end
+	return 0;
 end
 
 function InitReportHandi(code_evenement)
@@ -243,9 +261,14 @@ function InitReportHandi(code_evenement)
 	base:TableLoad(tPlace_Valeur, cmd)
 end
 
-function OnDecodeJsonBibo(code_evenement, groupe)
+function OnDecodeJsonBibo(code_evenement, groupe, vitesse)
+	if vitesse then
+		code_evenement = code_evenement * -1;
+	end
 	cmd = 'Select * From Resultat_Info_Bibo Where Code_evenement = '..code_evenement..' And Groupe = '..groupe;
 	base:TableLoad(tResultat_Info_Bibo, cmd);
+	-- adv.Alert('taille de tResultat_Info_Bibo = '..tResultat_Info_Bibo:GetNbRows());
+	-- adv.Alert(cmd);
 	tResultat_Info_Bibo:OrderBy('Groupe, Ligne');
 	local tableDossards1 = {};
 	local tableDossards2 = {};
@@ -261,10 +284,17 @@ function OnDecodeJsonBibo(code_evenement, groupe)
 	return tableDossards1, tableDossards2;
 end
 
-function OnEncodeJsonBibo(code_evenement, groupe)
+function OnEncodeJsonBibo(code_evenement, groupe, vitesse)
 	-- tDrawG6 contient tous les coureurs du BIBO
-	local cmd = 'Select * From Resultat_Info_Bibo Where Code_evenement = '..code_evenement;
-	base:TableLoad(tResultat_Info_Bibo, cmd);
+	if not groupe then
+		groupe = 1;
+	end
+	if vitesse then
+		code_evenement = code_evenement * -1;
+	end
+	tResultat_Info_Bibo:RemoveAllRows();
+	-- local cmd = 'Select * From Resultat_Info_Bibo Where Code_evenement = '..code_evenement;
+	-- base:TableLoad(tResultat_Info_Bibo, cmd);
 	local row_groupe = nil;
 	assert(tTableTirage1:GetNbRows() > 0);
 	for row = 0, tTableTirage1:GetNbRows() -1 do
@@ -292,16 +322,15 @@ function OnEncodeJsonBibo(code_evenement, groupe)
 		local jsontxt2 = table.ToStringJSON(xTable2, false);
 		local rowsql = tResultat_Info_Bibo:AddRow();
 		tResultat_Info_Bibo:SetCell('Code_evenement', rowsql, code_evenement);
-		if not groupe then
-			tResultat_Info_Bibo:SetCell('Groupe', rowsql, 1);
-		else
-			tResultat_Info_Bibo:SetCell('Groupe', rowsql, groupe);
-		end
+		tResultat_Info_Bibo:SetCell('Groupe', rowsql, groupe);
+		-- adv.Alert('jsontxt1 = '..jsontxt1);
+		-- adv.Alert('jsontxt2 = '..jsontxt2);
 		tResultat_Info_Bibo:SetCell('Ligne', rowsql, idx);
 		tResultat_Info_Bibo:SetCell('Table1', rowsql, jsontxt1);
 		tResultat_Info_Bibo:SetCell('Table2', rowsql, jsontxt2);
-		base:TableInsert(tResultat_Info_Bibo, rowsql);
+		-- base:TableInsert(tResultat_Info_Bibo, rowsql);
 	end
+	base:TableBulkInsert(tResultat_Info_Bibo);
 end
 
 
@@ -311,6 +340,33 @@ function Eval(e1, e2)
 	else
 		return false;
 	end
+end
+
+function Interrogation()
+	do return end
+	params = params or {};
+	local msg = "Après 20 années de bénévolat et une grande implication"..
+				"\npersonnelle, certains à la FFS ont décidé de me blacklister."..
+				"\nVous allez utiliser un de mes développements mis gracieusement"..
+				"\nà la disposition de la communauté mais celui-ci ne sera plus maintenu."..
+				"\nCeux parmi les outils que j'ai développés qui sont utilisés par"..
+				"\nles coordonnateurs des courses FIS et leurs chronométreurs"..
+				"\nne sont pas concernés par ce coup de colère."..
+				"\nVous pourrez peut-être obtenir des explications auprès"..
+				"\ndu Directeur Général de la FFS car moi, je n'en ai reçu aucune."..
+				"\nPhilippe Guérindon.";
+	if tEvenement then
+		if tEvenement:GetCell('Code_entite', 0) == 'FFS' then
+			if tEvenement:GetCell('Code_activite', 0) == 'ALP' or tEvenement:GetCell('Code_activite', 0) == 'CHA-CMB' then
+				app.GetAuiFrame():MessageBox(msg, "Interrogation personnelle", msgBoxStyle.OK + msgBoxStyle.ICON_WARNING);
+			end
+		end
+	elseif params.code_entite and params.code_entite == 'FFS' then
+		app.GetAuiFrame():MessageBox(msg, "Interrogation personnelle", msgBoxStyle.OK + msgBoxStyle.ICON_WARNING);
+	else
+		app.GetAuiFrame():MessageBox(msg, "Interrogation personnelle", msgBoxStyle.OK + msgBoxStyle.ICON_WARNING);
+	end
+	return;
 end
 
 function CreateXMLConfig()

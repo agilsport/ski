@@ -1,0 +1,1084 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Editions Activité "ALP" !-->
+<edition>
+	<!-- footer handiski !-->
+	<footer>
+		<lua>if params.Mode == 'WPAS' then</lua>
+			<background mode="transparent"/>
+			<font name="Calibri" size="8" adjust="best" weight="normal"/>
+			<pen border="none" />
+			<col value="1,1,1" />
+			<text row="auto" col_start="1" col_end="0" ><pen size="3" border="top" />app.GetName()..' Version '..app.GetVersion()</text>
+			<text col_start="2" align="center">'Report Created  '..string.upper(os.date('%a %d %b %Y  %H:%M'))</text>
+			<text col_start="3" align="right">string.format('Page %d/%s',editor:GetPageCurrent(), editor:GetPageCountLabel())</text>
+			<lua>choix_manche = 1; page_break = 1;</lua>
+		<lua>else</lua>
+			<background mode="transparent"/>
+			<font name="Calibri" size="8" adjust="best" weight="normal"/>
+			<pen border="none" />
+
+			<lua>entite = entite or $(Evenement.Code_entite)</lua>
+			<lua>info = $(Epreuve.Date_epreuve,'%2D/%2M/%4Y')..' / '..$(Evenement.Station)..' ('</lua>
+			<lua cond="entite=='FIS'">info = info..$(Evenement.Code_nation)..'-'</lua>
+			<lua>info = info..$(Evenement.Code_comite).. ') / '..$(Evenement.Organisateur)</lua>
+			<text row="auto" col="1" align="left">info</text>
+			<text align="right" font_weight="bold" cond="entite=='FIS'">$(Epreuve.Fichier_transfert_int)..' (Liste n°'..$(Evenement.Code_liste)..')'</text>
+			<text align="right" font_weight="bold" cond="entite=='FFS'">$(Epreuve.Fichier_transfert)..' (Liste n°'..$(Evenement.Code_liste)..')'</text>
+			<line col_start="1" col_end="0" pen_size="2" pen_color="dkgray" border="bottom"/>
+			<!-- <text row="auto" align="left"><pen border="top" />app.GetName()..' Version '..app.GetVersion()..' (FFS - ESF - Agil Informatique) - '..os.date('Edité le %d-%m-%Y à %H:%M:%S')</text> -->
+			
+			<row value="auto" />
+			<matrix col_start="1">
+				<row value="auto"/>
+				<text col="auto" align="left">app.GetName()..' Version '..app.GetVersion()..' / FFS'</text>
+				<image col="0.4cm" adjust="width" align="left">'./res/32x32_ffs.png'</image>
+				<text col="auto" align="left" adjust="width">' / ESF'</text>
+				<image col="0.4cm" adjust="width" align="left">'./res/32x32_esf.png'</image>
+				<text col="auto" align="left">' / Agil Informatique'</text>
+				<image col="0.4cm" adjust="width" align="left">'./res/32x32_agil.png'</image>
+				<text col="auto" align="left">os.date(' / Edité le %d-%m-%Y à %H:%M:%S')</text>
+			</matrix>	
+			<text align="right">string.format('Page %d/%s',editor:GetPageCurrent(), editor:GetPageCountLabel())</text>
+			<line col_start="1" col_end="0" border="top" />
+			<text row="auto" align="left" cond="editor:GetPageCurrent() == 1">$(Evenement.Commentaire)</text>
+		<lua>end</lua>	
+	</footer>
+
+	<!-- header handi ski !-->
+	<header>
+		<lua>if params.Mode == 'WPAS' then</lua>
+			<spacing all="0"/>
+			<background mode="transparent"/>
+			<font name="Calibri" size="12" adjust="max" weight="bold"/>
+			<matrix>
+				<col value="3cm,2,2,1" />
+				<text row="auto" col_start="2" align="left">$(Evenement.Station)..' '..$(Evenement.Code_saison)</text>
+				<text align="left" col_start="3" >string.sub($(Evenement.Nom),1,-2)</text>
+				<text row="auto" />
+				<text row="auto" col_start="2" ><font adjust="max" weight="normal"/>string.upper(os.date("%a", daytime))</text>
+				<lua>
+					<!-- strRupture = tSexe[$(Epreuve.Sexe)]..' '..tDiscipline[$(Epreuve.Code_discipline)]</lua> -->
+					strRupture = $(Epreuve.Sexe)..' '..$(Epreuve.Code_discipline)</lua>
+				<text col_start="3" >strRupture..' '..string.sub($(Evenement.Nom),-1)</text>
+				<text row="auto" col_start="2" ><font adjust="max" weight="normal"/>string.upper(os.date("%d %b %Y", daytime))</text>
+				<text row="auto" col_start="2" ><font adjust="max" weight="normal"/>os.date("%H:%M", daytime)</text>
+				<text col_start="3" cond="string.find(params.cible,'officiel')">'FINAL'</text>
+				<text col_start="3" cond="not string.find(params.cible,'officiel')">''</text>
+				<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
+				<row value="0.1cm"/>
+				<text row="auto" col_start="1" col_end="0" align="center" cond="title" ><font size="14"/>params.Titre</text>
+				<text col_start="3" align="right" cond="title" ><font size="10" weight="normal"/>'  As of '..string.upper(os.date("%d %b %Y", daytime))</text>
+			</matrix>
+			<row value="0.8cm"/>
+		<lua>else</lua>
+			<spacing all="0"/>
+			<background mode="transparent"/>
+			<font name="Calibri" size="14" adjust="max" weight="bold"/>
+			<text row="auto" col="1" align="center">$(Evenement.Nom)</text>
+			<text row="auto" align="center">$(Discipline.Libelle)</text>
+			<text row="auto" align="center">$(Categorie{$(Epreuve.Code_categorie)}.Libelle)..' - '..$(Sexe{$(Epreuve.Sexe)}.Libelle)</text>
+			<text row="auto" align="center" cond="title" >title</text>
+			<text row="auto" align="center" cond="title_filter">title_filter</text>
+
+			<!-- <text row="3cm" align="left"><font orientation="90" origin="left,bottom"/>'HELLO'</text> -->
+			<row value="0.5cm"/>
+		<lua>end</lua>
+	</header>
+
+	<!-- first_header standard !-->
+	<first_header>
+		<lua>if params.Mode == 'WPAS' then</lua>
+			<background mode="transparent"/>
+			<font name="Calibri" size="10" adjust="best" weight="normal"/>
+			<pen border="none" />
+			<lua>entite = $(Evenement.Code_entite)</lua>
+			<lua>discipline = $(Epreuve.Code_discipline)</lua>
+			<lua>if base:GetTable('Epreuve'):GetCellInt('Nombre_de_manche', 0, 1) &gt; 1 then manche2_ok = true else manche2_ok = false end</lua>
+			<lua>ouvreurM1 = base:GetTable('Epreuve_Alpine_Manche_Ouvreur'):CopyFilter("self:GetCellInt('Code_manche', row) == 1")</lua>
+			<lua>ouvreurM2 = base:GetTable('Epreuve_Alpine_Manche_Ouvreur'):CopyFilter("self:GetCellInt('Code_manche', row) == 2")</lua>
+			<lua>ouvreurM1:SetName('ouvreurM1'); base:AddTable(ouvreurM1)</lua>
+			<lua>ouvreurM2:SetName('ouvreurM2'); base:AddTable(ouvreurM2)</lua>
+			<lua>officiel = params.Officiel or 0</lua>
+			<spacing all="2" />
+			<col value="4,4,1, 0.5cm, 4,4,1" />
+			<row value="auto" />
+			<matrix row="auto" col_start="5" col_end="7">
+				<col value="1,1" />
+				<text row="auto" col_start="1" col_end="2" align="left" font_size_step="1" font_weight="bold"><pen border="top, bottom" />'TECHNICAL DATA'</text>
+				<text row="auto" col_start="1" align="left" font_weight="bold">'Course Name'</text>
+				<text col_start="2" align="right" >$(Pistes.Nom_piste)</text>
+				<text row="auto" col_start="1" align="left" font_weight="bold">'Start Altitude'</text>
+				<text col_start="2" align="right" >$(Epreuve_Alpine_Manche.Altitude_Depart):Suffix(' m')</text>
+				<text row="auto" col_start="1" align="left" font_weight="bold">'FinishAltitude'</text>
+				<text col_start="2" align="right" >$(Epreuve_Alpine_Manche.Altitude_Arrivee):Suffix(' m')</text>
+				<text row="auto" col_start="1" align="left" font_weight="bold">'Vertical Drop'</text>
+				<lua>denivelee = tonumber($(Epreuve_Alpine_Manche.Altitude_Depart,'','0')) - tonumber($(Epreuve_Alpine_Manche.Altitude_Arrivee,'','0'))</lua>
+				<text col_start="2" align="right">tostring(denivelee):Suffix(' m')</text>
+				<lua>if $(Epreuve_Alpine_Manche.Longueur):len() &gt; 0 then</lua>
+					<text row="auto" col_start="1" align="left" font_weight="bold">'Length'</text>
+					<text col_start="2" col_end="0" align="right" >$(Epreuve_Alpine_Manche.Longueur):Suffix(' m')</text>
+				<lua>end</lua>
+				<text row="auto" col_start="1" align="left" font_weight="bold">'Homologation number'</text>
+				<text col_start="2" align="right" cond="entite=='FIS'">$(Pistes.Homologation_fis)</text>
+				<text col_start="2" align="right" cond="entite=='FFS'">$(Pistes.Homologation_ffs)</text>
+				<text row="auto" col_start="1" align="left" font_weight="bold">'Timing device'</text>
+				<text col_start="2" align="right">$(Epreuve_Alpine.Homologation_chrono)</text>
+			</matrix>
+			<matrix row_start="0" col_start="1" col_end="3">
+				<col value="2,2,1" />
+				<text row="auto" col_start="1" col_end="3" align="left" font_size_step="1" font_weight="bold"><pen border="top, bottom" />'JURY'</text>
+				<text row="auto" col_start="1" align="left" font_weight="bold" cond="entite =='FIS'">'IPC/FIS Technical delegate'</text>
+				<text row="auto" col_start="1" align="left" font_weight="bold" cond="entite =='FFS'">'Technical delegate FFS'</text>
+				<text col_start="2" align="left">$(Epreuve_Alpine.Nom_dt)</text>
+				<text col_start="3" align="right">$(Epreuve_Alpine.Code_Nation_dt):Parenthesis()</text>
+				<text row="auto" col_start="1" align="left" font_weight="bold">'Referee'</text>
+				<text col_start="2" align="left">$(Epreuve_Alpine.Nom_arbitre)</text>
+				<text col_start="3" align="right">$(Epreuve_Alpine.Code_nation_arbitre):Parenthesis()</text>
+				<lua>if discipline:In('DH','SG','SC') then</lua>
+					<text row="auto" col_start="1" align="left" font_size_step="1" font_weight="bold">'Assistant referee'</text>
+					<text col_start="2" align="left">$(Epreuve_Alpine.Nom_arbitre_assistant)</text>
+					<text col_start="3" align="right">$(Epreuve_Alpine.Code_nation_arbitre_ass):Parenthesis()</text>
+				<lua>end</lua>
+				<text row="auto" col_start="1" align="left" font_weight="bold">'Chief of Race'</text>
+				<text col_start="2" align="left">$(Epreuve_Alpine.Nom_directeur_epreuve)</text>
+				<text col_start="3" align="right">$(Epreuve_Alpine.Code_nation_directeur_epreuve):Parenthesis()</text>
+			</matrix>
+
+			<line col_start="4" row_start="2" row_end="7" pen_color="dkgray" border="mid_vert" />
+			<row value="0.2cm" />
+			<row value="auto" />
+			<text col_start="1" col_end="3" align="left" font_size_step="1" font_weight="bold" ><pen border="top, bottom" />'Race Information 1st Run'</text>
+			<text col_start="5" col_end="7" align="left" font_size_step="1" font_weight="bold" cond="manche2_ok"><pen border="top, bottom" />'Race Information 2nd Run'</text>
+		
+			<row value="auto" />
+			<text col_start="1" align="left" font_weight="bold" >'Course Setter'</text>
+			<text col_start="2" align="left">$(Epreuve_Alpine_Manche.Nom_traceur)</text>
+			<text col_start="3" align="right">$(Epreuve_Alpine_Manche.Code_nation_traceur):Parenthesis()</text>
+			<text col_start="5" align="left" font_weight="bold" cond="manche2_ok">'Course Setter'</text>
+			<text col_start="6" align="left" cond="manche2_ok">$(Epreuve_Alpine_Manche[1].Nom_traceur)</text>
+			<text col_start="7" align="right" cond="manche2_ok">$(Epreuve_Alpine_Manche[1].Code_nation_traceur):Parenthesis()</text>
+
+			<row value="auto" />
+			<text col_start="1" align="left" font_weight="bold">'Number of Gates'</text>
+			<text col_start="2" align="left">$(Epreuve_Alpine_Manche[0].Nombre_de_portes)</text>
+			<text col_start="5" align="left" cond="manche2_ok" font_weight="bold">'Number of Gates'</text>
+			<text col_start="6" align="left" cond="manche2_ok">$(Epreuve_Alpine_Manche[1].Nombre_de_portes)</text>
+
+			<row value="auto" />
+			<text col_start="1" align="left" font_weight="bold" cond="discipline:In('SG','GS','SL')">'Turning Gates'</text>
+			<text col_start="2" align="left" cond="discipline:In('SG','GS','SL')">$(Epreuve_Alpine_Manche[0].Changement_de_directions)</text>
+			<text col_start="5" align="left" font_weight="bold" cond="manche2_ok and discipline:In('SG','GS','SL')">'Turning Gates'</text>
+			<text col_start="6" align="left" cond="manche2_ok and discipline:In('SG','GS', 'SL')">$(Epreuve_Alpine_Manche[1].Changement_de_directions)</text>
+			
+			<row value="auto" />
+			<text col_start="1" align="left" font_weight="bold">'Start Time'</text>
+			<text col_start="2" align="left">$(Epreuve_Alpine_Manche[0].Heure_depart)</text>
+			<text col_start="5" align="left" font_weight="bold" cond="manche2_ok">'Start Time'</text>
+			<text col_start="6" align="left" cond="manche2_ok">$(Epreuve_Alpine_Manche[1].Heure_depart)</text>
+			
+			<row value="0.2cm" />
+			<lua>for i=1,5 do</lua>
+				<row value="auto" />
+				<text col_start="1" align="left" font_weight="bold" cond="i==1">'Forerunners'</text>
+				<text col_start="1" align="right" cond="$(ouvreurM1[i-1].Nom) ~= 'Ouvreur ?'">'- '..string.char(64+i)..' -'</text>
+				<text col_start="2" align="left" cond="$(ouvreurM1[i-1].Nom) ~= 'Ouvreur ?'">$(ouvreurM1[i-1].Nom)</text>
+				<text col_start="3" align="right">$(ouvreurM1[i-1].Nation):Parenthesis()</text>
+				<text col_start="5" align="left" font_weight="bold" cond="manche2_ok and i==1">'Forerunners'</text>
+				<text col_start="5" align="right" cond="manche2_ok and $(ouvreurM1[i-1].Nom) ~= 'Ouvreur ?'">'- '..string.char(64+i)..' -'</text>
+				<text col_start="6" align="left" cond="manche2_ok and $(ouvreurM1[i-1].Nom) ~= 'Ouvreur ?'">$(ouvreurM2[i-1].Nom)</text>
+				<text col_start="7" align="right" cond="manche2_ok and $(ouvreurM1[i-1].Nom) ~= 'Ouvreur ?'">$(ouvreurM2[i-1].Nation):Parenthesis()</text>
+			<lua>end</lua>
+			
+			<line col_start="4" row_start="-14" row_end="0" pen_color="dkgray" border="mid_vert" />
+			
+			<row value="0.2cm" />
+			<lua>if id:sub(1,4) == 'res_' then</lua>
+				<matrix col_start="1" col_end="0" row="auto">
+					<col value="1,1,1, 0.5cm, 1,1,1" />
+					<text row="auto" col_start="1" font_weight="bold" align="left">'WEATHER DATA'</text>
+					<text col_start="2" font_weight="bold" align="left">'At Start'</text>
+					<text col_start="3" font_weight="bold" align="left">'At finish'</text>
+					<text col_start="5" font_weight="bold" align="left" cond="manche2_ok">'At Start'</text>
+					<text col_start="6" font_weight="bold" align="left" cond="manche2_ok">'At finish'</text>
+					<text row="auto" col_start="1" align="left">'Weather'</text>
+					<text col_start="2" align="left">$(Epreuve_Alpine.Meteo_course)</text>
+					<text col_start="3" align="left">$(Epreuve_Alpine.Meteo_course)</text>
+					<text col_start="5" align="left" cond="manche2_ok">$(Epreuve_Alpine.Meteo_course)</text>
+					<text col_start="6" align="left" cond="manche2_ok">$(Epreuve_Alpine.Meteo_course)</text>
+					<text row="auto" col_start="1" align="left">'Snow'</text>
+					<text col_start="2" align="left">$(Epreuve_Alpine.Neige_course)</text>
+					<text col_start="3" align="left">$(Epreuve_Alpine.Neige_course)</text>
+					<text col_start="5" align="left" cond="manche2_ok">$(Epreuve_Alpine.Neige_course)</text>
+					<text col_start="6" align="left" cond="manche2_ok">$(Epreuve_Alpine.Neige_course)</text>
+					<text row="auto" col_start="1" align="left">'Temperature'</text>
+					<text col_start="2" align="left">$(Epreuve_Alpine.Temperature_neige_depart)..'°C'</text>
+					<text col_start="3" align="left">$(Epreuve_Alpine.Temperature_neige_arrivee)..'°C'</text>
+					<text col_start="5" align="left" cond="manche2_ok">$(Epreuve_Alpine.Temperature_neige_depart)..'°C'</text>
+					<text col_start="6" align="left" cond="manche2_ok">$(Epreuve_Alpine.Temperature_neige_arrivee)..'°C'</text>
+				</matrix>
+				<row value="0.2cm" />
+				<matrix col_start="1" col_end="0" row="auto">
+					<col value="1cm,1,1,1,2" />
+					<text row="auto" col_start="2" cond="officiel==1" font_weight="bold" align="left">'Penalty :'</text>
+					<text col_start="3" align="left" cond="officiel==1" font_weight="bold" >$(Epreuve.Penalite_appliquee)</text>
+					<text col_start="4" align="left" cond="officiel==1" font_weight="bold" >'F-value: '..$(Discipline.Facteur_f)</text>
+					<text row="auto" col_start="2" font_weight="bold" align="left">'IPC/FIS codex :'</text>
+					<text col_start="3" font_weight="bold" >string.sub($(Epreuve.Fichier_transfert), -4)</text>
+				</matrix>
+				<row value="0.2cm" />
+			
+				<text row="auto" col_start="1" col_end="5" ><font size="14" weight="bold" />'Numbers of Competitors : '..params.Inscrits..', Number of NPCs : '..params.Nations</text>
+			<lua>end</lua>
+		
+			<row value="0.25cm" />
+		<lua>else</lua>
+			<call option="identiteOfficiel" file="./edition/options.xml"/>
+			<background mode="transparent"/>
+			<font name="Calibri" size="9" adjust="best" weight="normal"/>
+			<pen border="none" />
+			<lua>entite = $(Evenement.Code_entite)</lua>
+			<lua>discipline = $(Epreuve.Code_discipline)</lua>
+			<lua>if base:GetTable('Epreuve'):GetCellInt('Nombre_de_manche', 0, 1) &gt; 1 then manche2_ok = true else manche2_ok = false end</lua>
+			<lua>ouvreurM1 = base:GetTable('Epreuve_Alpine_Manche_Ouvreur'):CopyFilter("self:GetCellInt('Code_manche', row) == 1")</lua>
+			<lua>ouvreurM2 = base:GetTable('Epreuve_Alpine_Manche_Ouvreur'):CopyFilter("self:GetCellInt('Code_manche', row) == 2")</lua>
+			<lua>ouvreurM1:SetName('ouvreurM1'); base:AddTable(ouvreurM1)</lua>
+			<lua>ouvreurM2:SetName('ouvreurM2'); base:AddTable(ouvreurM2)</lua>
+			<lua>officiel = params.officiel or 0</lua>
+			<padding all="0px" />
+			<spacing all="2" />
+
+			<col value="4,4,1, 0.2cm, 4,4,1" />
+
+			<row value="auto" />
+			<text col_start="1" col_end="3" align="center" underlined="1" font_size_step="1" font_weight="bold">traduction(language,'JURY DE COMPETITION')</text>
+			<text col_start="5" col_end="7" align="center" underlined="1" font_size_step="1" font_weight="bold">traduction(language, 'CARACTERISTIQUES DE LA PISTE')</text>
+			<row value="0.05cm" />"
+		
+			<row value="auto" />
+			<text col_start="1" align="left">traduction(language, 'DÉLÉGUÉ TECHNIQUE')..' '..entite</text>
+			<text col_start="2" align="left">base:GetOfficiel('TechnicalDelegate', 'Nom')..' '..base:GetOfficiel('TechnicalDelegate', 'Prenom')</text>
+			<text col_start="3" align="right" >base:GetOfficiel('TechnicalDelegate', 'Nation'):Parenthesis()</text>
+			<text col_start="5" col_end="0" align="left" >traduction(language,'PISTE')</text>
+			<text col_start="5" col_end="0" align="right" >$(Pistes.Nom_piste)</text>
+			
+			<row value="auto" />
+			<text col_start="1" align="left">traduction(language, 'ARBITRE')</text>
+			<text col_start="2" align="left">base:GetOfficiel('Referee', 'Nom')..' '..base:GetOfficiel('Referee', 'Prenom')</text>
+			<text col_start="3" align="right">base:GetOfficiel('Referee', 'Nation'):Parenthesis()</text>
+			<text col_start="5" col_end="0" align="left" >traduction(language,'DEPART')</text>
+			<text col_start="5" col_end="0" align="right" >$(Epreuve_Alpine_Manche.Altitude_Depart):Suffix(' m')</text>
+
+			<row value="auto" />
+			<lua>if base:GetOfficiel('AssistantReferee', 'Nom'):len() &gt; 0 then</lua>
+				<text col_start="1" align="left">traduction(language, 'ARBITRE ASSISTANT')</text>
+				<text col_start="2" align="left">base:GetOfficiel('AssistantReferee', 'Nom')..' '..base:GetOfficiel('AssistantReferee', 'Prenom')</text>
+				<text col_start="3" align="right">base:GetOfficiel('AssistantReferee', 'Nation'):Parenthesis()</text>
+			<lua>end</lua>
+			<text col_start="5" col_end="0" align="left" >traduction(language,'ARRIVEE')</text>
+			<text col_start="5" col_end="0" align="right" >$(Epreuve_Alpine_Manche.Altitude_Arrivee):Suffix(' m')</text>
+
+			<row value="auto" />
+			<text col_start="1" align="left">traduction(language, 'DIRECTEUR D\'ÉPREUVE')</text>
+			<text col_start="2" align="left">base:GetOfficiel('ChiefRace', 'Nom')..' '..base:GetOfficiel('ChiefRace', 'Prenom')</text>
+			<text col_start="3" align="right">base:GetOfficiel('ChiefRace', 'Nation'):Parenthesis()</text>
+			<text col_start="5" col_end="0" align="left" >traduction(language,'DENIVELEE')</text>
+			<lua>denivelee = tonumber($(Epreuve_Alpine_Manche.Altitude_Depart,'','0')) - tonumber($(Epreuve_Alpine_Manche.Altitude_Arrivee,'','0'))</lua>
+			<text col_start="5" col_end="0" align="right">tostring(denivelee):Suffix(' m')</text>
+
+			<row value="auto" />
+			<text col_start="1" col_end="3" align="center" underlined="1" font_weight="bold" cond="base:GetTable('Epreuve'):GetCell('Code_niveau',0) ~= 'EC'">traduction(language, 'MEMBRES OFFICIELS')</text>
+			<text col_start="5" col_end="0" align="left" >traduction(language,'LONGUEUR')</text>
+			<text col_start="5" col_end="0" align="right" >$(Epreuve_Alpine_Manche.Longueur):Suffix(' m')</text>
+			
+			<row value="auto" />
+			<text col_start="1" align="left" cond="base:GetTable('Epreuve'):GetCell('Code_niveau',0) ~= 'EC'">traduction(language, 'JUGE AU DÉPART')</text>
+			<text col_start="2" align="left" cond="base:GetTable('Epreuve'):GetCell('Code_niveau',0) ~= 'EC'">base:GetOfficiel('StartReferee', 'Nom')..' '..base:GetOfficiel('StartReferee', 'Prenom')</text>
+			<text col_start="3" align="right" cond="base:GetTable('Epreuve'):GetCell('Code_niveau',0) ~= 'EC'">base:GetOfficiel('StartReferee', 'Nation'):Parenthesis()</text>
+			<text col_start="5" col_end="0" align="left" >traduction(language,'HOMOLOGATION PISTE')</text>
+			<text col_start="6" col_end="0" align="right" cond="entite=='FIS'">$(Pistes.Homologation_fis)</text>
+			<text col_start="6" col_end="0" align="right" cond="entite=='FFS'">$(Pistes.Homologation_ffs)</text>
+
+			<row value="auto" />
+			<text col_start="1" align="left" cond="base:GetTable('Epreuve'):GetCell('Code_niveau',0) ~= 'EC'">traduction(language, 'JUGE A L\'ARRIVÉE')</text>
+			<text col_start="2" align="left" cond="base:GetTable('Epreuve'):GetCell('Code_niveau',0) ~= 'EC'">base:GetOfficiel('FinishReferee', 'Nom')..' '..base:GetOfficiel('FinishReferee', 'Prenom')</text>
+			<text col_start="3" align="right" cond="base:GetTable('Epreuve'):GetCell('Code_niveau',0) ~= 'EC'">base:GetOfficiel('FinishReferee', 'Nation'):Parenthesis()</text>
+			<text col_start="5" col_end="0" align="left" >traduction(language,'HOMOLOGATION CHRONO')</text>
+			<text col_start="6" col_end="0" align="right">$(Epreuve_Alpine.Homologation_chrono)</text>
+
+			<row value="auto" />
+			<text col_start="1" align="left" cond="base:GetTable('Epreuve'):GetCell('Code_niveau',0) ~= 'EC'">traduction(language, 'CHRONOMÉTREUR')</text>
+			<text col_start="2" align="left" cond="base:GetTable('Epreuve'):GetCell('Code_niveau',0) ~= 'EC'">base:GetOfficiel('TimingBy', 'Nom')..' '..base:GetOfficiel('TimingBy', 'Prenom')</text>
+			<text col_start="3" align="right" cond="base:GetTable('Epreuve'):GetCell('Code_niveau',0) ~= 'EC'">base:GetOfficiel('TimingBy', 'Nation'):Parenthesis()</text>
+			<line col_start="4" row_start="2" row_end="0" pen_color="dkgray" border="mid_vert" />	
+			<row value="0.2cm" />
+			<line col_start="1" col_end="0" pen_color="dkgray" border="bottom" />
+			
+			<row value="0.2cm" />
+			<row value="auto" />
+			<text col_start="2" align="left" underlined="1" font_size_step="1" font_weight="bold" >traduction(language,'1ère MANCHE')</text>
+			<text col_start="6" align="left" underlined="1" font_size_step="1" font_weight="bold" cond="manche2_ok">traduction(language,'2ième MANCHE')</text>
+		
+			<row value="auto" />
+			<text col_start="1" align="left">traduction(language,'TRACEUR')</text>
+			<text col_start="2" align="left">$(Epreuve_Alpine_Manche.Nom_traceur)..' '..$(Epreuve_Alpine_Manche.Prenom_traceur)</text>
+			<text col_start="3" align="right">$(Epreuve_Alpine_Manche.Code_nation_traceur):Parenthesis()</text>
+			<text col_start="5" align="left" cond="manche2_ok">traduction(language,'TRACEUR')</text>
+			<text col_start="6" col_end="0" align="left" cond="manche2_ok">$(Epreuve_Alpine_Manche[1].Nom_traceur)..' '..$(Epreuve_Alpine_Manche[1].Prenom_traceur)</text>
+			<text col_start="7" col_end="0" align="right" cond="manche2_ok">$(Epreuve_Alpine_Manche[1].Code_nation_traceur):Parenthesis()</text>
+
+			<lua>for i=1, 5 do</lua>
+				<row value="auto" />
+				<text col_start="1" align="left" cond="i==1">traduction(language,'OUVREUR(S)')</text>
+				<text col_start="1" align="right">'- '..string.char(64+i)..' -'</text>
+				<text col_start="2" align="left">$(ouvreurM1[i-1].Nom)..' '..$(ouvreurM1[i-1].Prenom)</text>
+				<text col_start="3" align="right">$(ouvreurM1[i-1].Nation):Parenthesis()</text>
+				<text col_start="5" align="left" cond="i == 1 and manche2_ok">traduction(language,'OUVREUR(S)')</text>
+				<text col_start="5" align="right" cond="manche2_ok">'- '..string.char(64+i)..' -'</text>
+				<text col_start="6" align="left" cond="manche2_ok">$(ouvreurM2[i-1].Nom)..' '..$(ouvreurM2[i-1].Prenom)</text>
+				<text col_start="7" align="right" cond="manche2_ok">$(ouvreurM2[i-1].Nation):Parenthesis()</text>
+			<lua>end</lua>
+			
+			<row value="auto" />
+			<text col_start="1" align="left">traduction(language,'NB DE PORTES')</text>
+			<text col_start="2" align="left">$(Epreuve_Alpine_Manche[0].Nombre_de_portes)</text>
+			<text col_start="5" align="left" cond="manche2_ok">traduction(language,'NB DE PORTES')</text>
+			<text col_start="6" align="left" cond="manche2_ok">$(Epreuve_Alpine_Manche[1].Nombre_de_portes)</text>
+
+			<row value="auto" />
+			<text col_start="1" align="left" cond="discipline:In('SG','GS','SL')">traduction(language,'NB DE CHANG. DE DIRECTIONS')</text>
+			<text col_start="2" align="left" cond="discipline:In('SG','GS','SL')">$(Epreuve_Alpine_Manche[0].Changement_de_directions)</text>
+			<text col_start="5" align="left" cond="manche2_ok and discipline:In('SG','GS','SL')">traduction(language,'NB DE CHANG. DE DIRECTIONS')</text>
+			<text col_start="6" align="left" cond="manche2_ok and discipline:In('SG','GS', 'SL')">$(Epreuve_Alpine_Manche[1].Changement_de_directions)</text>
+		
+			<row value="auto" />
+			<text col_start="1" align="left">traduction(language,'HEURE DE DEPART')</text>
+			<text col_start="2" align="left">$(Epreuve_Alpine_Manche[0].Heure_depart)</text>
+			<text col_start="5" align="left" cond="manche2_ok">traduction(language,'HEURE DE DEPART')</text>
+			<text col_start="6" align="left" cond="manche2_ok">$(Epreuve_Alpine_Manche[1].Heure_depart)</text>
+			<lua>if id:sub(1,4) == 'res_' or id == 'stat_participation' then</lua>
+				<row value="auto" />
+				<text col_start="1" col_end="3" align="left">traduction(language,'TEMPERATURE DEPART')..' : '..$(Epreuve_Alpine_Manche[0].Temperature_air_depart,'',0)..'°C      '..traduction(language,'ARRIVEE')..' : '..$(Epreuve_Alpine_Manche[1].Temperature_air_arrivee,'',0)..'°C'</text>
+				<text col_start="5" col_end="0" align="left" cond="manche2_ok">traduction(language,'TEMPERATURE DEPART')..' : '..$(Epreuve_Alpine_Manche[1].Temperature_air_depart,'',0)..'°C      '..traduction(language,'ARRIVEE')..' : '..$(Epreuve_Alpine_Manche[2].Temperature_air_arrivee,'',0)..'°C'</text>
+				
+				<row value="auto" />
+				<text col_start="1" col_end="3" align="left">traduction(language,'TEMPS')..' : '..$(Epreuve_Alpine_Manche[0].Meteo_course)</text>
+				<text col_start="5" col_end="0" align="left" cond="manche2_ok">traduction(language,'TEMPS')..' : '..$(Epreuve_Alpine_Manche[1].Meteo_course)</text>,
+				
+				<row value="auto" />
+				<text col_start="1" col_end="3" align="left">traduction(language,'NEIGE')..' : '..$(Epreuve_Alpine_Manche[0].Neige_course)</text>
+				<text col_start="5" col_end="0" align="left" cond="manche2_ok">traduction(language,'NEIGE')..' : '..$(Epreuve_Alpine_Manche[1].Neige_course)</text>
+				
+				<line col_start="4" row_start="-12" row_end="0" pen_color="dkgray" border="mid_vert" />
+
+				<row value="0.2cm" />
+				<row value="auto" />
+				<line col_start="1" col_end="0" border="top|bottom" pen_color="dkgray"/>
+				<font weight="bold" />
+				<text col_start="1" col_end="0" align="left" cond="officiel=='1' or id=='stat_participation'">traduction(language,"PENALITE DE L\'EPREUVE")..': '..$(Epreuve.Penalite_appliquee)</text>
+				<text col_start="1" col_end="0" align="center">traduction(language,'LISTE')..': '..$(Evenement.Code_liste)</text>
+				<text col_start="1" col_end="0" align="right">'F: '..$(Discipline.Facteur_f)</text>
+
+			<lua>end</lua>
+			<row value="0.25cm" />
+		<lua>end</lua>
+	</first_header>
+
+
+	<!-- CompteursHandi -->
+	<option id="CompteursHandi">
+		<need h="6cm" />
+		<lua>
+			activite = $(Evenement.Code_activite)
+			if activite:In('FOND','ROL','BIATH','CN','SAUT') then
+				tEpreuveNordique = base:GetTable("Epreuve_Nordique")
+				dt = tEpreuveNordique:GetCell('Nom_dt', 0)
+				dt_code = tEpreuveNordique:GetCell('Code_dt', 0)
+				dt_nation = tEpreuveNordique:GetCell('Code_Nation_dt', 0)
+			else
+				tEpreuveAlpine = base:GetTable("Epreuve_Alpine")
+				dt = tEpreuveAlpine:GetCell('Nom_dt', 0)
+				dt_code = tEpreuveAlpine:GetCell('Code_dt', 0)
+				dt_nation = tEpreuveAlpine:GetCell('Code_Nation_dt', 0)
+			end
+		</lua>
+		<row value="0.5cm" />
+		<matrix row="auto" col_start="1" col_end="0" >
+			<col value="2,1,1,1,1,5" />
+			<text row="auto" col_start="1" col_end="4" font_weight="bold"><pen size="5" border="bottom" />traduction(language, 'Statistiques de Course')</text>
+			<text row="auto" col_start="1" font_weight="bold" >traduction(language, 'Inscrits')</text>"
+			<text col_start="(nb_manche+2)" align="center" font_weight="bold" >body:GetNbRows()</text>
+			<row value="auto" />
+			<lua>for run=1, nb_manche do</lua>
+				<text col_start="(run+1)" align="center" font_weight="bold" cond="run == 1">traduction(language, 'Manche 1')</text>
+				<text col_start="(run+1)" align="center" font_weight="bold" cond="run == 2">traduction(language, 'Manche 2')</text>
+				<text col_start="(run+1)" align="center" font_weight="bold" cond="run == 3">traduction(language, 'Manche 3')</text>
+			<lua>end</lua>
+			<text row="auto" col_start="1" col_end="4" font_weight="bold"><pen size="2" border="top" />traduction(language, 'Non Qualifiés')</text>"
+			<text row="auto" col_start="1" font_weight="bold">traduction(language, 'Abandons')</text>"
+			<lua>for run=1, nb_manche do</lua>
+				<text col_start="(run+1)" align="center" cond="tStat[run].DNF &gt; 0">tStat[run].DNF</text>
+			<lua>end</lua>
+			<text col_start="(nb_manche+2)" align="center" cond="tStat[99].DNF &gt; 0">tStat[99].DNF</text>
+			<text row="auto" col_start="1" font_weight="bold">traduction(language, 'Interdits de Départ')</text>"
+			<text row="auto" col_start="1" font_weight="bold">traduction(language, 'Absents')</text>"
+			<lua>for run=1, nb_manche do</lua>
+				<text col_start="(run+1)" align="center" cond="tStat[run].DNS &gt; 0">tStat[run].DNS</text>
+			<lua>end</lua>
+			<text col_start="(nb_manche+2)" align="center" cond="tStat[99].DNS &gt; 0">tStat[99].DNS</text>
+			<text row="auto" col_start="1" font_weight="bold">traduction(language, 'Disqualifiés')</text>
+
+			<lua>for run=1, nb_manche do</lua>
+				<text col_start="(run+1)" align="center" cond="tStat[run].DSQ &gt; 0">tStat[run].DSQ</text>
+			<lua>end</lua>
+			<text col_start="(nb_manche+2)" align="center" cond="tStat[99].DSQ &gt; 0">tStat[99].DSQ</text>
+			<text row="auto" col_start="1" col_end="4" font_weight="bold" ><pen border="top, bottom" />traduction(language, 'Classés')</text>
+			<text col_start="(nb_manche+2)" align="center" font_weight="bold" >body:GetCounterValue('Tps_status', 'ok')</text>
+			<text row="auto" row_start="-1" col_start="6" font_weight="bold" cond="officiel==1" ><pen border="top" />dt..' # '..dt_nation..'.'..dt_code</text>
+			<text row="auto" row_start="0" col_start="6" font_weight="bold" cond="officiel==1 and entite == 'FIS'">traduction(language, 'Délégué Technique FIS')</text>
+			<text row="auto" row_start="0" col_start="6" font_weight="bold" cond="officiel==1 and entite == 'FFS'">traduction(language, 'Délégué Technique FFH')</text>
+		</matrix>
+	</option>
+
+	<!-- Pénalité Alpine -->
+	<report id="penalite" title="Calcul de la Pénalité" first_header="0">
+		<lua>dofile('./edition/functionPG.lua');
+			dofile('./edition/traductionPG.lua');
+			dofile('./interface/adv.lua');</lua>
+		<end>
+		<lua>language = params.Language or 'fr'</lua>
+			<lua>entite = base:GetTable("Evenement"):GetCell("Code_entite", 0)</lua>
+			<lua>best10 = base:GetTable("best10")</lua>
+			<lua>best5 = base:GetTable("best5")</lua>
+			
+			<!-- Label -->
+			<row value="auto"/>
+			<font size="10" name ="calibri" weight="bold" adjust="best" />
+			<text col="4" align="center">'Rank'</text>
+			<text col="4" align="center">'Bib'</text>
+			<text col="24" align="center">'Name'</text>
+			<text col="4" align="center">'NPC\nCode'</text>
+			<text col="8" align="center">'WPAS\nPoints'</text>
+			<text col="8" align="center">'Best 5'</text>
+			<text col="8" align="center">'Race\nPts'</text>
+
+			<!-- 10 Meilleurs à l'arrivée -->
+			<text row="auto" col_start="1" col_end="0" align="center" ><pen size="2" border="top, bottom" /><font size="12" />'Best 10 At Finish'</text>
+			<lua>for i=0, best10:GetNbRows()-1 do</lua>
+				<row value="auto" />
+				<text lua="c=1" col_start="(c)" align="right">best10:GetCell('Clt',i)</text>
+				<text lua="c=c+1" col_start="(c)" align="right">best10:GetCell('Dossard',i)</text>
+				<text lua="c=c+1" col_start="(c)" align="left">best10:GetCell('Identite',i)</text>
+				<text lua="c=c+1" col_start="(c)" cond="entite == 'FIS'" align="center">best10:GetCell('Nation',i)</text>
+				<text lua="c=c+1" col_start="(c)" align="right">best10:GetCell('Point',i)</text>
+				<text lua="c=c+1" col_start="(c)" align="right">best10:GetCell('5Best',i)</text>
+				<text lua="c=c+1" col_start="(c)" align="right">best10:GetCell('Pts',i)</text>
+			<lua>end</lua>
+			
+			<!-- 5 Meilleurs Point Liste au départ -->
+			<text row="auto" col_start="1" col_end="0" align="center" ><font size="12" />'Best 5 Points at Start'</text>
+			<lua>for i=0, best5:GetNbRows()-1 do</lua>
+				<row value="auto" />
+				<text lua="c=1" col_start="(c)" align="right">best5:GetCell('Clt',i)</text>
+				<text lua="c=c+1" col_start="(c)" align="right">best5:GetCell('Dossard',i)</text>
+				<text lua="c=c+1" col_start="(c)" align="left">best5:GetCell('Identite',i)</text>
+				<text lua="c=c+1" col_start="(c)" cond="entite == 'FIS'" align="center">best5:GetCell('Nation',i)</text>
+				<text lua="c=c+1" col_start="(c)" align="right">best5:GetCell('Point',i)</text>
+			<lua>end</lua>
+
+			<!-- Total -->
+			<text row="auto" col_start="1" col_end="0" align="center" ><font size="12" />'TOTALS'</text>
+			<font size="11" />
+			<text row="auto" col_start="1" col_end="5" align="left">'WPAS Points of Best 5 at Start (B)'</text>
+			<text col_start="-2" border="1" align="right">string.format('%-.2f', params.B)</text>
+			<text row="auto" col_start="1" col_end="5" align="left">'WPAS Points of Best 5 at Finish in Top 10 (A)'</text>
+			<text col_start="-1" border="1" align="right" adjust="best">string.format('%-.2f', params.A)</text>
+			<text row="auto" col_start="1" col_end="5" align="left">'Race Points of corrzsponding competitors (C)'</text>
+			<text col_start="0" border="1" align="right">string.format('%-.2f', params.C)</text>
+			<text row="auto" col_start="1" col_end="5" align="left">'Calculated penalty (A+B-C):10 = '..string.format('%-.2f', params.A+params.B-params.C)..' / 10'</text>
+			<text col_start="-2" border="1" align="right">string.format('%-.2f', params.penalite_calculee)</text>
+			<text row="auto" col_start="1" col_end="5" align="left">'Category Adder'</text>
+			<text col_start="-2" border="1" align="right">string.format('%-.2f', params.additif_circuit)</text>
+			<text row="auto" col_start="1" col_end="5" align="left">'Z value'</text>
+			<text col_start="-2" border="1" align="right">string.format('%-.2f', params.valeur_correction)</text>
+			<text row="auto" col_start="1" col_end="5" align="left">'Penalty Applied'</text>
+			<text col_start="-2" border="1" align="right">string.format('%-.2f', params.penalite_appliquee)</text>
+	
+			DT Signature
+			<call option="signature_dt" file="./edition/options.xml" />
+		</end>
+	</report>
+	
+	<!-- Participants Par Ordre Alphabétique -->
+	<report id="parti_alpha" title="Liste des Participants par Ordre Alphabétique" first_header="0">
+		<lua>dofile('./edition/functionPG.lua');
+			dofile('./edition/traductionPG.lua');
+			dofile('./interface/adv.lua');</lua>
+		<lua>language = params.Language or 'fr'</lua>
+		<lua>InitReportHandi(params.Code_evenement)</lua>
+		<lua>entite = $(Evenement.Code_entite)</lua>
+		
+		<order key="Nom,Prenom" />
+
+		<body>
+			<call option="couleur_alternee" file="./edition/options.xml" />
+
+			<row value="auto"/>
+			<text col="5" align="center" label="Code"><font size="8" cond="group =='body'"/>$(Code_coureur):sub(4)</text>
+			<text col="18" label="(traduction(language, 'Nom'))" cond="string.sub(body:GetCell('Groupe', row),1,1) ~= 'B'">$(Identite)</text> 
+			<text col="18" label="(traduction(language, 'Nom'))" cond="string.sub(body:GetCell('Groupe', row),1,1) == 'B'">$(Identite)..'\nGuide : '..$(Equipe)</text> 
+			<text col="3" align="center" label="(traduction(language, 'Sexe'))" >$(Sexe)</text> 
+			<text col="1.5cm" align="center" label="(traduction(language, 'Categ\nHandi'))" >$(Groupe)</text> 
+			<text col="4" align="center" label="(traduction(language, 'Coef.'))">$(Critere)</text>
+			<text col="4" align="center" label="(traduction(language, 'Année'))">$(An)</text>
+			<text col="4" align="center" label="(traduction(language, 'Nation'))" cond="entite == 'FIS'">$(Nation)</text>
+			<text col="4" align="center" label="CS" cond="entite == 'FFS'">$(Comite)</text>
+			<text col="12" align="center" label="Club" cond="entite == 'FFS'">$(Club)</text>
+			<text col="7" align="center" label="WPAS Pts">$(Point)</text>
+			<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
+		</body>
+	</report>
+	
+	<!-- Participants Par Ordre dynamique -->
+	<report id="participant" title="('Liste dynamique des Participants Par '..params.OrderBy)" first_header="0">
+		<lua>dofile('./edition/functionPG.lua');
+			dofile('./edition/traductionPG.lua');
+			dofile('./interface/adv.lua');</lua>
+		<lua>language = params.Language or 'fr'</lua>
+		<lua>InitReportHandi(params.Code_evenement)</lua>
+		<lua>entite = $(Evenement.Code_entite)</lua>
+		<lua>body:SetCounter(params.OrderBy)</lua>
+		<order key="(params.OrderBy..', Nom,Prenom')" />
+		
+		<rupture key="(params.OrderBy)">
+			<before>
+				<pagebreak cond="params.PageBreak == 1 and row ~= 0" />
+				<font size="13"/>
+				<row value="0.5cm" />
+				<lua>code = body:GetCell(params.OrderBy, row)</lua>
+				<text row="auto" col="1" cond="params.OrderBy == 'Comite' and $(Comite) ~= '-' and code:len() &gt; 0">code..' - '..$(Comite{code}.Nom)..' ('..body:GetCounterValue(params.OrderBy, code)..')'</text>
+				<text row="auto" col="1" cond="params.OrderBy == 'Comite' and $(Comite) == '-'">'Without Comitee ('..body:GetCounterValue(params.OrderBy, code)..')'</text>
+				<text row="auto" col="1" cond="params.OrderBy ~= 'Comite' and code:len() &gt; 0">code..' ('..body:GetCounterValue(params.OrderBy, code)..')'</text>
+			</before>
+		</rupture>
+
+		<body>
+			<call option="couleur_alternee" file="./edition/options.xml" />
+			<row value="auto"/>
+			<text col="4" align="center" label="Code"><font size="8" cond="group =='body'"/>$(Code_coureur):sub(4)</text>
+			<text col="18" label="(traduction(language, 'Identité'))" cond="string.sub(body:GetCell('Groupe', row),1,1) ~= 'B'">$(Identite)</text> 
+			<text col="18" label="(traduction(language, 'Identité'))" cond="string.sub(body:GetCell('Groupe', row),1,1) == 'B'">$(Identite)..'\nGuide : '..$(Equipe)</text> 
+			<text col="3" align="center" label="(traduction(language, 'Sexe'))" >$(Sexe)</text> 
+			<text col="1.5cm" align="center" label="(traduction(language, 'Categ\nHandi'))" >$(Groupe)</text> 
+			<text col="4" align="center" label="(traduction(language, 'Coef.'))">$(Critere)</text>
+			<text col="4" align="center" label="(traduction(language, 'Année'))">$(An)</text>
+			<text col="4" align="center" label="(traduction(language, 'Nation'))" cond="entite == 'FIS'">$(Nation)</text>
+			<text col="4" align="center" label="CS" cond="entite == 'FFS'">$(Comite)</text>
+			<text col="12" align="center" label="Club" cond="entite == 'FFS'">$(Club)</text>
+			<text col="7" align="center" label="WPAS Pts">$(Point)</text>
+			<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
+		</body>
+	</report>
+		
+	<!-- Participants Par handicap + alpha -->
+	<report id="parti_handicap" title="Liste Alphabétique des Participants par Handicap" first_header="0">
+		<lua>dofile('./edition/functionPG.lua');
+			dofile('./edition/traductionPG.lua');
+			dofile('./interface/adv.lua');</lua>
+		<lua>language = params.Language or 'fr'</lua>
+		<lua>InitReportHandi(params.Code_evenement)</lua>
+		<lua>entite = $(Evenement.Code_entite)</lua>
+		<lua>body:SetCounter('Reserve')</lua>
+		<order key="Reserve, Sexe, Nom, Prenom" />
+		
+		<rupture key="Reserve" label="1">
+			<before>
+				<pagebreak cond="params.PageBreak == 1 and row ~= 0" />
+				<!-- <need h="(tostring(5+5)..'cm')" /> -->
+				<font size="13"/>
+				<row value="0.5cm" />
+				<lua>reserve = $(Reserve)</lua>
+				<text row="auto" col="1">$(Label_group)..' ('..body:GetCounterValue('Reserve', reserve)..')'</text>
+			</before>
+		</rupture>
+
+		<body>
+			<call option="couleur_alternee" file="./edition/options.xml" />
+
+			<row value="auto"/>
+			<text col="7" align="center" label="Code"><font size="8" cond="group =='body'"/>$(Code_coureur):sub(4)</text>
+			<text col="18" label="(traduction(language,'Nom'))" cond="string.sub(body:GetCell('Groupe', row),1,1) ~= 'B'">$(Identite)</text> 
+			<text col="18" label="(traduction(language,'Nom'))" cond="string.sub(body:GetCell('Groupe', row),1,1) == 'B'">$(Identite)..'\nGuide : '..$(Equipe)</text> 
+			<text col="3" align="center" label="(traduction(language,'Sexe'))" >$(Sexe)</text> 
+			<text col="1.5cm" align="center" label="(traduction(language,'Categ\nHandi'))" >$(Groupe)</text> 
+			<text col="4" align="center" label="(traduction(language, 'Coef.'))">$(Critere)</text>
+			<text col="4" align="center" label="(traduction(language,'Année'))">$(An)</text>
+			<text col="4" align="center" label="(traduction(language,'Nation'))" cond="entite == 'FIS'">$(Nation)</text>
+			<text col="4" align="center" label="CS" cond="entite == 'FFS'">$(Comite)</text>
+			<text col="12" align="center" label="Club" cond="entite == 'FFS'">$(Club)</text>
+			<text col="7" align="center" label="WPAS Pts">$(Point)</text>
+			<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
+		</body>
+	</report>
+	
+	<!-- Participants Etiquette -->
+	<report id="parti_etiquette" title="Liste Alphabétique des Participants par Handicap" first_header="0">
+		<lua>dofile('./edition/functionPG.lua');
+			dofile('./edition/traductionPG.lua');
+			dofile('./interface/adv.lua');</lua>
+		<lua>language = params.Language or 'fr'</lua>
+		<lua>InitReportHandi(params.Code_evenement)</lua>
+		<lua>entite = $(Evenement.Code_entite)</lua>
+		<header />
+		<firstheader />
+		<footer />
+		<label />
+		<layers />
+		<layer />
+		<order key="(params.OrderBy)" />
+		<lua>x = 0;</lua>
+		
+		<body>
+			<lua>x = x + 1;</lua>
+			<font size="12" weight="bold" cond="group =='body'"/>
+			<row value="0.3cm"/>
+			<row value="3.2cm"/>
+			<image col="8" adjust="height" align="center" border="0" cond="entite == 'FIS'"><background mode="transparent"/>app.ImageNation($(Nation))</image> 
+			<text col="4" align="center" >$(Nation)</text>
+			<text col="10" label="(traduction(language,'Nom'))" cond="string.sub(body:GetCell('Groupe', row),1,1) ~= 'B'">$(Identite)</text> 
+			<text col="10" label="(traduction(language,'Nom'))" cond="string.sub(body:GetCell('Groupe', row),1,1) == 'B'">$(Identite)..'\nGuide : '..$(Equipe)</text> 
+			<text col="5" label="(traduction(language,'Categ\nHandi')" >$(Groupe)</text> 
+			<text col="4" align="center" label="(traduction(language, 'Coef.'))">$(Critere)</text>
+			<text col="4" align="center" label="(traduction(language,'Année'))">$(An)</text>
+			<text col="5" align="center" label="WPAS Pts">$(Point)</text>
+			<row value="0.3cm"/>
+			<line col_start="1" col_end="0" pen_size="1" border="bottom" cond="x &lt; 5 and not _context_border"/>
+			<lua>if x == 5 then x = 0; end</lua>
+		</body>
+	</report>
+	
+	<!-- Liste de départ Officielle -->
+	<report id="lst_officiel" title="(params.Titre)">
+		<lua>dofile('./edition/functionPG.lua');
+			dofile('./edition/traductionPG.lua');
+			dofile('./interface/adv.lua');</lua>
+		<lua>language = params.Language or 'fr'</lua>
+		<lua>dofile('./interface/adv.lua');</lua>
+		<lua>InitReportHandi(params.Code_evenement)</lua>
+		<lua>entite = $(Evenement.Code_entite);
+			manche = tonumber(params.Manche) or 1;
+		</lua>
+		
+		<order key="('Rang'..manche..', Dossard')" />
+
+		<body>
+			<call option="couleur_alternee" file="./edition/options.xml" />
+			<font size="9" adjust="ellipsize"/>
+
+			<row h="auto"/>
+			<lua>if manche == 2 then</lua>
+				<text col="5" align="center" label="Order">$(Rang2)</text>
+			<lua>end</lua>
+			<text col="4" align="center" label="(traduction(language,'Dos.'))" >$(Dossard)</text>
+			<!-- <text col="7" align="center" label="Code"><font size="10" cond="group =='body'"/>$(Code_coureur):sub(4)</text> -->
+			<text col="7" align="center" label="Code">$(Code_coureur):sub(4)</text>
+			<text col="20" align="left" label="(traduction(language,'Identité'))" font_weight="bold" cond="string.sub(body:GetCell('Groupe', row),1,1) ~= 'B'">$(Identite)</text> 
+			<text col="20" align="left" label="(traduction(language,'Identité'))" font_weight="bold" cond="string.sub(body:GetCell('Groupe', row),1,1) == 'B'">$(Identite)..'\nGuide : '..$(Equipe)</text> 
+			<text col="2" align="center" label="(traduction(language,'Sexe'))">$(Sexe)</text>
+			<text col="4" align="center" label="(traduction(language,'Année'))">$(An)</text>:
+			<text col="4" align="center" label="Cat.">$(Categ)</text>
+			<lua>if manche == 1 then</lua>
+				<text col="7"  align="center" label="Sport Class" >$(Groupe)</text> 
+			<lua>end</lua>
+			<text col="4" align="center" label="(traduction(language,'Nation'))" cond="entite == 'FIS'">$(Nation)</text>
+			<text col="3" align="center" label="CS">$(Comite)</text>
+			<text col="12" align="center" label="Club">$(Club)</text>
+			<text col="7" align="center" label="Pts">$(Point)</text>
+			<lua>if manche == 2 then</lua>
+				<text col="11" align="center" label="T.M1" font_weight="bold">$(Tps1)..' ('..$(Clt1)..')'</text>
+				<text col="5" align="center" label="Diff">$(Diff1)</text>
+				<!-- <text col="4" align="center" label="C.M1" font_weight="bold">$(Clt1)</text> -->
+			<lua>end</lua>
+			<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
+		</body>
+	</report>
+	
+	<!-- Liste de départ par Club -->
+	<report id="lst_club" title="Liste Par Club" first_header="0">
+		<lua>dofile('./edition/functionPG.lua');
+			dofile('./edition/traductionPG.lua');
+			dofile('./interface/adv.lua');</lua>
+		<lua>language = params.Language or 'fr'</lua>
+		<lua>InitReportHandi(params.Code_evenement)</lua>
+		<lua>entite = $(Evenement.Code_entite)</lua>
+		<lua>body:SetCounter('Club')</lua>
+		<order key="Club,Nom,Prenom" />
+
+		<rupture key="Club">
+			<before>
+				<pagebreak cond="params.PageBreak == 1 and row ~= 0" />
+				<font name="Calibri" size="16"/>
+				<lua>club = $(Club)</lua>
+				<text row="0.3cm" col="1" />
+				<text row="auto" >club..' ('..body:GetCounterValue('Club', club)..')'</text>
+			</before>
+		</rupture>
+
+		<body>
+			<call option="couleur_alternee" file="./edition/options.xml" />
+	
+			<row value="auto"/>
+			<text col="4" align="center" label="(traduction(language,'Dos.'))" font_weight="bold" font_size_step="1">$(Dossard)</text>
+			<text col="7" align="center" label="Code">$(Code_coureur):sub(4)</text>
+			<text col="20" align="left" label="(traduction(language,'Identité'))" font_weight="bold" cond="string.sub(body:GetCell('Groupe', row),1,1) ~= 'B'">$(Identite)</text> 
+			<text col="20" align="left" label="(traduction(language,'Identité'))" font_weight="bold" cond="string.sub(body:GetCell('Groupe', row),1,1) == 'B'">$(Identite)..'\nGuide : '..$(Equipe)</text> 
+			<text col="2" align="center" label="(traduction(language,'Sexe'))">$(Sexe)</text>
+			<text col="4" align="center" label="(traduction(language,'Année'))">$(An)</text>
+			<text col="7" align="center" label="Cat.">$(Categ)</text>
+			<text col="4" align="center" label="(traduction(language,'Nation'))" cond="entite == 'FIS'">$(Nation)</text>
+			<text col="2" align="center" label="CS">$(Comite)</text>
+			<text col="12" align="center" label="Club">$(Club)</text>
+			<text col="7" align="center" label="WPAS Pts">$(Point)</text>
+			<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
+		</body>
+	</report>
+	
+	<!-- Liste de départ par Comité -->
+	<report id="lst_comite" title="Liste Par Comité" first_header="0">
+		<lua>dofile('./edition/functionPG.lua');
+			dofile('./edition/traductionPG.lua');
+			dofile('./interface/adv.lua');</lua>
+		<lua>language = params.Language or 'fr'</lua>
+		<lua>InitReportHandi(params.Code_evenement)</lua>
+		<lua>entite = $(Evenement.Code_entite)</lua>
+		<lua>body:SetCounter('Comite')</lua>
+		<order key="Comite,Dossard,Nom,Prenom" />
+
+		<rupture key="Comite">
+			<before>
+				<pagebreak cond="params.PageBreak == 1 and row ~= 0" />
+				<font name="Calibri" size="16"/>
+				<lua>cs = $(Comite)</lua>
+				<text row="auto" col="1">cs..' - '..$(Comite{cs}.Nom)..' ('..body:GetCounterValue('Comite', cs)..')'</text>
+			</before>
+		</rupture>
+
+		<body>
+			<call option="couleur_alternee" file="./edition/options.xml" />
+	
+			<row value="auto"/>
+			<text col="4" align="center" label="(traduction(language,'Dos.'))" font_weight="bold" font_size_step="1">$(Dossard)</text>
+			<text col="7" align="center" label="Code">$(Code_coureur):sub(4)</text>
+			<text col="20" align="left" label="(traduction(language,'Identité'))" font_weight="bold" cond="string.sub(body:GetCell('Groupe', row),1,1) ~= 'B'">$(Identite)</text> 
+			<text col="20" align="left" label="(traduction(language,'Identité'))" font_weight="bold" cond="string.sub(body:GetCell('Groupe', row),1,1) == 'B'">$(Identite)..'\nGuide : '..$(Equipe)</text> 
+			<text col="2" align="center" label="(traduction(language,'Sexe'))">$(Sexe)</text>
+			<text col="4" align="center" label="(traduction(language,'Année'))">$(An)</text>
+			<text col="7" align="center" label="Cat.">$(Categ)</text>
+			<text col="4" align="center" label="(traduction(language,'Nation'))" cond="entite == 'FIS'">$(Nation)</text>
+			<text col="2" align="center" label="CS">$(Comite)</text>
+			<text col="12" align="center" label="Club">$(Club)</text>
+			<text col="7" align="center" label="WPAS Pts">$(Point)</text>
+
+			<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
+		</body>
+	</report>
+	
+	<!-- Liste de départ par Nation -->
+	<report id="lst_nation" title="Liste Par Nation" first_header="0">
+		<lua>dofile('./edition/functionPG.lua');
+			dofile('./edition/traductionPG.lua');
+			dofile('./interface/adv.lua');</lua>
+		<lua>language = params.Language or 'fr'</lua>
+		<lua>InitReportHandi(params.Code_evenement)</lua>
+		<lua>entite = $(Evenement.Code_entite)</lua>
+		<lua>body:SetCounter('Nation')</lua>
+		<order key="Nation,Dossard, Nom,Prenom," />
+		<rupture key="Nation">
+			<before>
+				<pagebreak cond="params.PageBreak == 1 and row ~= 0" />
+				<font name="Calibri" size="16"/>
+				<lua>nat = $(Nation)</lua>
+				<text row="auto" col="1">nat..' - '..$(Nation{nat}.Libelle)..' ('..body:GetCounterValue('Nation', nat)..')'</text>
+			</before>
+		</rupture>
+
+		<body>
+			<call option="couleur_alternee" file="./edition/options.xml" />
+	
+			<row value="auto"/>
+			<text col="4" align="center" label="(traduction(language,'Dos.'))" font_weight="bold" font_size_step="1">$(Dossard)</text>
+			<text col="7" align="center" label="Code">$(Code_coureur):sub(4)</text>
+			<text col="20" align="left" label="(traduction(language,'Identité'))" font_weight="bold" cond="string.sub(body:GetCell('Groupe', row),1,1) ~= 'B'">$(Identite)</text> 
+			<text col="20" align="left" label="(traduction(language,'Identité'))" font_weight="bold" cond="string.sub(body:GetCell('Groupe', row),1,1) == 'B'">$(Identite)..'\nGuide : '..$(Equipe)</text> 
+			<text col="2" align="center" label="(traduction(language,'Sexe'))">$(Sexe)</text>
+			<text col="4" align="center" label="(traduction(language,'Année'))">$(An)</text>
+			<text col="7" align="center" label="Cat.">$(Categ)</text>
+			<text col="4" align="center" label="(traduction(language,'Nation'))" cond="entite == 'FIS'">$(Nation)</text>
+			<text col="2" align="center" label="CS">$(Comite)</text>
+			<text col="12" align="center" label="Club">$(Club)</text>
+			<text col="7" align="center" label="WPAS Pts">$(Point)</text>
+
+			<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
+		</body>
+		<end>
+			<row value="0.5cm" />
+			<text row="auto" col="1" font_size="14" align="center">'RECAPITULATIF'</text>
+			<row value="auto" count="(body:GetCounter('Nation'):GetNbRows())" />
+			<pen border="all" />
+			<font size="10"/>
+			<lua>body:GetCounter('Nation'):OrderBy('_count_ desc')</lua>
+			<lua>for i=0, body:GetCounterCount('Nation')-1 do </lua>
+				<text row_start="(i+3)" align="center">body:GetCounter('Nation'):GetCell(0,i)..' : '..body:GetCounter('Nation'):GetCell(1,i)</text>
+			<lua>end</lua>
+		</end>
+	</report>
+	
+	<!-- Résultats Manche -->
+	<report id="res_manche" title="('Résultat Manche n°'..params.Manche)" first_header="0">
+		<lua>dofile('./edition/functionPG.lua');
+			dofile('./edition/traductionPG.lua');
+			dofile('./interface/adv.lua');</lua>
+		<lua>language = params.Language or 'fr'</lua>
+		<lua>InitReportHandi(params.Code_evenement)
+			params.Manche = tonumber(params.Manche) or 1;
+		</lua>
+		<column name="Tps_status">chrono.Status(body:GetCellInt('Tps'..params.Manche), row)</column>
+		<lua>body:SetCounter('Tps_status')</lua>
+		<lua>body:SetCounter('Reserve')</lua>
+		<order key="('Reserve, Sexe, Tps'..params.Manche..', Dossard Desc')" />
+		<rupture key="Reserve" label="1">
+			<before >
+				<row value="0.5cm" />
+				<text row="auto" col="1" font_weight="bold" >$(Label_group)..' ('..body:GetCounterValue('Reserve', $(Reserve))..')';</text>
+			</before>
+		</rupture>
+
+		<body>
+			<call option="couleur_alternee" file="./edition/options.xml"/>
+			<font size="9" adjust="ellipsize"/>
+	
+			<row value="auto"/>
+			<lua>valTps = body:GetCellInt('Tps'..params.Manche,row,-1);</lua>
+			<lua>if valTps > 0 then cltManche = body:GetCellInt('Cltc'..params.Manche,row) else cltManche = '' end</lua>
+			<text col="4" align="center" label="(traduction(language,'Clt.'))" font_weight="bold" font_size_step="1">cltManche</text>
+			<text col="4" align="center" label="(traduction(language,'Dos.'))" font_style="italic">$(Dossard)</text>
+			<!-- <text col="7" align="center" label="Code"><font size="8" cond="group =='body'"/>$(Code_coureur):sub(4)</text> -->
+			<text col="18" label="(traduction(language,'Nom'))" cond="string.sub(body:GetCell('Groupe', row),1,1) ~= 'B'">$(Identite)</text> 
+			<text col="18" label="(traduction(language,'Nom'))" cond="string.sub(body:GetCell('Groupe', row),1,1) == 'B'">$(Identite)..'\nGuide:'..$(Equipe)</text> 
+			<text col="3" align="center" label="(traduction(language,'Sexe'))" >$(Sexe)</text> 
+			<text col="1.5cm" align="center" label="(traduction(language,'Categ\nHandi'))" >$(Groupe)</text> 
+			<text col="4" align="center" label="(traduction(language, 'Coef.'))">$(Critere)</text>
+			<text col="2" align="center" label="(traduction(language,'Sexe'))" cond="entite == 'FFS'">$(Sexe)</text>
+			<text col="4" align="center" label="(traduction(language,'Année'))" cond="entite == 'FFS'">$(An)</text>
+			<text col="3" align="center" label="CS" cond="entite == 'FFS'">$(Comite)</text>
+			<text col="10" align="center" label="Club" cond="entite == 'FFS'">$(Club)</text>
+			<text col="4" align="center" label="NPC\nCode" cond="entite == 'FIS'" font_style="italic">$(Nation)</text>
+			<text col="3" align="center" label="CS" cond="entite == 'FFS'" font_style="italic">$(Comite)</text>
+			<text col="12" align="center" label="Club" cond="entite == 'FFS'" font_style="italic">$(Club)</text>
+			<text col="8" align="center" label="Tps" cond="valTps &gt; 0">body:GetCell('Tps'..params.Manche,row)</text> 
+			<!-- <text col="8" align="center" label="Tps" cond="valTps &gt; 0">body:GetCell('Tps1',row)</text>  -->
+			<text col="8" align="center" label="Tps" cond="valTps == -600">'dns'</text> 
+			<text col="8" align="center" label="Tps" cond="valTps == -500">'dnf'</text> 
+			<text col="8" align="center" label="Tps" cond="valTps == -800">'dsq'</text> 
+			<text col="8" align="center" label="Tps" cond="valTps == -1">''</text> 
+
+			<text col="5" align="center" label="Diff." font_style="italic" cond="body:GetCellInt('Diff'..params.Manche,row) &gt; 0">body:GetCell('Diff'..params.Manche,row)</text> 
+			<text col="5" align="center" label="Diff." font_style="italic" cond="body:GetCellInt('Diff'..params.Manche,row) &lt;= 0">''</text> 
+
+			<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
+		</body>
+		
+	</report>
+
+	<!-- Résultats Officiels -->
+	<report id="res_officiel" title="(params.title)">
+		<lua>dofile('./edition/functionPG.lua');
+			dofile('./edition/traductionPG.lua');
+			dofile('./interface/adv.lua');</lua>
+
+		<!-- <lua>GetParamsHandiXML()</lua> -->
+		<lua>InitReportHandi(params.Code_evenement)</lua>
+		<lua>tRanked = params.tRanked</lua>
+		<lua>nb_manche = params.Nb_manche;</lua>
+		<lua>coef_diffmaxi = tonumber(params.CoefDiffMaxi) or 0;</lua>
+		<lua>language = params.Language or 'fr'</lua>
+		<order key="Reserve, Tps_status Desc, Tps" />
+		<rupture key="Reserve, Tps_status" label="1">
+			<before>
+				<lua>
+					reserve = body:GetCellInt('Reserve', row);
+					status = body:GetCell('Tps_status', row);
+					strStatus = '';
+					if reserve == 1 then
+						count_status = body:GetCounterValue('Tps_g1', status);
+					end
+					if reserve == 2 then
+						count_status = body:GetCounterValue('Tps_g2', status);
+					end
+					if reserve == 3 then
+						count_status = body:GetCounterValue('Tps_g3', status);
+					end
+					if reserve == 4 then
+						count_status = body:GetCounterValue('Tps_g4', status);
+					end
+					if status == 'dnf' then
+						strStatus = traduction(language,'Abandon');
+					elseif status == 'nps' then
+						strStatus = traduction(language, 'Interdit de départ');
+					elseif status == 'dns' then
+						strStatus = traduction(language, 'Absent');
+					elseif status == 'dsq' then
+						strStatus = traduction(language,'Disqualifié');
+					end
+				</lua>
+				<lua>if status ~= 'ok' then
+					count_status = count_status or 1;</lua>
+					<need h="(tostring(1 + count_status * 0.5)..'cm')" />
+				<lua>else</lua>
+					<row value="0.5cm"/>
+				<lua>end</lua>
+
+				<text border="1" row="0.8cm" col="1" font_weight="bold" cond="$(Tps_status) == 'ok'">$(Label_group)..' - race #'..string.sub($(Evenement.Nom),-1)</text>
+				<text border="1" row="0.8cm" col="1" font_weight="bold" cond="$(Tps_status) ~= 'ok'">strStatus..' ( '..count_status..' )'</text>
+			</before>
+		</rupture>
+		<body>
+			<call option="couleur_alternee" file="./edition/options.xml"/>
+			<font size="8" adjust="width"/>
+			<col value="3,3,18,4,2,3,3,8,6,5,5" />
+			<!-- <text row="0.8cm" col_start="1" col_end="0" cond="idem == 0" align="left" font_weight="bold" font_size_step="1"><pen border="all" />$(Label_group)..'toto'</text> -->
+			<text row="auto" col_start="1" align="center" label="(traduction(language, 'Clt.'))" font_weight="bold" font_size_step="1">$(Cltc)</text>
+			<text col_start="2" align="center" label="(traduction(language,'Dos.'))" font_style="italic">$(Dossard)</text>
+			<text col_start="3" label="(traduction(language,'Nom'))" cond="string.sub(body:GetCell('Groupe', row),1,1) ~= 'B'">$(Identite)</text> 
+			<text col_start="3" label="(traduction(language,'Nom'))" cond="string.sub(body:GetCell('Groupe', row),1,1) == 'B'">$(Identite)..'\nGuide : '..$(Equipe)</text> 
+			<text col_start="4" align="center" label="(traduction(language,'Categ\nHandi'))" >$(Groupe)</text> 
+			<text col_start="5" align="center" label="(traduction(language,'Sexe'))" >$(Sexe)</text>
+			<text col_start="6" align="center" label="(traduction(language,'An'))" >$(An)</text>
+			<text col_start="7" align="center" label="CS" cond="entite == 'FFS'">$(Comite)</text>
+			<text col_start="7" align="center" label="NPC\nCode" cond="entite == 'FIS'" font_style="italic">$(Nation)</text>
+			
+			<!-- <text col_start="8"  align="center" label="Club">$(Club)</text> -->
+			<!-- <image col_start="8" adjust="height" align="right" border="0" cond="entite == 'FIS'"><background mode="transparent"/>app.ImageNation($(Nation))</image>  -->
+			
+			<lua>valTps = body:GetCellInt('Tps',row);
+				cltc = body:GetCellInt('Cltc',row);
+				reserve = body:GetCellInt('Reserve',row);
+				diff = 0;
+				bol_diff_maxi = false;
+				nb_group = body:GetCounterValue('Tps_g'..reserve, 'ok')
+				if cltc == 1 then
+					besttime = valTps;
+					diffmaxi = besttime * coef_diffmaxi;
+					body:SetCell('PtsCM', row, GetPointPlaceHandi(cltc, nb_group));
+				elseif valTps &gt; 0 then
+					bestime = besttime or 0;
+					diff = valTps - besttime;
+					if diff  &gt; diffmaxi then
+						body:SetCellNull('PtsCM', row);
+						bol_diff_maxi = true;
+					else
+						body:SetCell('PtsCM', row, GetPointPlaceHandi(cltc, nb_group));
+					end
+				end
+				body:SetCell('Diff', row, diff);
+				labeldiff = 'Diff max='..app.TimeToString(diffmaxi, '%-1h%-1m%2s.%2f');
+			</lua>
+			<text col_start="8" align="center" label="(traduction(language,'Résultat'))" font_weight="bold" font_size_step="1" cond="valTps &gt; 0">$(Tps)</text> 
+			<text col_start="8" align="center" label="(traduction(language,'Résultat'))" font_weight="bold" font_size_step="1" cond="valTps &lt; 0">$(Tps_status)</text> 
+			<text col_start="9" align="center" label="(labeldiff)" font_style="italic" cond="diff &gt; 0"><background mode="solid" color="ltYellow" cond="bol_diff_maxi == true" />app.TimeToString(diff, '%-1h%-1m%2s.%2f')</text> 
+			<text col_start="9" align="center" label="Diff." font_style="italic" cond="diff &lt;= 0">''</text> 
+			<text col_start="10" align="center" label="Pts" cond="entite == 'FFS'" font_weight="bold">$(Note)</text> 
+			<text col_start="10" align="center" label="Pts" cond="entite == 'FIS'" font_weight="bold">$(Pts)</text> 
+			<text col_start="11" align="center" label="WC Pts" cond="entite == 'FIS' and body:GetCellInt('PtsCM',row) &gt; 0" font_weight="bold">$(PtsCM)</text> 
+			<text col_start="11" align="center" label="WC Pts" cond="entite == 'FIS' and body:GetCellInt('PtsCM',row) == 0" font_weight="bold">''</text> 
+			<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
+		</body>
+		
+		<end>
+			<col value="3,3,18,4,2,3,3,8,6,5,5" />
+			<!-- <lua>sqlBase.FixationTableRanking(body);</lua> -->
+			<lua>GetStatHandiBody(body);</lua>
+			<call option="CompteursHandi"/>
+		</end>
+	</report>
+		
+	<!-- Résultats Meilleurs Temps" -->
+	<report id="res_best" title="Résultats Meilleurs Temps" first_header="0">
+		<lua>dofile('./edition/functionPG.lua');
+			dofile('./edition/traductionPG.lua');
+			dofile('./interface/adv.lua');</lua>
+		<lua>language = params.Language or 'fr'</lua>
+
+		<lua>entite = $(Evenement.Code_entite)</lua>
+		<lua>nb_manche = base:GetTable('Epreuve'):GetCellInt('Nombre_de_manche', 0, 1)</lua>
+		<column name="Tps" type="chrono" cond="nb_manche == 2">chrono.Sum($(Tps1), $(Tps2))</column>
+		<column name="Tps_min" type="chrono" cond="nb_manche == 2">chrono.Min($(Tps1), $(Tps2))</column>
+		<column name="Clt_min" type="ranking" />
+		<lua>body:SetRanking('Clt_min', 'Tps_min')</lua>
+			
+		<column name="Tps" type="chrono" cond="nb_manche == 3">chrono.Min($(Tps1), $(Tps2), $(Tps3))</column>
+		<column name="Tps" type="chrono" cond="nb_manche == 4">chrono.Min($(Tps1), $(Tps2), $(Tps3), $(Tps4))</column>
+		<column name="Tps" type="chrono" cond="nb_manche == 5">chrono.Min($(Tps1), $(Tps2), $(Tps3), $(Tps4), $(Tps5))</column>
+		<lua>body:SetRanking('Clt', 'Tps')</lua>
+		<order key="Tps_min, Dossard Desc" />
+	
+		<body>
+			<call option="couleur_alternee" file="./edition/options.xml" />
+			<font size="9" adjust="ellipsize"/>
+	
+			<row value="auto"/>
+			<text col="4" align="right" label="Clt" font_weight="bold" font_size_step="1">$(Clt)</text>
+			<text col="4" align="right" label="(traduction(language,'Dos.'))">$(Dossard)</text>
+			<text col="7" align="center" label="Code"><font size="8" cond="group =='body'"/>$(Code_coureur):sub(4)</text>
+			<text col="20" align="left" label="(traduction(language,'Identité'))" font_weight="bold" font_size_step="1" cond="string.sub(body:GetCell('Groupe', row),1,1) ~= 'B'">$(Identite)</text> 
+			<text col="20" align="left" label="(traduction(language,'Identité'))" font_weight="bold" font_size_step="1" cond="string.sub(body:GetCell('Groupe', row),1,1) == 'B'">$(Identite)..'\nGuide : '..$(Equipe)</text> 
+			<text col="4" align="center" label="(traduction(language,'Année'))">$(An)</text>
+			<text col="4" align="center" label="(traduction(language,'Nation'))" cond="entite == 'FIS'">$(Nation)</text>
+			<text col="2" align="center" label="CR" cond="entite == 'FFS'">$(Comite)</text>
+			<text col="12" align="center" label="CR" cond="entite == 'FFS'">$(Club)</text>
+			<lua>for m=1,nb_manche do</lua>
+				<text col="6" align="right" label="('Tps.M'..m)" cond="nb_manche ~= 1"><font size_step="-1" cond="group == 'body'" />body:GetCell('Tps'..m,row)</text> 
+			<lua>end</lua>
+			<text col="8" align="right" label="Tps" font_weight="bold" font_size_step="1">$(Tps)</text> 
+			<text col="8" align="right" label="Tps.Min" font_weight="bold" font_size_step="1">$(Tps_min)</text> 
+			<text col="6" align="right" label="Clt.Min" font_weight="bold" font_size_step="1">$(Clt_min)</text> 
+
+			<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
+		</body>
+	</report>
+		
+
+	
+	<!-- Paramètres Handiski pour les Pts CM et groupes -->
+	<params>
+		<diffmaxi valeur="0.15" />
+		<ranked2 rank1="80" rank2="60" />
+		<ranked1 rank1="50" />
+		<groupes Groupe1="'B1','B2','B3'" Groupe2="'LW1','LW2','LW3','LW4','LW5/7-1','LW5/7-2','LW5/7-3','LW6/8-1','LW6/8-2','LW9-1','LW9-2'" Groupe3="'LW0'" Groupe4="'LW10-1','LW10-2','LW11','LW12-1','LW12-2'" />
+	</params>
+
+	<!-- Prise du numéro de manche -->
+	<panel name="choix_manche">
+		<padding all="10px"/>
+		<font weight="bold" size="12" color="black"/>
+		<col value="1,1" />
+		<background mode="gradient_line_vert" color_start="yellow" color_end="dkyellow"/>
+		<pen border="1" />
+		<statictext row="auto" col_start="1" align="right" label="Manche" />
+		<combobox col_start="2" name="manche" style="CB_READONLY" />
+		<row value="auto" />
+		<toolbar row="auto" col_start="1" col_end="0" name="tb" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT" />
+	</panel>
+
+	<panel name="config">
+		<padding all="3px"/>
+		<col value="1,1" />
+		<pen border="1" />
+		<statictext row="auto" col_start="1" style="ALIGN_RIGHT" label="Mode d\'impression (FFS ou WPAS) : " />
+		<combobox col_start="2" name="mode" style="CB_READONLY" />
+		<statictext row="auto" col_start="1" style="ALIGN_RIGHT" label="Choix de la langue pour les éditions : " />
+		<combobox col_start="2" name="language" style="CB_READONLY" />
+		<row value="10px" />
+		<toolbar row="auto" col_start="1" col_end="0" name="tb" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT" />
+	</panel>
+</edition>
+
