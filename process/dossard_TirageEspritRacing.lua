@@ -3,7 +3,7 @@ dofile('./edition/functionPG.lua');
 dofile('./interface/adv.lua');
 
 function GetMenuName()
-	return "Esprit Racing - Tirage des dossards ou des rangs de départ";
+	return "ER : Esprit Racing - Tirage des dossards ou des rangs de départ";
 end
 
 function GetActivite()
@@ -814,10 +814,10 @@ function main(params_c)
 	params.x = (display:GetSize().width - params.width) / 2;
 	params.y = 50;
 	
-	scrip_version = "1.7"; 
+	script_version = "2.0"; 
 	-- vérification de l'existence d'une version plus récente du script.
 	-- Ex de retour : LiveDraw=5.94,Matrices=5.92,TimingReport=4.2,DoubleTirage=3.2,TirageOptions=3.3,TirageER=1.7,ListeMinisterielle=2.3,KandaHarJunior=2.0
-	if app.GetVersion() >= '4.4c' then 
+	if app.GetVersion() >= '5.0' then 
 		indice_return = 6;
 		local url = 'https://agilsport.fr/bta_alpin/versionsPG.txt'
 		version = curl.AsyncGET(wnd.GetParentFrame(), url);
@@ -838,6 +838,7 @@ function main(params_c)
 	base = base or sqlBase.Clone();
 	tEvenement = base:GetTable('Evenement');
 	base:TableLoad(tEvenement, 'Select * From Evenement Where Code = '..params.code_evenement);
+	Interrogation();
 	params.code_saison = tEvenement:GetCell('Code_saison', 0);
 	params.code_entite = tEvenement:GetCell("Code_entite",0);
 	params.code_activite = tEvenement:GetCell("Code_activite",0);
@@ -885,7 +886,7 @@ function main(params_c)
 		height = params.height,
 		x = params.x,
 		y = params.y,
-		label='Configuration du tirage - version '..scrip_version..' du script', 
+		label='Configuration du tirage - version '..script_version..' du script', 
 		icon='./res/32x32_ffs.png'
 		});
 	dlgConfig:LoadTemplateXML({ 
@@ -912,6 +913,7 @@ function main(params_c)
 	dlgConfig:GetWindowName('manche'):Append('Manche 2');
 	dlgConfig:GetWindowName('manche'):SetSelection(0);
 	
+	wnd.GetParentFrame():Bind(eventType.CURL, OnCurlReturn);
 	dlgConfig:Bind(eventType.MENU, 
 		function(evt) 
 			params.code_manche = dlgConfig:GetWindowName('manche'):GetSelection() + 1;

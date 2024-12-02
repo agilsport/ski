@@ -1,5 +1,6 @@
 dofile('./interface/adv.lua');
 dofile('./interface/interface.lua');
+-- à jour au 20-11-2024
 
 -- https://www.fis-ski.com/DB/alpine-skiing/biographies.html?lastname=&firstname=&sectorcode=AL&gendercode=&birthyear=&skiclub=&skis=&nationcode=&fiscode=198029&status=&search=true
 -- textctrlbutton
@@ -12,11 +13,11 @@ dofile('./interface/interface.lua');
 --app.Unzip(fichier zip, destination, makelower false ou true , onlyfullname : false ou true false --> hierarchie);
 
 function CreateTableRapport_accident();
-	tResultat_Info_Tirage = sqlTable.Create("Rapport_accident");
-	tResultat_Info_Tirage:AddColumn({ name = 'Code_evenement', label = 'Code_evenement', type = sqlType.LONG });
-	tResultat_Info_Tirage:SetPrimary('Code_evenement');
-	tResultat_Info_Tirage:SetName('Rapport_accident');
-	local strCreate = tResultat_Info_Tirage:GetStringCreate(base);
+	tRapport_accident = sqlTable.Create("Rapport_accident");
+	tRapport_accident:AddColumn({ name = 'Code_evenement', label = 'Code_evenement', type = sqlType.LONG });
+	tRapport_accident:SetPrimary('Code_evenement');
+	tRapport_accident:SetName('Rapport_accident');
+	local strCreate = tRapport_accident:GetStringCreate(base);
 	if strCreate then
 		base:Query(strCreate);
 	end

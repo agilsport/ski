@@ -5,11 +5,11 @@
 <!-- Les catégories à l'intérieur des groupes sont indiquées entre parenthèses dans le XML -->
 <root>
 	<default abd_dsq_repartent="Oui" bibo_m1="10" bibo_m2="10" bib_abddsq_ordre="ASC" abd_dsq_apres_classes="Oui">
-		<dames groupe1="'C7','C8','C9','C10','C11','C12','C13'" groupe2="'C4','C5','C6'" groupe3="'U21','U30','C1','C2','C3'"/>
+		<dames groupe1="'D7','D8','D9','D10','D11','D12','D13'" groupe2="'C4','C5','C6'" groupe3="'U21','U30','C1','C2','C3'"/>
 		<hommes groupe4="'B9','B10','B11','B12','B13'" groupe5="'B7','B8'" groupe6="'A4','A5','A6'" groupe7="'U21','U30','A1','A2','A3'"/>
 	</default>
 	<config bibo_m1="10" bibo_m2="10" abd_dsq_repartent="Oui" bib_abddsq_ordre="ASC" abd_dsq_apres_classes="Oui">
-		<dames groupe1="'C7','C8','C9','C10','C11','C12','C13'" groupe2="'C4','C5','C6'" groupe3="'U21','U30','C1','C2','C3'"/>
+		<dames groupe1="'D7','D8','D9','D10','D11','D12','D13'" groupe2="'C4','C5','C6'" groupe3="'U21','U30','C1','C2','C3'"/>
 		<hommes groupe4="'B9','B10','B11','B12','B13'" groupe5="'B7','B8'" groupe6="'A4','A5','A6'" groupe7="'U21','U30','A1','A2','A3'"/>
 	</config>
 	<panel name="config">
