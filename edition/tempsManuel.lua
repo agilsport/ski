@@ -1,6 +1,8 @@
 -- Calcul d'un temps manuel (avec 10 avant ou avec décalage)
 dofile('./interface/adv.lua');
 dofile('./interface/interface.lua');
+dofile('./edition/functionPG.lua');
+
 
 function ReplaceTableEnvironnement(t, name)		-- replace la table créée dans l'environnement de la base de donnée pour éviter les memory leaks
 	if type(t) ~= 'userdata' then
@@ -29,11 +31,13 @@ function OnPrint()
 	else
 		params.difference = 'H.Départ : '..app.TimeToString(PG_TempsManuel:GetCellInt('Heure_depart', TM.row_coureur), params.fmt)..'  -  H.Arrivée : '..params.HeureCalculee.. '  => Temps de course = '..params.tps;
 	end
+	params.date_calcul = PG_TempsManuel:GetCell('Date_calcul', 0);
 	params.recherche = "\n\nCalcul de l'impulsion de "..TM.impulsion..
 		" (EET) en manche "..params.code_manche..
 		"\npour le dossard "..TM.dossard..
-		" : "..params.Identite;
-		params.base_de_temps = TM.BaseDeTemps;
+		" : "..params.Identite..
+		"\nEdition du "..params.date_calcul;
+	params.base_de_temps = TM.BaseDeTemps;
 	report = wnd.LoadTemplateReportXML({
 		xml = './edition/tempsManuel.xml',
 		node_name = 'root/panel',
@@ -79,7 +83,7 @@ function OnChangeDossard()
 	TM.calculfait = false;
 	TM.ok = true;
 	params.Identite = "???";
-	TM.dossard = tonumber(dlgPage1:GetWindowName('dossard'):GetValue()) or 0;
+	TM.dossard = tonumber(dlgConfig:GetWindowName('dossard'):GetValue()) or 0;
 	if TM.dossard > 0 then
 		local r = Resultat:GetIndexRow('Dossard', TM.dossard);
 		if r and r >= 0 then
@@ -94,7 +98,7 @@ function OnChangeDossard()
 			end
 		end
 	end
-	dlgPage1:GetWindowName('identite'):SetValue(params.Identite);
+	dlgConfig:GetWindowName('identite'):SetValue(params.Identite);
 end
 
 function OnChangeDossardPrecedent(dossardPrecedent)
@@ -115,7 +119,7 @@ function OnChangeDossardPrecedent(dossardPrecedent)
 			params.IdentitePrecedente = Resultat:GetCell("Nom", r).." "..Resultat:GetCell("Prenom", r).." - "..Resultat:GetCell("Nation", r);
 		end
 	end
-	dlgPage1:GetWindowName('identite_precedente'):SetValue(params.IdentitePrecedente);
+	dlgConfig:GetWindowName('identite_precedente'):SetValue(params.IdentitePrecedente);
 end
 
 function OnChangeManche(code_manche);
@@ -146,7 +150,12 @@ function OnValidation()
 	for idx = 1, 11 do
 		row = idx -1;
 		PG_TempsManuel:SetCell("Doublage", row, TM.ligne[idx].int_doublage);
+		TM.ligne[idx].delta =  TM.ligne[idx].int_heure - TM.ligne[idx].int_doublage;
+		if PG_TempsManuel:GetCellInt("Coureur", row) == 1 then
+			TM.ligne[idx].delta = 0;
+		end
 		PG_TempsManuel:SetCell("Delta", row , TM.ligne[idx].delta);
+		PG_TempsManuel:SetCell('Date_calcul', row, TM.date);
 	end
 	base:TableBulkInsert(PG_TempsManuel);
 	OK = SetHeureCalculee();
@@ -219,39 +228,72 @@ function OnChangeHeure(idx)
 end
 
 function OnChangeBib(i)
-	row = i - 1;
-	local bib = tonumber(dlgSaisie:GetWindowName("bib"..i):GetValue()) or 0;
-	if bib == 0 then
-		dlgSaisie:GetWindowName("identite"..i):SetValue('');
-		return
-	end
-	
+	local row = i -1;
+	local bib = dlgSaisie:GetWindowName("bib"..i):GetValue();
+	heure_depart, heure_arrivee = GetHeuresCoureur(bib);
+	PG_TempsManuel:SetCell('Heure_depart', row, heure_depart);
+	PG_TempsManuel:SetCell('Heure_arrivee', row, heure_arrivee);
 	local r = Resultat:GetIndexRow('Dossard', bib);
 	if r and r >= 0 then
 		dlgSaisie:GetWindowName("identite"..i):SetValue(Resultat:GetCell('Nom', r)..' '..Resultat:GetCell('Prenom', r));
 		TM.ligne[i].bib = Resultat:GetCell('Dossard', r);
+	else
+		dlgSaisie:GetWindowName("identite"..i):SetValue('');
+		return;
 	end
-	TM.ligne[idx].bib = bib;
+	if TM.impulsion == 'Départ' then
+		int_heure = heure_depart;
+		heure = app.TimeToString(heure_depart, params.fmt);
+		if int_heure == 0 then
+			dlgSaisie:GetWindowName("heure"..i):SetValue('Abs');
+		end
+	else
+		int_heure = heure_arrivee;
+		heure = app.TimeToString(heure_arrivee, params.fmt);
+	end
+	if int_heure == 0 then
+		return;
+	end
+	PG_TempsManuel:SetCell('Code_evenement', row, params.code_evenement);
+	PG_TempsManuel:SetCell('Code_manche', row, params.code_manche);
+	PG_TempsManuel:SetCell('Code_coureur', row, Resultat:GetCell('Code_coureur', r));
 	PG_TempsManuel:SetCell('Dossard', row, bib);
-	PG_TempsManuel:SetCell('Nom', row, Resultat:GetIndexRow('Nom', r));
-	PG_TempsManuel:SetCell('Prenom', row, Resultat:GetIndexRow('Prenom', r));
-	PG_TempsManuel:SetCell('Heure_depart', row, 0);
-	PG_TempsManuel:SetCell('Heure_arrivee', row, 0);
-	PG_TempsManuel:SetCell('Doublage', row, 0);
-	TM.ligne[idx].identite = PG_TempsManuel:GetCell('Nom', row).." "..PG_TempsManuel:GetCell('Prenom', row);
-	TM.ligne[idx].int_heure = int_heure;
-	TM.ligne[idx].heure = heure;
-	TM.ligne[idx].int_doublage = PG_TempsManuel:GetCellInt('Doublage', row);
-	TM.ligne[idx].doublage = app.TimeToString(TM.ligne[idx].int_doublage, params.fmt);
-	TM.ligne[idx].delta = PG_TempsManuel:GetCellInt('Delta', row);
-	PG_TempsManuel:SetCell('Coureur', i-1, 0);
-	if bib == TM.dossard then
-		PG_TempsManuel:SetCell('Coureur', i-1, 1);
-		TM.row_coureur = i-1;
-		TM.idx_coureur = i;
+	PG_TempsManuel:SetCell('Dossard_calcul', row, TM.dossard);
+	PG_TempsManuel:SetCell('Rang', row, i);
+	PG_TempsManuel:SetCell('Nom', row, Resultat:GetCell('Nom', r));
+	PG_TempsManuel:SetCell('Prenom', row, Resultat:GetCell('Prenom', r));
+	PG_TempsManuel:SetCell('Comite', row, Resultat:GetCell('Comite', r));
+	PG_TempsManuel:SetCell('Nation', row, Resultat:GetCell('Nation', r));
+	PG_TempsManuel:SetCell('Coureur', row, 0);
+	PG_TempsManuel:SetCell('OK', row, 1);
+	heure_depart, heure_arrivee = GetHeuresCoureur(bib);
+	PG_TempsManuel:SetCell('Heure_depart', row, heure_depart);
+	PG_TempsManuel:SetCell('Heure_arrivee', row, heure_arrivee);
+	if TM.impulsion == 'Départ' then
+		PG_TempsManuel:SetCell('Impulsion', row, 'D');
+		int_heure = heure_depart;
+		heure = app.TimeToString(heure_depart, params.fmt);
+	else
+		PG_TempsManuel:SetCell('Impulsion', row, 'A');
+		int_heure = heure_arrivee;
+		heure = app.TimeToString(heure_arrivee, params.fmt);
 	end
-
+	dlgSaisie:GetWindowName('heure'..i):SetValue(heure);
+	PG_TempsManuel:SetCellNull('Doublage', row);
+	PG_TempsManuel:SetCellNull('Delta', row);
+	TM.ligne[i].identite = PG_TempsManuel:GetCell('Nom', row).." "..PG_TempsManuel:GetCell('Prenom', row);
+	TM.ligne[i].int_heure = int_heure;
+	TM.ligne[i].heure = heure;
+	-- TM.ligne[i].int_doublage = PG_TempsManuel:GetCellInt('Doublage', row);
+	-- TM.ligne[i].doublage = app.TimeToString(TM.ligne[i].int_doublage, params.fmt);
+	-- TM.ligne[i].delta = PG_TempsManuel:GetCellInt('Delta', row);
+	TM.ligne[i].int_doublage = 0;
+	TM.ligne[i].doublage = '';
+	TM.ligne[i].delta = 0;
+	base:TableUpdate(PG_TempsManuel, row);
+	PG_TempsManuel:OrderBy('Rang');
 end
+
 function OnRead(dossard, code_manche)
 	local cmd = "Select * From PG_TempsManuel Where"..
 			" Code_evenement = "..params.code_evenement..
@@ -342,15 +384,15 @@ function OnSaisieDlg1()
 	local y = math.floor((heightMax-heightControl)/2);
 
 	-- Creation des Controles et Placement des controles par le Template XML ...
-	dlgPage1 = wnd.CreateDialog({
+	dlgConfig = wnd.CreateDialog({
 		x = x,
 		y = y,
 		width=widthControl, 
 		height=heightControl, 
-		label='Calcul d\'un temps manuel', 
+		label='Calcul d\'un temps manuel - version '..script_version, 
 		icon='./res/32x32_chrono.png'
 	});
-	dlgPage1:LoadTemplateXML({ 
+	dlgConfig:LoadTemplateXML({ 
 		xml = './edition/tempsManuel.xml', 	
 		node_name = 'root/panel', 			
 		node_attr = 'name', 				
@@ -360,55 +402,57 @@ function OnSaisieDlg1()
 
 	local race = params.evenement_nom:Split('%\n');
 	race = race[1];
-	dlgPage1:GetWindowName('race'):SetValue(race);
-	dlgPage1:GetWindowName('dossard'):SetValue('');
-	dlgPage1:GetWindowName('identite'):SetValue('');
+	dlgConfig:GetWindowName('race'):SetValue(race);
+	dlgConfig:GetWindowName('dossard'):SetValue('');
+	dlgConfig:GetWindowName('identite'):SetValue('');
 		
-	dlgPage1:GetWindowName("impulsion"):Append('Départ');
-	dlgPage1:GetWindowName("impulsion"):Append('Arrivée');
-	dlgPage1:GetWindowName("impulsion"):SetSelection(0);
+	dlgConfig:GetWindowName("impulsion"):Append('Départ');
+	dlgConfig:GetWindowName("impulsion"):Append('Arrivée');
+	dlgConfig:GetWindowName("impulsion"):SetSelection(0);
 	for i = 1, params.nb_manche do
-		dlgPage1:GetWindowName("manche"):Append(i);
+		dlgConfig:GetWindowName("manche"):Append(i);
 	end
-	dlgPage1:GetWindowName("manche"):SetSelection(0);
+	dlgConfig:GetWindowName("manche"):SetSelection(0);
 	-- -- Toolbar Principale ...
-	local tbh = dlgPage1:GetWindowName('tbh');
+	local tbh = dlgConfig:GetWindowName('tbh');
+	tbh:AddStretchableSpace();
 	local btnNext = tbh:AddTool("Suite", "./res/vpe32x32_page_next.png");
 	tbh:AddSeparator();
 	local btnRead = tbh:AddTool("Charger le calcul", "./res/32x32_refresh.png");
-	tbh:AddStretchableSpace();
+	tbh:AddSeparator();
 	local btnClose = tbh:AddTool("Fermer", "./res/32x32_quit.png");
+	tbh:AddStretchableSpace();
 	tbh:Realize();
 	
-	dlgPage1:Bind(eventType.TEXT, 
+	dlgConfig:Bind(eventType.TEXT, 
 		function(evt) 
 			OnChangeDossard()
 		end,  
-		dlgPage1:GetWindowName('dossard'));
+		dlgConfig:GetWindowName('dossard'));
 										  
-	dlgPage1:Bind(eventType.TEXT, 
+	dlgConfig:Bind(eventType.TEXT, 
 		function(evt) 
-			OnChangeDossardPrecedent(dlgPage1:GetWindowName('dossard_precedent'):GetValue());
+			OnChangeDossardPrecedent(dlgConfig:GetWindowName('dossard_precedent'):GetValue());
 		end,  
-		dlgPage1:GetWindowName('dossard_precedent'));
-	dlgPage1:Bind(eventType.COMBOBOX, 
+		dlgConfig:GetWindowName('dossard_precedent'));
+	dlgConfig:Bind(eventType.COMBOBOX, 
 		function(evt) 
-			OnChangeImpulsion(dlgPage1:GetWindowName('impulsion'):GetValue(), tonumber(dlgPage1:GetWindowName('manche'):GetValue()))
+			OnChangeImpulsion(dlgConfig:GetWindowName('impulsion'):GetValue(), tonumber(dlgConfig:GetWindowName('manche'):GetValue()))
 		end,  
-		dlgPage1:GetWindowName('impulsion'));
+		dlgConfig:GetWindowName('impulsion'));
 
-	dlgPage1:Bind(eventType.COMBOBOX, 
+	dlgConfig:Bind(eventType.COMBOBOX, 
 		function(evt) 
-			OnChangeManche(tonumber(dlgPage1:GetWindowName('manche'):GetValue()))
+			OnChangeManche(tonumber(dlgConfig:GetWindowName('manche'):GetValue()))
 		end,  
-		dlgPage1:GetWindowName('manche'));
+		dlgConfig:GetWindowName('manche'));
 
 	tbh:Bind(eventType.MENU, 
 		function(evt)
-			params.code_manche = tonumber(dlgPage1:GetWindowName('manche'):GetValue());
-			TM.impulsion = dlgPage1:GetWindowName('impulsion'):GetValue();
-			TM.dossard = dlgPage1:GetWindowName('dossard'):GetValue();
-			params.dossard_precedent = dlgPage1:GetWindowName('dossard_precedent'):GetValue();
+			params.code_manche = tonumber(dlgConfig:GetWindowName('manche'):GetValue());
+			TM.impulsion = dlgConfig:GetWindowName('impulsion'):GetValue();
+			TM.dossard = dlgConfig:GetWindowName('dossard'):GetValue();
+			params.dossard_precedent = dlgConfig:GetWindowName('dossard_precedent'):GetValue();
 			OK = ControleData()
 			if OK == true then
 				local msg = "Toutes les données de doublage existante seront effacées.\nVoulez-vous poursuivre ?";
@@ -416,16 +460,16 @@ function OnSaisieDlg1()
 					OnSaisieDlg2()
 				end
 			end
-			dlgPage1:EndModal(idButton.OK);
+			dlgConfig:EndModal(idButton.OK);
 		end, 
 		btnNext)
 
 	tbh:Bind(eventType.MENU, 
 		function(evt) 
 			TM.lire = true;
-			params.code_manche = tonumber(dlgPage1:GetWindowName('manche'):GetValue());
-			TM.impulsion = dlgPage1:GetWindowName('impulsion'):GetValue();
-			TM.dossard = dlgPage1:GetWindowName('dossard'):GetValue();
+			params.code_manche = tonumber(dlgConfig:GetWindowName('manche'):GetValue());
+			TM.impulsion = dlgConfig:GetWindowName('impulsion'):GetValue();
+			TM.dossard = dlgConfig:GetWindowName('dossard'):GetValue();
 			if tonumber(TM.dossard) then
 				OnSaisieDlg2();
 			else
@@ -438,12 +482,12 @@ function OnSaisieDlg1()
 		tbh:Bind(eventType.MENU, 
 		function(evt) 
 			params.sortir = true;
-			dlgPage1:EndModal(idButton.CANCEL);
+			dlgConfig:EndModal(idButton.CANCEL);
 		end, 
 		btnClose)
 	
 	-- -- Ouverture de la boite de Dialogue 
-	dlgPage1:ShowModal();
+	dlgConfig:ShowModal();
 	
 	if TM.Table ~= nil then
 		TM.Table:Delete();
@@ -473,7 +517,7 @@ function OnSaisieDlg2()
 		node_value = 'saisie' 				
 	});
 	if TM.lire == true then
-		OnRead(dlgPage1:GetWindowName('dossard'):GetValue(), tonumber(dlgPage1:GetWindowName('manche'):GetValue()))
+		OnRead(dlgConfig:GetWindowName('dossard'):GetValue(), tonumber(dlgConfig:GetWindowName('manche'):GetValue()))
 		if PG_TempsManuel:GetNbRows() ~= 11 then
 			msg = "Il n'y a aucun calcul correspondant à ces données !!";
 			app.GetAuiFrame():MessageBox(msg, "Attention", msgBoxStyle.OK+msgBoxStyle.ICON_WARNING)
@@ -486,16 +530,16 @@ function OnSaisieDlg2()
 		
 	if TM.lire == false then
 		-- si on ne lit pas un calcul précédent il faut construire toutes les tables utiles dans SetData()
-		SetData();
+		SetData(nil, nil);
 	end
 	TM.date = os.date("%d/%m/%Y %X");
 	-- Toolbar Principale ...
 	local tbh2 = dlgSaisie:GetWindowName('tbh2');
-	-- local btnPrevious = tbh2:AddTool("Précédent", "./res/vpe32x32_page_previous.png");
-	-- tbh2:AddSeparator();
+	tbh2:AddStretchableSpace();
 	local btnPrint = tbh2:AddTool("Calculer", "./res/32x32_chrono_v1.png");
 	tbh2:AddStretchableSpace();
 	local btnClose = tbh2:AddTool("Fermer", "./res/32x32_quit.png");
+	tbh2:AddStretchableSpace();
 	-- if TM.lire == true then
 		-- tbh2:EnableTool(btnPrevious:GetId(), false);
 	-- end
@@ -537,8 +581,9 @@ function OnSaisieDlg2()
 			end,  dlgSaisie:GetWindowName('doublage'..i));
 	end
 	-- Ouverture de la boite de Dialogue 
+	dlgSaisie:Fit();
 	if dlgSaisie:ShowModal() == idButton.OK then
-		dlgPage1:EndModal();
+		dlgConfig:EndModal();
 	end	
 	if TM.Table ~= nil then
 		TM.Table:Delete();
@@ -562,11 +607,11 @@ function SetCtrlEnable(enable)
 	for idx = 1, 11 do
 		local row = idx - 1;
 		local bib = dlgSaisie:GetWindowName('bib'..idx):GetValue();
-		dlgSaisie:GetWindowName('bib'..idx):Enable(enable);
+		-- dlgSaisie:GetWindowName('bib'..idx):Enable(enable);
 		dlgSaisie:GetWindowName('identite'..idx):Enable(enable);
 		dlgSaisie:GetWindowName('heure'..idx):Enable(enable);
 		if enable == true then
-			dlgSaisie:GetWindowName('bib'..idx):SetValue('');
+			-- dlgSaisie:GetWindowName('bib'..idx):SetValue('');
 			dlgSaisie:GetWindowName('identite'..idx):SetValue('');
 			dlgSaisie:GetWindowName('heure'..idx):SetValue('');
 			dlgSaisie:GetWindowName('doublage'..idx):SetValue('');
@@ -593,7 +638,17 @@ function PopulatePG_Tempsmanuel()
 	end
 end
 
-function SetData()
+function ReplaceBib(indice)
+	if dlgSaisie:GetWindowName('identite'..indice):GetValue():len() > 5 then
+		if TM.impulsion == "Départ" then
+			dlgSaisie:GetWindowName('heure'..indice):SetValue(PG_TempsManuel:GetCell('Heure_depart', indice-1));
+		else
+			dlgSaisie:GetWindowName('heure'..indice):SetValue(PG_TempsManuel:GetCell('Heure_arrivee', indice-1));
+		end
+	end
+end
+
+function SetData(force_rang, force_bib)
 	-- on charge tous les départs et toutes les arrivées
 	if TM.impulsion == "Départ" then
 		TM.Table = tDeparts:Copy();
@@ -650,7 +705,13 @@ function SetData()
 		local row2 = PG_TempsManuel:AddRow();
 		rang = rang + 1;
 		local dossardlu = '';
-		dossardlu = TM.Table:GetCell("Dossard", row);
+		if force_rang ~= nil and force_bib ~= nil then
+			if force_rang == rang then
+				dossardlu = force_bib;
+			end
+		else	
+			dossardlu = TM.Table:GetCell("Dossard", row);
+		end
 		local r = Resultat:GetIndexRow('Dossard', dossardlu);
 		local h_depart, h_arrivee = GetHeuresCoureur(dossardlu);
 		PG_TempsManuel:SetCell('Code_evenement', row2, params.code_evenement);
@@ -756,9 +817,19 @@ function main(params_c)
 	if params_c == nil then
 		return false;
 	end
+
 	base = base or sqlBase.Clone();
 	params = params_c;
-	params.version = 4.0;
+	script_version = 2.0;
+	wnd.GetParentFrame():Bind(eventType.CURL, OnCurlReturn);
+	if app.GetVersion() >= '6.0' then 
+		-- vérification de l'existence d'une version plus récente du script.
+		-- Ex de retour : LiveDraw=5.94,Matrices=5.92,TimingReport=4.2
+		indice_return = 15;
+		local url = 'https://agilsport.fr/bta_alpin/versionsPG.txt'
+		version = curl.AsyncGET(wnd.GetParentFrame(), url);
+	end
+
 	OK = true;
 	params.code_manche = 1;
 	params.nb_manche = 1;
@@ -778,6 +849,7 @@ function main(params_c)
 	base:TableLoad(Resultat, 'Select * From Resultat Where Code_evenement = '..params.code_evenement);
 	Evenement = base:GetTable('Evenement');
 	base:TableLoad(Evenement, 'Select * From Evenement Where Code = '..params.code_evenement);
+	Interrogation();
 	params.evenement_nom = Evenement:GetCell("Nom", 0);
 	Epreuve = base:GetTable('Epreuve');
 	base:TableLoad(Epreuve, 'Select * From Epreuve Where Code_evenement = '..params.code_evenement);

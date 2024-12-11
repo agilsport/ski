@@ -26,16 +26,17 @@
 		<toolbar col_start="1" col_end="0" row_start="0" name="tbh" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT" />
 	</panel>
 	<panel name="saisie">
+		<wnd name="statictext" style="ALIGN_CENTER"/>
 		<col value="1,4,2,2,2"/>
 		<row value="60px"/>
-		<textctrl row_start="0" align="center" col_start="1" col_end="0" name="what" style="TE_READONLY|ALIGN_CENTER_HORIZONTAL|TE_MULTILINE"/>
+		<textctrl row_start="0" font_weight="bold" font_size_step="2" align="center" col_start="1" col_end="0" name="what" style="TE_READONLY|ALIGN_CENTER_HORIZONTAL|TE_MULTILINE"/>
 		<row value="auto"/>
 		<padding all="5px"/>
-		<statictext col_start="1" row_start="2" align="center" label="Dossard " />
-		<statictext col_start="2" row_start="2" align="center" label="Identite" />
-		<statictext col_start="3" row_start="2" align="center" label="Heure" />
-		<statictext col_start="4" row_start="2" align="center" label="Doublage" />
-		<statictext col_start="5" row_start="2" align="center" label="Delta" />
+		<statictext col_start="1" font_weight="bold" font_size_step="1" row_start="2" label="Dossard " />
+		<statictext col_start="2" font_weight="bold" font_size_step="1" row_start="2" label="Identite" />
+		<statictext col_start="3" font_weight="bold" font_size_step="1" row_start="2" label="Heure" />
+		<statictext col_start="4" font_weight="bold" font_size_step="1" row_start="2" label="Doublage" />
+		<statictext col_start="5" font_weight="bold" font_size_step="1" row_start="2" label="Delta" />
 		<padding all="2px"/>
 		<lua>for idx = 1, 11 do</lua>
 			<row value="25px" />

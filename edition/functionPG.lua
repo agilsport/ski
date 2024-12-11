@@ -113,7 +113,7 @@ function ReplaceTableEnvironnement(t, name)		-- replace la table créée dans l'en
 end
 
 function OnCurlReturn(evt)
-	-- Ex de retour : LiveDraw=5.94,Matrices=5.92,TimingReport=4.2,DoubleTirage=3.2,TirageOptions=3.3,TirageER=1.7,ListeMinisterielle=2.3,KandaHarJunior=2.0,MarquageEquipe=2.0,Regroupement=2.0,quotaFIS=2.0,coureurListe=1,entryFIS=1.9, youthFIS=1.0
+	-- Ex de retour : LiveDraw=5.94,Matrices=5.92,TimingReport=4.2,DoubleTirage=3.2,TirageOptions=3.3,TirageER=1.7,ListeMinisterielle=2.3,KandaHarJunior=2.0,MarquageEquipe=2.0,Regroupement=2.0,quotaFIS=2.0,coureurListe=1,entryFIS=1.9, youthFIS=1.0, tempsManuel=2.0
 	local tNomSVersionDoc = {};
 	table.insert(tNomSVersionDoc, 'process/LiveDraw_versions.rtf');		-- LiveDraw
 	table.insert(tNomSVersionDoc, 'challenge/Matrice_versions.rtf');	-- Matrices
@@ -128,6 +128,11 @@ function OnCurlReturn(evt)
 	table.insert(tNomSVersionDoc, '');									-- Quotas en FIS
 	table.insert(tNomSVersionDoc, '');									-- Coureurs d'une liste
 	table.insert(tNomSVersionDoc, '');									-- Entry FIS
+	table.insert(tNomSVersionDoc, '');									-- nada
+	table.insert(tNomSVersionDoc, '');									-- nada
+	table.insert(tNomSVersionDoc, '');									-- nada
+	table.insert(tNomSVersionDoc, '');									-- nada
+	table.insert(tNomSVersionDoc, '');									-- nada
 	table.insert(tNomSVersionDoc, '');									-- nada
 	if evt:GetInt() == 1 then
 		local chaine = evt:GetString();
@@ -154,8 +159,6 @@ function OnCurlReturn(evt)
 					f:close();
 				end
 				local reponse = app.AutoUpdateResource('https://agilsport.fr/bta_alpin/UpdateScript.zip');
-				-- local url = ' https://agilsport.fr/bta_alpin/UpdateScript.zip';
-				-- Telechargement(url, 'UpdateScript.zip');
 				script_version = last_version;
 				if dlgConfig then
 					dlgConfig:EndModal(idButton.CANCEL);
@@ -163,23 +166,6 @@ function OnCurlReturn(evt)
 				return true;
 			end
 		end
-	end
-end
-
-function Telechargement(url, disponible)
-	do return end
-	local localFile = './tmp/'..disponible;
-	if curl.DownloadFile(url, localFile) ~= true then
-		return;
-	end
-	if dlgConfig then
-		dlgConfig:EndModal(idButton.CANCEL);
-	end
-	if dlgConfiguration then
-		dlgConfiguration:EndModal(idButton.CANCEL);
-	end
-	if app.FileExists(localFile) then
-		app.Unzip(localFile);
 	end
 end
 
