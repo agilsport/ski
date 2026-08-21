@@ -1,9 +1,9 @@
--- Esprit Racing - Tirage des dossards et des rangs de départ en manche 2 par Philippe Guérindon
+-- Esprit Racing - Tirage des dossards et des rangs de dÃ©part en manche 2 par Philippe GuÃ©rindon
 dofile('./edition/functionPG.lua');
 dofile('./interface/adv.lua');
 
 function GetMenuName()
-	return "ER : Esprit Racing - Tirage des dossards ou des rangs de départ";
+	return "ER : Esprit Racing - Tirage des dossards ou des rangs de dÃ©part";
 end
 
 function GetActivite()
@@ -178,7 +178,7 @@ function OnSetup()
 	dlgSetup:GetWindowName('bib_abddsq_ordre'):Append("Ne repartent pas en M2");
 
 	dlgSetup:GetWindowName('abd_dsq_apres_classes'):Clear();
-	dlgSetup:GetWindowName('abd_dsq_apres_classes'):Append("A la fin de tous les classés");
+	dlgSetup:GetWindowName('abd_dsq_apres_classes'):Append("A la fin de tous les classÃ©s");
 	dlgSetup:GetWindowName('abd_dsq_apres_classes'):Append("A la fin de leur groupe");
 	dlgSetup:GetWindowName('abd_dsq_apres_classes'):Append("Sans objet");
 
@@ -213,7 +213,7 @@ function OnSetup()
 	end
 	local categories = '';
 	for i = 0, tCategorieDames:GetNbRows() -1 do
-		categories = categories..tCategorieDames:GetCell('Code', i)..' - de '..tCategorieDames:GetCell('An_min', i)..' à '..tCategorieDames:GetCell('An_max', i)..'\n';
+		categories = categories..tCategorieDames:GetCell('Code', i)..' - de '..tCategorieDames:GetCell('An_min', i)..' Ã  '..tCategorieDames:GetCell('An_max', i)..'\n';
 	end
 	dlgSetup:GetWindowName('categ_dames'):SetValue(categories);
 	
@@ -224,7 +224,7 @@ function OnSetup()
 	end
 	local categories = '';
 	for i = 0, tCategorieHommes:GetNbRows() -1 do
-		categories = categories..tCategorieHommes:GetCell('Code', i)..' - de '..tCategorieHommes:GetCell('An_min', i)..' à '..tCategorieHommes:GetCell('An_max', i)..'\n';
+		categories = categories..tCategorieHommes:GetCell('Code', i)..' - de '..tCategorieHommes:GetCell('An_min', i)..' Ã  '..tCategorieHommes:GetCell('An_max', i)..'\n';
 	end
 	dlgSetup:GetWindowName('categ_hommes'):SetValue(categories);
 	
@@ -233,7 +233,7 @@ function OnSetup()
 	tbsetup:AddStretchableSpace();
 	local btnSave = tbsetup:AddTool("Valider", "./res/vpe32x32_save.png");
 	tbsetup:AddSeparator();
-	local btnDefault = tbsetup:AddTool("Valeurs par défaut", "./res/32x32_param.png");
+	local btnDefault = tbsetup:AddTool("Valeurs par dÃ©faut", "./res/32x32_param.png");
 	tbsetup:AddSeparator();
 	local btnClose = tbsetup:AddTool("Quitter", "./res/32x32_end.png");
 	tbsetup:AddStretchableSpace();
@@ -285,7 +285,7 @@ end
 		
 function OnTirageManche1()
 	if params.dossard1 > 0 then
-		local msg = "Les dossards ont déjà été tirés.\nVoulez-vous les remplacer ?\nTous les rangs de tirage antérieurs seront supprimés.";
+		local msg = "Les dossards ont dÃ©jÃ  Ã©tÃ© tirÃ©s.\nVoulez-vous les remplacer ?\nTous les rangs de tirage antÃ©rieurs seront supprimÃ©s.";
 		if app.GetAuiFrame():MessageBox(msg, "Attention !!!"
 			, msgBoxStyle.YES_NO+msgBoxStyle.NO_DEFAULT+msgBoxStyle.ICON_WARNING) == msgBoxStyle.NO then
 			return;
@@ -309,7 +309,7 @@ function OnTirageManche1()
 	end
 
 	if #params.tExaequo > 0 then
-		local msg = "Il y a égalité de points pour :\n";
+		local msg = "Il y a Ã©galitÃ© de points pour :\n";
 		for i = 1, #params.tExaequo do
 			local rang = params.tExaequo[i];
 			tResultat_Copy = tResultat:Copy();
@@ -319,7 +319,7 @@ function OnTirageManche1()
 			tResultat_Copy:OrderRandom();
 			for j = 0, tResultat_Copy:GetNbRows() -1 do
 				local dossard = rang + j;
-				msg = msg..tResultat_Copy:GetCell('Nom', j).." ("..tResultat_Copy:GetCellDouble('Point', j)..'), dossard attribué = '..dossard..'\n';
+				msg = msg..tResultat_Copy:GetCell('Nom', j).." ("..tResultat_Copy:GetCellDouble('Point', j)..'), dossard attribuÃ© = '..dossard..'\n';
 				tResultat_Copy:SetCell('Dossard', j, dossard);
 			end							
 		end
@@ -328,8 +328,8 @@ function OnTirageManche1()
 			, msgBoxStyle.OK+msgBoxStyle.ICON_WARNING);
 	end
 	if params.non_tires_message:len() > 0 then
-		local msg = "Certains dossards n'ont pas été attribués. Liste des coureurs concernés ; \n"..params.non_tires_message;
-		app.GetAuiFrame():MessageBox(msg, "Dossards non tirés"
+		local msg = "Certains dossards n'ont pas Ã©tÃ© attribuÃ©s. Liste des coureurs concernÃ©s ; \n"..params.non_tires_message;
+		app.GetAuiFrame():MessageBox(msg, "Dossards non tirÃ©s"
 			, msgBoxStyle.OK+msgBoxStyle.ICON_WARNING);
 	end
 end
@@ -339,7 +339,7 @@ function OnTirageManche2()
 	--Tps pour absent = -600, Abd = -500  ou Dsq = -800
 	local cmd = 'Select * From Resultat_Manche Where Code_evenement = '..params.code_evenement..' and Code_manche = 1 And Not Tps = -600 ';
 	base:TableLoad(tResultat_Manche, cmd)
-	-- adv.Alert('à traiter en M2 = '..tResultat_Manche:GetNbRows())
+	-- adv.Alert('Ã  traiter en M2 = '..tResultat_Manche:GetNbRows())
 	for i = 0, tResultat_Manche:GetNbRows() -1 do
 		local code_coureur = tResultat_Manche:GetCell('Code_coureur', i);
 		local reserve = tCodes[code_coureur].Reserve;
@@ -377,7 +377,7 @@ function OnTirageManche2()
 		OnTirageRang(tablex, i);
 	end
 	if params.abd_dsq_repartent == 'Oui' and params.abd_dsq_apres_classes == 'Oui' then
-		local cmd = 'Select * From Resultat_Manche Where Code_evenement = '..params.code_evenement..' and (Tps = -500 or Tps = -800) And Code_manche = 1';
+		local cmd = 'Select * From Resultat_Manche Where Code_evenement = '..params.code_evenement..' AND Code_manche = 1 and (Tps_chrono = -500 or Tps_chrono = -800)';
 		base:TableLoad(tResultat_Manche, cmd);
 		for i = 0, tResultat_Manche:GetNbRows() -1 do
 			local code_coureur = tResultat_Manche:GetCell('Code_coureur', i);
@@ -423,10 +423,10 @@ function SetDossardBackOffice(course, nbGroupes)
 	end
 	
 	-- on fera toujours un double tirage des dossards en manche 1 de la course 1
-	-- params.tableDossards1 est brassée par la fonction Shuffle du fichier functionPG.lua
-	-- tTableTirage1 est brassée par la méthode OrderRandom de skiFFS
-	-- des groupes seront constitués selon le back office
-	-- la colonne Reserve sera mise à jour selon les différents groupes
+	-- params.tableDossards1 est brassÃ©e par la fonction Shuffle du fichier functionPG.lua
+	-- tTableTirage1 est brassÃ©e par la mÃ©thode OrderRandom de skiFFS
+	-- des groupes seront constituÃ©s selon le back office
+	-- la colonne Reserve sera mise Ã  jour selon les diffÃ©rents groupes
 	if course == 1 or params.bib_skip == 0 then
 		for i = 1, #tBibo do
 			tBibo[i].Reserves = {};
@@ -474,7 +474,7 @@ end
 
 -- moins de bibo coureurs --> ordre inverse des temps de la manche 1
 -- au moins bibo coureurs --> bibo puis ordre des temps
--- ABD DSQ à la fin par groupe dans ordre inverse des dossards
+-- ABD DSQ Ã  la fin par groupe dans ordre inverse des dossards
 -- table.insert(tCoureurs.F, {Categ = value, Reserve = reserve, Nombre = 0, NbPoint = 0, NbClasses = 0, NbABD = 0, NbDSQ = 0});
 
 function OnTirageRang(tablex, indice)
@@ -814,8 +814,8 @@ function main(params_c)
 	params.x = (display:GetSize().width - params.width) / 2;
 	params.y = 50;
 	
-	script_version = "2.0"; 
-	-- vérification de l'existence d'une version plus récente du script.
+	script_version = "2.01"; 
+	-- vÃ©rification de l'existence d'une version plus rÃ©cente du script.
 	-- Ex de retour : LiveDraw=5.94,Matrices=5.92,TimingReport=4.2,DoubleTirage=3.2,TirageOptions=3.3,TirageER=1.7,ListeMinisterielle=2.3,KandaHarJunior=2.0
 	if app.GetVersion() >= '5.0' then 
 		indice_return = 6;
@@ -833,7 +833,7 @@ function main(params_c)
 		app.RemoveFile(updatefile);
 		app.LaunchDefaultEditor('./'..alire);
 	end
-	-- vérification de l'existence d'une version plus récente du script.
+	-- vÃ©rification de l'existence d'une version plus rÃ©cente du script.
 	-- Ex de retour : LiveDraw=5.94,Matrices=5.92,TimingReport=4.2
 	base = base or sqlBase.Clone();
 	tEvenement = base:GetTable('Evenement');
@@ -870,7 +870,7 @@ function main(params_c)
 	tCategorie = base:GetTable('Categorie');
 	
 	if params.code_entite ~= 'FFS' then
-		local msg = "Ce scénario n'est valable que pour les courses FFS !!";
+		local msg = "Ce scÃ©nario n'est valable que pour les courses FFS !!";
 		app.GetAuiFrame():MessageBox(msg, "Attention aux erreurs !!!", msgBoxStyle.OK+msgBoxStyle.ICON_ERROR);
 		return;
 	end

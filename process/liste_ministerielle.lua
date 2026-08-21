@@ -1,9 +1,7 @@
--- Matrices / Challenges et CombinÈs pour skiFFS
-dofile('./interface/adv.lua');
-dofile('./interface/interface.lua');
+-- Matrices / Challenges et Combin√©s pour skiFFS
 dofile('./edition/functionPG.lua');
 
-function ReplaceTableEnvironnement(t, name)		-- replace la table crÈÈe dans l'environnement de la base de donnÈe pour Èviter les memory leaks
+function ReplaceTableEnvironnement(t, name)		-- replace la table cr√©√©e dans l'environnement de la base de donn√©e pour √©viter les memory leaks
 	if type(t) ~= 'userdata' then
 		return;
 	end
@@ -14,9 +12,134 @@ function ReplaceTableEnvironnement(t, name)		-- replace la table crÈÈe dans l'en
 	base:AddTable(t);
 end
 
+function CreateNode(parent, node_nom, attribut1, attribut2, attribut3)
+	local node = xmlNode.Create(parent, xmlNodeType.ELEMENT_NODE, node_nom);
+	node:ChangeAttribute('c1', attribut1);
+	node:ChangeAttribute('c2', attribut2);
+	node:ChangeAttribute('c3', attribut3);
+	return node
+end
+
+function CreateXmlCfg()
+	local utf8 = true;
+	local doc_config = xmlDocument.Create();
+	local nodeRoot = xmlNode.Create(nil, xmlNodeType.ELEMENT_NODE, "root");
+	if doc_config:SetRoot(nodeRoot) == false then
+		return;
+	end
+	
+	local nodeReleve = xmlNode.Create(nil, xmlNodeType.ELEMENT_NODE, "Releve");
+	local nodeReleveDames = xmlNode.Create(nodeReleve, xmlNodeType.ELEMENT_NODE, "Dames");
+	local nodeReleveDamesannee1 = CreateNode(nodeReleveDames, 'annee1', '80', '50', '')
+	local nodeReleveDamesannee2 = CreateNode(nodeReleveDames, 'annee2', '80', '50', '')
+	local nodeReleveDamesannee3 = CreateNode(nodeReleveDames, 'annee3', '80', '50', '')
+	local nodeReleveDamesannee4 = CreateNode(nodeReleveDames, 'annee4', '100', '60', '')
+	local nodeReleveDamesannee5 = CreateNode(nodeReleveDames, 'annee5', '100', '60', '')
+	local nodeReleveDamesannee6 = CreateNode(nodeReleveDames, 'annee6', '120', '80', '250,100')
+	local nodeReleveDamesannee7 = CreateNode(nodeReleveDames, 'annee7', '140', '', '250,100')
+	local nodeReleveDamesannee8 = CreateNode(nodeReleveDames, 'annee8', '160', '', '300,120')
+	local nodeReleveDamesannee9 = CreateNode(nodeReleveDames, 'annee9', '15a|240', '', '400,125')
+	local nodeReleveDamesannee10 = CreateNode(nodeReleveDames, 'annee10', '15a|400', '', '500,150')
+	
+	local nodeReleveHommes = xmlNode.Create(nodeReleve, xmlNodeType.ELEMENT_NODE, "Hommes");
+	local nodeReleveHommesannee1 = CreateNode(nodeReleveHommes, 'annee1', '100', '75', '')
+	local nodeReleveHommesannee2 = CreateNode(nodeReleveHommes, 'annee2', '100', '75', '')
+	local nodeReleveHommesannee3 = CreateNode(nodeReleveHommes, 'annee3', '100', '75', '')
+	local nodeReleveHommesannee4 = CreateNode(nodeReleveHommes, 'annee4', '150', '110', '')
+	local nodeReleveHommesannee5 = CreateNode(nodeReleveHommes, 'annee5', '150', '110', '')
+	local nodeReleveHommesannee6 = CreateNode(nodeReleveHommes, 'annee6', '200', '160', '')
+	local nodeReleveHommesannee7 = CreateNode(nodeReleveHommes, 'annee7', '15a|260', '', '350,230')
+	local nodeReleveHommesannee8 = CreateNode(nodeReleveHommes, 'annee8', '20a|400', '', '450,270')
+	local nodeReleveHommesannee9 = CreateNode(nodeReleveHommes, 'annee9', '30a', '', '40a,15a')
+	local nodeReleveHommesannee10 = CreateNode(nodeReleveHommes, 'annee10', '40a', '', '50a,10a')
+
+	local nodeEspoirs = xmlNode.Create(nil, xmlNodeType.ELEMENT_NODE, "Espoirs");
+	local nodeEspoirsDames = xmlNode.Create(nodeEspoirs, xmlNodeType.ELEMENT_NODE, "Dames");
+	local nodeEspoirsDamesannee1 = CreateNode(nodeEspoirsDames, 'annee1', '', '', '')
+	local nodeEspoirsDamesannee2 = CreateNode(nodeEspoirsDames, 'annee2', '', '', '')
+	local nodeEspoirsDamesannee3 = CreateNode(nodeEspoirsDames, 'annee3', '', '', '')
+	local nodeEspoirsDamesannee4 = CreateNode(nodeEspoirsDames, 'annee4', '', '', '')
+	local nodeEspoirsDamesannee5 = CreateNode(nodeEspoirsDames, 'annee5', '', '', '')
+	local nodeEspoirsDamesannee6 = CreateNode(nodeEspoirsDames, 'annee6', '150', '|150', '')
+	local nodeEspoirsDamesannee7 = CreateNode(nodeEspoirsDames, 'annee7', '250', '', '500,250')
+	local nodeEspoirsDamesannee8 = CreateNode(nodeEspoirsDames, 'annee8', '300', '', '600,350')
+	local nodeEspoirsDamesannee9 = CreateNode(nodeEspoirsDames, 'annee9', '30a', '', '40a,15a')
+	local nodeEspoirsDamesannee10 = CreateNode(nodeEspoirsDames, 'annee10', '40a', '', '50a,20a')
+
+ 	local nodeEspoirsHommes = xmlNode.Create(nodeEspoirs, xmlNodeType.ELEMENT_NODE, "Hommes");
+	local nodeEspoirsHommesannee1 = CreateNode(nodeEspoirsHommes, 'annee1', '', '', '')
+	local nodeEspoirsHommesannee2 = CreateNode(nodeEspoirsHommes, 'annee2', '', '', '')
+	local nodeEspoirsHommesannee3 = CreateNode(nodeEspoirsHommes, 'annee3', '', '', '')
+	local nodeEspoirsHommesannee4 = CreateNode(nodeEspoirsHommes, 'annee4', '', '', '')
+	local nodeEspoirsHommesannee5 = CreateNode(nodeEspoirsHommes, 'annee5', '', '', '')
+	local nodeEspoirsHommesannee6 = CreateNode(nodeEspoirsHommes, 'annee6', '350', '', '500,250')
+	local nodeEspoirsHommesannee7 = CreateNode(nodeEspoirsHommes, 'annee7', '450', '', '600,300')
+	local nodeEspoirsHommesannee8 = CreateNode(nodeEspoirsHommes, 'annee8', '550', '', '750,450')
+	local nodeEspoirsHommesannee9 = CreateNode(nodeEspoirsHommes, 'annee9', '100a', '', '120a,30a')
+	local nodeEspoirsHommesannee10 = CreateNode(nodeEspoirsHommes, 'annee10', '100a', '', '120a,30a')
+
+ 	-- local nodeCNE = xmlNode.Create(nil, xmlNodeType.ELEMENT_NODE, "CNE");
+	-- local nodeCNEDames = xmlNode.Create(nodeCNE, xmlNodeType.ELEMENT_NODE, "Dames");
+	-- local nodeCNEDamesannee1 = CreateNode(nodeCNEDames, 'annee1', '', '', '')
+	-- local nodeCNEDamesannee2 = CreateNode(nodeCNEDames, 'annee2', '', '', '')
+	-- local nodeCNEDamesannee3 = CreateNode(nodeCNEDames, 'annee3', '100', '60', '')
+	-- local nodeCNEDamesannee4 = CreateNode(nodeCNEDames, 'annee4', '100', '60', '')
+	-- local nodeCNEDamesannee5 = CreateNode(nodeCNEDames, 'annee5', '100', '60', '')
+	-- local nodeCNEDamesannee6 = CreateNode(nodeCNEDames, 'annee6', '120', '80', '250,100')
+	-- local nodeCNEDamesannee7 = CreateNode(nodeCNEDames, 'annee7', '140', '', '250,100')
+	-- local nodeCNEDamesannee8 = CreateNode(nodeCNEDames, 'annee8', '160', '', '300,120')
+	-- local nodeCNEDamesannee9 = CreateNode(nodeCNEDames, 'annee9', '15a|240', '', '300,125')
+	-- local nodeCNEDamesannee10 = CreateNode(nodeCNEDames, 'annee10', '15a|400', '', '500,150')
+ 
+ 	-- local nodeCNEHommes = xmlNode.Create(nodeCNE, xmlNodeType.ELEMENT_NODE, "Hommes");
+	-- local nodeCNEHommesannee1 = CreateNode(nodeCNEHommes, 'annee1', '100', '75', '')
+	-- local nodeCNEHommesannee2 = CreateNode(nodeCNEHommes, 'annee2', '100', '75', '')
+	-- local nodeCNEHommesannee3 = CreateNode(nodeCNEHommes, 'annee3', '100', '75', '')
+	-- local nodeCNEHommesannee4 = CreateNode(nodeCNEHommes, 'annee4', '150', '110', '')
+	-- local nodeCNEHommesannee5 = CreateNode(nodeCNEHommes, 'annee5', '150', '110', '')
+	-- local nodeCNEHommesannee6 = CreateNode(nodeCNEHommes, 'annee6', '200', '160', '')
+	-- local nodeCNEHommesannee7 = CreateNode(nodeCNEHommes, 'annee7', '15a|260', '', '350,230')
+	-- local nodeCNEHommesannee8 = CreateNode(nodeCNEHommes, 'annee8', '20a|400', '', '450,270')
+	-- local nodeCNEHommesannee9 = CreateNode(nodeCNEHommes, 'annee9', '30a', '', '40a,15a')
+	-- local nodeCNEHommesannee10 = CreateNode(nodeCNEHommes, 'annee10', '40a', '', '50a,10a')
+
+ 	-- local nodeCIE = xmlNode.Create(nil, xmlNodeType.ELEMENT_NODE, "CIE");
+	-- local nodeCIEDames = xmlNode.Create(nodeCIE, xmlNodeType.ELEMENT_NODE, "Dames");
+	-- local nodeCIEDamesannee1 = CreateNode(nodeCIEDames, 'annee1', '', '', '')
+	-- local nodeCIEDamesannee2 = CreateNode(nodeCIEDames, 'annee2', '', '', '')
+	-- local nodeCIEDamesannee3 = CreateNode(nodeCIEDames, 'annee3', '', '', '')
+	-- local nodeCIEDamesannee4 = CreateNode(nodeCIEDames, 'annee4', '', '', '')
+	-- local nodeCIEDamesannee5 = CreateNode(nodeCIEDames, 'annee5', '', '', '')
+	-- local nodeCIEDamesannee6 = CreateNode(nodeCIEDames, 'annee6', '', '', '')
+	-- local nodeCIEDamesannee7 = CreateNode(nodeCIEDames, 'annee7', '550', '700,350', '')
+	-- local nodeCIEDamesannee8 = CreateNode(nodeCIEDames, 'annee8', '600', '800,450', '')
+	-- local nodeCIEDamesannee9 = CreateNode(nodeCIEDames, 'annee9', '150a', '100a,40a', '')
+	-- local nodeCIEDamesannee10 = CreateNode(nodeCIEDames, 'annee10', '200a', '100a,50a', '')
+
+ 	-- local nodeCIEHommes = xmlNode.Create(nodeCIE, xmlNodeType.ELEMENT_NODE, "Hommes");
+	-- local nodeCIEHommesannee1 = CreateNode(nodeCIEHommes, 'annee1', '', '', '')
+	-- local nodeCIEHommesannee2 = CreateNode(nodeCIEHommes, 'annee2', '', '', '')
+	-- local nodeCIEHommesannee3 = CreateNode(nodeCIEHommes, 'annee3', '', '', '')
+	-- local nodeCIEHommesannee4 = CreateNode(nodeCIEHommes, 'annee4', '', '', '')
+	-- local nodeCIEHommesannee5 = CreateNode(nodeCIEHommes, 'annee5', '', '', '')
+	-- local nodeCIEHommesannee6 = CreateNode(nodeCIEHommes, 'annee6', '500', '550,500', '')
+	-- local nodeCIEHommesannee7 = CreateNode(nodeCIEHommes, 'annee7', '600', '750,600', '')
+	-- local nodeCIEHommesannee8 = CreateNode(nodeCIEHommes, 'annee8', '750', '900,550', '')
+	-- local nodeCIEHommesannee9 = CreateNode(nodeCIEHommes, 'annee9', '200a', '200a,150a', '')
+	-- local nodeCIEHommesannee10 = CreateNode(nodeCIEHommes, 'annee10', '200a', '200a,150a', '')
+
+	nodeRoot:AddChild(nodeReleve);
+	nodeRoot:AddChild(nodeEspoirs);
+	-- nodeRoot:AddChild(nodeCNE);
+	-- nodeRoot:AddChild(nodeCIE);
+	doc_config:SaveFile(app.GetPath()..'/liste_ministerielle_cfg.xml');
+	doc_config:Delete();
+
+end
+
 function GetNode()	-- lecture d'une valeur du XML 
 	local node = nil;
-	if listeMinisterielle.comboNiveau == 'RelËve' then
+	if listeMinisterielle.comboNiveau == 'Rel√®ve' then
 		listeMinisterielle.comboNiveau = 'Releve';
 	end
 	if string.find(listeMinisterielle.comboNiveau, 'CNE') then
@@ -27,14 +150,14 @@ function GetNode()	-- lecture d'une valeur du XML
 	end
 	local anneexml = 'annee'..listeMinisterielle.indexAnneeDebut+1;
 	local strnode = 'root/'..listeMinisterielle.comboNiveau..'/'..listeMinisterielle.comboSexe..'/'..anneexml;
-	if doc:FindFirst(strnode) then
-		node = doc:FindFirst(strnode);
+	if doc_cfg:FindFirst(strnode) then
+		node = doc_cfg:FindFirst(strnode);
 	end
 	return node;
 end
 
 function GetNodex(niveau, sexe, idxannee)	-- lecture d'une valeur du XML 
-	if niveau == 'RelËve' then
+	if niveau == 'Rel√®ve' then
 		niveau = 'Releve';
 	end
 	if string.find(niveau, 'CNE') then
@@ -46,16 +169,13 @@ function GetNodex(niveau, sexe, idxannee)	-- lecture d'une valeur du XML
 	local node = nil;
 	local anneexml = 'annee'..listeMinisterielle.indexAnneeDebut+1;
 	local strnode = 'root/'..niveau..'/'..sexe..'/annee'..idxannee;
-	if doc:FindFirst(strnode) then
-		node = doc:FindFirst(strnode);
+	if doc_cfg:FindFirst(strnode) then
+		node = doc_cfg:FindFirst(strnode);
 	end
 	return node;
 end
 
-function SetNodex(niveau, sexe, idxannee)
-end
-
-function ChargeDisciplines()	-- charge les disciplines de l'activitÈ pour la saison choisie.
+function ChargeDisciplines()	-- charge les disciplines de l'activit√© pour la saison choisie.
 	local suffixe = '';
 	suffixe = " And Not Code LIKE 'P%' And Not Code LIKE 'TE%' And Not Code LIKE 'KO%' ";
 	local cmd = "Select * From Discipline Where Code_activite = 'ALP' And Code_entite = 'FIS' And Code_saison = '"..listeMinisterielle.Saison.."'"..suffixe.." ORDER BY Ordre";;
@@ -85,117 +205,329 @@ function ChargeDisciplines()	-- charge les disciplines de l'activitÈ pour la sai
 end
 
 function SetCriteres()
+	bolTechVit = false;
 	-- Classement_Coureur est construit
-	-- Ètude du critËre 1 : discipline technique
-	local c1 = dlgConfig:GetWindowName('gxpremiers1'):GetValue();
-	c1 = tonumber(c1) or 0;
-	local c2 = dlgConfig:GetWindowName('gxpremiers2'):GetValue();
-	c2 = tonumber(c2) or 0;
+	-- r√©cup√©ration des crit√®res
+	local bolc1aParAnnee = false;
+	local bolc1bParAnnee = false;
+	local bolc2aParAnnee = false;
+	local bolc2bParAnnee = false;
+	local bolc3aParAnnee = false;
+	local bolc3bParAnnee = false;
+	local bolc1bOU = false;
+	local bolc2aOU = false;
+	local bolc2bOU = false;
+	local bolc3bOU = false;
+	local bolc4bOU = false;
+	local bolc5bOU = false;
+	local bolc6bOU = false;
+
+	local c1a = dlgConfig:GetWindowName('gxpremiersc1a'):GetValue();
+	c1a = tonumber(c1a) or 0;
+	if dlgConfig:GetWindowName('chkc1a'):GetValue() == true then
+		bolc1aParAnnee = true;
+	end
+	local c1b = dlgConfig:GetWindowName('gxpremiersc1b'):GetValue();
+	c1b = tonumber(c1b) or 0;
+	if dlgConfig:GetWindowName('chkc1b'):GetValue() == true then
+		bolc1bParAnnee = true;
+	end
+	if dlgConfig:GetWindowName('chkouc1b'):GetValue() == true then
+		bolc1bOU = true;
+	end
+
+	local c2a = dlgConfig:GetWindowName('gxpremiersc2a'):GetValue();
+	c2a = tonumber(c2a) or 0;
+	if dlgConfig:GetWindowName('chkc2a'):GetValue() == true then
+		bolc2aParAnnee = true;
+	end
+	if dlgConfig:GetWindowName('chkouc2a'):GetValue() == true then
+		bolc2aOU = true;
+	end
+
+	local c2b = dlgConfig:GetWindowName('gxpremiersc2b'):GetValue();
+	c2b = tonumber(c2b) or 0;
+	if dlgConfig:GetWindowName('chkc2b'):GetValue() == true then
+		bolc2bParAnnee = true;
+	end
+	if dlgConfig:GetWindowName('chkouc2b'):GetValue() == true then
+		bolc2bOU = true;
+	end
 		
-	-- Ètude du critËre 2 : discipline vitesse
-	local c3 = dlgConfig:GetWindowName('gxpremiers3'):GetValue();
-	c3 = tonumber(c3) or 0;
+	local c3a = dlgConfig:GetWindowName('gxpremiersc3a'):GetValue();
+	c3a = tonumber(c3a) or 0;
+	if dlgConfig:GetWindowName('chkc3a'):GetValue() == true then
+		bolc3aParAnnee = true;
+	end
+	local c3b = dlgConfig:GetWindowName('gxpremiersc3b'):GetValue();
+	c3b = tonumber(c3b) or 0;
+	if dlgConfig:GetWindowName('chkc3b'):GetValue() == true then
+		bolc3bParAnnee = true;
+	end
+
+	-- √©tude du crit√®re 2 : discipline vitesse
+	local c3 = dlgConfig:GetWindowName('gxpremiersc2a'):GetValue();
 	
-	-- Ètude du critËre 3 : 1 discipline technique + 1 discipline vitesse
-	local c4 = dlgConfig:GetWindowName('gxpremiers4'):GetValue();
-	c4 = tonumber(c4) or 0;
-	local c5 = dlgConfig:GetWindowName('gxpremiers5'):GetValue();
-	c5 = tonumber(c5) or 0;
+	if bolc2aOU == true then
+		bolTechVit = true;
+	end
 	
-	-- Col1 = les Pts Techniques sont sÈlectionnÈs
-	-- Col2 = les Pts Vitesses sont sÈlectionnÈs
-	-- Col3 = les Pts Techniques par annÈe sont sÈlectionnÈs
-	-- Col4 = les Pts Vitesses par annÈe sont sÈlectionnÈs
-	-- Col5 = on prend 1 vitesse + 1 technique
+	-- cas particulier
+	--	on a c1="150" et c2 ="/200"   => 150 en technique OU 200 en vitesse pour remplir le crit√®re
+	
+	-- Col1 = les Pts Techniques sont s√©lectionn√©s
+	-- Col2 = les Pts Vitesses sont s√©lectionn√©s
+	-- Col3 = les Pts Techniques par ann√©e sont s√©lectionn√©s
+	-- Col4 = les Pts Vitesses par ann√©e sont s√©lectionn√©s
+	-- Col5 = on prend 1 vitesse + 1 technique et on met dedans la colonne choisie
 	for row = 0, Classement_Coureur:GetNbRows() -1 do
 		Classement_Coureur:SetCell('Col1', row, 0);
 		Classement_Coureur:SetCell('Col2', row, 0);
 		Classement_Coureur:SetCell('Col3', row, 0);
 		Classement_Coureur:SetCell('Col4', row, 0);
-		Classement_Coureur:SetCell('Col5', row, 0);
+		Classement_Coureur:SetCell('Col5', row, '');
 		local clt_tech = Classement_Coureur:GetCellInt('Clt_technique', row, 10000);
 		local clt_vitesse = Classement_Coureur:GetCellInt('Clt_vitesse', row, 10000);
 		local clt_tech_annee = Classement_Coureur:GetCellInt('Clt_technique_annee', row, 10000);
 		local clt_vitesse_annee = Classement_Coureur:GetCellInt('Clt_vitesse_annee', row, 10000);
+		if Classement_Coureur:GetCellInt('Clt_SL_Annee', row) < Classement_Coureur:GetCellInt('Clt_GS_Annee', row) then
+			Classement_Coureur:SetCell('Best_tech_annee', row, ' (SL) ');
+		else
+			Classement_Coureur:SetCell('Best_tech_annee', row, ' (GS) ');
+		end
+		if Classement_Coureur:GetCellInt('Clt_SG_Annee', row) < Classement_Coureur:GetCellInt('Clt_DH_Annee', row) then
+			Classement_Coureur:SetCell('Best_vit_annee', row, ' (SG) ');
+		else
+			Classement_Coureur:SetCell('Best_vit_annee', row, ' (DH) ');
+		end
 		local critere = 0;
-		-- technique
-		if c1 > 0 then
-			if dlgConfig:GetWindowName('chk1'):GetValue() == true then	-- la premiËre ligne est par annÈe 
-				if clt_tech_annee > 0 and clt_tech_annee  <= c1 then
-					critere = critere + 1;
-					Classement_Coureur:SetCell('Col3', row, 1);
-				end
-			else
-				if clt_tech > 0 and clt_tech <= c1 then
-					critere = critere + 1;
-					Classement_Coureur:SetCell('Col1', row, 1);
-				end
-			end
-		end
-		if c2 > 0 then
-			if dlgConfig:GetWindowName('chk2'):GetValue() == true then	-- la deuxiËme ligne est par annÈe on mettra 
-				if clt_tech_annee > 0 and clt_tech_annee <= c2 then
-					critere = critere + 1;
-					Classement_Coureur:SetCell('Col3', row, 1);
-				end
-			else
-				if clt_tech > 0 and clt_tech <= c2 then
-					critere = critere + 1;
-					Classement_Coureur:SetCell('Col1', row, 1);
+		local bolcritere1 = false;
+		local bolcritere2 = false;
+		local txtcol5 = 'Z';
+		if bolTechVit == false then
+			-- la technique
+			if c1a > 0 then
+				if bolc1aParAnnee == false then
+					if clt_tech > 0 and clt_tech <= c1a then
+						bolcritere1 = true;
+						txtcol5 = txtcol5..',1';
+						Classement_Coureur:SetCell('Col1', row, 1);
+					end
+				else
+					if clt_tech_annee > 0 and clt_tech_annee <= c1a then
+						bolcritere1 = true;
+						txtcol5 = txtcol5..',1';
+						Classement_Coureur:SetCell('Col3', row, 1);
+					end
 				end
 			end
-		end
+			if c1b > 0 then
+				if bolc1bParAnnee == false then
+					if clt_tech > 0 and clt_tech <= c1b then
+						bolcritere1 = true;
+						txtcol5 = txtcol5..',1';
+						Classement_Coureur:SetCell('Col1', row, 1);
+					end
+				else
+					if clt_tech_annee > 0 and clt_tech_annee <= c1b then
+						bolcritere1 = true;
+						txtcol5 = txtcol5..',1';
+						Classement_Coureur:SetCell('Col3', row, 1);
+					end
+				end
+			end
+			if bolcritere1 == true then
+				critere = critere + 1;
+			end
 
-		if c3 > 0 then
-			if clt_vitesse > 0 and clt_vitesse <= c3 then
+			-- la vitesse 
+			if c2a > 0 then
+				if bolc2aParAnnee == false then
+					if clt_vitesse > 0 and clt_vitesse <= c2a then
+						bolcritere2 = true;
+						txtcol5 = txtcol5..' / 2';
+						Classement_Coureur:SetCell('Col2', row, 1);
+					end
+				else
+					if clt_vitesse_annee > 0 and clt_vitesse_annee <= c2a then
+						bolcritere2 = true;
+						txtcol5 = txtcol5..' / 2';
+						Classement_Coureur:SetCell('Col4', row, 1);
+					end
+				end
+			end
+			if c2b > 0 then
+				if bolc2bParAnnee == false then
+					if clt_vitesse > 0 and clt_vitesse <= c2b then
+						bolcritere2 = true;
+						txtcol5 = txtcol5..',2';
+						Classement_Coureur:SetCell('Col2', row, 1);
+					end
+				else
+					if clt_vitesse_annee > 0 and clt_vitesse_annee <= c2b then
+						bolcritere2 = true;
+						txtcol5 = txtcol5..',2';
+						Classement_Coureur:SetCell('Col4', row, 1);
+					end
+				end
+			end
+			if bolcritere2 == true then
+				critere = critere + 1;
+			end
+		else
+			local bolPrendreTech = false;
+			local bolPrendreTechAnnee = false;
+			local bolPrendreVit = false;
+			local bolPrendreVitAnnee = false;
+			if c1a > 0 then
+				if bolc1aParAnnee == false then
+					if clt_tech > 0 and clt_tech <= c1a then
+						bolPrendreTech = true;
+						txtcol5 = txtcol5..',1';
+					end
+				else
+					if clt_tech_annee > 0 and clt_tech_annee <= c1a then
+						bolPrendreTechAnnee = true; 
+						txtcol5 = txtcol5..',1';
+					end
+				end
+			end
+			if c1b > 0 then
+				if bolc1bParAnnee == false then
+					if clt_tech > 0 and clt_tech <= c1b then
+						bolPrendreTech = true; 
+						txtcol5 = txtcol5..',1';
+					end
+				else
+					if clt_tech_annee > 0 and clt_tech_annee <= c1b then
+						bolPrendreTechAnnee = true; 
+						txtcol5 = txtcol5..',1';
+					end
+				end
+			end
+			-- la vitesse 
+			if c2a > 0 then
+				if bolc2aParAnnee == false then
+					if clt_vitesse > 0 and clt_vitesse <= c2a then
+						bolPrendreVit = true;
+						txtcol5 = txtcol5..' / 2';
+					end
+				else
+					if clt_vitesse_annee > 0 and clt_vitesse_annee <= c2a then
+						bolPrendreVitAnnee = true;
+						txtcol5 = txtcol5..' / 2';
+					end
+				end
+			end
+			if c2b > 0 then
+				if bolc2bParAnnee == false then
+					if clt_vitesse > 0 and clt_vitesse <= c2b then
+						bolPrendreVit = true;
+						txtcol5 = txtcol5..',2';
+					end
+				else
+					if clt_vitesse_annee > 0 and clt_vitesse_annee <= c2b then
+						bolPrendreVitAnnee = true;
+						txtcol5 = txtcol5..',2';
+					end
+				end
+			end
+			if bolPrendreTech == true then
+				critere = critere + 1;
+				Classement_Coureur:SetCell('Col1', row, 1);
+			end
+			if bolPrendreTechAnnee == true then
+				critere = critere + 1;
+				Classement_Coureur:SetCell('Col3', row, 1);
+			end
+			if bolPrendreVit == true then
 				critere = critere + 1;
 				Classement_Coureur:SetCell('Col2', row, 1);
 			end
+			if bolPrendreVitAnnee == true then
+				critere = critere + 1;
+				Classement_Coureur:SetCell('Col4', row, 1);
+			end
 		end
 		
-		if c4 > 0 and c5 > 0 then	-- 1 discipline vitesse ET 1 discipline technique
-			local est_critere = 1;
-			if dlgConfig:GetWindowName('chk4'):GetValue() == true and dlgConfig:GetWindowName('chk5'):GetValue() == true then
-				if clt_vitesse_annee > c4 then
-					est_critere = 0;
-				end
-				if clt_tech_annee > c5 then
-					est_critere = 0;
-				end
-				if est_critere == 1 then
-					critere = critere + 1;
-					Classement_Coureur:SetCell('Col3', row, 1);
-					Classement_Coureur:SetCell('Col4', row, 1);
-					Classement_Coureur:SetCell('Col5', row, 1);
+		-- deux discipline 1 technique ET 1 vitesse
+		local boltech = false;
+		local boltechannee = false;
+		local bolvit = false;
+		local bolvitannee = false;
+		local boltechnique = false;
+		local bolvitesse = false;
+		if c3a > 0 then
+			if bolc3aParAnnee == false then
+				if clt_tech > 0 and clt_tech <= c3a then
+					boltech = true;
+					boltechnique = true;
 				end
 			else
-				if clt_vitesse > c4 then
-					est_critere = 0;
-				end
-				if clt_tech > c5 then
-					est_critere = 0;
-				end
-				if est_critere == 1 then
-					critere = critere + 1;
-					Classement_Coureur:SetCell('Col1', row, 1);
-					Classement_Coureur:SetCell('Col2', row, 1);
-					Classement_Coureur:SetCell('Col5', row, 1);
+				if clt_tech_annee > 0 and clt_tech_annee <= c3a then
+					boltechannee = true;
+					boltechnique = true;
 				end
 			end
 		end
+		if c3b > 0 then
+			if bolc3bParAnnee == false then
+				if clt_vitesse > 0 and clt_vitesse <= c3b then
+					bolvit = true;
+					bolvitesse = true;
+				end
+			else
+				if clt_vitesse_annee > 0 and clt_vitesse_annee <= c3b then
+					bolvitannee = true;
+					bolvitesse = true;
+				end
+			end
+		end
+		if boltechnique == true and bolvitesse == true then
+			critere = critere + 1;
+			txtcol5 = txtcol5..' / 3';
+			if boltech == true then
+				Classement_Coureur:SetCell('Col1', row, 1);
+				txtcol5 = txtcol5..',A';
+			end
+			if boltechannee == true then
+				Classement_Coureur:SetCell('Col3', row, 1);
+				txtcol5 = txtcol5..',C';
+			end
+			if bolvit == true then
+				Classement_Coureur:SetCell('Col2', row, 1);
+				txtcol5 = txtcol5..',B';
+			end
+			if bolvitannee == true then
+				Classement_Coureur:SetCell('Col4', row, 1);
+				txtcol5 = txtcol5..',D';
+			end
+		end
+		txtcol5 = string.gsub(txtcol5, 'Z', '');
+		if txtcol5:sub(1, 1) == ',' then
+			txtcol5 = string.sub(txtcol5,2);
+		end
+		Classement_Coureur:SetCell('Col5', row, txtcol5);
 		Classement_Coureur:SetCell('Est_critere', row, critere);
 	end
+	Classement_Coureur:Snapshot('Classement_Coureur.db3');
 end
 
 function SetClassement_Coureur_Annee()
-	Classement_Coureur:OrderBy('Pts_SL');
-	Classement_Coureur:SetRanking('Clt_SL_Annee', 'Pts_SL', '')
-	Classement_Coureur:OrderBy('Pts_GS');
-	Classement_Coureur:SetRanking('Clt_GS_Annee', 'Pts_GS', '')
-	Classement_Coureur:OrderBy('Pts_DH');
-	Classement_Coureur:SetRanking('Clt_DH_Annee', 'Pts_DH', '')
-	Classement_Coureur:OrderBy('Pts_SG');
-	Classement_Coureur:SetRanking('Clt_SG_Annee', 'Pts_SG', '')
+	Classement_Coureur:ChangeColumn('Clt_SL_Annee', 'ranking');
+	Classement_Coureur:ChangeColumn('Clt_GS_Annee', 'ranking');
+	Classement_Coureur:ChangeColumn('Clt_DH_Annee', 'ranking');
+	Classement_Coureur:ChangeColumn('Clt_SG_Annee', 'ranking');
+	Classement_Coureur:ChangeColumn('Clt_technique_annee', 'ranking');
+	Classement_Coureur:ChangeColumn('Clt_vitesse_annee', 'ranking');
+	Classement_Coureur:SetRanking('Clt_SL_Annee', 'Pts_SL', 'An')
+	Classement_Coureur:SetRanking('Clt_GS_Annee', 'Pts_GS', 'An')
+	Classement_Coureur:SetRanking('Clt_DH_Annee', 'Pts_DH', 'An')
+	Classement_Coureur:SetRanking('Clt_SG_Annee', 'Pts_SG', 'An')
+	Classement_Coureur:SetRanking('Clt_technique_annee', 'Pts_technique', 'An')
+	Classement_Coureur:SetRanking('Clt_vitesse_annee', 'Pts_vitesse', 'An')
+	
+	-- Classement_Coureur:Snapshot('Classement_Coureur.db3');
 	
 end
 
@@ -226,15 +558,17 @@ function BuildClassementCoureur()	-- construction de la table des classements
 	Classement_Coureur:AddColumn({ name = 'Clt_GS_Annee', label = 'Clt_GS_Annee', type = sqlType.LONG, style = sqlStyle.NULL });
 	Classement_Coureur:AddColumn({ name = 'Clt_DH_Annee', label = 'Clt_DH_Annee', type = sqlType.LONG, style = sqlStyle.NULL });
 	Classement_Coureur:AddColumn({ name = 'Clt_SG_Annee', label = 'Clt_SG_Annee', type = sqlType.LONG, style = sqlStyle.NULL });
-	Classement_Coureur:AddColumn({ name = 'Pts_technique_annee', label = 'Pts_technique_annee', type = sqlType.DOUBLE, style = sqlStyle.NULL });
 	Classement_Coureur:AddColumn({ name = 'Clt_technique_annee', label = 'Clt_technique_annee', type = sqlType.LONG, style = sqlStyle.NULL });
-	Classement_Coureur:AddColumn({ name = 'Pts_vitesse_annee', label = 'Pts_vitesse_annee', type = sqlType.DOUBLE, style = sqlStyle.NULL });
 	Classement_Coureur:AddColumn({ name = 'Clt_vitesse_annee', label = 'Clt_vitesse_annee', type = sqlType.LONG, style = sqlStyle.NULL });
+	Classement_Coureur:AddColumn({ name = 'Best_tech', label = 'Best_tech', type = sqlType.TEXT, width = 20, style = sqlStyle.NULL });
+	Classement_Coureur:AddColumn({ name = 'Best_tech_annee', label = 'Best_tech_annee', type = sqlType.TEXT, width = 20, style = sqlStyle.NULL });
+	Classement_Coureur:AddColumn({ name = 'Best_vit', label = 'Best_vit', type = sqlType.TEXT, width = 20, style = sqlStyle.NULL });
+	Classement_Coureur:AddColumn({ name = 'Best_vit_annee', label = 'Best_vit_annee', type = sqlType.TEXT, width = 20, style = sqlStyle.NULL });
 	Classement_Coureur:AddColumn({ name = 'Col1', label = 'Col1', type = sqlType.LONG, style = sqlStyle.NULL });
 	Classement_Coureur:AddColumn({ name = 'Col2', label = 'Col2', type = sqlType.LONG, style = sqlStyle.NULL });
 	Classement_Coureur:AddColumn({ name = 'Col3', label = 'Col3', type = sqlType.LONG, style = sqlStyle.NULL });
 	Classement_Coureur:AddColumn({ name = 'Col4', label = 'Col4', type = sqlType.LONG, style = sqlStyle.NULL });
-	Classement_Coureur:AddColumn({ name = 'Col5', label = 'Col5', type = sqlType.LONG, style = sqlStyle.NULL });
+	Classement_Coureur:AddColumn({ name = 'Col5', label = 'Col5', type = sqlType.TEXT, width = 20, style = sqlStyle.NULL });
 	Classement_Coureur:OrderBy('Clt_technique DESC');
 	last_clt_technique = Classement_Coureur:GetCellInt('Clt_technique', 0, -1);
 	Classement_Coureur:OrderBy('Clt_vitesse DESC');
@@ -255,8 +589,9 @@ function BuildClassementCoureur()	-- construction de la table des classements
 	for i = num_annee_debut, num_annee_fin do
 		listeMinisterielle.filter_annees = listeMinisterielle.filter_annees..",'"..tostring(i).."'";
 	end
-	listeMinisterielle.filter_annees = "$(An):In("..listeMinisterielle.filter_annees..")";
-	Classement_Coureur:Filter()
+	local filter = "$(An):In("..listeMinisterielle.filter_annees..")";
+	Classement_Coureur:Filter(filter, true)
+	SetClassement_Coureur_Annee();
 
 	for row = 0, Classement_Coureur:GetNbRows()-1 do
 		local cltSL = Classement_Coureur:GetCellInt('Clt_SL', row, 10000);
@@ -273,51 +608,47 @@ function BuildClassementCoureur()	-- construction de la table des classements
 		if cltTect < 10000 then
 			if cltSL < cltGS then
 				Classement_Coureur:SetCell('Pts_technique', row, ptsSL);
-				Classement_Coureur:SetCell('Pts_technique_annee', row, ptsSL);
 				Classement_Coureur:SetCell('Clt_technique', row, cltSL);
+				Classement_Coureur:SetCell('Best_tech', row, ' (SL) ');
 			else
 				Classement_Coureur:SetCell('Pts_technique', row, ptsGS);
-				Classement_Coureur:SetCell('Pts_technique_annee', row, ptsGS);
 				Classement_Coureur:SetCell('Clt_technique', row, cltGS);
+				Classement_Coureur:SetCell('Best_tech', row, ' (GS) ');
 			end
 		end
 		local cltVit = math.min(cltSG, cltDH);
 		if cltVit < 10000 then
 			if cltSG < cltDH then
 				Classement_Coureur:SetCell('Pts_vitesse', row, ptsSG);
-				Classement_Coureur:SetCell('Pts_vitesse_annee', row, ptsSG);
 				Classement_Coureur:SetCell('Clt_vitesse', row, cltSG);
+				Classement_Coureur:SetCell('Best_vit', row, ' (SG) ');
 			else
 				Classement_Coureur:SetCell('Pts_vitesse', row, ptsDH);
-				Classement_Coureur:SetCell('Pts_vitesse_annee', row, ptsDH);
 				Classement_Coureur:SetCell('Clt_vitesse', row, cltDH);
+				Classement_Coureur:SetCell('Best_vit', row, ' (DH) ');
 			end
 		end
 	end
-	Classement_Coureur:Filter(listeMinisterielle.filter_annees, true);
-	if listeMinisterielle.par_annee == true then
-		--Classement_Coureur:Filter(listeMinisterielle.filter_annees, true);
-		SetClassement_Coureur_Annee();
-		for row = 0, Classement_Coureur:GetNbRows()-1 do
-			local cltSLannee = Classement_Coureur:GetCellInt('Clt_SL_Annee', row, 10000);
-			local cltGSannee = Classement_Coureur:GetCellInt('Clt_GS_Annee', row, 10000);
-			local cltSGannee = Classement_Coureur:GetCellInt('Clt_SG_Annee', row, 10000);
-			local cltDHannee = Classement_Coureur:GetCellInt('Clt_DH_Annee', row, 10000);
-			local cltTectannee = math.min(cltSLannee, cltGSannee);
-			local cltVitannee = math.min(cltSGannee, cltDHannee);
-			if cltTectannee < 10000 then
-				if cltSLannee < cltGSannee then
-					Classement_Coureur:SetCell('Clt_technique_annee', row, cltSLannee);
-				else
-					Classement_Coureur:SetCell('Clt_technique_annee', row, cltGSannee);
-				end
+	--Classement_Coureur:Filter(listeMinisterielle.filter_annees, true);
+	for row = 0, Classement_Coureur:GetNbRows()-1 do
+		local cltSLannee = Classement_Coureur:GetCellInt('Clt_SL_Annee', row, 10000);
+		local cltGSannee = Classement_Coureur:GetCellInt('Clt_GS_Annee', row, 10000);
+		local cltSGannee = Classement_Coureur:GetCellInt('Clt_SG_Annee', row, 10000);
+		local cltDHannee = Classement_Coureur:GetCellInt('Clt_DH_Annee', row, 10000);
+		local cltTectannee = math.min(cltSLannee, cltGSannee);
+		local cltVitannee = math.min(cltSGannee, cltDHannee);
+		if cltTectannee < 10000 then
+			if cltSLannee < cltGSannee then
+				Classement_Coureur:SetCell('Clt_technique_annee', row, cltSLannee);
+			else
+				Classement_Coureur:SetCell('Clt_technique_annee', row, cltGSannee);
 			end
-			if cltVitannee < 10000 then
-				if cltSGannee < cltDHannee then
-					Classement_Coureur:SetCell('Clt_vitesse_annee', row, cltSGannee);
-				else
-					Classement_Coureur:SetCell('Clt_vitesse_annee', row, cltDHannee);
-				end
+		end
+		if cltVitannee < 10000 then
+			if cltSGannee < cltDHannee then
+				Classement_Coureur:SetCell('Clt_vitesse_annee', row, cltSGannee);
+			else
+				Classement_Coureur:SetCell('Clt_vitesse_annee', row, cltDHannee);
 			end
 		end
 	end
@@ -329,49 +660,68 @@ end
 
 function OnPrintAnalyse()
 	-- Creation du Report
-	listeMinisterielle.Critere1  = 'NÈant';
-	listeMinisterielle.Critere2  = 'NÈant';
-	listeMinisterielle.Critere3  = 'NÈant';
-	local x1 = dlgConfig:GetWindowName('gxpremiers1'):GetValue();
-	local x2 = dlgConfig:GetWindowName('gxpremiers2'):GetValue();
-	local x3 = dlgConfig:GetWindowName('gxpremiers3'):GetValue();
-	local x4 = dlgConfig:GetWindowName('gxpremiers4'):GetValue();
-	local x5 = dlgConfig:GetWindowName('gxpremiers5'):GetValue();
-	if x1 ~= '' then
-		listeMinisterielle.Critere1 = "Ítre dans les "..x1..' mondiaux';
-		if dlgConfig:GetWindowName('chk1'):GetValue() == true then
-			listeMinisterielle.Critere1 = listeMinisterielle.Critere1.." de son annÈe ";
+	listeMinisterielle.Critere1  = 'N√©ant';
+	listeMinisterielle.Critere2  = 'N√©ant';
+	listeMinisterielle.Critere3  = 'N√©ant';
+	local xc1a = dlgConfig:GetWindowName('gxpremiersc1a'):GetValue();
+	local xc1b = dlgConfig:GetWindowName('gxpremiersc1b'):GetValue();
+	local xc2a = dlgConfig:GetWindowName('gxpremiersc2a'):GetValue();
+	local xc2b = dlgConfig:GetWindowName('gxpremiersc2b'):GetValue();
+	local xc3a = dlgConfig:GetWindowName('gxpremiersc3a'):GetValue();
+	local xc3b = dlgConfig:GetWindowName('gxpremiersc3b'):GetValue();
+	if xc1a:len() > 0 then
+		listeMinisterielle.Critere1 = "Etre dans les "..xc1a..' mondiaux';
+		if dlgConfig:GetWindowName('chkc1a'):GetValue() == true then
+			listeMinisterielle.Critere1 = listeMinisterielle.Critere1.." de son ann√©e ";
 		end
 	end
-	if x2 ~= '' then
-		listeMinisterielle.Critere1 = listeMinisterielle.Critere1.. ' OU Ítre dans les '..x2..' mondiaux';
+	if xc1b:len() > 0 then
+		listeMinisterielle.Critere1 = listeMinisterielle.Critere1.. ' OU √™tre dans les '..xc1b..' mondiaux';
+		if dlgConfig:GetWindowName('chkc1b'):GetValue() == true then
+			listeMinisterielle.Critere1 = listeMinisterielle.Critere1.." de son ann√©e ";
+		end
 	end
-	if x3 ~= '' then
-		listeMinisterielle.Critere2 = "Ítre dans les "..x3..' mondiaux';
-	end
-	if x4 ~= '' then
-		listeMinisterielle.Critere3 = "Ítre dans les "..x4..' mondiaux';
-		if dlgConfig:GetWindowName('chk4'):GetValue() == true then
-			listeMinisterielle.Critere3 = listeMinisterielle.Critere3.." de son annÈe en Vitesse";
+	
+	if xc2a:len() > 0 then
+		if dlgConfig:GetWindowName('chkouc2a'):GetValue() == true then
+			listeMinisterielle.Critere2 = 'OU √™tre dans les '..xc2a..' mondiaux';
 		else
-			listeMinisterielle.Critere3 = listeMinisterielle.Critere3.." en Vitesse";
+			listeMinisterielle.Critere2 = "Etre dans les "..xc2a..' mondiaux';
 		end
-		listeMinisterielle.Critere3 = listeMinisterielle.Critere3.." ET Ítre dans les ";
-		listeMinisterielle.Critere3 = listeMinisterielle.Critere3..x5..' mondiaux';
-		if dlgConfig:GetWindowName('chk5'):GetValue() == true then
-			listeMinisterielle.Critere3 = listeMinisterielle.Critere3.." de son annÈe en Technique";
-		else
-			listeMinisterielle.Critere3 = listeMinisterielle.Critere3.." en Technique";
+		if dlgConfig:GetWindowName('chkc2a'):GetValue() == true then
+			listeMinisterielle.Critere2 = listeMinisterielle.Critere2.." de son ann√©e ";
 		end
 	end
+	if xc2b:len() > 0 then
+		listeMinisterielle.Critere2 = listeMinisterielle.Critere2..' OU √™tre dans les '..xc2b..' mondiaux';
+		if dlgConfig:GetWindowName('chkc2b'):GetValue() == true then
+			listeMinisterielle.Critere2 = listeMinisterielle.Critere2.." de son ann√©e ";
+		end
+	end
+	
+	if xc3a:len() > 0 then
+		listeMinisterielle.Critere3 = "En Technique, √™tre dans les "..xc3a..' mondiaux';
+		if dlgConfig:GetWindowName('chkc3a'):GetValue() == true then
+			listeMinisterielle.Critere3 = listeMinisterielle.Critere3.." de son ann√©e ";
+		end
+	end
+	if xc3b:len() > 0 then
+		listeMinisterielle.Critere3 = listeMinisterielle.Critere3.. ' ET en Vitesse √™tre dans les '..xc3b..' mondiaux';
+		if dlgConfig:GetWindowName('chkc3b'):GetValue() == true then
+			listeMinisterielle.Critere3 = listeMinisterielle.Critere3.." de son ann√©e ";
+		end
+	end
+	if listeMinisterielle.Critere3:len() > 10 then
+		listeMinisterielle.Critere3 = listeMinisterielle.Critere3.. '  (r√©p√©r√© par un signe "X")';
+	end
+
 	Classement_Coureur:OrderBy('Est_critere DESC, Pts_technique')
-	-- Classement_Coureur:Snapshot('Classement_Coureur.db3');
 	report = wnd.LoadTemplateReportXML({
 		xml = './process/liste_ministerielle.xml',
 		node_name = 'root/panel',
 		node_attr = 'id',
 		node_value = 'printanalyse',
-		title = "Edition des coureurs selon les critËres",
+		title = "Edition des coureurs selon les crit√®res",
 		base = base,
 		body = Classement_Coureur,
 		margin_first_top = 120,
@@ -383,186 +733,181 @@ function OnPrintAnalyse()
 		margin_right = 100,
 		margin_bottom = 100,
 		paper_orientation = 'landscape',
-		params = {Niveau = ' - Pour le niveau : '..listeMinisterielle.comboNiveau, Liste = listeMinisterielle.comboListe, Version = scrip_version, Critere1 = listeMinisterielle.Critere1, Critere2 = listeMinisterielle.Critere2, Critere3 = listeMinisterielle.Critere3, X1 = x1, X2 = x2, X3 = x3, X4 = x4, X5 = x5, AnneeDebut = num_annee_debut, AnneeFin = num_annee_fin}
+		params = {Niveau = ' - Pour le niveau : '..listeMinisterielle.comboNiveau, Liste = listeMinisterielle.comboListe, Version = script_version, Critere1 = listeMinisterielle.Critere1, Critere2 = listeMinisterielle.Critere2, Critere3 = listeMinisterielle.Critere3, AnneeDebut = num_annee_debut, AnneeFin = num_annee_fin}
 	});
 	-- report:SetZoom(10)
 end
 
 function OnSavedlgBackoffice()
+	if not doc_cfg then
+		do return end
+	end
 	for i = 1, 10 do
 		local c1 = '';
 		local c2 = '';
 		local c3 = '';
 		node = GetNodex(listeMinisterielle.comboNiveau, listeMinisterielle.comboSexe, i);
+		assert(node ~= nil);
 		local col1 = dlgBackoffice:GetWindowName('unetechniquea'..i):GetValue();
 		local col2 = dlgBackoffice:GetWindowName('unetechniqueb'..i):GetValue();
-		local col3 = dlgBackoffice:GetWindowName('unevitesse'..i):GetValue();
-		local col4 = dlgBackoffice:GetWindowName('deuxvitessea'..i):GetValue();
-		local col5 = dlgBackoffice:GetWindowName('deuxvitesseb'..i):GetValue();
-		local col6 = dlgBackoffice:GetWindowName('deuxtechniquea'..i):GetValue();
-		local col7 = dlgBackoffice:GetWindowName('deuxtechniqueb'..i):GetValue();
-		if col1 == '' and col2 == '' then
-			c1 = '-1';
-		else
-			if col1 ~= '' then
-				c1 = col1..'a';
+		local col3 = dlgBackoffice:GetWindowName('unevitessea'..i):GetValue();
+		local col4 = dlgBackoffice:GetWindowName('unevitesseb'..i):GetValue();
+		local col5 = dlgBackoffice:GetWindowName('deuxvitessea'..i):GetValue();
+		local col6 = dlgBackoffice:GetWindowName('deuxvitesseb'..i):GetValue();
+		local col7 = dlgBackoffice:GetWindowName('deuxtechniquea'..i):GetValue();
+		local col8 = dlgBackoffice:GetWindowName('deuxtechniqueb'..i):GetValue();
+		local chkouc2b = dlgBackoffice:GetWindowName('chkouc2b'..i):GetValue();
+		
+		if col1:len() > 0 then
+			col1 = col1..'a';
+		end
+		if col3:len() > 0 then
+			col3 = col3..'a';
+		end
+		if col5:len() > 0 then
+			col5 = col5..'a';
+		end
+		if col7:len() > 0 then
+			col7 = col7..'a';
+		end
+		
+		if col1:len() > 0 and col2:len() > 0 then
+			col2 = '|'..col2;
+		end
+		if chkouc2b == true then
+			if col3:len() > 0 then
+				col3 = '|'..col3;
 			end
-			if col2 ~= '' then
-				if c1:len() > 0 then
-					c1 = c1..',';
-				end
-				c1 = c1..col2;
+			if col4:len() > 0 then
+				col4 = '|'..col4;
+			end
+		else
+			if col3:len() > 0 and col4:len() > 0 then
+				col4 = ','..col4;
 			end
 		end
-		if col3 == '' then
-			c2 = '-1';
-		else
-			c2 = col3;
+		if col5:len() > 0 and col6:len() > 0 then
+			col6 = ','..col6;
 		end
-		if (col4 == '' and col5 == '') or (col6 == '' and col7 == '') then
-			c3 = '-1';
+		if col7:len() > 0 and col8:len() > 0 then
+			col8 = ','..col8;
 		end
-		if col4 ~= '' and col6 ~= '' then	-- col4 et col 6 = par annÈe d'‚ge
-			c3 = col4..'a,'..col6..'a';
-		end
-		if col5 ~= '' and col7 ~= '' then	-- col5 et col 7 = clt modial
-			c3 = col5..','..col7;
-		end
-		if c1 == '' then
-			c1 = '-1';
-		end
-		if c2 == '' then
-			c2 = '-1';
-		end
-		if c3 == '' then
-			c3 = '-1';
+		c1 = col1..col2;
+		c2 = col3..col4;
+		if (col5:len() > 0 or col6:len() > 0) and (col7:len() > 0 or col8:len() > 0) then
+			c3 = col5..col6..','..col7..col8;
 		end
 		node:ChangeAttribute('c1', c1);
 		node:ChangeAttribute('c2', c2);
 		node:ChangeAttribute('c3', c3);
-		doc:SaveFile();
-		doc:Delete();
-		XML = app.GetPath().."/process/liste_ministerielle.xml";
-		doc = xmlDocument.Create(XML);
+		doc_cfg:SaveFile();
+		doc_cfg:Delete();
+		XML_cfg = app.GetPath().."/liste_ministerielle_cfg.xml";
+		doc_cfg = xmlDocument.Create(XML_cfg);
 	end
 	SetDataAnalyse();
+	dlgBackoffice:EndModal();
 end
 
-function OnSavedlgBackofficeOLD()
-	for i = 1, 10 do
-		local c1 = '';
-		local c2 = '';
-		local c3 = '';
-		node = GetNodex(listeMinisterielle.comboNiveau, listeMinisterielle.comboSexe, i);
-		local col1 = dlgBackoffice:GetWindowName('unetechniquea'..i):GetValue();
-		local col2 = dlgBackoffice:GetWindowName('unetechniqueb'..i):GetValue();
-		local col3 = dlgBackoffice:GetWindowName('unevitesse'..i):GetValue();
-		local col4 = dlgBackoffice:GetWindowName('deuxvitessea'..i):GetValue();
-		local col5 = dlgBackoffice:GetWindowName('deuxvitesseb'..i):GetValue();
-		local col6 = dlgBackoffice:GetWindowName('deuxtechniquea'..i):GetValue();
-		local col7 = dlgBackoffice:GetWindowName('deuxtechniqueb'..i):GetValue();
-		if col1 == '' and col2 == '' then
-			c1 = '-1';
-		else
-			if col1 ~= '' then
-				c1 = col1..'a';
-			end
-			if col2 ~= '' then
-				if c1:len() > 0 then
-					c1 = c1..',';
-				end
-				c1 = c1..col2;
-			end
-		end
-		if col3 == '' then
-			c2 = '-1';
-		else
-			c2 = col2;
-		end
-		if (col4 == '' and col5 == '') or (col6 == '' and col7 == '') then
-			c3 = '-1';
-		end
-		if col4 ~= '' and col6 ~= '' then	-- col4 et col 6 = par annÈe d'‚ge
-			c3 = col4..'a,'..col6;
-		end
-		if col5 ~= '' and col7 ~= '' then	-- col5 et col 7 = clt modial
-			c3 = col5..','..col7;
-		end
-		if c1 == '' then
-			c1 = '-1';
-		end
-		if c2 == '' then
-			c2 = '-1';
-		end
-		if c3 == '' then
-			c3 = '-1';
-		end
-		node:ChangeAttribute('c1', c1);
-		node:ChangeAttribute('c2', c2);
-		node:ChangeAttribute('c3', c3);
-		doc:SaveFile();
-		doc:Delete();
-		XML = app.GetPath().."/process/liste_ministerielle.xml";
-		doc = xmlDocument.Create(XML);
-	end
-	SetDataAnalyse();
-end
-
-function SetAnalyseGauche(c1,c2,c3)	-- c1, c2 et c3 sont des valeurs de critËres
-	dlgConfig:GetWindowName('chk1'):SetValue(false);
-	dlgConfig:GetWindowName('chk2'):SetValue(false);
-	dlgConfig:GetWindowName('chk3'):SetValue(false);
-	dlgConfig:GetWindowName('chk4'):SetValue(false);
-	dlgConfig:GetWindowName('chk5'):SetValue(false);
-	local tc1 = c1:Split(',');
+function SetAnalyseGauche(c1,c2,c3)	-- c1, c2 et c3 sont des valeurs de crit√®res
+	dlgConfig:GetWindowName('chkc1a'):SetValue(false);
+	dlgConfig:GetWindowName('chkc1b'):SetValue(false);
+	dlgConfig:GetWindowName('chkouc1b'):SetValue(false);
+	dlgConfig:GetWindowName('chkc2a'):SetValue(false);
+	dlgConfig:GetWindowName('chkc2b'):SetValue(false);
+	dlgConfig:GetWindowName('chkc3a'):SetValue(false);
+	dlgConfig:GetWindowName('chkc3b'):SetValue(false);
+	dlgConfig:GetWindowName('chkouc2a'):SetValue(false);
+	dlgConfig:GetWindowName('chkouc2b'):SetValue(false);
+	dlgConfig:GetWindowName('gxpremiersc1a'):SetValue('');
+	dlgConfig:GetWindowName('gxpremiersc1b'):SetValue('');
+	dlgConfig:GetWindowName('gxpremiersc2a'):SetValue('');
+	dlgConfig:GetWindowName('gxpremiersc2b'):SetValue('');
+	dlgConfig:GetWindowName('gxpremiersc3a'):SetValue('');
+	dlgConfig:GetWindowName('gxpremiersc3b'):SetValue('');
 	listeMinisterielle.par_annee = false;
-	for i = 1, #tc1 do
-		if string.find(tc1[i], 'a') then	-- on est par annÈe d'‚ge
+	local tc1 = c1:Split('|');		--	exemple dans c1 : 15a|240 => 15√®me dans l'ann√©e d'√¢ge ou 240√®me mondial mettre 15 dans la premi√®re ligne cocher ann√©e et mettre 250 en ligne 2, d√©cocher ou et d√©cocher ann√©e d'√¢ge
+	if #tc1 > 1 then	-- on a 2 crit√®res
+		dlgConfig:GetWindowName('gxpremiersc1a'):SetValue(string.gsub(tc1[1], "%D", ""));
+		if string.find(tc1[1], 'a') then
 			listeMinisterielle.par_annee = true;
-			tc1[i] = string.gsub(tc1[i], "%D", "");
-			dlgConfig:GetWindowName('chk1'):SetValue(true);
+			dlgConfig:GetWindowName('chkc1a'):SetValue(true);
 		end
-		if tc1[i] ~= '-1' then
-			dlgConfig:GetWindowName('gxpremiers'..i):SetValue(tc1[i]);
-		end
-	end
-	local tc2 = c2:Split(',');
-	for i = 1, #tc2 do
-		if tc2[i] ~= '-1' then
-			dlgConfig:GetWindowName('gxpremiers'..i+2):SetValue(tc2[i]);
-		end
-	end
-	local tc3 = c3:Split(',');
-	if tc3[1] ~= '-1' then
-		if string.find(tc3[1], 'a') then	-- on est par annÈe d'‚ge
+		dlgConfig:GetWindowName('chkouc1b'):SetValue(true);
+		if string.find(tc1[2], 'a') then
 			listeMinisterielle.par_annee = true;
-			dlgConfig:GetWindowName('chk4'):SetValue(true);
+			dlgConfig:GetWindowName('chkc1b'):SetValue(true);
 		end
-		tc3[1] = string.gsub(tc3[1], "%D", "");
-		if tc3[1] ~= '-1' then
-			dlgConfig:GetWindowName('gxpremiers4'):SetValue(tc3[1]);
-		end
-	end
-	if tc3[2] and tc3[2] ~= '-1' then
-		if string.find(tc3[2], 'a') then	-- on est par annÈe d'‚ge
+		dlgConfig:GetWindowName('gxpremiersc1b'):SetValue(string.gsub(tc1[2], "%D", ""));
+	else	-- crit√®re simple
+		dlgConfig:GetWindowName('gxpremiersc1a'):SetValue(string.gsub(tc1[1], "%D", ""));
+		if string.find(tc1[1], 'a') then
 			listeMinisterielle.par_annee = true;
-			dlgConfig:GetWindowName('chk5'):SetValue(true);
-		end
-		tc3[2] = string.gsub(tc3[2], "%D", "");
-		if tc3[2] ~= -1 then
-			dlgConfig:GetWindowName('gxpremiers5'):SetValue(tc3[2]);
+			dlgConfig:GetWindowName('chkc1a'):SetValue(true);
 		end
 	end
+	
+	local tc2 = c2:Split('|');		--	exemple dans c2 : |240 => ou √™tre 250 en ... on active le ou √† la ligne 1
+	if #tc2 > 1 then	-- on a 2 crit√®res dont le premier peut √™tre vide. C'est alors un OU entre technique et vitesse
+		if tc2[1]:len() == 0 then
+			dlgConfig:GetWindowName('chkouc2a'):SetValue(true);
+			dlgConfig:GetWindowName('gxpremiersc2a'):SetValue(string.gsub(tc2[2], "%D", ""));
+			if string.find(tc2[2], 'a') then
+				listeMinisterielle.par_annee = true;
+				dlgConfig:GetWindowName('chkc2a'):SetValue(true);
+			end
+		else
+			dlgConfig:GetWindowName('gxpremiersc2a'):SetValue(string.gsub(tc2[1], "%D", ""));
+			if string.find(tc2[1], 'a') then
+				listeMinisterielle.par_annee = true;
+				dlgConfig:GetWindowName('chkc2a'):SetValue(true);
+			end
+			dlgConfig:GetWindowName('chkouc2b'):SetValue(true);
+			if string.find(tc2[2], 'a') then
+				listeMinisterielle.par_annee = true;
+				dlgConfig:GetWindowName('chkc2b'):SetValue(true);
+			end
+			dlgConfig:GetWindowName('gxpremiersc2b'):SetValue(string.gsub(tc2[2], "%D", ""));
+		end
+	else	-- crit√®re simple
+		dlgConfig:GetWindowName('gxpremiersc2a'):SetValue(string.gsub(tc2[1], "%D", ""));
+		if string.find(tc2[1], 'a') then
+			listeMinisterielle.par_annee = true;
+			dlgConfig:GetWindowName('chkc2a'):SetValue(true);
+		end
+	end
+	
+	local tc3 = c3:Split(',');	-- s√©pare technique et vitesse
+	if #tc3 > 1 then	-- on a 2 crit√®res dont le premier peut √™tre vide. C'est alors un OU entre technique et vitesse
+		dlgConfig:GetWindowName('gxpremiersc3a'):SetValue(string.gsub(tc3[1], "%D", ""));
+		if string.find(tc3[1], 'a') then
+			listeMinisterielle.par_annee = true;
+			dlgConfig:GetWindowName('chkc3a'):SetValue(true);
+		end
+		dlgConfig:GetWindowName('gxpremiersc3b'):SetValue(string.gsub(tc3[2], "%D", ""));
+		if string.find(tc3[2], 'a') then
+			listeMinisterielle.par_annee = true;
+			dlgConfig:GetWindowName('chkc3b'):SetValue(true);
+		end
+	end
+	dlgConfig:GetWindowName('gxpremiersc1b'):Enable(dlgConfig:GetWindowName('chkouc1b'):GetValue());
+	dlgConfig:GetWindowName('gxpremiersc2b'):Enable(dlgConfig:GetWindowName('chkouc2b'):GetValue());
 end
 
 function SetDataAnalyse()
-	dlgConfig:GetWindowName('chk1'):SetValue(false);
-	dlgConfig:GetWindowName('chk4'):SetValue(false);
-	dlgConfig:GetWindowName('gxpremiers1'):SetValue('');
-	dlgConfig:GetWindowName('gxpremiers2'):SetValue('');
-	dlgConfig:GetWindowName('gxpremiers3'):SetValue('');
-	dlgConfig:GetWindowName('gxpremiers4'):SetValue('');
-	dlgConfig:GetWindowName('gxpremiers5'):SetValue('');
+	dlgConfig:GetWindowName('chkc1a'):SetValue(false);
+	dlgConfig:GetWindowName('chkc1b'):SetValue(false);
+	dlgConfig:GetWindowName('chkc2a'):SetValue(false);
+	dlgConfig:GetWindowName('chkc2b'):SetValue(false);
+	dlgConfig:GetWindowName('chkc3a'):SetValue(false);
+	dlgConfig:GetWindowName('chkc3b'):SetValue(false);
+	dlgConfig:GetWindowName('chkouc1b'):SetValue(false);
+	dlgConfig:GetWindowName('chkouc2a'):SetValue(false);
+	dlgConfig:GetWindowName('chkouc2b'):SetValue(false);
+	dlgConfig:GetWindowName('gxpremiersc1a'):SetValue('');
+	dlgConfig:GetWindowName('gxpremiersc1b'):SetValue('');
+	dlgConfig:GetWindowName('gxpremiersc2a'):SetValue('');
+	dlgConfig:GetWindowName('gxpremiersc2b'):SetValue('');
 	
 	listeMinisterielle.node = GetNode();
 	assert(listeMinisterielle.node ~= nil)
@@ -581,65 +926,81 @@ end
 function AfficheNode(node, idx)
 	dlgBackoffice:GetWindowName('unetechniquea'..idx):SetValue('');
 	dlgBackoffice:GetWindowName('unetechniqueb'..idx):SetValue('');
-	dlgBackoffice:GetWindowName('unevitesse'..idx):SetValue('');
+	dlgBackoffice:GetWindowName('unevitessea'..idx):SetValue('');
+	dlgBackoffice:GetWindowName('unevitesseb'..idx):SetValue('');
 	dlgBackoffice:GetWindowName('deuxvitessea'..idx):SetValue('');
 	dlgBackoffice:GetWindowName('deuxvitesseb'..idx):SetValue('');
 	dlgBackoffice:GetWindowName('deuxtechniquea'..idx):SetValue('');
 	dlgBackoffice:GetWindowName('deuxtechniqueb'..idx):SetValue('');
+	dlgBackoffice:GetWindowName('chkouc2b'..idx):SetValue(false);
 	
 	dlgBackoffice:GetWindowName('unetechniquea'..idx):Enable(true);
 	dlgBackoffice:GetWindowName('unetechniqueb'..idx):Enable(true);
-	dlgBackoffice:GetWindowName('unevitesse'..idx):Enable(true);
+	dlgBackoffice:GetWindowName('unevitessea'..idx):Enable(true);
 	dlgBackoffice:GetWindowName('deuxvitessea'..idx):Enable(true);
 	dlgBackoffice:GetWindowName('deuxvitesseb'..idx):Enable(true);
 	dlgBackoffice:GetWindowName('deuxtechniquea'..idx):Enable(true);
 	dlgBackoffice:GetWindowName('deuxtechniqueb'..idx):Enable(true);
-	
+	dlgBackoffice:GetWindowName('chkouc2b'..idx):Enable(true);
+
 	local c1 = node:GetAttribute("c1");
 	local c2 = node:GetAttribute("c2");
 	local c3 = node:GetAttribute("c3");
-	if c1 ~= '-1' then
-		local tc1 = c1:Split(',');
-		for i = 1, #tc1 do
-			if string.find(tc1[i], 'a') then	-- on est par annÈe d'‚ge
-				tc1[i] = string.gsub(tc1[i], "%D", "");
-				dlgBackoffice:GetWindowName('unetechniquea'..idx):SetValue(tc1[i]);
-			else
-				dlgBackoffice:GetWindowName('unetechniqueb'..idx):SetValue(tc1[i]);
+	if c1:len() > 0 then
+		if c1 ~= '' then
+			local tc1 = c1:Split('|');
+			for i = 1, #tc1 do
+				if string.find(tc1[i], 'a') then	-- on est par ann√©e d'√¢ge
+					tc1[i] = string.gsub(tc1[i], "%D", "");
+					dlgBackoffice:GetWindowName('unetechniquea'..idx):SetValue(tc1[i]);
+				else
+					dlgBackoffice:GetWindowName('unetechniqueb'..idx):SetValue(tc1[i]);
+				end
 			end
 		end
 	end
-	local tc2 = c2:Split(',');
-	for i = 1, #tc2 do
-		if tc2[i] ~= '-1' then
-			dlgBackoffice:GetWindowName('unevitesse'..idx):SetValue(tc2[i]);
-		end
-	end
-	local tc3 = c3:Split(',');
-	if #tc3 > 1 then
-		if string.find(tc3[1], 'a') then	-- on est par annÈe d'‚ge
-			tc3[1] = string.gsub(tc3[1], "%D", "");
-			dlgBackoffice:GetWindowName('deuxvitessea'..idx):SetValue(tc3[1]);
+	if c2:len() > 0 then
+		-- dlgBackoffice:GetWindowName('unevitessea'..idx):SetValue(c2);
+		local tc2 = c2:Split('|');
+		if #tc2 > 1 then
+			if tc2[1]:len() == 0 then	-- c'est un ou entre technique et vitesse
+				dlgBackoffice:GetWindowName('chkouc2b'..idx):SetValue(true);
+				-- dlgBackoffice:GetWindowName('unevitessea'..idx):SetValue(tc2[2]);
+				if string.find(tc2[2], 'a') then
+					dlgBackoffice:GetWindowName('unevitessea'..idx):SetValue(tc2[2]);
+				else
+					dlgBackoffice:GetWindowName('unevitesseb'..idx):SetValue(tc2[2]);
+				end
+			else						-- c'est un choix entre par ann√©e et mondial
+				dlgBackoffice:GetWindowName('unevitessea'..idx):SetValue(tc2[1]);
+				dlgBackoffice:GetWindowName('unevitesseb'..idx):SetValue(tc2[2]);
+			end
 		else
-			dlgBackoffice:GetWindowName('deuxvitesseb'..idx):SetValue(tc3[1]);
-		end
-		if string.find(tc3[2], 'a') then	-- on est par annÈe d'‚ge
-			tc3[2] = string.gsub(tc3[2], "%D", "");
-			dlgBackoffice:GetWindowName('deuxtechniquea'..idx):SetValue(tc3[2]);
-		else
-			dlgBackoffice:GetWindowName('deuxtechniqueb'..idx):SetValue(tc3[2]);
+			if string.find(tc2[1], 'a') then
+				dlgBackoffice:GetWindowName('unevitessea'..idx):SetValue(tc2[1]);
+			else
+				dlgBackoffice:GetWindowName('unevitesseb'..idx):SetValue(tc2[1]);
+			end
 		end
 	end
-	if dlgBackoffice:GetWindowName('unetechniquea'..idx):GetValue() == '' and  dlgBackoffice:GetWindowName('unetechniqueb'..idx):GetValue() == '' then
-		dlgBackoffice:GetWindowName('unetechniquea'..idx):Enable(false);
-		dlgBackoffice:GetWindowName('unetechniqueb'..idx):Enable(false);
-		dlgBackoffice:GetWindowName('unevitesse'..idx):Enable(false);
-		dlgBackoffice:GetWindowName('deuxvitessea'..idx):Enable(false);
-		dlgBackoffice:GetWindowName('deuxvitesseb'..idx):Enable(false);
-		dlgBackoffice:GetWindowName('deuxtechniquea'..idx):Enable(false);
-		dlgBackoffice:GetWindowName('deuxtechniqueb'..idx):Enable(false);
+	
+	if c3:len() > 0 then
+		local tc3 = c3:Split(',');
+		if #tc3 > 1 then
+			if string.find(tc3[1], 'a') then	-- on est par ann√©e d'√¢ge
+				tc3[1] = string.gsub(tc3[1], "%D", "");
+				dlgBackoffice:GetWindowName('deuxvitessea'..idx):SetValue(tc3[1]);
+			else
+				dlgBackoffice:GetWindowName('deuxvitesseb'..idx):SetValue(tc3[1]);
+			end
+			if string.find(tc3[2], 'a') then	-- on est par ann√©e d'√¢ge
+				tc3[2] = string.gsub(tc3[2], "%D", "");
+				dlgBackoffice:GetWindowName('deuxtechniquea'..idx):SetValue(tc3[2]);
+			else
+				dlgBackoffice:GetWindowName('deuxtechniqueb'..idx):SetValue(tc3[2]);
+			end
+		end
 	end
-
 end
 
 function AfficheBackOffice()
@@ -649,7 +1010,7 @@ function AfficheBackOffice()
 		height = listeMinisterielle.dlgPosit.height,
 		x = listeMinisterielle.dlgPosit.x,
 		y = listeMinisterielle.dlgPosit.y,
-		label='Gestion des critËres', 
+		label='Gestion des crit√®res', 
 		icon='./res/32x32_ffs.png'
 		});
 
@@ -665,8 +1026,8 @@ function AfficheBackOffice()
 	-- remplissage des Combo
 	dlgBackoffice:GetWindowName('comboNiveau'):Append("Releve");
 	dlgBackoffice:GetWindowName('comboNiveau'):Append("Espoirs");
-	dlgBackoffice:GetWindowName('comboNiveau'):Append("AccËs CNE");
-	dlgBackoffice:GetWindowName('comboNiveau'):Append("AccËs CIE");
+	-- dlgBackoffice:GetWindowName('comboNiveau'):Append("Acc√®s CNE");
+	-- dlgBackoffice:GetWindowName('comboNiveau'):Append("Acc√®s CIE");
 	dlgBackoffice:GetWindowName('comboSexe'):Append("Dames");
 	dlgBackoffice:GetWindowName('comboSexe'):Append("Hommes");
 	dlgBackoffice:GetWindowName('comboNiveau'):SetValue(listeMinisterielle.comboNiveau);
@@ -736,14 +1097,15 @@ function AfficheBackOffice()
 end
 
 function AffichagedlgConfiguration()
-	-- Creation de la boÓte de dialogue
+
+	-- Creation de la bo√Æte de dialogue
 	dlgConfig = wnd.CreateDialog(
 		{
 		width = listeMinisterielle.dlgPosit.width,
 		height = listeMinisterielle.dlgPosit.height,
 		x = listeMinisterielle.dlgPosit.x,
 		y = listeMinisterielle.dlgPosit.y,
-		label='Configuration des paramËtres', 
+		label='Configuration des param√®tres', 
 		icon='./res/32x32_ffs.png'
 		});
 
@@ -757,10 +1119,10 @@ function AffichagedlgConfiguration()
 	});
 
 	-- remplissage des Combo
-	dlgConfig:GetWindowName('comboNiveau'):Append("RelËve");
+	dlgConfig:GetWindowName('comboNiveau'):Append("Rel√®ve");
 	dlgConfig:GetWindowName('comboNiveau'):Append("Espoirs");
-	dlgConfig:GetWindowName('comboNiveau'):Append("AccËs CNE");
-	dlgConfig:GetWindowName('comboNiveau'):Append("AccËs CIE");
+	-- dlgConfig:GetWindowName('comboNiveau'):Append("Acc√®s CNE");
+	-- dlgConfig:GetWindowName('comboNiveau'):Append("Acc√®s CIE");
 	dlgConfig:GetWindowName('comboSexe'):Append("Dames");
 	dlgConfig:GetWindowName('comboSexe'):Append("Hommes");
 	dlgConfig:GetWindowName('comboListe'):Clear();
@@ -792,6 +1154,7 @@ function AffichagedlgConfiguration()
 	local btnRetour = tbedit1:AddTool("Sortie", "./res/32x32_exit.png");
 	tbedit1:AddSeparator();
 	tbedit1:Realize();
+
 	
 	-- Bind
 	tbedit1:Bind(eventType.MENU, 
@@ -825,6 +1188,7 @@ function AffichagedlgConfiguration()
 		function(evt) 
 			listeMinisterielle.comboAnneeDebut = dlgConfig:GetWindowName('comboAnneeDebut'):GetValue();
 			listeMinisterielle.indexAnneeDebut = dlgConfig:GetWindowName('comboAnneeDebut'):GetSelection();
+			dlgConfig:GetWindowName('comboAnneeFin'):SetValue(listeMinisterielle.comboAnneeDebut);
 			SetDataAnalyse();
 		end, 
 		dlgConfig:GetWindowName('comboAnneeDebut'))
@@ -832,11 +1196,20 @@ function AffichagedlgConfiguration()
 	dlgConfig:Bind(eventType.TEXT, 
 		function(evt) 
 		end, 
-		dlgConfig:GetWindowName('gxpremiers1'))
+		dlgConfig:GetWindowName('gxpremiersc1a'))
 	dlgConfig:Bind(eventType.TEXT, 
 		function(evt) 
 		end, 
-		dlgConfig:GetWindowName('gxpremiers2'))
+		dlgConfig:GetWindowName('gxpremiersc1b'))
+	dlgConfig:Bind(eventType.CHECKBOX,
+		function(evt) 
+			dlgConfig:GetWindowName('gxpremiersc1b'):Enable(dlgConfig:GetWindowName('chkouc1b'):GetValue()); 
+		end, dlgConfig:GetWindowName('chkouc1b'))
+		
+	dlgConfig:Bind(eventType.CHECKBOX,
+		function(evt) 
+			dlgConfig:GetWindowName('gxpremiersc2b'):Enable(dlgConfig:GetWindowName('chkouc2b'):GetValue()); 
+		end, dlgConfig:GetWindowName('chkouc2b'))
 	dlgConfig:Fit();
 	dlgConfig:ShowModal();
 	if base then
@@ -845,15 +1218,24 @@ function AffichagedlgConfiguration()
 	if doc then
 		doc:Delete();
 	end
+	if doc_cfg then
+		doc_cfg:Delete();
+	end
 end
 
 function main(cparams)
+
+	XML_cfg = app.GetPath().."/liste_ministerielle_cfg.xml";
+	if not app.FileExists(XML_cfg) then
+		CreateXmlCfg();
+	end
+	doc_cfg = xmlDocument.Create(XML_cfg);
 	XML = app.GetPath().."/process/liste_ministerielle.xml";
 	doc = xmlDocument.Create(XML);
 	listeMinisterielle = {};
 	listeMinisterielle.affichage = false;	
-	scrip_version = "2.4"; 
-	-- vÈrification de l'existence d'une version plus rÈcente du script.
+	script_version = "2.7"; 
+	-- v√©rification de l'existence d'une version plus r√©cente du script.
 	-- Ex de retour : LiveDraw=5.94,Matrices=5.92,TimingReport=4.2,DoubleTirage=3.2,TirageOptions=3.3,TirageER=1.7,ListeMinisterielle=2.3,KandaHarJunior=2.0
 	if app.GetVersion() >= '4.4c' then 
 		indice_return = 7;
@@ -871,6 +1253,12 @@ function main(cparams)
 		app.RemoveFile(updatefile);
 		app.LaunchDefaultEditor('./'..alire);
 	end
+	
+	-- app.GetAuiFrame():MessageBox(
+	-- "Vous n'avez plus acc√®s √† ce d√©veloppement.", 
+	-- "Erreur !!!",
+	-- msgBoxStyle.OK + msgBoxStyle.ICON_WARNING); 
+	-- do return false; end
 
 	listeMinisterielle.dlgPosit = {};
 	listeMinisterielle.dlgPosit.width = display:GetSize().width * .7;
@@ -883,6 +1271,9 @@ function main(cparams)
 	local cmd = "SELECT * FROM Liste WHERE Type_classement = 'IAU' ORDER BY Seasoncode DESC, Code_liste DESC";
 	base:TableLoad(Liste, cmd);
 	listeMinisterielle.Saison = Liste:GetCell('Seasoncode', 0);
+	
+	-- listeMinisterielle.Saison = listeMinisterielle.Saison - 1; -- pour voir les crit√®res n-1 
+	
 	listeMinisterielle.comboAnneeDebut = tonumber(listeMinisterielle.Saison) -24;
 	listeMinisterielle.indexAnneeDebut = 2;
 	listeMinisterielle.comboAnneeFin = tonumber(listeMinisterielle.Saison) -22;
@@ -890,7 +1281,7 @@ function main(cparams)
 	listeMinisterielle.par_annee = false;
 	listeMinisterielle.comboListe = Liste:GetCellInt('Code_liste',0);
 	listeMinisterielle.comboSexe = "Dames";
-	listeMinisterielle.comboNiveau = "RelËve";
+	listeMinisterielle.comboNiveau = "Rel√®ve";
 	Discipline = base:GetTable('Discipline');
 	ChargeDisciplines();
 	Evenement_Matrice = base:GetTable('Evenement_Matrice');

@@ -2,7 +2,7 @@
 <!-- Regroupement de coureurs -->
 <!-- <background mode="gradient_line_vert" color_start="white" color_end="ltgray" /> -->
 <root title="Regroupement de coureurs">
-  <config titre="Regroupement de coureurs" comboPrendre="0" coursef1="0" courseg1="0" coursef1_filtre="" courseg1_filtre="" coursef2="0" courseg2="0" coursef2_filtre="" courseg2_filtre="" coursef3="0" courseg3="0" coursef3_filtre="" courseg3_filtre="" coursef4="0" courseg4="0" coursef4_filtre="" courseg4_filtre="" comboColEquipe="0" comboPtsTps="2" comboAbdDsq="0" coefManche="50" nb_filles="1" nb_garcons="1" comboGarderEquipe="0" comboEquipeBis="0"/>
+  <config coursef2_filtre="" courseg2_filtre="" coursef3_filtre="" courseg3_filtre="" coursef4_filtre="" courseg4_filtre="" coursef5_filtre="" courseg5_filtre="" courseg1="133" courseg2="0" courseg3="0" courseg4="0" courseg5="0" nb_garcons="2" coursef1_filtre="$(Categ):In('U16')" coursef1="133" coursef2="0" coursef3="0" coursef4="0" coursef5="0" titre="Regroupement de coureurs" comboColEquipe="3" comboPrendre="0" comboPtsTps="1" comboAbdDsq="1" coefManche="100" nb_filles="2" comboGarderEquipe="0" comboEquipeBis="1"/>
   <panel name="config">
     <lua>dofile('./interface/adv.lua');
 		dofile('./edition/functionPG.lua');
@@ -14,30 +14,30 @@
     <row value="5px"/>
     <matrix row="auto">
       <col value="1,6,8,1"/>
-      <row value="20px"/>
-      <row value="10px"/>
+      <row value="5px"/>
+      <row value="5px"/>
       <matrix row="auto" col_start="2" col_end="3">
         <col value="1,1,6,100px,1"/>
-        <lua>for i = 1, 4 do</lua>
+        <lua>for i = 1, 5 do</lua>
         <textctrl row="auto" col_start="2" name="('coursef'..i)"/>
         <textctrl col_start="3" name="('coursef'..i..'_nom')"/>
         <button col_start="4" align="left" name="('filtragef'..i)" label="Filtrage"/>
         <lua>end</lua>
       </matrix>
-      <row value="20px"/>
+      <row value="5px"/>
       <staticbox row_start="-3" row_end="0" col_start="2" col_end="3" label="Courses Filles"/>
-      <row value="10px"/>
+      <row value="5px"/>
       <matrix row="auto" col_start="2" col_end="3">
         <col value="1,1,6,100px,1"/>
-        <lua>for i = 1, 4 do</lua>
+        <lua>for i = 1, 5 do</lua>
         <textctrl row="auto" col_start="2" name="('courseg'..i)"/>
         <textctrl col_start="3" name="('courseg'..i..'_nom')"/>
         <button col_start="4" align="left" name="('filtrageg'..i)" label="Filtrage"/>
         <lua>end</lua>
       </matrix>
-      <row value="20px"/>
+      <row value="5px"/>
       <staticbox row_start="-3" row_end="0" col_start="2" col_end="3" label="Courses Garçons"/>
-      <row value="20px"/>
+      <row value="5px"/>
       <matrix row="auto" col_start="2" col_end="3">
         <col value="1,1,1,1,30px"/>
         <statictext row="auto" col_start="1" style="ALIGN_RIGHT" label="Colonne choisie pour l\'équipe"/>
@@ -60,12 +60,11 @@
         <statictext row="auto" col_start="1" style="ALIGN_RIGHT" label="Création d\'équipes BIS automatique "/>
         <combobox col_start="2" name="comboEquipeBis" style="CB_READONLY"/>
       </matrix>
-      <row value="10px"/>
+      <row value="5px"/>
       <staticbox row_start="-3" row_end="0" col_start="2" col_end="3" label="Paramétrage des calculs"/>
       <toolbar row="auto" col_start="1" col_end="0" name="tbconfig" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
       <row value="1"/>
     </matrix>
-    <row value="1"/>
   </panel>
   <panel name="configscratch">
     <lua>dofile('./interface/adv.lua');
@@ -83,7 +82,7 @@
       <matrix row="auto" col_start="2" col_end="3">
         <col value="1,1,6,100px,1"/>
         <row value="30px"/>
-        <lua>for i = 1, 4 do</lua>
+        <lua>for i = 1, 5 do</lua>
         <textctrl row="auto" col_start="2" name="('coursef'..i)"/>
         <textctrl col_start="3" name="('coursef'..i..'_nom')"/>
         <button col_start="4" align="left" name="('filtragef'..i)" label="Filtrage"/>
@@ -113,9 +112,7 @@
       <row value="10px"/>
       <staticbox row_start="-3" row_end="0" col_start="2" col_end="3" label="Paramétrage des calculs"/>
       <toolbar row="auto" col_start="1" col_end="0" name="tbconfig" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
-      <row value="1"/>
     </matrix>
-    <row value="1"/>
   </panel>
   <panel id="print">
     <lua>dofile('./interface/adv.lua');
@@ -243,7 +240,7 @@
         <col value="2.5cm, 8cm, 8cm" cond="params.TypeRegroupement == 'Sexe'"/>
         <col value="2.5cm, 10cm" cond="params.TypeRegroupement ~= 'Sexe'"/>
         <pen border="all"/>
-        <row value="0.5cm" count="(maxlignes)"/>
+        <row value="0.7cm" count="(maxlignes)"/>
         <matrix row_start="1" row_end="0" col_start="1">
           <col value="1"/>
           <text col_start="1" align="center" label="Clt - Equipe : Points totaux" row_start="1" row_end="0" cond="params.PtsTps ~= 2">(row+1)..'\n'..body:GetCell(0,row):gsub('_',"'")..'\n'..$(Pts_total)</text>
@@ -260,7 +257,7 @@
           <text col_start="1" row_start="(row_start)">
             <background mode="transparent"/>tFillesEquipe[i].Dossard..' - '..tFillesEquipe[i].Clt..' : '..tFillesEquipe[i].Nom</text>
           <text col_start="1" row_start="(row_start)" align="right">
-            <background mode="transparent"/>tFillesEquipe[i].Categ</text>
+            <background mode="transparent"/>tFillesEquipe[i].Categ..' ('..tFillesEquipe[i].Sexe..')'</text>
           <lua>if params.PtsTps == 0 then</lua>
           <text col_start="2" row_start="(row_start)" align="right">
             <background mode="transparent"/>

@@ -123,7 +123,7 @@ function AffichedlgCourses()	-- affichage des courses
 			end
 			local cmd = 'Select * From Evenement_Officiel Where Code_evenement In('..strin..") And Fonction In('ResponsibleEntry','NationalAssociation','TeamCaptain','Trainer','Doctor','Physiotherapist','Technician','ServicePersonnal') And LENGTH('Nom') > 0 Order By Fonction, Nom, Prenom";
 			base:TableLoad(tEvenement_Officiel, cmd);
-			for i = tEvenement_Officiel:GetNbRows() -1, 0, -1 do	-- éliminer les doublons
+			for i = tEvenement_Officiel:GetNbRows() -1, 0, -1 do	-- Ã©liminer les doublons
 				local fonction = tEvenement_Officiel:GetCell('Fonction', i);
 				local nom = tEvenement_Officiel:GetCell('Nom', i);
 				local prenom = tEvenement_Officiel:GetCell('Prenom', i);
@@ -170,38 +170,38 @@ function CtrlFonction()
 			arFonction[fonction].Nombre = arFonction[fonction].Nombre + 1;
 		end
 	end
-	local erreur = 'Attention aux erreurs ! Vous avez sélectionné ';
+	local erreur = 'Attention aux erreurs ! Vous avez sÃ©lectionnÃ© ';
 	if arFonction.ResponsibleEntry.Nombre > 1 then
 		params.ok = false;
-		erreur = erreur..'\n'..arFonction.ResponsibleEntry.Nombre..' responsables des inscriptions (1 maximum autorisé)';
+		erreur = erreur..'\n'..arFonction.ResponsibleEntry.Nombre..' responsables des inscriptions (1 maximum autorisÃ©)';
 	end
 	if arFonction.NationalAssociation.Nombre > 1 then
 		params.ok = false;
-		erreur = erreur..'\n'..arFonction.NationalAssociation.Nombre..' structures responsables des inscriptions (1 maximum autorisé)';
+		erreur = erreur..'\n'..arFonction.NationalAssociation.Nombre..' structures responsables des inscriptions (1 maximum autorisÃ©)';
 	end
 	if arFonction.TeamCaptain.Nombre > 1 then
 		params.ok = false;
-		erreur = erreur..'\n'..arFonction.TeamCaptain.Nombre..' chefs d\'équipe (1 maximum autorisé)';
+		erreur = erreur..'\n'..arFonction.TeamCaptain.Nombre..' chefs d\'Ã©quipe (1 maximum autorisÃ©)';
 	end
 	if arFonction.Trainer.Nombre > 6 then
 		params.ok = false;
-		erreur = erreur..'\n'..arFonction.Trainer.Nombre..' entraîneurs (6 maximum autorisés)';
+		erreur = erreur..'\n'..arFonction.Trainer.Nombre..' entraÃ®neurs (6 maximum autorisÃ©s)';
 	end
 	if arFonction.Doctor.Nombre > 2 then
 		params.ok = false;
-		erreur = erreur..'\n'..arFonction.Doctor.Nombre..' médecins (2 maximum autorisés)';
+		erreur = erreur..'\n'..arFonction.Doctor.Nombre..' mÃ©decins (2 maximum autorisÃ©s)';
 	end
 	if arFonction.Physiotherapist.Nombre > 2 then
 		params.ok = false;
-		erreur = erreur..'\n'..arFonction.Physiotherapist.Nombre..' Kinésithérapeutes (2 maximum autorisés)';
+		erreur = erreur..'\n'..arFonction.Physiotherapist.Nombre..' KinÃ©sithÃ©rapeutes (2 maximum autorisÃ©s)';
 	end
 	if arFonction.Technician.Nombre > 1 then
 		params.ok = false;
-		erreur = erreur..'\n'..arFonction.Technician.Nombre..' techniciens (1 maximum autorisé)';
+		erreur = erreur..'\n'..arFonction.Technician.Nombre..' techniciens (1 maximum autorisÃ©)';
 	end
 	if arFonction.ServicePersonnal.Nombre > 8 then
 		params.ok = false;
-		erreur = erreur..'\n'..arFonction.ServicePersonnal.Nombre..' accompagnateurs (8 maximum autorisés)';
+		erreur = erreur..'\n'..arFonction.ServicePersonnal.Nombre..' accompagnateurs (8 maximum autorisÃ©s)';
 	end
 	if params.ok == false then
 		app.GetAuiFrame():MessageBox(erreur, "Attention au nombre des officiels !!", msgBoxStyle.OK+msgBoxStyle.ICON_WARNING); 
@@ -367,7 +367,7 @@ function OnDates()
 		height = params.dlgPosit.height - 51,
 		x = 400,
 		y = 1,
-		label='Gestion des dates de l\'évenement : ' , 
+		label='Gestion des dates de l\'Ã©venement : ' , 
 		icon='./res/32x32_fis.png'
 		});
 	
@@ -510,7 +510,7 @@ function OnEdition(evt)
 				tCritere.discipline = body:GetCell('Critere',i):sub(2);
 				tCritere.code_epreuve = tonumber(body:GetCell('Critere',i):sub(4,4)) or -1;
 			end
-			for j = 1, #t do  -- il y a autant de ligne que d'épreuve.
+			for j = 1, #t do  -- il y a autant de ligne que d'Ã©preuve.
 				local pts = '';
 				local discipline = t[j]:sub(3);
 				if not tCritere.discipline then
@@ -526,11 +526,11 @@ function OnEdition(evt)
 							params.no_entry = params.no_entry + 1;
 						end
 					elseif plus_moins == '-' then
-						-- épreuve 1 = SL
-						-- épreuve 2 = GS
-						-- épreuve 3 = GS, -GS2 = on fait le SL et le GS1, on met les points du SL ET les points du GS, 
-						-- épreuve 1 = GS 
-						-- épreuve 2 = GS, -SG2 = on fait le GS1 donc on met les points du GS
+						-- Ã©preuve 1 = SL
+						-- Ã©preuve 2 = GS
+						-- Ã©preuve 3 = GS, -GS2 = on fait le SL et le GS1, on met les points du SL ET les points du GS, 
+						-- Ã©preuve 1 = GS 
+						-- Ã©preuve 2 = GS, -SG2 = on fait le GS1 donc on met les points du GS
 						if arDiscipline[discipline].Nombre > 1 then	-- je mets les points de la discipline
 							pts = base:GetClassementCoureur(code_coureur, t[j]):GetCell('Pts', 0);
 							params.no_entry = params.no_entry + arDiscipline[discipline].Nombre -1;
@@ -574,7 +574,7 @@ function OnEdition(evt)
 	
 	-- On Enchaine avec la page 2 
 	local editor = report:GetEditor();
-	editor:PageBreak(); -- Saut de Page entre les 2 éditions ...
+	editor:PageBreak(); -- Saut de Page entre les 2 Ã©ditions ...
 
 	wnd.LoadTemplateReportXML({
 		xml = './edition/entryFIS_ALP.xml',
@@ -587,6 +587,6 @@ function OnEdition(evt)
 		params = params
 	});
 
-	-- Positionnement sur la Dernière Page ...
+	-- Positionnement sur la DerniÃ¨re Page ...
 	-- editor:SetPagePreview(editor:GetPageCount());
 end

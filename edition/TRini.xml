@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Fisresults>
+  <Timingreportversion/>
+  <OSversion>Windows 11 (build 22631), édition 64-bit</OSversion>
+  <XMLversion/>
+  <Draft>1</Draft>
+  <AL_race>
+    <Jury Function="Technicaldelegate">
+      <Number>728</Number>
+      <Lastname>SCHUEPBACH</Lastname>
+      <Firstname>URS</Firstname>
+      <Nation>SUI</Nation>
+      <Email/>
+      <Phonenbr/>
+    </Jury>
+    <Jury Function="Chiefoftiming">
+      <Lastname>Guerindon TOTO</Lastname>
+      <Firstname>Philippe</Firstname>
+      <Nation>FRA</Nation>
+      <Email>philippeguerindon@orange.fr</Email>
+      <Phonenbr>+33 607 13 34 11</Phonenbr>
+    </Jury>
+  </AL_race>
+  <AL_timingreport>
+    <Timekeeper>
+      <Company>-</Company>
+      <Lastname>Guerindon</Lastname>
+      <Firstname>Philippe</Firstname>
+      <Nation>FRA</Nation>
+      <Email>philippeguerindon@orange.fr</Email>
+      <Phonenbr>+33 607 13 34 11</Phonenbr>
+    </Timekeeper>
+    <Devices>
+      <Timer System="A" used="yes">
+        <Brand>FDS-TIMING</Brand>
+        <Model>TBox</Model>
+        <Serial>9876</Serial>
+        <Homologation>FDS.001T.20</Homologation>
+      </Timer>
+      <Timer System="B" used="yes">
+        <Brand>AGIL</Brand>
+        <Model>IMHP 870</Model>
+        <Serial>114</Serial>
+        <Homologation>AGI.078T.09</Homologation>
+      </Timer>
+      <Timer_start System="A">
+        <Brand/>
+        <Model/>
+        <Serial/>
+        <Homologation/>
+      </Timer_start>
+      <Timer_start System="B">
+        <Brand/>
+        <Model/>
+        <Serial/>
+        <Homologation/>
+      </Timer_start>
+      <Startdevice Type="10">
+        <Brand>ALGE</Brand>
+        <Model>STSnM2S</Model>
+        <Serial>230808106</Serial>
+        <Homologation>ALG.S53T.10</Homologation>
+      </Startdevice>
+      <Finishcells System="A">
+        <Brand>ALGE</Brand>
+        <Model>PR1a</Model>
+        <Serial>231128020</Serial>
+        <Homologation>ALG.L74T.09</Homologation>
+      </Finishcells>
+      <Finishcells System="B">
+        <Brand>ALGE</Brand>
+        <Model>PR1a</Model>
+        <Serial>161164065</Serial>
+        <Homologation>ALG.L74T.09</Homologation>
+      </Finishcells>
+      <Software>
+        <Brand>skiFFS</Brand>
+        <Version>6.1s_TR_5.0</Version>
+      </Software>
+    </Devices>
+    <Connections>
+      <Mode System="A">Cable</Mode>
+      <Mode System="B">Cable</Mode>
+      <Voice>Cable</Voice>
+    </Connections>
+  </AL_timingreport>
+</Fisresults>

@@ -1,40 +1,69 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <root update="0">
-  <panel name="config">
-    <lua>dofile('./interface/adv.lua');</lua>
-    <lua>CE = params.CE or 'N'; CE = 'O'; </lua>
-    <padding all="2px"/>
-    <col value="1"/>
-    <row value="50px"/>
-    <matrix row="auto">
-      <col value="1,1,1,1"/>
-      <row value="40px"/>
-      <padding all="5px"/>
-      <textctrl row="150px" col_start="2" col_end="3" style="TE_CENTER|TE_READONLY|TE_MULTILINE" name="race_name">
-        <background mode="solid" color="ltgray"/>
-      </textctrl>
-      <statictext row="auto" col_start="2" style="ALIGN_RIGHT" label="Codex : "/>
-      <textctrl col_start="3" style="TE_READONLY" name="codex"/>
-      <statictext row="auto" col_start="2" style="ALIGN_RIGHT" label="Hostname : "/>
-      <textctrl col_start="3" style="TE_READONLY" name="fis_hostname"/>
-      <statictext row="auto" col_start="2" style="ALIGN_RIGHT" label="Port : "/>
-      <textctrl col_start="3" name="fis_port"/>
-      <statictext row="auto" col_start="2" style="ALIGN_RIGHT" label="Mot de Passe : "/>
-      <textctrl col_start="3" name="fis_pwd"/>
-      <statictext row="auto" cond="params.CE == 'O'" col_start="2" style="ALIGN_RIGHT" label="Est-ce la Finale des Coupes d\'Europe ? : "/>
-      <combotable col_start="3" cond="params.CE == 'O'" name="finale_ce" style="CB_READONLY"/>
-      <statictext row="auto" col_start="2" style="ALIGN_RIGHT" label="Date du tirage des dossards : "/>
-      <datepickerctrl col_start="3" name="draw_date" />
-      <statictext row="auto" col_start="2" style="ALIGN_RIGHT" label="Heure du tirage des dossards : "/>
-      <textctrl col_start="3" name="draw_time" />
-      <row value="20px"/>
-      <!-- <textctrl row="auto" col_start="3" cond="discipline=='AC'" name="discipline_vitesse"/> -->
-      <!-- <statictext col_start="2" style="ALIGN_RIGHT" cond="discipline=='AC'" label="Discipline en vitesse : "/> -->
-      <!-- <row value="20px"/> -->
-      <toolbar row="auto" col_start="1" col_end="0" name="tbconfig" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
-    </matrix>
-  </panel>
+	<panel name="config">
+		<wnd name="statictext" style="ALIGN_RIGHT" />
+		<lua>dofile('./interface/adv.lua');</lua>
+		<lua>dofile('./edition/traductionPG.lua');</lua>
+		<!-- <lua>CE = params.CE or 'N'; CE = 'O'; </lua> -->
+		<lua>CE = params.CE or 'N';</lua>
+		<padding all="2px"/>
+		<col value="1"/>
+		<row value="30px"/>
+		<col value="1,1,1,1"/>
+		<row value="20px"/>
+		<padding all="5px"/>
+		<textctrl row="150px" col_start="1" col_end="0" style="TE_CENTER|TE_READONLY|TE_MULTILINE" name="race_name"><font size="10" weight="bold"/>
+		<background mode="solid" color="ltgray"/>
+		</textctrl>
+		<statictext row="auto" col_start="2" label="Codex :" />
+		<textctrl col_start="3" style="TE_READONLY" name="codex"/>
+		<statictext row="auto" name="label_host_name" label="Cible :" col_start="2"/>
+		<textctrl col_start="3" style="TE_READONLY" name="fis_hostname"/>
+		<statictext row="auto" col_start="2" label="Port : "/>
+		<textctrl col_start="3" name="fis_port"/>
+		<statictext row="auto" name="label_fis_pwd" col_start="2"/>
+		<textctrl col_start="3" name="fis_pwd"/>
+		<statictext row="auto" name="label_finale" cond="params.CE == 'O'" col_start="2"/>
+		<combobox col_start="3" cond="params.CE == 'O'" name="finale_ce" style="CB_READONLY" />
+		<statictext row="auto" name="label_date" col_start="2"/>
+		<datepickerctrl col_start="3" name="draw_date" style="ALIGN_RIGHT" />
+		<statictext row="auto" name="label_heure" col_start="2"/>
+		<textctrl col_start="3" name="draw_time" />
+		<statictext row="auto" name="label_langage" col_start="2"/>
+		<combobox col_start="3" name="language" />
+		<statictext row="auto" cond="params.CE == 'O'" label="Debug mode" col_start="2"/>
+		<combobox col_start="3" cond="params.CE == 'O'" name="debug" />
+		<row value="20px"/>
+		<!-- <textctrl row="auto" col_start="3" cond="discipline=='AC'" name="discipline_vitesse"/> -->
+		<!-- <statictext col_start="2" style="ALIGN_RIGHT" cond="discipline=='AC'" label="Discipline en vitesse : "/> -->
+		<!-- <row value="20px"/> -->
+		<toolbar row="auto" col_start="1" col_end="0" name="tbconfig" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
+	</panel>
+	<panel name="get_epreuve">
+		<lua>dofile('./interface/adv.lua');</lua>
+		<!-- <padding all="3px"/> -->
+		<col value="1"/>
+		<row value="10px"/>
+		<background mode="solid" color="ltgray"/>
+		<matrix row="auto">
+			<col value="1,200px,500px,1"/>
+			<row value="10px"/>
+			<pen size="1" border="all"/>
+			<!-- <padding all="1px"/> -->
+			<wndtext row="50px" col_start="2" col_end="3" font_weight="bold" font_size="11" align="center">"Sur quelle épreuve voulez-vous travailler ?"</wndtext>
+			<row value="10px"/>
+			<wndtext row="35px" col_start="2" font_weight="bold" font_size="10" align="center">"N° de l'épreuve :"</wndtext>
+			<combobox col_start="3" style="TE_LEFT" font_weight="bold" font_size="10" name="num_epreuve" ><background mode="transparent" color="white"/></combobox>
+			<toolbar row="auto" col_start="2" col_end="3" name="tbgetepreuve" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
+			<!-- <row value="10px"/> -->
+		</matrix>
+		<row value="10px"/>
+	</panel>
   <panel name="gridCE">
+	<lua>dofile('./edition/traductionPG.lua');
+	     dofile('./interface/adv.lua');
+	</lua>
+
     <padding all="2px"/>
     <col value="50px,1,50px"/>
     <row value="10px"/>
@@ -44,56 +73,56 @@
       <row value="40px"/>
       <col value="1+50px,1,4,4,1,1,1,1,1,1,1"/>
       <wndtext row="30px" col_start="1" align="center">
-        <background mode="solid" color="ltgray"/>				'Code_FIS'
-			</wndtext>
+        <background mode="solid" color="ltgray"/>traduction(params.language,'Code FIS')
+		</wndtext>
       <wndtext col_start="2" align="center">
-        <background mode="solid" color="ltgray"/>				'Groupe'
+        <background mode="solid" color="ltgray"/>traduction(params.language,'Groupe')
 			</wndtext>
       <wndtext col_start="3" align="center">
-        <background mode="solid" color="ltgray"/>				'Nom'
+        <background mode="solid" color="ltgray"/>traduction(params.language,'Nom')
 			</wndtext>
       <wndtext col_start="4" align="center">
-        <background mode="solid" color="ltgray"/>				'Prenom'
+        <background mode="solid" color="ltgray"/>traduction(params.language,'Prénom')
 			</wndtext>
       <wndtext col_start="5" align="center">
-        <background mode="solid" color="ltgray"/>				'Sexe'
+        <background mode="solid" color="ltgray"/>traduction(params.language,'Sexe')
 			</wndtext>
       <wndtext col_start="6" align="center">
-        <background mode="solid" color="ltgray"/>				'Année'
+        <background mode="solid" color="ltgray"/>traduction(params.language,'Année')
 			</wndtext>
       <wndtext col_start="7" align="center">
-        <background mode="solid" color="ltgray"/>				'Nation'
+        <background mode="solid" color="ltgray"/>traduction(params.language,'Nation')
 			</wndtext>
       <wndtext col_start="8" align="center">
-        <background mode="solid" color="ltgray"/>				'FIS Pts'
+        <background mode="solid" color="ltgray"/>'FIS Pts'
 			</wndtext>
       <wndtext col_start="9" align="center">
-        <background mode="solid" color="ltgray"/>				'FIS Clt'
+        <background mode="solid" color="ltgray"/>traduction(params.language,'FIS Clt')
 			</wndtext>
-      <textctrl row="auto" col_start="1" align="left" name="code"/>
-      <textctrl col_start="2" align="left" name="groupe"/>
-      <textctrl col_start="3" align="left" name="nom"/>
-      <textctrl col_start="4" align="left" name="prenom"/>
-      <textctrl col_start="5" align="left" name="sexe"/>
-      <textctrl col_start="6" align="left" name="an"/>
-      <textctrl col_start="7" align="left" name="nation"/>
-      <textctrl col_start="8" align="left" name="points"/>
-      <textctrl col_start="9" align="left" name="classement"/>
-      <button col_start="10" align="left" name="ajouter" label="Ajouter"/>
+      <textctrl row="auto" col_start="1" style="TE_READONLY|TE_CENTER" name="code"/>
+      <textctrl col_start="2" style="TE_CENTER" name="groupe"/>
+      <textctrl col_start="3" name="nom"/>
+      <textctrl col_start="4" name="prenom"/>
+      <textctrl col_start="5" style="TE_CENTER" name="sexe"/>
+      <textctrl col_start="6" style="TE_CENTER" name="an"/>
+      <textctrl col_start="7" style="TE_CENTER" name="nation"/>
+      <textctrl col_start="8" style="TE_CENTER" name="points"/>
+      <textctrl col_start="9" style="TE_CENTER" name="classement"/>
+      <button col_start="10" align="left" name="ajouter" label="(traduction(params.language, 'Ajouter'))"/>
       <row value="10px"/>
-      <staticbox row_start="1" row_end="0" col_start="1" col_end="0" label="Recherche de coureur"/>
+      <staticbox row_start="1" row_end="0" col_start="1" col_end="0" label="(traduction(params.language,'Recherche de coureurs'))"/>
     </matrix>
     <row value="10px"/>
     <matrix row="auto" col_start="2">
       <row value="40px"/>
       <col value="20px,1,1,4,4"/>
       <wndtext row="auto" col_start="2" align="right">
-        <background mode="solid" color="ltgray"/>				'Séquences :'
+        <background mode="solid" color="ltgray"/>traduction(params.language,'Séquences')..' :'
 			</wndtext>
       <textctrl col_start="3" align="left" name="sequence" style="TE_READONLY"/>
       <textctrl col_start="4" align="left" name="info" style="TE_READONLY"/>
       <row value="10px"/>
-      <staticbox row_start="1" row_end="0" col_start="1" col_end="0" label="Informations sur la communication avec la FIS"/>
+      <staticbox row_start="1" row_end="0" col_start="1" col_end="0" label="(traduction(params.language,'Informations sur la communication avec la FIS'))"/>
     </matrix>
     <row value="5px" />
 	<toolbar row="auto" col_start="2" name="tbtableau" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
@@ -138,16 +167,16 @@
       <wndtext col_start="10" align="center">
         <background mode="solid" color="ltgray"/>				'FIS Clt'
 			</wndtext>
-      <textctrl row="auto" col_start="1" align="left" name="code"/>
-      <textctrl col_start="2" align="left" name="groupe"/>
-      <textctrl col_start="3" align="left" name="nom"/>
-      <textctrl col_start="4" align="left" name="prenom"/>
-      <textctrl col_start="5" align="left" name="an"/>
-      <textctrl col_start="6" align="left" name="nation"/>
-      <textctrl col_start="7" align="left" name="comite"/>
-      <textctrl col_start="8" align="left" name="club"/>
-      <textctrl col_start="9" align="left" name="points"/>
-      <textctrl col_start="10" align="left" name="classement"/>
+      <textctrl row="auto" col_start="1" style="TE_READONLY|TE_CENTER" name="code"/>
+      <textctrl col_start="2" style="TE_CENTER" name="groupe"/>
+      <textctrl col_start="3" name="nom"/>
+      <textctrl col_start="4" name="prenom" style="TE_READONLY"/>
+      <textctrl col_start="5" style="TE_CENTER" name="an"/>
+      <textctrl col_start="6" style="TE_CENTER" name="nation"/>
+      <textctrl col_start="7" style="TE_CENTER" name="comite"/>
+      <textctrl col_start="8" style="TE_CENTER" name="club"/>
+      <textctrl col_start="9" style="TE_CENTER" name="points"/>
+      <textctrl col_start="10" style="TE_CENTER" name="classement"/>
       <button col_start="11" align="left" name="ajouter" label="Ajouter"/>
       <row value="10px"/>
       <staticbox row_start="1" row_end="0" col_start="1" col_end="0" label="Recherche de coureur"/>
@@ -206,16 +235,16 @@
       <wndtext col_start="10" align="center">
         <background mode="solid" color="ltgray"/>				'FIS Clt'
 			</wndtext>
-      <textctrl row="auto" col_start="1" align="left" name="code"/>
-      <textctrl col_start="2" align="left" name="groupe"/>
-      <textctrl col_start="3" align="left" name="nom"/>
-      <textctrl col_start="4" align="left" name="prenom"/>
-      <textctrl col_start="5" align="left" name="an"/>
-      <textctrl col_start="6" align="left" name="nation"/>
-      <textctrl col_start="7" align="left" name="comite"/>
-      <textctrl col_start="8" align="left" name="club"/>
-      <textctrl col_start="9" align="left" name="points"/>
-      <textctrl col_start="10" align="left" name="classement"/>
+      <textctrl row="auto" col_start="1" style="TE_READONLY|TE_CENTER" name="code"/>
+      <textctrl col_start="2" style="TE_CENTER"  name="groupe"/>
+      <textctrl col_start="3" name="nom"/>
+      <textctrl col_start="4" name="prenom"/>
+      <textctrl col_start="5" style="TE_CENTER" name="an"/>
+      <textctrl col_start="6" style="TE_CENTER" name="nation"/>
+      <textctrl col_start="7" style="TE_CENTER" name="comite"/>
+      <textctrl col_start="8" style="TE_CENTER" name="club"/>
+      <textctrl col_start="9" style="TE_CENTER" name="points"/>
+      <textctrl col_start="10" style="TE_CENTER" name="classement"/>
       <button col_start="11" align="left" name="ajouter" label="Ajouter"/>
       <row value="10px"/>
       <staticbox row_start="1" row_end="0" col_start="1" col_end="0" label="Recherche de coureur"/>
@@ -242,12 +271,28 @@
     <grid row="1" col_start="2" name="coureur"/>
     <row value="10px"/>
   </panel>
-  <panel name="message">
+   <panel name="fislist">
+    <padding all="2px"/>
+	<col value="1"/>
+	<row value="10px"/>
+	<background mode="solid" color="ltgray"/>
+	<wndtext row="30px" col_start="1" name="count" align="center" />
+	<row value="10px"/>
+   </panel>
+ <panel name="message">
     <padding all="2px"/>
     <col value="1,3"/>
     <statictext row="auto" col_start="1" style="ALIGN_RIGHT" label="Message :"/>
     <combobox col_start="2" name="message"/>
     <toolbar row="auto" col_start="1" col_end="0" name="tb" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
+  </panel>
+  <panel name="importlist">
+	<padding all="2px"/>
+	<col value="1,1"/>
+	<row value="40px" />
+    <statictext col_start="1" style="ALIGN_RIGHT" label="FIS List code : "/>
+	<textctrl col_start="2" name="code" style="ALIGN_LEFT"/>
+	<toolbar row="auto" col_start="1" col_end="0" name="tb" style="TB_FLAT,TB_HORIZONTAL,TB_TEXT"/>
   </panel>
   <panel name="discipline">
     <padding all="2px"/>
@@ -261,11 +306,12 @@
 	<!-- tDrawG1 dans les 15 de la ECSL -->
 	<!-- tDrawG2 les 450 - 200 pts -->
 	<!-- tDrawG3 dans les 30 de la WC -->
-	<!-- tDrawG4 les winner des CC -->
-	<!-- tDrawG5 tous les ECSL  -->
+	<!-- tDrawG4 tous les ECSL  -->
+	<!-- tDrawG5 les winner des CC -->
 	<!-- tDrawG6 tous les pts FIS  -->
    <panel name="backoffice">
     <lua>dofile('./interface/adv.lua');</lua>
+    <lua>dofile('./edition/traductionPG.lua');</lua>
     <padding all="5px"/>
     <col value="1"/>
     <row value="20px"/>
@@ -273,53 +319,54 @@
 	
 	<matrix row="auto">
 		<col value="1,1+100px,2,1,1"/>
-		<wndtext row="50px" col_start="3" align="center"><font size="12" /><background mode="solid" color="ltgray"/>'Back Office des COC'</wndtext>
-		<statictext row="auto" font_weight="bold" col_start="2" style="ALIGN_RIGHT" label="Nom du groupe"/>
-		<statictext col_start="3" font_weight="bold"  style="ALIGN_CENTER" label="Clefs de tri appliquée"/>
-		<statictext col_start="4" font_weight="bold"  style="ALIGN_CENTER" label="Clefs de tri disponibles"/>
-		<statictext row="auto" font_weight="bold" col_start="2" style="ALIGN_RIGHT" label="ECSL de 1 à 15 : "/>
+		<wndtext row="50px" col_start="3" align="center"><font size="12" /><background mode="solid" color="ltgray"/>traduction(params.language,'Back Office des COC')</wndtext>
+		<statictext row="auto" font_weight="bold" col_start="2" style="ALIGN_RIGHT" label="(traduction(params.language,'Nom du groupe : '))"/>
+		<statictext col_start="3" font_weight="bold"  style="ALIGN_CENTER" label="(traduction(params.language,'Clefs de tri appliquées'))"/>
+		<statictext col_start="4" font_weight="bold"  style="ALIGN_CENTER" label="(traduction(params.language,'Clefs de tri disponibles'))"/>
+		<statictext row="auto" font_weight="bold" col_start="2" style="ALIGN_RIGHT" label="(traduction(params.language,'ECSL de 1 à 15 : '))"/>
 		<textctrl col_start="3" align="left" name="clef_g1" style="TE_READONLY"/>
 		<combobox col_start="4" style="CB_READONLY" name="groupe1" />
-		<statictext row="auto" font_weight="bold" col_start="2" style="ALIGN_RIGHT" label="Groupe 450+ : "/>
+		<statictext row="auto" font_weight="bold" col_start="2" style="ALIGN_RIGHT" label="(traduction(params.language,'Groupe 450+ : '))"/>
 		<textctrl col_start="3" align="left" name="clef_g2" style="TE_READONLY"/>
 		<combobox col_start="4" style="CB_READONLY" name="groupe2" />
 		<statictext row="auto" font_weight="bold" col_start="2" style="ALIGN_RIGHT" label="WCSL Top 30 : "/>
 		<textctrl col_start="3" align="left" name="clef_g3" style="TE_READONLY"/>
 		<combobox col_start="4" style="CB_READONLY" name="groupe3" />
-		<statictext row="auto" font_weight="bold" col_start="2" style="ALIGN_RIGHT" label="COC Winners : "/>
+		<statictext row="auto" font_weight="bold" col_start="2" style="ALIGN_RIGHT" label="(traduction(params.language,'Groupe ECSL : '))"/>
 		<textctrl col_start="3" align="left" name="clef_g4" style="TE_READONLY"/>
 		<combobox col_start="4" style="CB_READONLY" name="groupe4" />
-		<statictext row="auto" font_weight="bold" col_start="2" style="ALIGN_RIGHT" label="Groupe ECSL : "/>
+		<statictext row="auto" font_weight="bold" col_start="2" style="ALIGN_RIGHT" label="COC Winners : "/>
 		<textctrl col_start="3" align="left" name="clef_g5" style="TE_READONLY"/>
 		<combobox col_start="4" style="CB_READONLY" name="groupe5" />
-		<statictext row="auto" font_weight="bold" col_start="2" style="ALIGN_RIGHT" label="Position du 1er 450+ : "/>
-		<textctrl col_start="3" align="left" name="pos_450+"/>
-		<statictext row="auto" font_weight="bold" col_start="2" style="ALIGN_RIGHT" label="Position du 1er COC Winner : "/>
+		<!-- <statictext row="auto" font_weight="bold" col_start="2" style="ALIGN_RIGHT" label="Position du 1er 450+ : "/> -->
+		<!-- <textctrl col_start="3" align="left" name="pos_450+"/> -->
+		<statictext row="auto" font_weight="bold" col_start="2" style="ALIGN_RIGHT" label="(traduction(params.language,'Position du 1er COC Winner : '))"/>
 		<textctrl col_start="3" align="left" name="pos_COC"/>
-		<statictext row="auto" font_weight="bold" col_start="2" style="ALIGN_RIGHT" label="Nombre de ECSL à prendre : "/>
+		<statictext row="auto" font_weight="bold" col_start="2" style="ALIGN_RIGHT" label="(traduction(params.language,'Nombre de ECSL à prendre : '))"/>
 		<textctrl col_start="3" align="left" name="nb_ECSL"/>
-		<statictext row="auto" font_weight="bold" col_start="2" style="ALIGN_RIGHT" label="Points du TOP x WCSL à indiquer : "/>
+		<statictext row="auto" font_weight="bold" col_start="2" style="ALIGN_RIGHT" label="(traduction(params.language,'Sauf pour les finales, envoyer les points WCSL pour les rangs &lt;= : '))"/>
 		<textctrl col_start="3" align="left" name="clt_WCSL"/>
-		<statictext row="auto" font_weight="bold" col_start="2" style="ALIGN_RIGHT" label="Nb de QLF pour les finales : "/>
+		<statictext row="auto" font_weight="bold" col_start="2" style="ALIGN_RIGHT" label="(traduction(params.language,'Nb de QLF pour les finales : '))"/>
 		<textctrl col_start="3" align="left" name="qlf_Finale"/>
-		<statictext row="auto" font_weight="bold" col_start="2" style="ALIGN_RIGHT" label="Impression du top x en Pts FIS : "/>
+		<statictext row="auto" font_weight="bold" col_start="2" style="ALIGN_RIGHT" label="(traduction(params.language,'Impression du top x en Pts FIS : '))"/>
 		<textctrl col_start="3" align="left" name="topx_FIS"/>
 	</matrix>
     <row value="50px"/>
     <toolbar row="auto" col_start="1" col_end="0" name="tbbackoffice" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
   </panel>
  <panel id="print">
-    <lua>dofile('./interface/adv.lua'); </lua>
+    <lua>dofile('./interface/adv.lua'); 
+		current_group = 1;
+	</lua>
     <header>
       <spacing all="0"/>
       <padding all="0"/>
       <col value="2cm,2cm,1"/>
       <pen border="none"/>
       <font name="Calibri" size="13" adjust="width" weight="bold"/>
-      <text row="2cm" col_start="1" col_end="0" align="center">params.Evenement_nom</text>
+      <text row="2cm" col_start="1" col_end="0" align="center" cond="params.Station:len() == 0">params.Evenement_nom</text>
+      <text row="2cm" col_start="1" col_end="0" align="center" cond="params.Station:len() ~= 0">params.Evenement_nom..'\n'..params.Station..' - on '..params.Date</text>
       <image col_start="2" adjust="best">'./res/logo_fis.jpg'
-			  
-        
         <background mode="transparent"/>
       </image>
     </header>
@@ -360,6 +407,9 @@
       <text col_start="8" cond="params.EstCE == 0" align="center">'FIS Pts'</text>
     </label>
     <body>
+	  <lua>if body:GetCellInt('Groupe_tirage', row) ~= current_group then</lua>
+			<row value="0.5cm"/>
+	  <lua>end</lua>
       <pen border="all"/>
       <col value="1,1,1,1,1,5,1,1,1"/>
       <call option="couleur_alternee" file="./edition/options.xml"/>
@@ -372,9 +422,10 @@
       <text col_start="5" align="center">$(Code_coureur):sub(4)</text>
       <text col_start="6" align="left">$(Nom)..' '..$(Prenom)</text>
       <text col_start="7" align="center">$(Nation)</text>
-      <text col_start="8" cond="params.EstCE == 0 and GetCellInt('FIS_clt', row) &gt; 0" align="center">$(FIS_pts)</text>
-      <text col_start="8" cond="params.EstCE == 0 and GetCellInt('FIS_clt', row) &lt; 0" align="center">''</text>
-    </body>
+      <text col_start="8" cond="params.EstCE == 0 and body:GetCellDouble('FIS_pts', row) &gt; 0" align="center">$(FIS_pts)</text>
+      <text col_start="8" cond="params.EstCE == 0 and body:GetCellDouble('FIS_pts', row) &lt; 0" align="center">''</text>
+	  <lua>current_group = body:GetCellInt('Groupe_tirage', row)</lua>
+	</body>
   </panel>
   <!-- Participants - par nations -->
   <report id="parti_factorise" title="Entry List By " first_header="0">
@@ -395,17 +446,15 @@
       <pen border="none"/>
       <background mode="transparent"/>
       <font name="Calibri" size="14" adjust="max" weight="bold"/>
-      <text row="2cm" col_start="1" col_end="0" align="center">$(Evenement.Nom)</text>
-      <text align="right" cond="$(Epreuve.Sexe) == 'M'">"Men's"</text>
-      <text align="right" cond="$(Epreuve.Sexe) == 'F'">"Ladies's"</text>
+      <text row="2cm" col_start="1" col_end="0" align="center" cond="params.Station:len() == 0">$(Evenement.Nom)</text>
+      <text row="2cm" col_start="1" col_end="0" align="center" cond="params.Station:len() ~= 0">$(Evenement.Nom)..'\n'..params.Station..' - on '..params.Date </text>
+      <text align="right" cond="params.Sexe == 'M'">"Men's"</text>
+      <text align="right" cond="params.Sexe == 'F'">"Ladies's"</text>
       <text row="1cm" col_start="1" col_end="0" align="center" cond="title">title</text>
-      <text align="right">$(Epreuve.Code_discipline)..' '</text>
+     <text align="right">$(Epreuve.Code_discipline)..' '</text>
       <image row_start="1" col_start="1" adjust="best">'./res/logo_fis.jpg'
-			  
-        
         <background mode="transparent"/>
       </image>
-      <row value="0.5cm"/>
     </header>
     <first_header/>
     <footer>
@@ -479,7 +528,7 @@
       <text col="4" align="center" label="YoB">$(An)</text>
       <!-- <text col="4" align="center" label="Nation" >$(Nation)</text> -->
       <!-- <text col="12" align="center" label="Club" >$(Club)</text> -->
-      <text col="7" align="center" label="Points" cond="body:GetCellInt('FIS_clt', row) &gt; 0">$(Point)</text>
+      <text col="7" align="center" label="Points" cond="body:GetCellInt('FIS_clt', row) &gt; 0">$(FIS_pts)</text>
       <text col="7" align="center" label="Points" cond="body:GetCellInt('FIS_clt', row) == 0">''</text>
       <text col="4" align="center" label="Rank">clt</text>
       <text col="4" align="center" cond="params.EstWJC == 1" label="ZK ?">$(Racer_info)</text>
@@ -502,7 +551,7 @@
       <text col_start="1" align="center" cond="comite[rupture_label1].EQ &gt; 0 and counter_col1 &gt; 0">rupture_label1..' : '..body:GetCounter(rupture):GetCell(1,i)..' (+ '..comite[rupture_label1].EQ..' EQ)'</text>
       <text col_start="2" align="center" cond="rupture ~= 'Nation'">rupture_label2..' : '..body:GetCounter('Nation'):GetCell(1,i)</text>
       <text row="auto" col_start="1" align="center" cond="i == max_ligne_recap -1">'Racers with column '..rupture..' informed : '..somme_rupture</text>
-      <text row="auto" col_start="1" align="center" cond="i == max_ligne_recap -1">'Total other than FRA : '..nb_etrangers</text>
+      <!-- <text row="auto" col_start="1" align="center" cond="i == max_ligne_recap -1">'Total other than FRA : '..nb_etrangers</text> -->
       <lua>end</lua>
       <lua>end</lua>
     </end>
@@ -518,14 +567,21 @@
 				tNation[nation] = {};
 				tNation[nation].Nombre = 0;
 				tNation[nation].QLF = 0;
+				tNation[nation].WC = 0;
 			end
 			tNation[nation].Nombre = tNation[nation].Nombre + 1;
 			if body:GetCell('TG', i) == 'QLF' then
 				tNation[nation].QLF = tNation[nation].QLF + 1;
 			end
+			if body:GetCell('TG', i) == 'WCSL Top30' then
+				tNation[nation].WC = tNation[nation].WC + 1;
+			end
 		end
 	</lua>
-   <header>
+    <layers>
+      <layer id="FIS-PM"/>
+    </layers>
+    <header>
       <spacing all="0"/>
       <background mode="transparent"/>
       <font name="Calibri" size="14" adjust="max" weight="bold"/>
@@ -556,7 +612,7 @@
       <background color="white" mode="solid"/>
       <font name="Calibri" size="9" adjust="width" weight="bold"/>
       <col value="4,5,20,4,7,7,7,7"/>
-      <text row="auto" col_start="1" align="center">'Order'</text>
+      <text row="auto" col_start="1" align="center">'Rank'</text>
       <text col_start="2" align="center">'Code'</text>
       <text col_start="3" align="center">'Identity'</text>
       <text col_start="4" align="center">'YoB'</text>
@@ -574,7 +630,8 @@
         <row value="0.5cm"/>
         <lua>codelu = body:GetCell('Nation', row)</lua>
         <background mode="solid" color="white"/>
-        <text row="auto" col="1" >codelu..' ('..tNation[codelu].Nombre..') - '..tNation[codelu].QLF..' qualified'</text>
+        <text row="auto" col="1" cond="tNation[codelu].WC &gt; 0">codelu..' ('..tNation[codelu].Nombre..') - '..tNation[codelu].QLF..' qualified (+ '..tNation[codelu].WC..' WC)'</text>
+       <text row="auto" col="1" cond="tNation[codelu].WC == 0">codelu..' ('..tNation[codelu].Nombre..') - '..tNation[codelu].QLF..' qualified'</text>
         <!-- <text row="auto" col="1" >codelu</text> -->
       </before>
     </rupture>
@@ -584,7 +641,7 @@
       <background mode="solid" color="green" cond="body:GetCell('TG', row) == 'QLF'"/>
       <background mode="solid" color="white" cond="body:GetCell('TG', row) == 'DNQLF'"/>
       <background mode="solid" color="yellow" cond="string.find(body:GetCell('TG', row),'WC')"/>
-      <text col="4" align="center">$(Rang_tirage)</text>
+      <text col="4" align="center">$(ECSL_rank)</text>
       <text col="5" align="center">$(Code_coureur):sub(4)</text>
       <text col="20" align="left" font_weight="bold" font_size_step="1">$(Nom)..' '..$(Prenom)</text>
       <text col="4" align="center">$(An)</text>
@@ -854,6 +911,7 @@
       <background mode="transparent"/>
       <font name="Calibri" size="14" adjust="max" weight="bold"/>
       <text row="1cm" align="center">$(Evenement.Nom)</text>
+      <text row="0.5cm" align="center" cond="params.Station:len() ~= 0">params.Station..' - on '..params.Date </text>
       <text align="right" cond="$(Epreuve.Sexe) == 'M'">"Men's"</text>
       <text align="right" cond="$(Epreuve.Sexe) == 'F'">"Ladies's"</text>
       <text row="1cm" align="center" cond="title">title</text>
@@ -895,6 +953,7 @@
     <margin top="50" bottom="50"/>
     <lua>lignedouble = 0; lastrowECSL_30 = 0;</lua>
     <body>
+		<lua>if params.EstCE == 1 and params.EstVitesse == 1 and body:GetCell('TG', row) == 'tDrawG2' then body:SetCell('Groupe_tirage', row, 2) end</lua>
       <lua>if row == 0 then current_group = body:GetCellInt('Groupe_tirage', row); end</lua>
       <font size="10" weight="normal" adjust="ellipsize"/>
       <call option="couleur_alternee" file="./edition/options.xml"/>
@@ -916,14 +975,14 @@
       <text col="5" align="center" label="FIS Pts">$(FIS_pts)</text>
       <text col="5" align="center" label="FIS rank">$(FIS_clt)</text>
       <lua>if params.EstVitesse == 1 and $(Epreuve.Code_discipline) ~= 'SG' then</lua>
-      <text col="5" align="center" label="FIS SG Pts">$(FIS_SG_pts)</text>
-      <text col="5" align="center" label="FIS SG rank">$(FIS_SG_clt)</text>
+      <text col="5" align="center" label="FIS SG Pts">$(FIS_VIT_pts)</text>
+      <text col="5" align="center" label="FIS SG rank">$(FIS_VIT_clt)</text>
       <lua>end</lua>
-      <text col="5" align="center" label="WCSL pts">$(WCSL_points)</text>
-      <text col="5" align="center" label="WCSL rank">$(WCSL_rank)</text>
-      <text col="5" align="center" label="EC OA Pts">$(ECSL_overall_points)</text>
+      <text col="5" align="center" label="WCSL pts"> $(WCSL_points)</text>
+      <text col="5" align="center" label="WCSL rank"><background color="LtYellow" mode="solid" cond="body:GetCell('TG', row) == 'tDrawG3'"/>$(WCSL_rank)</text>
+      <text col="5" align="center" label="EC OA Pts"><background color="LtYellow" mode="solid" cond="body:GetCell('TG', row) == 'tDrawG2'"/>$(ECSL_overall_points)</text>
       <!-- <text col="5" align="center" label="OA rank">$(ECSL_overall_rank)</text> -->
-      <text col="5" align="center" label="CC Winner">$(Winner_CC)</text>
+      <text col="5" align="center" label="CC Winner"><background color="LtYellow" mode="solid" cond="body:GetCell('TG', row) == 'tDrawG5'"/>$(Winner_CC)</text>
       <!-- <text col="5" align="center" label="ECSL_30">$(ECSL_30)</text> -->
       <lua>else</lua>
       <text col="5" align="center" label="FIS Pts">$(FIS_pts)</text>
@@ -933,5 +992,66 @@
 		<text col="5" align="center" label="ZK">$(Winner_CC)</text>
       <lua>end</lua>
   </body>
+  
   </report>
+ 	<!-- Liste de départ Officielle -->
+	<report id="lst_officiel" title="Official Start List" first_header="1">
+		<lua>dofile('./xml/xmlTools.lua');
+			dofile('./edition/traductionPG.lua');
+			dofile('./interface/adv.lua');
+			label_pts = 'List #'..$(Evenement.Code_liste);
+			code_regroupement = $(Epreuve.Code_regroupement);
+		</lua>
+		
+		<!-- <margin top="50" bottom="50" /> -->
+		<header>
+			 <spacing all="0"/>
+			  <padding all="0"/>
+			  <col value="2cm,1"/>
+			  <pen border="none"/>
+			  <background mode="transparent"/>
+			  <font name="Calibri" size="14" adjust="max" weight="bold"/>
+			  <text row="2cm" col_start="1" col_end="0" align="center">$(Evenement.Nom)</text>
+			  <text row="auto" col_start="1" col_end="0" align="center">$(Evenement.Station)..' - '..$(Epreuve.Date_epreuve)</text>
+			  <text align="right" cond="$(Epreuve.Sexe) == 'M'">"Men's"</text>
+			  <text align="right" cond="$(Epreuve.Sexe) == 'F'">"Ladies's"</text>
+			  <text row="1cm" col_start="1" col_end="0" align="center" cond="title">title</text>
+			  <text align="right">$(Epreuve.Code_discipline)..' '</text>
+			  <image row_start="1" col_start="1" adjust="best">'./res/logo_fis.jpg'
+				<background mode="transparent"/>
+			  </image>
+			  <row value="0.5cm"/>
+		</header>
+		<first_header />
+	<footer>
+		<background mode="transparent"/>
+		<font name="Calibri" size="8" adjust="best" weight="normal"/>
+		<pen border="none" />
+		
+		<row value="auto" />
+		<text align="right">string.format('Page %d/%s',editor:GetPageCurrent(), editor:GetPageCountLabel())</text>
+		<line col_start="1" col_end="0" border="top" />
+	</footer>
+		<order key="Dossard" />
+
+		<body>
+			<call option="couleur_alternee" file="./edition/options.xml" />
+			<font size="9" adjust="ellipsize"/>
+
+			<row h="auto"/>
+			<text col="4" align="center" label="Bib" font_weight="bold" font_size_step="1">$(Dossard)</text>
+			<!-- <text col="6" align="center" label="Code"><font size="8" cond="group =='body'"/>$(Code_coureur):sub(4)</text> -->
+			<text col="19" align="left" label="Identity" font_weight="bold" font_size_step="1">$(Identite)</text> 
+			<text col="3" align="center" label="Sex" cond="code_regroupement ~= 'CE'">$(Sexe)</text>
+			<text col="4" align="center" label="YoB">$(An)</text>
+			<text col="5" align="center" cond="code_regroupement ~= 'CE'" label="Cat.">$(Categ)</text>
+			<text col="5" align="left" label="NSA">$(Nation)</text>
+			<image col_start="0" adjust="height" align="right" border="0"><background mode="transparent"/>app.ImageNation($(Nation))</image> 
+			<text col="14" label="Club">$(Club)</text>
+			<text col="7" align="center" label="(label_pts)" >$(Point)</text>
+			
+			<line col_start="1" col_end="0" pen_size="4" border="bottom" cond="not _context_border"/>
+		</body>
+	</report>
+
 </root>

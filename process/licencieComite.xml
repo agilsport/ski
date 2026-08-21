@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+  <panel name="configgenerale">
+    <wnd name="statictext" style="ALIGN_RIGHT"/>
+    <lua>dofile('./interface/adv.lua')</lua>
+    <padding all="3px"/>
+    <col value="1"/>
+    <statictext row="50px" col_start="2" align="center" label="Edition des licenciés du Comité"/>
+    <row value="5px"/>
+    <toolbar row="auto" col_start="1" name="tbedit1" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
+  </panel>
+  <panel id="print">
+    <layers/>
+    <margin left="80" top="100" right="80" bottom="100"/>
+    <header>
+      <padding all="1px"/>
+      <spacing all="2"/>
+      <pen border="none"/>
+      <font name="Calibri" size="13" adjust="width" weight="bold"/>
+      <text row="auto" align="center">'Liste des licenciés du Comité'..os.date(' - Edition du %d-%m-%Y à %H:%M:%S')</text>
+      <text row="auto" align="center">'Comparatif des saisons '..params.Saison..' et '..params.Saison0</text>
+      <text row="auto" align="center">"Le Delta représente l'évolution du nombre de licences en pourcentage"</text>
+      <row value="0.5cm"/>
+      <font name="Calibri" size="12" adjust="width" weight="bold"/>
+      <row value="0.5cm"/>
+    </header>
+    <end>
+      <font name="Calibri" size_step="-1" adjust="width" weight="bold"/>
+      <pen border="all"/>
+      <!-- <text row="auto" col_start="2" align="right">'Nombre total de licences pour le Comité : '</text> -->
+      <!-- <text col_start="3" align="center">total_licence</text> -->
+      <col value="4,18,5,5,5,6,5,5,5,5,5,5,5,5"/>
+      <text row="auto" col_start="1" align="center">''</text>
+      <text col_start="2" align="center">''</text>
+      <text col_start="3" align="center">'Licences'</text>
+      <text col_start="4" align="center">params.Saison0</text>
+      <text col_start="5" align="center">'Diff'</text>
+      <text col_start="6" align="center">'Delta %'</text>
+      <text col_start="7" align="center">'Compet.'</text>
+      <text col_start="8" align="center">params.Saison0</text>
+      <text col_start="9" align="center">'ESF'</text>
+      <text col_start="10" align="center">params.Saison0</text>
+      <text col_start="11" align="center">'Dirig.'</text>
+      <text col_start="12" align="center">params.Saison0</text>
+      <text col_start="13" align="center">'Loisir'</text>
+      <text col_start="14" align="center">params.Saison0</text>
+      <text row="auto" col_start="1" align="center">''</text>
+      <text col_start="2" align="center">'Total Général'</text>
+      <text col_start="3" align="center">params.TotalNombre</text>
+      <text col_start="4" align="center">params.TotalNombre0</text>
+      <text col_start="5" align="center">params.TotalDiff</text>
+      <text col_start="6" align="center">params.TotalDelta..' %'</text>
+      <text col_start="7" align="center">params.TotalCompetiteur</text>
+      <text col_start="8" align="center">params.TotalCompetiteur0</text>
+      <text col_start="9" align="center">params.TotalEsf</text>
+      <text col_start="10" align="center">params.TotalEsf0</text>
+      <text col_start="11" align="center">params.TotalDirigeant</text>
+      <text col_start="12" align="center">params.TotalDirigeant0</text>
+      <text col_start="13" align="center">params.TotalLoisir</text>
+      <text col_start="14" align="center">params.TotalLoisir0</text>
+    </end>
+    <footer>
+      <background mode="transparent"/>
+      <font name="Calibri" size="8" adjust="width" weight="normal"/>
+      <pen border="none"/>
+      <text row="auto" col="1" align="left"/>
+      <line col_start="1" col_end="0" pen_size="2" pen_color="dkgray" border="bottom"/>
+      <row value="auto"/>
+      <matrix col_start="1">
+        <row value="auto"/>
+        <text col="auto" align="left">app.GetName()..' Version '..app.GetVersion()..' / FFS'</text>
+        <image col="0.4cm" adjust="width" align="left">'./res/32x32_ffs.png'</image>
+        <text col="auto" align="left">' / Agil Informatique'</text>
+        <image col="0.4cm" adjust="width" align="left">'./res/32x32_agil.png'</image>
+        <text col="auto" align="left">os.date(' - Philippe Guérindon / Edition du %d-%m-%Y à %H:%M:%S')</text>
+        <text col="auto" align="left">' / sript LUA version '..params.Version</text>
+      </matrix>
+      <text align="right">string.format('Page %d/%s',editor:GetPageCurrent(), editor:GetPageCountLabel())</text>
+      <line col_start="1" col_end="0" border="top"/>
+    </footer>
+    <body>
+      <lua>ligne = ligne or 0</lua>
+      <need h="0.5cm"/>
+      <padding all="0"/>
+      <pen border="all"/>
+      <lua>if body:GetCellInt('Nombre', row) &gt; 0 then</lua>
+      <font name="Calibri" size_step="-1" adjust="width" weight="normal"/>
+      <background color="white" mode="solid" cond="ligne%2 == 0"/>
+      <background color="ltgray" mode="solid" cond="ligne%2 == 1"/>
+      <text row="auto" col="4" label="N° Club" align="center">$(Numero_club)</text>
+      <text col="18" label="Club">$(Nom_club)</text>
+      <text col="5" label="Licences" font_weight="bold" align="center">$(Nombre)</text>
+      <text col="5" label="(params.Saison0)" align="center">$(Nombre-1)</text>
+      <text col="5" label="Diff." font_weight="bold" align="center">$(Diff)</text>
+      <text col="6" label="Delta" font_weight="bold" align="center">body:GetCellDouble('Delta', row)..' %'</text>
+      <text col="5" label="Compet." font_weight="bold" align="center">$(Nombre_competiteur)</text>
+      <text col="5" label="(params.Saison0)" align="center">$(Nombre_competiteur-1)</text>
+      <text col="5" label="ESF" font_weight="bold" align="center">$(Nombre_esf)</text>
+      <text col="5" label="(params.Saison0)" align="center">$(Nombre_esf-1)</text>
+      <text col="5" label="Dirig." font_weight="bold" align="center">$(Nombre_dirigeant)</text>
+      <text col="5" label="(params.Saison0)" align="center">$(Nombre_dirigeant-1)</text>
+      <text col="5" label="Loisir" font_weight="bold" align="center">$(Nombre_loisir)</text>
+      <text col="5" label="(params.Saison0)" align="center">$(Nombre_loisir-1)</text>
+      <lua>ligne = ligne + 1; end</lua>
+    </body>
+  </panel>
+  <licence_comite saison0="2024" saison1="2025"/>
+</root>

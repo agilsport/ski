@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Options Générales pour les Edition Ski !-->
+<!-- Version 2.0 !-->
+<edition>
+
+	<option id="count_nation_partant">
+		<lua>body:SetCounter('Nation');</lua>
+		<matrix row="auto" col_start="1" col_end="0"> 
+			<text row="auto" col="auto" align="left" ><font size="11"/>'(Number of NSA: '..body:GetCounter('Nation'):GetNbRows().." - Number of Participants: "..body:GetNbRows()..')'</text>
+		</matrix>
+		<lua>body:OrderBy('Rang,Dossard')</lua>
+	</option>
+	<!-- Compteur Nation -->
+	<option id="count_nation">
+		<lua>body:SetCounter('Nation');</lua>
+		<matrix row="auto" col_start="1" col_end="0"> 
+			<col value="8cm,1" />"
+			<text row="auto" col_start="2" align="left" cond="body:GetCounter('Nation'):GetNbRows() &gt; 1" ><font size="11"/>'( number of NSA : '..body:GetCounter('Nation'):GetNbRows()..' )'</text>
+		</matrix>
+	</option>
+
+	<!-- Compteur inscrits - classés - DNS1-->
+	<option id="count_partant">
+		<lua>
+			nb_classes = 0; 
+			nb_dns1 = 0; 
+			for row=0, body:GetNbRows()-1 do
+				if body:GetCellInt('Clt', row) > 0 then nb_classes = nb_classes + 1 end
+				if body:GetCellInt('Tps1', row) == -600 then nb_dns1 = nb_dns1 + 1 end
+			end
+		</lua>
+		<matrix row="auto" col_start="1" col_end="0"> 
+			<col value="8cm,1" />"
+			<text row="auto" col_start="2" align="left" cond="entite == 'FIS'"><font size="11"/>'(participants : '..body:GetNbRows()..' - ranked : '..nb_classes..' - DNS1 : '..nb_dns1..')'</text>
+		</matrix>
+	</option>
+	<option id="signature_dt">
+		<lua>
+			dt_code = base:GetOfficiel('TECHNICALDELEGATE', 'Code_coureur'):sub(4)
+			TableEpreuveTransfert = base:GetTable('Epreuve_Transfert');
+				cmd3 = "Select * From Epreuve_Transfert Where Code_evenement = "..$(Evenement.Code)
+				commentaire =  base:TableLoad(TableEpreuveTransfert, cmd3):GetCell('Commentaire', 0);
+		</lua>
+		<lua cond="dt_code:len() ~= 0">dt = GetIdentiteOfficiels('TechnicalDelegate')..' - '..dt_code</lua>
+		<row value="0.8cm" />
+		<row value="auto" />
+		<matrix col_start="1" col_end="0"> 
+			<col w="1,0.3cm,1"/>
+			<text row="auto" col_start="1" col_end="0" align="Left" cond="commentaire:len() ~= 0" >'Optional Comments:'</text>
+			<text row="auto" col_start="1" col_end="0" style="TE_LEFT|TE_MULTILINE" border="all" cond="commentaire:len() ~= 0" align="top,right" ><spacing left="10" right="10" top="10" bottom="10" />commentaire</text>
+			<!-- <col value="8cm" /> -->
+			<text row="auto" col_start="3" col_end="0" align="left"><font size="14"/>'The Technical Delegate'</text>
+			<text row="auto" col_start="3" col_end="0" align="left"><font size="15"/>dt</text>
+		</matrix>
+		<!-- <lua>adv.Alert(('Ok Signature')</lua> -->
+
+	</option>
+
+</edition>
+

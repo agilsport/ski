@@ -1,11 +1,11 @@
--- regroupement de coureurs par critéres pour skiFFS
+-- regroupement de coureurs par critÃ©res pour skiFFS
 	-- version_script = '1.2';
-	-- Permet de créer des regroupement de coureurs par comite club cat distance....
+	-- Permet de crÃ©er des regroupement de coureurs par comite club cat distance....
 	-- et d'etalir un resultat
 dofile('./interface/adv.lua');
 dofile('./interface/interface.lua');
 
-function ReplaceTableEnvironnement(t, name)		-- replace la table créée dans l'environnement de la base de donnée pour éviter les memory leaks
+function ReplaceTableEnvironnement(t, name)		-- replace la table crÃ©Ã©e dans l'environnement de la base de donnÃ©e pour Ã©viter les memory leaks
 	if type(t) ~= 'userdata' then
 		return;
 	end
@@ -62,13 +62,13 @@ function ConstructionCriteres()
 			if ok == true then
 				if sexe == 'T' then
 					libelle = prendre..' hommes ou dames';
-					carsexe = ' né(e)s';
+					carsexe = ' nÃ©(e)s';
 				elseif sexe == 'F' then
 					libelle = prendre..' dames';
-					carsexe = ' nées';
+					carsexe = ' nÃ©es';
 				else
 					libelle = prendre..' hommes';
-					carsexe = ' nés';
+					carsexe = ' nÃ©s';
 				end
 				if filtre == 'Categ' then
 					libelle = libelle..' '..valeur1;
@@ -123,7 +123,7 @@ function Calculer()
 		if tRanking:GetCell(comboGroupe, row):len() == 0 then
 			boldelete = true;
 		else
-			if indexQuoi == 0 then		-- au général
+			if indexQuoi == 0 then		-- au gÃ©nÃ©ral
 				local tps = tRanking:GetCellInt('Tps', row, -1);
 				if tps > 0 then
 					tRanking:SetCell('Tps_total', row, tps);
@@ -134,7 +134,7 @@ function Calculer()
 			end
 		end
 		if bolTemps == true then
-			if tRanking:GetCellInt('Tps_total', row) < 0 then	-- valeur initialisée à -1 dans main()
+			if tRanking:GetCellInt('Tps_total', row) < 0 then	-- valeur initialisÃ©e Ã  -1 dans main()
 				boldelete = true;
 			end
 		elseif tRanking:GetCellDouble('Pts_total', row) < 0 then
@@ -209,7 +209,7 @@ function Calculer()
 	
 	if #Criteres < 1 then
 		app.GetAuiFrame():MessageBox(
-			"Merci de renseigner tous les critères du regroupement !!!", 
+			"Merci de renseigner tous les critÃ¨res du regroupement !!!", 
 			"Erreurs",
 			msgBoxStyle.OK + msgBoxStyle.ICON_WARNING);
 		return;
@@ -264,7 +264,7 @@ function Calculer()
 							bolconvient = false;
 						end
 					end
-					if tRanking:GetCell('Status', row) == 'O' then	-- s'il est déjà pris dans un critère, on ne doit pas le reprendre
+					if tRanking:GetCell('Status', row) == 'O' then	-- s'il est dÃ©jÃ  pris dans un critÃ¨re, on ne doit pas le reprendre
 						bolconvient = false;
 					end
 					if bolTemps == true then
@@ -422,14 +422,14 @@ function OnPrint()
 end
 
 function AffichedlgConfiguration()
-	-- Creation de la boîte de dialogue principale
+	-- Creation de la boÃ®te de dialogue principale
 	dlgConfiguration = wnd.CreateDialog(
 		{
 		width = dlgPosit.width,
 		height = dlgPosit.height,
 		x = dlgPosit.x,
 		y = dlgPosit.y,
-		label='Paramètres du regroupement', 
+		label='ParamÃ¨tres du regroupement', 
 		icon='./res/32x32_ffs.png'
 		});
 
@@ -622,7 +622,7 @@ function OnChangecomboTpsPts()
 		end
 	else
 		bolTemps = false;
-		dlgConfiguration:GetWindowName('comboQuoi'):Append("les points du classement général");
+		dlgConfiguration:GetWindowName('comboQuoi'):Append("les points du classement gÃ©nÃ©ral");
 		if nombre_de_manche > 1 then
 			dlgConfiguration:GetWindowName('comboQuoi'):Append("les points de la meilleure manche");
 			if nombre_de_manche > 2 then
@@ -729,16 +729,16 @@ function main(cparams)
 	local strErreur = '';
 	if bolAlerteSexe == true or bolAlerteCateg == true or bolAlerteAn == true then
 		if bolAlerteCateg == true then
-			strErreur = strErreur..'\nLa catégorie';
+			strErreur = strErreur..'\nLa catÃ©gorie';
 		end
 		if bolAlerteSexe == true then
 			strErreur = strErreur..'\nLe sexe';
 		end
 		if bolAlerteAn == true then
-			strErreur = strErreur.."\nL'année de naissance";
+			strErreur = strErreur.."\nL'annÃ©e de naissance";
 		end
 		app.GetAuiFrame():MessageBox(
-			"ATTENTION, Certaines données sont manquantes !!!!!!!!!!!"..strErreur,
+			"ATTENTION, Certaines donnÃ©es sont manquantes !!!!!!!!!!!"..strErreur,
 			"Erreurs",
 			msgBoxStyle.OK + msgBoxStyle.ICON_WARNING);
 		return;

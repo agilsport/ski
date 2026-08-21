@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+  <panel name="configgenerale">
+    <wnd name="statictext" style="ALIGN_RIGHT"/>
+   <lua>dofile('./interface/adv.lua')</lua>
+    <padding all="3px"/>
+    <col value="1"/>
+    <statictext row="50px" col_start="2" align="center" label="Edition des coureurs français d\'une liste FIS"/>
+    <matrix col_start="1" row="auto">
+      <row value="5px"/>
+      <col value="1,2,2,1"/>
+      <statictext row="auto" col_start="2" label="Liste FIS support : "/>
+      <combobox col_start="3" name="comboListe" style="CB_READONLY"/>
+      <statictext row="auto" col_start="2" label="Discipline choisie : "/>
+      <combobox col_start="3" name="combo_discipline" style="CB_READONLY"/>
+      <statictext row="auto" col_start="2" label="Classement minimum : "/>
+      <textctrl col_start="3" name="clt_mini"/>
+      <statictext row="auto" col_start="2" label="Classement maximum : "/>
+      <textctrl col_start="3" name="clt_maxi"/>
+      <statictext row="auto" col_start="2" label="x meilleurs français ? "/>
+      <textctrl col_start="3" name="xmeilleurs_francais"/>
+      <statictext row="auto" col_start="2" label="Sexe des coureurs : "/>
+      <combobox col_start="3" name="combo_sexe" style="CB_READONLY"/>
+      <statictext row="auto" col_start="2" label="Année mini des coureurs : "/>
+      <textctrl col_start="3" name="annee_mini"/>
+      <statictext row="auto" col_start="2" label="Année maxi des coureurs : "/>
+      <textctrl col_start="3" name="annee_maxi"/>
+      <statictext row="auto" col_start="2" label="type de classement à prendre : "/>
+      <combobox col_start="3" name="combo_clt"/>
+      <row value="20px"/>
+    </matrix>
+    <row value="5px"/>
+     <toolbar row="auto" col_start="1" col_end="0" name="tbedit1" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
+  </panel>
+  <panel id="print">
+    <layers />
+     <header>
+      <padding all="1px"/>
+      <spacing all="2"/>
+      <pen border="none"/>
+      <font name="Calibri" size="13" adjust="width" weight="bold"/>
+      <text row="auto" align="center">'Coureurs '..params.Sexe..' de la liste FIS '..params.Liste</text>
+      <row value="0.5cm"/>
+      <text row="auto" style="TE_MULTILINE">params.Critere</text>
+	  <text row="auto" cond="params.Criteres == 1">params.NbCritere..' coureurs correspondent au critère dont '..params.NbFrancais..' français'</text>
+	  <text row="auto" cond="params.Criteres ~= 1">params.NbCritere..' coureurs correspondent aux critères dont '..params.NbFrancais..' français'</text>
+	  <text row="auto" cond="params.Nb_Rows &gt; 0">'Liste des '..params.Nb_Rows..' meilleurs français'</text>
+     <font name="Calibri" size="12" adjust="width" weight="bold"/>
+      <row value="0.5cm"/>
+    </header>
+	<end>
+		<font name="Calibri" size="13" adjust="width" weight="bold"/>
+		<col value="1" count="14"/>
+		<row value="0.5cm"/>
+		<text row="1cm" col_start="1" col_end="0">'Etat récapitulatif par nation'</text>
+		<pen border="all" size="1" />
+		<font name="Calibri" size="10" adjust="width" weight="bold"/>
+		<lua>
+			id_col = 1;
+			tNation = {};
+			for i = 0, body:GetCounterCount('Nation') -1 do
+				if body:GetCounter('Nation'):GetCell(0,i):len() > 0 then
+					local nation = body:GetCounter('Nation'):GetCell(0,i);
+					local nombre = body:GetCounter('Nation'):GetCell(1,i);
+					table.insert(tNation, {Nation = nation, Nombre = tonumber(nombre)});
+				end
+			end
+			table.sort(tNation, function(a, b) return a.Nombre > b.Nombre end);
+		</lua>
+		<lua>for i = 1, #tNation do</lua>
+			<row value="0.5cm" cond="id_col == 1"/>
+			<text col_start="(id_col)" align="center">tNation[i].Nation..' : '..tNation[i].Nombre</text>
+			<lua>id_col = id_col + 1;
+				if id_col &gt; 14 then id_col = 1; end</lua>
+		<lua>end</lua>
+	</end>
+		
+    <footer>
+      <background mode="transparent"/>
+      <font name="Calibri" size="8" adjust="width" weight="normal"/>
+      <pen border="none"/>
+      <text row="auto" col="1" align="left"/>
+      <line col_start="1" col_end="0" pen_size="2" pen_color="dkgray" border="bottom"/>
+      <row value="auto"/>
+      <matrix col_start="1">
+        <row value="auto"/>
+        <text col="auto" align="left">app.GetName()..' Version '..app.GetVersion()..' / FFS'</text>
+        <image col="0.4cm" adjust="width" align="left">'./res/32x32_ffs.png'</image>
+        <text col="auto" align="left">' / Agil Informatique'</text>
+        <image col="0.4cm" adjust="width" align="left">'./res/32x32_agil.png'</image>
+        <text col="auto" align="left">os.date(' - Philippe Guérindon / Edition du %d-%m-%Y à %H:%M:%S')</text>
+        <text col="auto" align="left">' / sript LUA version '..params.Version</text>
+      </matrix>
+      <text align="right">string.format('Page %d/%s',editor:GetPageCurrent(), editor:GetPageCountLabel())</text>
+      <line col_start="1" col_end="0" border="top"/>
+    </footer>
+    <body>
+      <padding all="0"/>
+      <pen border="all"/>
+      <font name="Calibri" size_step="-1" adjust="width" weight="normal"/>
+       <background color="white" mode="solid" cond="row%2 == 0"/>
+      <background color="ltgray" mode="solid" cond="row%2 == 1"/>
+      <text row="auto" col="3" label="Rang" align="center">(row+1)</text>
+      <text col="7" label="Code" align="center">$(Code)</text>
+      <text col="18" label="Identité">$(Identite)</text>
+      <text col="4" label="An" align="center">$(An)</text>
+      <text col="2" label="S." align="center">$(Sexe)</text>
+      <text col="3" label="C.R." align="center">$(Comite)</text>
+      <text col="8" label="Club">$(Club)</text>
+      <text col="4" label= "Pts SL" align="center"><font weight="bold" cond="params.Discipline == 'SL'"/><background color="ltYellow" mode="solid" cond="params.Discipline == 'SL'"/>$(Pts_SL)</text>
+      <text col="4" label= "Clt SL" align="center"><font weight="bold" cond="params.Discipline == 'SL'"/><background color="ltYellow" mode="solid" cond="params.Discipline == 'SL'"/>$(Clt_SL)</text>
+      <text col="4" label= "Pts GS" align="center"><font weight="bold" cond="params.Discipline == 'GS'"/><background color="ltYellow" mode="solid" cond="params.Discipline == 'GS'"/>$(Pts_GS)</text>
+      <text col="4" label= "Clt GS" align="center"><font weight="bold" cond="params.Discipline == 'GS'"/><background color="ltYellow" mode="solid" cond="params.Discipline == 'GS'"/>$(Clt_GS)</text>
+      <text col="4" label= "Pts SG" align="center"><font weight="bold" cond="params.Discipline == 'SG'"/><background color="ltYellow" mode="solid" cond="params.Discipline == 'SG'"/>$(Pts_SG)</text>
+      <text col="4" label= "Clt SG" align="center"><font weight="bold" cond="params.Discipline == 'SG'"/><background color="ltYellow" mode="solid" cond="params.Discipline == 'SG'"/>$(Clt_SG)</text>
+      <text col="4" label= "Pts DH" align="center"><font weight="bold" cond="params.Discipline == 'DH'"/><background color="ltYellow" mode="solid" cond="params.Discipline == 'DH'"/>$(Pts_DH)</text>
+      <text col="4" label= "Clt DH" align="center"><font weight="bold" cond="params.Discipline == 'DH'"/><background color="ltYellow" mode="solid" cond="params.Discipline == 'DH'"/>$(Clt_DH)</text>
+      <text col="4" label= "Pts Tech" align="center"><font weight="bold" cond="params.Discipline == 'technique'"/><background color="ltYellow" mode="solid" cond="params.Discipline == 'technique'"/>$(Best_technique)..'-'..$(Pts_technique)</text>
+      <text col="4" label= "Clt Tech" align="center"><font weight="bold" cond="params.Discipline == 'technique'"/><background color="ltYellow" mode="solid" cond="params.Discipline == 'technique'"/>$(Best_technique)..'-'..$(Clt_technique)</text>
+      <text col="4" label= "Pts Vit" align="center"><font weight="bold" cond="params.Discipline == 'vitesse'"/><background color="ltYellow" mode="solid" cond="params.Discipline == 'vitesse'"/>$(Best_vitesse)..'-'..$(Pts_vitesse)</text>
+      <text col="4" label= "Clt Vit" align="center"><font weight="bold" cond="params.Discipline == 'vitesse'"/><background color="ltYellow" mode="solid" cond="params.Discipline == 'vitesse'"/>$(Best_vitesse)..'-'..$(Clt_vitesse)</text>
+    </body>
+  </panel>
+</root>

@@ -1,6 +1,7 @@
 dofile('./interface/adv.lua');
 dofile('./interface/interface.lua');
--- à jour au 20-11-2024
+
+-- Ã  jour au 20-11-2024
 
 -- https://www.fis-ski.com/DB/alpine-skiing/biographies.html?lastname=&firstname=&sectorcode=AL&gendercode=&birthyear=&skiclub=&skis=&nationcode=&fiscode=198029&status=&search=true
 -- textctrlbutton
@@ -22,6 +23,35 @@ function CreateTableRapport_accident();
 		base:Query(strCreate);
 	end
 	ReplaceTableEnvironnement(tRapport_accident, 'Rapport_accident');
+end
+
+function CreateResultatPaiement()
+	tResultat_Paiement = sqlTable.Create("tResultat_Paiement");
+	tResultat_Paiement:AddColumn({ name = "Code_evenement", label = "Code_evenement", type = sqlType.LONG });
+	tResultat_Paiement:AddColumn({ name = "Code_coureur", label = "Code_coureur", type = sqlType.CHAR, size = 15 });
+	tResultat_Paiement:AddColumn({ name = "Mode_paiement", label = "Mode_paiement", type = sqlType.CHAR, size = 2, style = sqlStyle.NULL });
+	tResultat_Paiement:AddColumn({ name = "Etat_paiement", label = "Etat_paiement", type = sqlType.LONG, style = sqlStyle.NULL });
+	tResultat_Paiement:AddColumn({ name = "Transaction_paiement", label = "Transaction_paiement", type = sqlType.CHAR, size = 30, style = sqlStyle.NULL });
+	tResultat_Paiement:AddColumn({ name = "Montant_paiement", label = "Montant_paiement", type = sqlType.LONG, style = sqlStyle.NULL });
+	tResultat_Paiement:AddColumn({ name = "Epreuve_selection1", label = "Epreuve_selection1", type = sqlType.CHAR, size = 1, style = sqlStyle.NULL });
+	tResultat_Paiement:AddColumn({ name = "Epreuve_selection2", label = "Epreuve_selection2", type = sqlType.CHAR, size = 1, style = sqlStyle.NULL });
+	tResultat_Paiement:AddColumn({ name = "Epreuve_selection3", label = "Epreuve_selection3", type = sqlType.CHAR, size = 1, style = sqlStyle.NULL });
+	tResultat_Paiement:AddColumn({ name = "Epreuve_selection4", label = "Epreuve_selection4", type = sqlType.CHAR, size = 1, style = sqlStyle.NULL });
+	tResultat_Paiement:AddColumn({ name = "Epreuve_selection5", label = "Epreuve_selection5", type = sqlType.CHAR, size = 1, style = sqlStyle.NULL });
+	tResultat_Paiement:AddColumn({ name = "Epreuve_selection6", label = "Epreuve_selection6", type = sqlType.CHAR, size = 1, style = sqlStyle.NULL });
+	tResultat_Paiement:AddColumn({ name = "Epreuve_selection7", label = "Epreuve_selection7", type = sqlType.CHAR, size = 1, style = sqlStyle.NULL });
+	tResultat_Paiement:AddColumn({ name = "Epreuve_selection8", label = "Epreuve_selection8", type = sqlType.CHAR, size = 1, style = sqlStyle.NULL });
+	tResultat_Paiement:AddColumn({ name = "Epreuve_selection9", label = "Epreuve_selection9", type = sqlType.CHAR, size = 1, style = sqlStyle.NULL });
+	tResultat_Paiement:AddColumn({ name = "Email_login", label = "Email_login", type = sqlType.CHAR, size = 50, style = sqlStyle.NULL });
+	tResultat_Paiement:AddColumn({ name = "Email_indi", label = "Email_indi", type = sqlType.CHAR, size = 50, style = sqlStyle.NULL });
+	tResultat_Paiement:SetPrimary("Code_evenement, Code_coureur");
+	tResultat_Paiement:SetName('Resultat_Paiement');
+	local strCreate = tResultat_Paiement:GetStringCreate(base);
+	if strCreate then
+		base:Query(strCreate);
+	end
+	ReplaceTableEnvironnement(tResultat_Paiement, 'Resultat_Paiement');
+	tResultat_Paiement = base:GetTable('Resultat_Paiement');
 end
 
 function CreateTableResultat_Info_Tirage();
@@ -46,6 +76,10 @@ function CreateTableResultat_Info_Tirage();
 	tResultat_Info_Tirage:AddColumn({ name = 'TG', label = 'Groupe', type = sqlType.CHAR, size = 10 });
 	tResultat_Info_Tirage:AddColumn({ name = 'Racer_info', label = 'Racer_info', type = sqlType.CHAR, size = 10 });
 	tResultat_Info_Tirage:AddColumn({ name = 'Pts_info', label = 'Pts_info', type = sqlType.CHAR, size = 3 });
+	tResultat_Info_Tirage:AddColumn({ name = 'ECSL_overall_points_n', label = 'ECSL_overall_points_n', type = sqlType.LONG, style = sqlStyle.NULL });
+	tResultat_Info_Tirage:AddColumn({ name = 'ECSL_overall_rank_n', label = 'ECSL_overall_rank_n', type = sqlType.LONG, style = sqlStyle.NULL });
+	tResultat_Info_Tirage:AddColumn({ name = 'ECSL_overall_points_0', label = 'ECSL_overall_points_0', type = sqlType.LONG, style = sqlStyle.NULL });
+	tResultat_Info_Tirage:AddColumn({ name = 'ECSL_overall_rank_0', label = 'ECSL_overall_rank_0', type = sqlType.LONG, style = sqlStyle.NULL });
 	tResultat_Info_Tirage:SetPrimary('Code_evenement, Code_coureur');
 	tResultat_Info_Tirage:SetName('Resultat_Info_Tirage');
 	local strCreate = tResultat_Info_Tirage:GetStringCreate(base);
@@ -79,12 +113,7 @@ function SortTable2(array)	-- tri des tables
 	end)
 end
 
-function Shuffle(t, seed)
-	if seed == true then
-		math.randomseed( tonumber(tostring(os.time()):reverse():sub(1,6)) )
-		--math.randomseed(os.time())
-		math.random(); math.random(); math.random();
-	end
+function Shuffle(t)
     for i = 1, #t - 1 do
         local r = math.random(i, #t)
         t[i], t[r] = t[r], t[i]
@@ -92,7 +121,7 @@ function Shuffle(t, seed)
 	return t;
 end
 
-function Round(num, dec)	-- en entrée un nombre décimal, en sortie un nombre arrondi avec dec chiffres après la virgule.
+function Round(num, dec)	-- en entrÃ©e un nombre dÃ©cimal, en sortie un nombre arrondi avec dec chiffres aprÃ¨s la virgule.
 	local num = tonumber(num) or 0;
 	local val_return = math.floor( (num * 10^dec) + 0.5) / (10^dec);
 	if dec== 0 then
@@ -101,7 +130,7 @@ function Round(num, dec)	-- en entrée un nombre décimal, en sortie un nombre arr
     return val_return;
 end
 
-function ReplaceTableEnvironnement(t, name)		-- replace la table créée dans l'environnement de la base de donnée pour éviter les memory leaks
+function ReplaceTableEnvironnement(t, name)		-- replace la table crÃ©Ã©e dans l'environnement de la base de donnÃ©e pour Ã©viter les memory leaks
 	if type(t) ~= 'userdata' then
 		return;
 	end
@@ -113,44 +142,49 @@ function ReplaceTableEnvironnement(t, name)		-- replace la table créée dans l'en
 end
 
 function OnCurlReturn(evt)
-	-- Ex de retour : LiveDraw=5.94,Matrices=5.92,TimingReport=4.2,DoubleTirage=3.2,TirageOptions=3.3,TirageER=1.7,ListeMinisterielle=2.3,KandaHarJunior=2.0,MarquageEquipe=2.0,Regroupement=2.0,quotaFIS=2.0,coureurListe=1,entryFIS=1.9, youthFIS=1.0, tempsManuel=2.0
+	-- Ex de retour : LiveDraw=9.8,Matrices=8.5,TimingReport=5.1,DoubleTirage=3.4,TirageOptions=4.,TirageER=2.0,ListeMinisterielle=2.5,KandaHarJunior=2.8,marquageEquipe=2.1,Regroupement=2.6,quotaFIS=2.91,coureurListe=1.3,entryFIS=1.91s,youngFIS=1.1,tempsManuel=2.0,verification_competition=1;
 	local tNomSVersionDoc = {};
 	table.insert(tNomSVersionDoc, 'process/LiveDraw_versions.rtf');		-- LiveDraw
 	table.insert(tNomSVersionDoc, 'challenge/Matrice_versions.rtf');	-- Matrices
-	table.insert(tNomSVersionDoc, 'edition/TR_versions.rtf');			-- Timing report									-- Timing Report
+	table.insert(tNomSVersionDoc, 'edition/TR_versions.rtf');			-- Timing report									
 	table.insert(tNomSVersionDoc, '');									-- Double Tirage			
 	table.insert(tNomSVersionDoc, '');									-- Tirage avec Options			
 	table.insert(tNomSVersionDoc, '');									-- Tirage Esprit Racing
-	table.insert(tNomSVersionDoc, '');									-- Listes Ministérielles
+	table.insert(tNomSVersionDoc, '');									-- Listes MinistÃ©rielles
 	table.insert(tNomSVersionDoc, '');									-- Kandahar Junior
-	table.insert(tNomSVersionDoc, '');									-- Marquage des équipes
+	table.insert(tNomSVersionDoc, '');									-- Marquage des Ã©quipes
 	table.insert(tNomSVersionDoc, '');									-- Regroupement de coureurs
 	table.insert(tNomSVersionDoc, '');									-- Quotas en FIS
 	table.insert(tNomSVersionDoc, '');									-- Coureurs d'une liste
 	table.insert(tNomSVersionDoc, '');									-- Entry FIS
-	table.insert(tNomSVersionDoc, '');									-- nada
-	table.insert(tNomSVersionDoc, '');									-- nada
-	table.insert(tNomSVersionDoc, '');									-- nada
-	table.insert(tNomSVersionDoc, '');									-- nada
+	table.insert(tNomSVersionDoc, '');									-- youngFIS=1.1
+	table.insert(tNomSVersionDoc, '');									-- tempsManuel
+	table.insert(tNomSVersionDoc, '');									-- verification_competition
+	table.insert(tNomSVersionDoc, '');									-- licences Comite
 	table.insert(tNomSVersionDoc, '');									-- nada
 	table.insert(tNomSVersionDoc, '');									-- nada
 	if evt:GetInt() == 1 then
 		local chaine = evt:GetString();
 		local tChaine = chaine:Split(',');
-		local tVersions = tChaine[indice_return];	-- Matrices=5.92
+		local tVersions = tChaine[indice_return];	-- Matrices=8.5
+		if not tVersions then
+			return chaine;
+		end
 		local tversionScript = tVersions:Split('=');
-		local last_version = tversionScript[2];
-		if tonumber(last_version) > tonumber(script_version) then
+		last_version = tonumber(tversionScript[#tversionScript]:Trim()) or 0;
+		script_version = tonumber(script_version) or 0;
+		if last_version > script_version then
 			if app.GetAuiFrame():MessageBox(
-				"Vous utilisez la version "..script_version.." du script et la version "..last_version.." plus récente est disponible.\nVoulez-vous la télécharger ?", 
-				"Téléchargement du script",
+				"Vous utilisez la version "..script_version.." du script et la version "..last_version.." plus rÃ©cente est disponible.\nVoulez-vous la tÃ©lÃ©charger ?", 
+				"TÃ©lÃ©chargement du script",
 				msgBoxStyle.YES_NO + msgBoxStyle.NO_DEFAULT + msgBoxStyle.ICON_INFORMATION
 				) == msgBoxStyle.YES then
 				app.GetAuiFrame():MessageBox(
-					"Le script va être fermé pour validation de la mise à jour.", 
+					"Le script va Ãªtre fermÃ© pour validation de la mise Ã  jour.", 
 					"Information !!!",
 					msgBoxStyle.OK + msgBoxStyle.ICON_INFORMATION
 					);
+				sortir_du_script = true;
 				if tNomSVersionDoc[indice_return]:len() > 0 then
 					local filename = './tmp/updatesPG.txt';
 					local f = io.open(filename, 'w')
@@ -218,12 +252,12 @@ function GetPointPlaceHandi(clt, nbclt)
 	end
 	if nbclt == 1 then
 		 if clt == 1 then
-			pts = tRanked[1][clt].Pts 	-- idx = nombre de classés, i = classement
+			pts = tRanked[1][clt].Pts 	-- idx = nombre de classÃ©s, i = classement
 			return pts;
 		end
 	elseif nbclt == 2 then
 		if clt < 3 then
-			pts = tRanked[2][clt].Pts 	-- idx = nombre de classés, i = classement
+			pts = tRanked[2][clt].Pts 	-- idx = nombre de classÃ©s, i = classement
 			return pts
 		end
 	else
@@ -248,10 +282,7 @@ function InitReportHandi(code_evenement)
 	base:TableLoad(tPlace_Valeur, cmd)
 end
 
-function OnDecodeJsonBibo(code_evenement, groupe, vitesse)
-	if vitesse then
-		code_evenement = code_evenement * -1;
-	end
+function OnDecodeJsonEgalite(code_evenement, groupe)
 	cmd = 'Select * From Resultat_Info_Bibo Where Code_evenement = '..code_evenement..' And Groupe = '..groupe;
 	base:TableLoad(tResultat_Info_Bibo, cmd);
 	-- adv.Alert('taille de tResultat_Info_Bibo = '..tResultat_Info_Bibo:GetNbRows());
@@ -271,20 +302,38 @@ function OnDecodeJsonBibo(code_evenement, groupe, vitesse)
 	return tableDossards1, tableDossards2;
 end
 
-function OnEncodeJsonBibo(code_evenement, groupe, vitesse)
+function OnDecodeJsonBibo(code_evenement, groupe)
+	cmd = 'Select * From Resultat_Info_Bibo Where Code_evenement = '..code_evenement..' And Groupe = '..groupe;
+	base:TableLoad(tResultat_Info_Bibo, cmd);
+	tResultat_Info_Bibo:OrderBy('Groupe, Ligne');
+	local tableDossards1 = {};
+	local tableDossards2 = {};
+	for i = 0, tResultat_Info_Bibo:GetNbRows() -1 do
+		local jsontxt1 = tResultat_Info_Bibo:GetCell('Table1', i);
+		-- adv.Alert(jsontxt1);
+		local xTable1 = table.FromStringJSON(jsontxt1);
+		table.insert(tableDossards1, xTable1.Table1[1].Col2);
+		local jsontxt2 = tResultat_Info_Bibo:GetCell('Table2', i);
+		-- adv.Alert(jsontxt2);
+		local xTable2 = table.FromStringJSON(jsontxt2);
+		table.insert(tableDossards2, {Identite = xTable2.Table2[1].Identite, Pts = xTable2.Table2[1].Pts, RangFictif = xTable2.Table2[1].RangFictif, Dossard = xTable2.Table2[1].Dossard})
+	end
+	return tableDossards1, tableDossards2;
+end
+
+function OnEncodeJsonBibo(code_evenement, groupe)
 	-- tDrawG6 contient tous les coureurs du BIBO
 	if not groupe then
 		groupe = 1;
 	end
-	if vitesse then
-		code_evenement = code_evenement * -1;
-	end
-	tResultat_Info_Bibo:RemoveAllRows();
-	-- local cmd = 'Select * From Resultat_Info_Bibo Where Code_evenement = '..code_evenement;
-	-- base:TableLoad(tResultat_Info_Bibo, cmd);
 	local row_groupe = nil;
 	assert(tTableTirage1:GetNbRows() > 0);
+	local cmd = 'DELETE FROM Resultat_Info_Bibo WHERE Code_evenement = '..code_evenement..' AND Groupe = '..groupe;
+	base:Query(cmd);
+	base:TableLoad(tResultat_Info_Bibo, 'Select * From Resultat_Info_Bibo Where Code_evenement = '..code_evenement..' AND Groupe = '..groupe);
+	local ligne = 0;
 	for row = 0, tTableTirage1:GetNbRows() -1 do
+		ligne = ligne + 1;
 		local idx = row + 1;
 		local tTable1 = {};
 		local tTable2 = {};
@@ -307,19 +356,33 @@ function OnEncodeJsonBibo(code_evenement, groupe, vitesse)
 		table.insert(tTable2, {Identite = col1, Pts = col2, RangFictif = col3, Dossard = col4});
 		local xTable2 = {Table2 = tTable2};
 		local jsontxt2 = table.ToStringJSON(xTable2, false);
-		local rowsql = tResultat_Info_Bibo:AddRow();
-		tResultat_Info_Bibo:SetCell('Code_evenement', rowsql, code_evenement);
-		tResultat_Info_Bibo:SetCell('Groupe', rowsql, groupe);
+		--local rowsql = tResultat_Info_Bibo:AddRow();
+		rResultat_Info_Bibo = tResultat_Info_Bibo:GetRecord();
+		rResultat_Info_Bibo:Set('Code_evenement', code_evenement);
+		rResultat_Info_Bibo:Set('Groupe', groupe);
 		-- adv.Alert('jsontxt1 = '..jsontxt1);
 		-- adv.Alert('jsontxt2 = '..jsontxt2);
-		tResultat_Info_Bibo:SetCell('Ligne', rowsql, idx);
-		tResultat_Info_Bibo:SetCell('Table1', rowsql, jsontxt1);
-		tResultat_Info_Bibo:SetCell('Table2', rowsql, jsontxt2);
-		-- base:TableInsert(tResultat_Info_Bibo, rowsql);
+		rResultat_Info_Bibo:Set('Ligne', ligne);
+		rResultat_Info_Bibo:Set('Table1', jsontxt1);
+		rResultat_Info_Bibo:Set('Table2', jsontxt2);
+		base:TableInsert(tResultat_Info_Bibo, -1, 'Code_evenement, Groupe, Ligne, Table1, Table2');
+		base:TableLoad(tResultat_Info_Bibo, 'Select * From Resultat_Info_Bibo Where Code_evenement = '..code_evenement);
 	end
-	base:TableBulkInsert(tResultat_Info_Bibo);
+	--base:TableBulkUpdate(tResultat_Info_Bibo, 'Code_evenement, Groupe, Ligne, Table1, Table2', 'Resultat_Info_Bibo');
 end
 
+function TraceTable(t, prefix)
+
+    prefix = prefix or ""
+
+    for k, v in pairs(t) do
+        adv.Alert(prefix .. tostring(k) .. " = " .. tostring(v))
+
+        if type(v) == "table" then
+            TraceTable(v, prefix .. "   ")
+        end
+    end
+end
 
 function Eval(e1, e2)
 	if e1 == e2 then
@@ -332,16 +395,16 @@ end
 function Interrogation()
 	do return end
 	params = params or {};
-	local msg = "Après 20 années de bénévolat et une grande implication"..
-				"\npersonnelle, certains à la FFS ont décidé de me blacklister."..
-				"\nVous allez utiliser un de mes développements mis gracieusement"..
-				"\nà la disposition de la communauté mais celui-ci ne sera plus maintenu."..
-				"\nCeux parmi les outils que j'ai développés qui sont utilisés par"..
-				"\nles coordonnateurs des courses FIS et leurs chronométreurs"..
-				"\nne sont pas concernés par ce coup de colère."..
-				"\nVous pourrez peut-être obtenir des explications auprès"..
-				"\ndu Directeur Général de la FFS car moi, je n'en ai reçu aucune."..
-				"\nPhilippe Guérindon.";
+	local msg = "AprÃ¨s 20 annÃ©es de bÃ©nÃ©volat et une grande implication"..
+				"\npersonnelle, certains Ã  la FFS ont dÃ©cidÃ© de me blacklister."..
+				"\nVous allez utiliser un de mes dÃ©veloppements mis gracieusement"..
+				"\nÃ  la disposition de la communautÃ© mais celui-ci ne sera plus maintenu."..
+				"\nCeux parmi les outils que j'ai dÃ©veloppÃ©s qui sont utilisÃ©s par"..
+				"\nles coordonnateurs des courses FIS et leurs chronomÃ©treurs"..
+				"\nne sont pas concernÃ©s par ce coup de colÃ¨re."..
+				"\nVous pourrez peut-Ãªtre obtenir des explications auprÃ¨s"..
+				"\ndu Directeur GÃ©nÃ©ral de la FFS car moi, je n'en ai reÃ§u aucune."..
+				"\nPhilippe GuÃ©rindon.";
 	if tEvenement then
 		if tEvenement:GetCell('Code_entite', 0) == 'FFS' then
 			if tEvenement:GetCell('Code_activite', 0) == 'ALP' or tEvenement:GetCell('Code_activite', 0) == 'CHA-CMB' then
@@ -453,13 +516,18 @@ function GetDisciplines(Table_critere)
 	return arDiscipline;
 end
 
-function GetValuePG(cle, defaultValue)	-- Lecture d'une valeur dans la table Evenement_Matrice avec lecture d'une valeur par défaut dans le XML et retour de la valeur lue ou de la valeur par défaut
+function GetValuePG(cle, defaultValue)	-- Lecture d'une valeur dans la table Evenement_Matrice avec lecture d'une valeur par dÃ©faut dans le XML et retour de la valeur lue ou de la valeur par dÃ©faut
 	local valretour = defaultValue;
 	local r = tEvenement_Matrice:GetIndexRow('Cle', cle);
 	if r >= 0 then
 		valretour = tEvenement_Matrice:GetCell('Valeur', r);
 	end
 	return valretour;
+end
+
+function HtmlLink(var1, var2)
+	local lien = '<a href="https://ffs.fr/fiche-individuelle/?licence='..string.sub(var1,4)..'&amp;discipline=ALPIN" target="_blank">'..string.sub(var2,4)..'</a>';
+	return lien;
 end
 
 function AnalysePerformances(code_evenement)
@@ -502,9 +570,9 @@ function AnalysePerformances(code_evenement)
 				end					
 				table.insert(tcritere, {Faire = faire, Premiers = premiers, Discipline = discipline, Rempli = 0});
 				table.insert(arAnalyse, {idxcritere = idxcritere, Rempli = 0, Etou = nil, Criteres = tcritere, String = what});
-				-- adv.Alert('i = '..i..', critère sans ET ni OU, analyseGauche = '..analyseGauche..', tcritere[#tcritere].Faire = '..tcritere[#tcritere].Faire..' dans les '..tcritere[#tcritere].Premiers..' en '..tcritere[#tcritere].Discipline);
+				-- adv.Alert('i = '..i..', critÃ¨re sans ET ni OU, analyseGauche = '..analyseGauche..', tcritere[#tcritere].Faire = '..tcritere[#tcritere].Faire..' dans les '..tcritere[#tcritere].Premiers..' en '..tcritere[#tcritere].Discipline);
 			else
-				-- adv.Alert('i = '..i..', critère avec ET ou OU, analyseGauche = '..analyseGauche);
+				-- adv.Alert('i = '..i..', critÃ¨re avec ET ou OU, analyseGauche = '..analyseGauche);
 				if string.find(analyseGauche, 'ET') then
 					etou = 'ET';
 				else
@@ -537,7 +605,7 @@ function AnalysePerformances(code_evenement)
 	end
 	for row = 0, body:GetNbRows() -1 do
 		-- adv.Alert('passage 2 pour '..body:GetCell('Identite', row));
-		-- on initialise toutes les données des critères à chaque coureur
+		-- on initialise toutes les donnÃ©es des critÃ¨res Ã  chaque coureur
 		local bolAnalyseFaite = false;
 		for i = 1, #arAnalyse do
 			arAnalyse[i].Rempli = 0;
@@ -555,12 +623,12 @@ function AnalysePerformances(code_evenement)
 			discipline = tMatrice_Courses:GetCell('Code_discipline',idxcourse-1);
 			table.insert(tData, {Clt = clt, Ordre = idxcourse, Discipline = discipline});
 		end
-		SortTable2(tData, {'Clt'});	-- les courses sont triées par classement indépendamment de la discipline
-		for idxcritere = 1, #arAnalyse do		-- on parcourt tous les critères et les sous-criteres
+		SortTable2(tData, {'Clt'});	-- les courses sont triÃ©es par classement indÃ©pendamment de la discipline
+		for idxcritere = 1, #arAnalyse do		-- on parcourt tous les critÃ¨res et les sous-criteres
 			if bolAnalyseFaite == true then
 				break;
 			end
-			local etou = arAnalyse[idxcritere].Etou;	-- etou peut être = nil, ET, OU
+			local etou = arAnalyse[idxcritere].Etou;	-- etou peut Ãªtre = nil, ET, OU
 			local tcritere = arAnalyse[idxcritere].Criteres;
 			for idx = 1, #tcritere do
 				criterex = tcritere[idx];
@@ -568,7 +636,7 @@ function AnalysePerformances(code_evenement)
 				local faire = criterex.Faire;
 				local premiers = criterex.Premiers;
 				local discipline = criterex.Discipline;
-				-- adv.Alert('passage 3 - '..idx..', critère '..idxcritere..' - faire = '..faire..', dans les '..premiers..', en '..discipline);
+				-- adv.Alert('passage 3 - '..idx..', critÃ¨re '..idxcritere..' - faire = '..faire..', dans les '..premiers..', en '..discipline);
 				for i = 1, #tData do
 					if discipline == 'Vitesse' then
 						if tData[i].Discipline:In('SG','DH') then
@@ -648,12 +716,12 @@ function EvaluateVal(val, tps)
 end
 
 function EvaluatePts(row, idxcourse, colpts, abddsq)
-	if not idxcourse or arCourses[idxcourse].Discipline == 'CS' then	-- Pts total la matrice pour le row
+	if not idxcourse or arCourses[idxcourse].Discipline == 'CS' then	
 		local pts = body:GetCellDouble(colpts, row);
 		if pts >=0 then
 			if math.floor(pts) == pts then
 				pts = math.floor(pts);
-			end	
+			end			
 			return pts;
 		else
 			return '';
@@ -689,16 +757,28 @@ function EvaluatePts(row, idxcourse, colpts, abddsq)
 				return '-';
 			end
 		end
-	else	-- Ptstotal
+	else
 		if run_best > 0 then
 			if pts >= 0 then
 				return pts;
-			else
+			elseif abddsq == 'Non' then
 				return '';
+			else
+				return txt_tps;
 			end
 		elseif tps == -500 or tps == -800 then
 			if abddsq == 'Oui' then
 				return txt_tps;
+			else
+				return '';
+			end
+		else
+			if pts >= 0 then
+				if (tps > 0 or tps == -500 or tps == -600) then
+					return pts;
+				else
+					return '';
+				end
 			else
 				return '';
 			end
@@ -744,11 +824,11 @@ function InitColorDiscipline()
 	tDiscipline = base:GetTable('Discipline');
 	colorDiscipline = {};
 	local doc = xmlDocument.Create(app.GetPath().."/challenge/matrice_config.xml");
-	local nodecle = doc:FindFirst('root/colors');	-- on va chercher les valeurs par défaut des variables des couleurs des disciplines
+	local nodecle = doc:FindFirst('root/colors');	-- on va chercher les valeurs par dÃ©faut des variables des couleurs des disciplines
 	if nodecle then
 		for i = 0, tDiscipline:GetNbRows() -1 do
 			local discipline = tDiscipline:GetCell('Code', i);
-			local nodecle = doc:FindFirst('root/colors/'..discipline);	-- on va chercher les valeurs par défaut des variables des couleurs des disciplines
+			local nodecle = doc:FindFirst('root/colors/'..discipline);	-- on va chercher les valeurs par dÃ©faut des variables des couleurs des disciplines
 			if nodecle then
 				background = 'rgb '..nodecle:GetNodeContent();
 			else
@@ -855,10 +935,10 @@ end
 
 function InitPrnColonnes()
 	tMatrice_Courses = base:GetTable('_Matrice_Courses');
-	ImprimerColonnes = GetValuePG('imprimerColonnes', 'Code_coureur,Code,center,1|Identite,Identité,left,1|Sexe,S.,center,0|An,An,center,1|Categ,Cat.,center,1|Nation,Nat.,center,0|Comite,CR,center,1|Club,Club,left,1|Groupe,Groupe,left,0|Equipe,Equipe,left,0|Critere,Critère,left,0|Liste1,Liste,center,0|Liste2,Liste,center,0|Delta,Delta,center,0');
-	PrendreBloc1 = GetValuePG('comboPrendreBloc1', '1.Classement général');
+	ImprimerColonnes = GetValuePG('imprimerColonnes', 'Code_coureur,Code,center,1|Identite,IdentitÃ©,left,1|Sexe,S.,center,0|An,An,center,1|Categ,Cat.,center,1|Nation,Nat.,center,0|Comite,CR,center,1|Club,Club,left,1|Groupe,Groupe,left,0|Equipe,Equipe,left,0|Critere,CritÃ¨re,left,0|Liste1,Liste,center,0|Liste2,Liste,center,0|Delta,Delta,center,0');
+	PrendreBloc1 = GetValuePG('comboPrendreBloc1', '1.Classement gÃ©nÃ©ral');
 	ImprimerBloc1 = GetValuePG('imprimerBloc1', 'Clt,0|Tps,0|Diff,0|Pts,1|Cltrun,0|Tpsrun,0|Diffrun,0|Ptsrun,0|Ptstotal,0|EtapeClt,0|EtapePts,0');
-	PrendreBloc2 = GetValuePG('comboPrendreBloc2', '1.Classement général');
+	PrendreBloc2 = GetValuePG('comboPrendreBloc2', '1.Classement gÃ©nÃ©ral');
 	ImprimerBloc2 = GetValuePG('imprimerBloc2', 'Clt,0|Tps,0|Diff,0|Pts,1|Cltrun,0|Tpsrun,0|Diffrun,0|Ptsrun,0|Ptstotal,0');
 	ImprimerCombiSaut = GetValuePG('imprimerCombiSaut', 'Cltcs,1|Lng_saut,1|Clt_saut,1|Pts_saut,1|Tps_alpin,1|Clt_alpin,1|Pts_alpin,1|Ptstotalcs,1');
 	row1haut = false;
@@ -884,7 +964,7 @@ function InitPrnColonnes()
 		SetAlignCol('Categ', chaine);
 	end
 	
-	-- Ex ImprimerColonnes = Code_coureur,Code,center,1|Identite,Identité,left,1|Sexe,S.,center,1|An,An,center,1|Categ,Cat.,center,0|Nation,Nat.,center,0|Comite,CR,center,0|Club,Club,left,0|Groupe,Groupe,left,0|Equipe,Equipe,left,0|Critere,Critère,left,0|Liste1,Liste,center,0|Liste2,Liste,center,0|Delta,Delta,center,0
+	-- Ex ImprimerColonnes = Code_coureur,Code,center,1|Identite,IdentitÃ©,left,1|Sexe,S.,center,1|An,An,center,1|Categ,Cat.,center,0|Nation,Nat.,center,0|Comite,CR,center,0|Club,Club,left,0|Groupe,Groupe,left,0|Equipe,Equipe,left,0|Critere,CritÃ¨re,left,0|Liste1,Liste,center,0|Liste2,Liste,center,0|Delta,Delta,center,0
 	tColCoureur = ImprimerColonnes:Split('|');
 	prnColonne = {};
 	colstartrace = 3;
@@ -1010,8 +1090,7 @@ function InitPrnColonnes()
 			-- if string.find(prendre, '3%.') then
 				-- prnBlocx.Ptstotal.Imprimer = 0;
 				-- prnBlocx.Pts.Imprimer = 1;
-			-- end
-
+			-- endadv.Alert(')
 			prnColonne.Clt[idxcourse].Imprimer = prnBlocx['Clt'].Imprimer;
 			prnColonne.Tps[idxcourse].Imprimer = prnBlocx['Tps'].Imprimer;
 			prnColonne.Diff[idxcourse].Imprimer = prnBlocx['Diff'].Imprimer;
@@ -1021,6 +1100,13 @@ function InitPrnColonnes()
 			prnColonne.Diffrun[idxcourse].Imprimer = prnBlocx['Diffrun'].Imprimer;
 			prnColonne.Ptsrun[idxcourse].Imprimer = prnBlocx['Ptsrun'].Imprimer;
 			prnColonne.Ptstotal[idxcourse].Imprimer = prnBlocx['Ptstotal'].Imprimer;
+			if string.find(prendre, '1%.') then 
+				prnColonne.Cltrun[idxcourse].Imprimer = 0;
+				prnColonne.Tpsrun[idxcourse].Imprimer = 0;
+				prnColonne.Diffrun[idxcourse].Imprimer = 0;
+				prnColonne.Ptsrun[idxcourse].Imprimer  = 0;
+				prnColonne.Ptstotal[idxcourse].Imprimer = 0;
+			end				
 			if nb_run == 1 then
 				if prnColonne.Cltrun[idxcourse].Imprimer == 1 then
 					prnColonne.Cltrun[idxcourse].Imprimer = 0;
@@ -1043,15 +1129,12 @@ function InitPrnColonnes()
 					prnColonne.Ptstotal[idxcourse].Imprimer = 0;
 				end
 			end
-			if string.find(prendre, '1') then
-				prnColonne.Ptstotal[idxcourse].Imprimer = 0;
-			end
-			if string.find(prendre, '2') then
+			if tMatrice_Courses:GetCell('Manche', i) == 'Oui' then
+				prnColonne.Pts[idxcourse].Imprimer = 0;
 				prnColonne.Ptstotal[idxcourse].Imprimer = 0;
 				prnColonne.Ptsrun[idxcourse].Imprimer = 1;
-				prnColonne.Pts[idxcourse].Imprimer = 0;
 			end
-			
+				
 	-- bloc1 : Clt,0|Tps,0|Diff,0|Pts,1|Cltrun,0|Tpsrun,0|Diffrun,0|Ptsrun,1|Ptstotal,1	/ EtapeClt,0|EtapePts,0
 			nbcol_course = prnColonne.Clt[idxcourse].Imprimer + prnColonne.Tps[idxcourse].Imprimer + prnColonne.Diff[idxcourse].Imprimer + prnColonne.Pts[idxcourse].Imprimer + (prnColonne.Cltrun[idxcourse].Imprimer * nb_run) + (prnColonne.Tpsrun[idxcourse].Imprimer * nb_run) + (prnColonne.Diffrun[idxcourse].Imprimer * nb_run) + (prnColonne.Ptsrun[idxcourse].Imprimer * nb_run) + prnColonne.Ptstotal[idxcourse].Imprimer;
 			tMatrice_Courses:SetCell('Nb_col', i, nbcol_course);
@@ -1150,8 +1233,8 @@ function GetComiteOrigine(code)
 end
 
 function GetOfficiel(code_evenement, fonction, data_complete, return_table)
-	-- s'il n'y a qu'un seul record dans Evenement_Officiel, valeurs de data_complete : false --> identité seule, true --> toutes les données de la table
-	-- si return_table == true, on retourne la table et l'identité
+	-- s'il n'y a qu'un seul record dans Evenement_Officiel, valeurs de data_complete : false --> identitÃ© seule, true --> toutes les donnÃ©es de la table
+	-- si return_table == true, on retourne la table et l'identitÃ©
 	data = '';
 	Evenement_Officiel = base:GetTable('Evenement_Officiel');
 	local cmd = 'Select * from Evenement_Officiel Where Code_evenement = '..code_evenement..' And Fonction = "'..fonction..'"';
@@ -1227,19 +1310,19 @@ function GetOfficielSignature(code_evenement, fonction, logo)
 end
 
 function bodyModulo(val)
-	local msg = 'Liste des coureurs enlevés du formulaire \n pour cause de licence invalide :\n';
+	local msg = 'Liste des coureurs enlevÃ©s du formulaire \n pour cause de licence invalide :\n';
 	local posit = string.find(msg,':') + 1;
 	for i = body:GetNbRows() -1, 0, -1  do
 		if body:GetCell('Modif_manuel', i) == "F" or body:GetCell('Modif_manuel', i) == "D" then
-			if app.GetAuiFrame():MessageBox('Licence invalide pour '..body:GetCell('Identite', i)..'\nConfirmez-vous son inscription ?', "Attention à la validité des licences !!", msgBoxStyle.YES_NO+msgBoxStyle.ICON_WARNING) == msgBoxStyle.NO then 
+			if app.GetAuiFrame():MessageBox('Licence invalide pour '..body:GetCell('Identite', i)..'\nConfirmez-vous son inscription ?', "Attention Ã  la validitÃ© des licences !!", msgBoxStyle.YES_NO+msgBoxStyle.ICON_WARNING) == msgBoxStyle.NO then 
 				msg = msg.."\n"..body:GetCell('Identite', i);
 				body:RemoveRowAt(i);
 			end
 		end
 	end
 	if msg:len() > posit then
-		msg = msg.."\n\n"..'il reste '..body:GetNbRows()..' coureurs à inscrire';
-		app.GetAuiFrame():MessageBox(msg, "Attention à la validité des licences !!", msgBoxStyle.OK+msgBoxStyle.ICON_WARNING)
+		msg = msg.."\n\n"..'il reste '..body:GetNbRows()..' coureurs Ã  inscrire';
+		app.GetAuiFrame():MessageBox(msg, "Attention Ã  la validitÃ© des licences !!", msgBoxStyle.OK+msgBoxStyle.ICON_WARNING)
 	end
 	body:GetRecord():SetNull(); 
 	nb = body:GetNbRows() % val; 

@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<root>
+	<panel name="page1">
+		<wnd name="statictext" style="ALIGN_RIGHT" />
+		<padding all="2px"/>
+		<col value="1,2"/>
+		<row value="10px" />
+		<textctrl row="80px" style="TE_CENTER|TE_READONLY|TE_MULTILINE" col_start="1" col_end="0" name="race"/>
+		<statictext row="auto" col_start="1" label="Impulsion manquante : " />
+		<combobox col_start="0" name="impulsion" style="TE_READONLY" />
+		<statictext row="auto" col_start="1" label="Manche concernée : " />
+		<combobox col_start="0" name="manche" style="TE_READONLY" />
+		<statictext row="auto" col_start="1" label="Dossard : " />
+		<textctrl col_start="0" name="dossard" align="left"/>
+		<statictext row="auto" col_start="1" label="Identite : " />
+		<textctrl col_start="0" name="identite" style="TE_READONLY"/>
+		<row value="20px" />
+		<statictext row="auto" col_start="1" label="Dossard précédent : " />
+		<textctrl col_start="0" name="dossard_precedent" />
+		<statictext row="auto" col_start="1" label="Identite : " />
+		<textctrl col_start="0" name="identite_precedente" style="TE_READONLY"/>
+		<statictext row="30px" col_start="2" font_weight="bold" style="ALIGN_CENTER" label="Code du calcul à remplir uniquement si vous envoyez les données du Système B. Laisser vide pour le système A" />
+		<statictext row="auto" col_start="1" label="Code du calcul renvoyé : " />
+		<textctrl col_start="0" name="calcul_id" />
+		<statictext row="auto" col_start="1" label="Mode (Réel / Test) : " />
+		<combobox col_start="0" name="mode" style="TE_READONLY" />
+		<statictext row="80px" col_start="1" label="Message de retour éventuel : " />
+		<textctrl col_start="0" name="message" font_weight="bold" style="TE_READONLY|TE_MULTILINE"/>
+		<row value="10px" />
+		<toolbar row="auto" col_start="1" col_end="0" row_start="0" name="tbh" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT" />
+	</panel>
+	<panel name="json">
+		<wnd name="statictext" style="ALIGN_CENTER" />
+		<padding all="2px"/>
+		<pen size="2" border="all"/>
+		<col value="1,2,2,2,2,2,2,2,1,1"/>
+		<statictext row="auto" col_start="2" font_weight="bold" label="Clé du calcul" />
+		<statictext col_start="3" font_weight="bold" label="Saison" />
+		<statictext col_start="4" font_weight="bold" label="Date" />
+		<statictext col_start="5" font_weight="bold" label="Codex" />
+		<statictext col_start="6" font_weight="bold" label="Dossard" />
+		<statictext col_start="7" font_weight="bold" label="Manche" />
+		<statictext col_start="8" font_weight="bold" label="Impulsion manquante" />
+		<statictext col_start="9" style="ALIGN_RIGHT" font_weight="bold" label="Voir" />
+		<lua>for i = 1, 20 do</lua>
+			<textctrl row="auto" col_start="2" font_weight="bold" style="TE_CENTER|TE_READONLY" name="('json_id'..i)"/>
+			<textctrl col_start="3" font_weight="bold" style="TE_CENTER|TE_READONLY" name="('saison'..i)"/>
+			<textctrl col_start="4" font_weight="bold" style="TE_CENTER|TE_READONLY" name="('date'..i)"/>
+			<textctrl col_start="5" font_weight="bold" style="TE_CENTER|TE_READONLY" name="('codex'..i)"/>
+			<textctrl col_start="6" font_weight="bold" style="TE_CENTER|TE_READONLY" name="('dossard'..i)"/>
+			<textctrl col_start="7" font_weight="bold" style="TE_CENTER|TE_READONLY" name="('manche'..i)"/>
+			<textctrl col_start="8" font_weight="bold" style="TE_CENTER|TE_READONLY" name="('impulsion'..i)"/>
+			<checkbox col_start="9" style="CHK_3STATE|ALIGN_RIGHT" name="('chk'..i)"/>
+		<lua>end</lua>
+		<toolbar row="auto" col_start="1" col_end="0" row_start="0" name="tbjson" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT" />
+	</panel>
+</root>

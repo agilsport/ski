@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root >
+ <panel name="resultat_controle">
+    <wnd name="statictext" style="ALIGN_RIGHT"/>
+    <padding all="2px"/>
+	<pen border="all" size="1" />
+	<col value="50px,1,4,4,50px,4,6"/>
+	<statictext row="auto " col_start="1" col_end="0" name="titre" label="" /> 
+	<wndtext row="80px" col_start="1" col_end="7" font_weight="bold" font_size="10" align="center"><background mode="solid" color="ltgray"/>"Contrôle des Officiels de la competition : "..params.NomEvenement</wndtext>
+	<statictext row="auto" col_start="1" style="ALIGN_CENTER" font_weight="bold" label="N°"/>
+	<statictext col_start="2" style="ALIGN_CENTER" font_weight="bold" label="Ctrl"/>
+	<statictext col_start="3" style="ALIGN_CENTER" font_weight="bold" label="Fonction"/>
+	<statictext col_start="4" style="ALIGN_CENTER" font_weight="bold" label="Identité"/>
+	<statictext col_start="5" col_end="6" style="ALIGN_CENTER" font_weight="bold" label="Diplôme testé"/>
+	<statictext col_start="7" style="ALIGN_CENTER" font_weight="bold" label="Validité"/>
+	<lua>for ligne = 1, params.nblignes do </lua>
+	<wndtext row="30px" col_start="1" align="center" font_weight="bold" name="('indice'..ligne)"/>
+	<wndimage col_start="2" name="('image_ctrl'..ligne)" adjust="best" align="center" />
+	<wndtext col_start="3" name="('officiel_fonction_fr'..ligne)" style="TE_READONLY"/>
+	<wndtext col_start="4" name="('officiel_identite'..ligne)" style="TE_READONLY"/>
+	<wndtext col_start="5" col_end="6" name="('officiel_diplome_teste'..ligne)" style="TE_READONLY"/>
+	<wndtext col_start="7" name="('officiel_validite'..ligne)" style="TE_READONLY"/>
+	<lua>end</lua>
+	<wndtext row="40px" col_start="1" col_end="7" font_weight="bold" font_size="10" align="center"><background mode="solid" color="ltgray"/>"Contrôle de la validité de la piste et de la liste utilisée"</wndtext>
+	<textctrl row="auto" font_size="10" col_start="2" col_end="4" name="piste" style="TE_CENTER|TE_READONLY|TE_MULTILINE"/>
+	<wndimage col_start="1" name="piste_ctrl" adjust="none" align="center" />
+	<wndimage col_start="5" name="liste_ctrl" adjust="none" align="center" />
+	<textctrl font_size="10" col_start="6" col_end="7" name="liste" style="TE_CENTER|TE_READONLY|TE_MULTILINE"/>
+	<textctrl row="auto" font_size="10" col_start="2" col_end="4" align="center" name="piste" style="TE_ALIGN_CENTER|TE_READONLY"/>
+	<wndtext row="40px" col_start="1" col_end="7" font_weight="bold" font_size="10" align="center"><background mode="solid" color="ltgray"/>"Manche 1            Contrôle du nombre de porte / dénivelé            (Manche 2)"</wndtext>
+    <padding all="0px"/>
+	<textctrl row="(params.PortesHauteur)" font_size="10" col_start="2" col_end="4" name="portes_run1" style="TE_CENTER|TE_READONLY|TE_MULTILINE"/>
+	<!-- <textctrl row="100px" font_size="10" col_start="2" col_end="4" name="portes_run1" style="TE_CENTER|TE_READONLY|TE_MULTILINE"/> -->
+	<wndimage col_start="1" name="portes_ctrl1" adjust="none" align="center" />
+	<wndimage col_start="5" name="portes_ctrl2" adjust="none" align="center" />
+	<textctrl font_size="10" col_start="6" col_end="7" name="portes_run2" style="TE_CENTER|TE_READONLY|TE_MULTILINE"/>
+	<wndimage row="40px" col_start="1" name="resultat_ctrl" adjust="none" align="center" />
+	<wndtext font_size="10" col_start="2" col_end="7" name="ranking_scan" align="center"/>
+	<toolbar row="auto" col_start="1" col_end="0" name="tbctrl" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT" />
+ </panel>
+ <panel name="message">
+    <col value="1"/>
+	<wndtext row="100px" col_start="1" font_size="10" align="center" name="lbl_message"/>
+</panel>
+</root>

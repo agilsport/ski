@@ -2,7 +2,7 @@ dofile('./interface/adv.lua');
 dofile('./interface/interface.lua');
 dofile('./edition/functionPG.lua');
 
-function ReplaceTableEnvironnement(t, name)		-- replace la table crÈÈe dans l'environnement de la base de donnÈe pour Èviter les memory leaks
+function ReplaceTableEnvironnement(t, name)		-- replace la table cr√©√©e dans l'environnement de la base de donn√©e pour √©viter les memory leaks
 	if type(t) ~= 'userdata' then
 		return;
 	end
@@ -371,7 +371,7 @@ end
 function ControlData();
 	local bolOK = true;
 
-	-- contrÙle des data
+	-- contr√¥le des data
 	TR.OS = TR.OS or '';
 	TR.technicaldelegate_Number = TR.technicaldelegate_Number or '';	
 	TR.technicaldelegate_Lastname = TR.technicaldelegate_Lastname or '';	
@@ -491,7 +491,7 @@ function ControlData();
 	end
 
 	if bolOK == false then 
-		local msg = "L'environnement ne permet pas la crÈation du Rapport Technique de ChronomÈtrage FIS :\n\n"..TR.errormessage;
+		local msg = "L'environnement ne permet pas la cr√©ation du Rapport Technique de Chronom√©trage FIS :\n\n"..TR.errormessage;
 		app.GetAuiFrame():MessageBox(msg, "Attention", msgBoxStyle.OK+msgBoxStyle.ICON_WARNING)
 	end
 	return bolOK;
@@ -677,7 +677,7 @@ end
 function GetCartouche();
 	if Epreuve:GetCell("Code_entite", 0) ~= "FIS" or TR.code_activite ~= "ALP" then
 		TR.errormessage = TR.errormessage or '';
-		TR.errormessage = TR.errormessage.."La course n'a pas une entitÈ FIS ou n'est pas Alpine !!\n";
+		TR.errormessage = TR.errormessage.."La course n'a pas une entit√© FIS ou n'est pas Alpine !!\n";
 		TR.OK = false
 		return;
 	end
@@ -700,7 +700,7 @@ function GetSetData();
 		TR[i].Biblast = {};
 		TR[i].Biblast.Net = '00:00.000';
 		TR[i].Biblast.Bib = '';
-		-- on rÈcupËre le meilleur de la manche
+		-- on r√©cup√®re le meilleur de la manche
 		filter_manche = "Select * From Resultat_Manche Where Code_evenement = "..TR.code_evenement.." And Code_manche = "..i.." And Tps_chrono > 0 Order By Tps_chrono"; 
 		base:TableLoad(Resultat_Manche, filter_manche);
 		TR[i].bestcodecoureur = Resultat_Manche:GetCell("Code_coureur",0);
@@ -710,7 +710,7 @@ function GetSetData();
 		TR[i].BestA_Bib = Resultat:GetCell("Dossard", 0);
 		TR[i].BestA_Name = Resultat:GetCell("Nom", 0).." "..Resultat:GetCell("Prenom", 0);
 		
-		-- on prend ceux qui sont arrivÈs 
+		-- on prend ceux qui sont arriv√©s 
 		filter_arrivee = "Select * From Resultat_Chrono Where Code_evenement = "..TR.code_evenement.." And Code_manche = "..i.." And ABS(Dossard) > 0 And Heure > 0 And Id = -1 Order By Heure"; 
 		base:TableLoad(Resultat_Chrono, filter_arrivee);
 		Arrives = Resultat_Chrono:Copy();
@@ -742,7 +742,7 @@ function GetSetData();
 			TR[i].Biblast.Net = app.TimeToString(Resultat_Manche:GetCellInt('Reserve', 0), fmt3);
 		end
 
-		-- donnÈes du dÈpart 
+		-- donn√©es du d√©part 
 		-- first
 		filter_start = "Select * From Resultat_Chrono Where Code_evenement = "..TR.code_evenement.." And Heure > 0 And Code_manche = "..i.." And Dossard In(Select Dossard From Resultat_Chrono Where Code_evenement = "..TR.code_evenement.." And Code_manche = "..i.." And ABS(Dossard) > 0 And Heure > 0 And Id = -1 Order By Heure) And Heure > 0 And Id = 0 Order By Heure"; 
 		base:TableLoad(Resultat_Chrono, filter_start);
@@ -939,10 +939,10 @@ function AfficheDialog0()
 			function(evt) 
 				local urlFile = "https://member.fis-ski.com/software/timingreport/TimingReport_Install.exe";
 				local localFile = string.format("%s/tmp/TimingReport_Install.exe", app:GetPath());
-				message:AddLineSuccess("TÈlÈchargement en cours")
+				message:AddLineSuccess("T√©l√©chargement en cours")
 				localFile = string.gsub(localFile, app.GetPathSeparator(), "/");
 				if curl.DownloadFile(urlFile, localFile) ~= true then
-					message.AddLineError("Erreur : TÈlÈchargement du programme impossible");
+					message.AddLineError("Erreur : T√©l√©chargement du programme impossible");
 					return;
 				end
 				InstalleTimingReport(localFile);
@@ -952,10 +952,10 @@ function AfficheDialog0()
 			function(evt) 
 				local urlFile = "https://member.fis-ski.com/software/timingreport/TimingReport_Install.dmg";
 				local localFile = string.format("%s/tmp/TimingReport_Install.dmg", app:GetPath());
-				message:SetValue("TÈlÈchargement en cours")
+				message:SetValue("T√©l√©chargement en cours")
 				localFile = string.gsub(localFile, app.GetPathSeparator(), "/");
 				if curl.DownloadFile(urlFile, localFile) ~= true then
-					message.AddLineError("Erreur : TÈlÈchargement du programme impossible");
+					message.AddLineError("Erreur : T√©l√©chargement du programme impossible");
 					return;
 				end
 				InstalleTimingReport(localFile);
@@ -971,15 +971,15 @@ function AfficheDialog0()
 		 end,  btnClose);
 	wnd.GetParentFrame():Bind(eventType.CURL, OnCurlReturn);
 				
-	local txt = "Vous aller crÈer le brouillon du Timing Report FIS pour l'ÈvÈnement :\n\n"..
+	local txt = "Vous aller cr√©er le brouillon du Timing Report FIS pour l'√©v√©nement :\n\n"..
 		TR.Evenement..".\n\n"..
-		"Le fichier XML sera crÈÈ avec toutes les donnÈes rÈcupÈrables depuis le chronomÈtrage de la course\n"..
-		"et devra Ítre repris avec le programme de la FIS disponible en tÈlÈchargement gratuit.\n"..
-		"Celui-ci peut Ítre installÈ automatiquement en cliquant sur bouton ci-dessous.\n"..
-		"Vous n'aurez plus qu'‡ complÈter les donnÈes manquantes non issues de la base de donnÈes.\n\n"..
-		"Les donnÈes affichÈes sur la page 1 sont automatiquement sauvegardÈes\n"..
-		"pour une utilisation ultÈrieure dans un autre Timing Report.\n\n";
-		txt = txt.."(votre systËme d'exploitation est "..TR.OS..")";
+		"Le fichier XML sera cr√©√© avec toutes les donn√©es r√©cup√©rables depuis le chronom√©trage de la course\n"..
+		"et devra √™tre repris avec le programme de la FIS disponible en t√©l√©chargement gratuit.\n"..
+		"Celui-ci peut √™tre install√© automatiquement en cliquant sur bouton ci-dessous.\n"..
+		"Vous n'aurez plus qu'√† compl√©ter les donn√©es manquantes non issues de la base de donn√©es.\n\n"..
+		"Les donn√©es affich√©es sur la page 1 sont automatiquement sauvegard√©es\n"..
+		"pour une utilisation ult√©rieure dans un autre Timing Report.\n\n";
+		txt = txt.."(votre syst√®me d'exploitation est "..TR.OS..")";
 
 	dlgConfig:GetWindowName('page0Text'):SetValue(txt);
 
@@ -1000,7 +1000,7 @@ end
 
 -- Point Entree Principal
 function main(params)
-	-- vÈrification de l'existence d'une version plus rÈcente du script.
+	-- v√©rification de l'existence d'une version plus r√©cente du script.
 	base = base or sqlBase.Clone();
 	Device = {};
 	TR = {};
@@ -1012,7 +1012,7 @@ function main(params)
 
 			
 	scrip_version = "4.7"; 
-	-- vÈrification de l'existence d'une version plus rÈcente du script.
+	-- v√©rification de l'existence d'une version plus r√©cente du script.
 	-- Ex de retour : LiveDraw=5.94,Matrices=5.92,TimingReport=4.3,DoubleTirage=3.2,TirageOptions=3.3,TirageER=1.7,ListeMinisterielle=2.3,KandaHarJunior=2.0
 	if app.GetVersion() >= '4.4c' then 
 		indice_return = 3;
@@ -1034,8 +1034,8 @@ function main(params)
 	local device_file = './res/tr/FIS-Timing-Devices.csv';
 	if not app.FileExists(device_file) then
 		app.GetAuiFrame():MessageBox(
-			"Vous devez tÈlÈcharger le fichier des appareils homologuÈs.\nLe script va se fermer automatiquement.", 
-			"TÈlÈchargement du fichier supplÈmentaire",
+			"Vous devez t√©l√©charger le fichier des appareils homologu√©s.\nLe script va se fermer automatiquement.", 
+			"T√©l√©chargement du fichier suppl√©mentaire",
 			msgBoxStyle.OK + msgBoxStyle.ICON_INFORMATION); 
 			local reponse = app.AutoUpdateResource('https://agilsport.fr/bta_alpin/UpdateScript.zip');
 			return true;
@@ -1046,9 +1046,9 @@ function main(params)
 	TR.code_evenement = params.code_evenement or -1;
 	if TR.code_evenement < 0 then
 		TR.OK = false;
-		TR.errormessage = TR.errormessage.."Le n∞ de course est incorrest !!\n";
+		TR.errormessage = TR.errormessage.."Le n¬∞ de course est incorrest !!\n";
 	end
-	-- en FIS, il n'y a qu'une seule Èpreuve
+	-- en FIS, il n'y a qu'une seule √©preuve
 	OpenTables(TR.code_evenement);
 	TR.nombre_de_manche = Epreuve:GetCellInt("Nombre_de_manche", 0);
 	-- adv.Alert('TR.nombre_de_manche  = '..TR.nombre_de_manche);
@@ -1060,25 +1060,25 @@ function main(params)
 			local cmd = "Select * From Resultat_Chrono Where Code_evenement = "..TR.code_evenement.." and Code_manche = "..i.." and ABS(Dossard) > 0 And Heure > 0 And (Id = 0 Or Origine = 'D')";
 			base:TableLoad(Resultat_Chrono, cmd);
 			if Resultat_Chrono:GetNbRows() == 0 then
-				TR.errormessage = TR.errormessage.."Il n'y a pas de dÈpart dans cette course pour la manche "..i.." !! \n";
+				TR.errormessage = TR.errormessage.."Il n'y a pas de d√©part dans cette course pour la manche "..i.." !! \n";
 				-- TR.OK = false;
 			end
 			local cmd = "Select * From Resultat_Chrono Where Code_evenement = "..TR.code_evenement.." and Code_manche = "..i.." and ABS(Dossard) > 0 And Heure > 0 And (Id = -1 Or Origine = 'A')";
 			base:TableLoad(Resultat_Chrono, cmd);
 			if Resultat_Chrono:GetNbRows() == 0 then
-				TR.errormessage = TR.errormessage.."Il n'y a pas d'arrivÈe dans cette course pour la manche "..i.." !! \n";
+				TR.errormessage = TR.errormessage.."Il n'y a pas d'arriv√©e dans cette course pour la manche "..i.." !! \n";
 				-- TR.OK = false;
 			end
 		end
 	end
 	if TR.OK == false then 
-		local msg = "L'environnement ne permet pas la crÈation du Rapport Technique de ChronomÈtrage FIS :\n\n"..TR.errormessage;
+		local msg = "L'environnement ne permet pas la cr√©ation du Rapport Technique de Chronom√©trage FIS :\n\n"..TR.errormessage;
 		app.GetAuiFrame():MessageBox(msg, "Attention", msgBoxStyle.OK+msgBoxStyle.ICON_WARNING)
 		return false;
 	end
-	-- on rÈcupËre toutes les donnÈes chrono de la course
-	-- on crÈe la sqlTable complËte de Device_fis et on la met dans l'environnement
-	-- on crÈe aussi les tables des marques pour les Timer, Photocell et Start (Startgates et startdoors)
+	-- on r√©cup√®re toutes les donn√©es chrono de la course
+	-- on cr√©e la sqlTable compl√®te de Device_fis et on la met dans l'environnement
+	-- on cr√©e aussi les tables des marques pour les Timer, Photocell et Start (Startgates et startdoors)
 	CreateDeviceFis();
 	GetSetData();
 	AfficheDialog0();
@@ -1108,7 +1108,7 @@ function AfficheDialog2()
 		height = TR.height,
 		x = TR.x,
 		y = TR.y,
-		label='Page 2 : donnÈes de chronomÈtrage  - Timing Report version '..scrip_version; 
+		label='Page 2 : donn√©es de chronom√©trage  - Timing Report version '..scrip_version; 
 		icon='./res/32x32_fis.png'
 		});
 	dlgPage2:LoadTemplateXML({ 
@@ -1171,7 +1171,7 @@ function AfficheDialog2()
 				TR.XML = app.GetPath().."/tmp/"..TR.saison..TR.Sector..TR.Codex.."TR.xml";
 				TR.XML = string.gsub(TR.XML, "\\", "/");
 				OnSaveXML(TR.XML, true)
-				dlgPage2:MessageBox("Le fichier "..TR.XML.." a ÈtÈ enregistrÈ avec succËs.\nVous devez finaliser le rapport en l'ouvrant avec le programme de la FIS.", "CrÈation du fichier "..TR.XML, msgBoxStyle.OK+msgBoxStyle.ICON_INFORMATION);
+				dlgPage2:MessageBox("Le fichier "..TR.XML.." a √©t√© enregistr√© avec succ√®s.\nVous devez finaliser le rapport en l'ouvrant avec le programme de la FIS.", "Cr√©ation du fichier "..TR.XML, msgBoxStyle.OK+msgBoxStyle.ICON_INFORMATION);
 				dlgPage2:EndModal(idButton.CANCEL) 
 			end, btnSave);
 	tbpage2:Bind(eventType.MENU, 
@@ -1322,7 +1322,7 @@ end
 
 function AfficheDialog1()
 	if Resultat_Chrono:GetNbRows() == 0 then
-		msg = "La course n'a pas (encore) ÈtÈ chronomÈtrÈe en base de temps sur cet ordinateur.\nVous ne pourrez enregistrer que les donnÈes de la page 1.";
+		msg = "La course n'a pas (encore) √©t√© chronom√©tr√©e en base de temps sur cet ordinateur.\nVous ne pourrez enregistrer que les donn√©es de la page 1.";
 		app.GetAuiFrame():MessageBox(msg, "Attention", msgBoxStyle.OK+msgBoxStyle.ICON_WARNING)
 	end
 	dlgConfig:EndModal(idButton.CANCEL) 
@@ -1332,7 +1332,7 @@ function AfficheDialog1()
 		height = TR.height,
 		x = TR.x,
 		y = TR.y,
-		label='Page 1 des donnÈes ‡ saisir - Timing Report version '..scrip_version;
+		label='Page 1 des donn√©es √† saisir - Timing Report version '..scrip_version;
 		icon='./res/32x32_fis.png'
 		});
 	dlgPage1:LoadTemplateXML({ 
@@ -1407,8 +1407,8 @@ function AfficheDialog1()
 	if not app.FileExists('./res/tr/WIRC.jpg') then
 		local url = 'http://188.165.236.85/maj_pg/tr/TimingReportImages2.exe';
 		adv.Alert('./res/tr/WIRC.jpg existe pas')
-		local msg = "Voulez-vous tÈlÈcharger les images manquantes pour les appareils homologuÈs ? ";
-		if app.GetAuiFrame():MessageBox(msg, "TÈlÈcharger les images manquantes", msgBoxStyle.YES_NO+msgBoxStyle.ICON_WARNING) == msgBoxStyle.YES then
+		local msg = "Voulez-vous t√©l√©charger les images manquantes pour les appareils homologu√©s ? ";
+		if app.GetAuiFrame():MessageBox(msg, "T√©l√©charger les images manquantes", msgBoxStyle.YES_NO+msgBoxStyle.ICON_WARNING) == msgBoxStyle.YES then
 			if not app.FileExists('./res/tr/RLS1.jpg') then
 				adv.Alert('./res/tr/RLS1.jpg existe pas')
 				url = 'http://188.165.236.85/maj_pg/tr/TimingReportImages.exe';
@@ -1429,7 +1429,7 @@ function AfficheDialog1()
 	tbpage1:AddSeparator();
 	local btnOpenXML = tbpage1:AddTool("Ouvrir un Timing Report XML", "./res/32x32_import.png");
 	tbpage1:AddSeparator();
-	local btnSave = tbpage1:AddTool("Enregistrer les donnÈes", "./res/32x32_save.png");
+	local btnSave = tbpage1:AddTool("Enregistrer les donn√©es", "./res/32x32_save.png");
 	tbpage1:AddSeparator();
 	local btnClose = tbpage1:AddTool("Quitter", "./res/32x32_exit.png");
 	tbpage1:AddStretchableSpace();
@@ -1442,9 +1442,9 @@ function AfficheDialog1()
 			TR.XML = string.gsub(TR.XML, "\\", "/");
 			OnSaveXML(TR.XML, false);
 			if not TR.XML_lu then
-				local msg = "Attention, Si vous avez dÈj‡ enregistrÈ les donnÈes de la manche 1,\n"..
-							"vous devez Ouvrir le Timing Report dÈj‡ enregistrÈ.\n"..
-							"Sinon les donnÈes de la manche 1 du SystËme B seront effacÈes.\n"..
+				local msg = "Attention, Si vous avez d√©j√† enregistr√© les donn√©es de la manche 1,\n"..
+							"vous devez Ouvrir le Timing Report d√©j√† enregistr√©.\n"..
+							"Sinon les donn√©es de la manche 1 du Syst√®me B seront effac√©es.\n"..
 							"Voulez-vous poursuivre ?";
 				if app.GetAuiFrame():MessageBox(msg,
 						"Passer sur la page 2", 
@@ -1464,7 +1464,7 @@ function AfficheDialog1()
 	dlgPage1:Bind(eventType.MENU, 
 		function(evt) 
 			local fileDialog = wnd.CreateFileDialog(dlgPage2,
-				"SÈlection du fichier de Timing Report",
+				"S√©lection du fichier de Timing Report",
 				'./tmp', 
 				"",
 				"*.xml|*.xml",

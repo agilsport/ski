@@ -1,9 +1,8 @@
--- Calcul d'un temps manuel (avec 10 avant ou avec dÈcalage)
+-- Calcul d'un temps manuel (avec 10 avant ou avec d√©calage)
 dofile('./edition/functionPG.lua');
-dofile('./interface/adv.lua');
 
 function GetMenuName()
-	return "Tirage des dossards ou des rangs de dÈpart avec options de tirage";
+	return "FFS : Tirage des dossards ou des rangs de d√©part avec options de tirage";
 end
 function GetActivite()
 	return "ALP,TM";
@@ -116,7 +115,7 @@ function OnSetup(selection, quit)
 	tbsetup:AddStretchableSpace();
 	local btnSave = tbsetup:AddTool("Valider", "./res/vpe32x32_save.png");
 	tbsetup:AddSeparator();
-	local btnDefault = tbsetup:AddTool("Valeurs par dÈfaut", "./res/32x32_param.png");
+	local btnDefault = tbsetup:AddTool("Valeurs par d√©faut", "./res/32x32_param.png");
 	tbsetup:AddSeparator();
 	local btnClose = tbsetup:AddTool("Quitter", "./res/32x32_end.png");
 	tbsetup:AddStretchableSpace();
@@ -126,13 +125,13 @@ function OnSetup(selection, quit)
 	dlgSetup:GetWindowName('bib_skip'):Append('Oui');
 	for i = 1, nbmanches do
 		dlgSetup:GetWindowName('course1_sens'..i):Clear();
-		dlgSetup:GetWindowName('course1_sens'..i):Append('‡ la mÍlÈe');
+		dlgSetup:GetWindowName('course1_sens'..i):Append('√† la m√™l√©e');
 		dlgSetup:GetWindowName('course1_sens'..i):Append('par ordre croissant');
-		dlgSetup:GetWindowName('course1_sens'..i):Append('par ordre dÈcroissant');
+		dlgSetup:GetWindowName('course1_sens'..i):Append('par ordre d√©croissant');
 		dlgSetup:GetWindowName('course2_sens'..i):Clear();
-		dlgSetup:GetWindowName('course2_sens'..i):Append('‡ la mÍlÈe');
+		dlgSetup:GetWindowName('course2_sens'..i):Append('√† la m√™l√©e');
 		dlgSetup:GetWindowName('course2_sens'..i):Append('par ordre croissant');
-		dlgSetup:GetWindowName('course2_sens'..i):Append('par ordre dÈcroissant');
+		dlgSetup:GetWindowName('course2_sens'..i):Append('par ordre d√©croissant');
 	end
 	
 	dlgSetup:GetWindowName('bib_skip'):SetSelection(tonumber(params.activeNode:GetAttribute('bib_skip')));
@@ -313,17 +312,17 @@ end
 	-- dlgConfig:GetWindowName('option1'):Append('4. Tirage des 3 manches par tiers tournants');
 	-- dlgConfig:GetWindowName('option1'):Append("5. Coupes d'Argent et Nationales jeunes : Tirage pour des courses de 4 manches");
 	-- dlgConfig:GetWindowName('option1'):Append("6. Coupes d'Argent et Nationales jeunes : Tirage pour des courses de 2 manches");
-	-- dlgConfig:GetWindowName('option1'):Append("7. BIBO en manche 3 / resultat des 2 premiËres");
+	-- dlgConfig:GetWindowName('option1'):Append("7. BIBO en manche 3 / resultat des 2 premi√®res");
 
 	-- dlgConfig:GetWindowName('option2'):Append("1. Pas d'inversion des dossards dans les groupes de tirage");
 	-- dlgConfig:GetWindowName('option2'):Append('2. Inversion des dossards dans les groupes de tirage');
 	-- dlgConfig:GetWindowName('option2'):Append('3. Gestion du BIBO');
-	-- dlgConfig:GetWindowName('option2'):Append('4. Selon le paramÈtrage du Back Office');
+	-- dlgConfig:GetWindowName('option2'):Append('4. Selon le param√©trage du Back Office');
 	-- dlgConfig:GetWindowName('option2'):Append('5. Sans objet');
 	
 	-- dlgConfig:GetWindowName('clef1'):Append('1. Par Sexe');
-	-- dlgConfig:GetWindowName('clef1'):Append('2. Par Sexe et par CatÈgorie');
-	-- dlgConfig:GetWindowName('clef1'):Append('3. Par Sexe et par AnnÈe');
+	-- dlgConfig:GetWindowName('clef1'):Append('2. Par Sexe et par Cat√©gorie');
+	-- dlgConfig:GetWindowName('clef1'):Append('3. Par Sexe et par Ann√©e');
 	-- dlgConfig:GetWindowName('clef1'):Append('4. Sans objet');
 		
 function ValideClef1(clef1, option1, option2)
@@ -331,16 +330,21 @@ function ValideClef1(clef1, option1, option2)
 	local nbcateg = tResultat:GetCounter('Categ'):GetNbRows();
 	local nban = tResultat:GetCounter('An'):GetNbRows();
 
+	if string.find(option2, '6%.') then
+		dlgConfig:GetWindowName('clef1'):SetSelection(3);
+		dlgConfig:GetWindowName('option1'):SetSelection(0);
+		return;
+	end
 	if string.find(clef1, '1%.') then
 		if nbsexe == 1 then 
-			local msg = "VÈrifiez les options choisies.";
+			local msg = "V√©rifiez les options choisies.";
 			app.GetAuiFrame():MessageBox(msg, "Attention !!!"
 				, msgBoxStyle.OK+msgBoxStyle.ICON_WARNING);
 			dlgConfig:GetWindowName('clef1'):SetSelection(3);
 			return;
 		end
 	end
-	if string.find(clef1, '2%.') and nbcateg == 1 then 
+	if string.find(clef1, '2%.') and nbcateg == 1 and nbsexe == 1 then 
 		dlgConfig:GetWindowName('clef1'):SetSelection(3);
 		return;
 	end
@@ -368,6 +372,11 @@ end
 function ValideOption1(clef1, option1, option2)
 	dlgConfig:GetWindowName('course2'):Enable(true);
 	dlgConfig:GetWindowName('course2_nom'):Enable(true);
+	if string.find(option2, '6%.') then
+		dlgConfig:GetWindowName('clef1'):SetSelection(3);
+		dlgConfig:GetWindowName('option1'):SetSelection(0);
+		return;
+	end
 	if string.find(option1, '1%.') or string.find(option1, '2%.') or string.find(option1, '3%.') then
 		dlgConfig:GetWindowName('course1'):SetValue(params.code_evenement);
 		dlgConfig:GetWindowName('course1_nom'):SetValue(tEvenement:GetCell('Nom',0));
@@ -391,8 +400,8 @@ function ValideOption1(clef1, option1, option2)
 	end
 end
 	-- dlgConfig:GetWindowName('clef1'):Append('1. Par Sexe');
-	-- dlgConfig:GetWindowName('clef1'):Append('2. Par Sexe et par CatÈgorie');
-	-- dlgConfig:GetWindowName('clef1'):Append('3. Par Sexe et par AnnÈe');
+	-- dlgConfig:GetWindowName('clef1'):Append('2. Par Sexe et par Cat√©gorie');
+	-- dlgConfig:GetWindowName('clef1'):Append('3. Par Sexe et par Ann√©e');
 	-- dlgConfig:GetWindowName('clef1'):Append('4. Sans objet');
 		
 	-- dlgConfig:GetWindowName('option1'):Append('1. Tirage pour la manche 1 seulement');
@@ -401,12 +410,12 @@ end
 	-- dlgConfig:GetWindowName('option1'):Append('4. Tirage des 3 manches par tiers tournants');
 	-- dlgConfig:GetWindowName('option1'):Append("5. Coupes d'Argent et Nationales jeunes : Tirage pour des courses de 4 manches");
 	-- dlgConfig:GetWindowName('option1'):Append("6. Coupes d'Argent et Nationales jeunes : Tirage pour des courses de 2 manches");
-	-- dlgConfig:GetWindowName('option1'):Append("7. Tirage de la manche 3 BIBO rÈsultats M1/M2;
+	-- dlgConfig:GetWindowName('option1'):Append("7. Tirage de la manche 3 BIBO r√©sultats M1/M2;
 
 	-- dlgConfig:GetWindowName('option2'):Append("1. Pas d'inversion des dossards dans les groupes de tirage");
 	-- dlgConfig:GetWindowName('option2'):Append('2. Inversion des dossards dans les groupes de tirage');
 	-- dlgConfig:GetWindowName('option2'):Append('3. Gestion du BIBO');
-	-- dlgConfig:GetWindowName('option2'):Append('4. Selon le paramÈtrage du Back Office');
+	-- dlgConfig:GetWindowName('option2'):Append('4. Selon le param√©trage du Back Office');
 	-- dlgConfig:GetWindowName('option2'):Append('5. Sans objet');
 	
 function OnTirageM3Seule(clef1, option1, option2)
@@ -417,132 +426,128 @@ function OnTirageM3Seule(clef1, option1, option2)
 		reponse = app.GetAuiFrame():MessageBox(msg, "Attention !!!"
 			, msgBoxStyle.YES_NO+msgBoxStyle.NO_DEFAULT+msgBoxStyle.ICON_WARNING);
 	end
+	local cmd = 'Select * From Resultat_Manche Where Code_evenement = '..params.code_evenement..' And Code_manche = 3';
+	base:TableLoad(tResultat_Manche, cmd);
 	params.enable_bib_first = 0;
 	local bibo, _ = GetBibo(30, -1, '*');
 	tRanking = base.CreateTableRanking({ code_evenement = params.code_evenement});
-	tRanking:AddColumn({ name = 'Tps_M1M2', type = sqlType.LONG, style = sqlStyle.NULL });
-	tRanking:ChangeColumn('Tps_M1M2', 'chrono');
+	tRanking:OrderBy('Code_epreuve');
+	if params.code_epreuve > 0 then
+		local filter = "$(Code_epreuve):In("..params.code_epreuve..')';
+		tRanking:Filter(filter, true);
+	end
+	tEpreuves = {};
 	for i = 0, tRanking:GetNbRows() -1 do
+		tRanking:SetCellNull('Rang', i);
 		local tps1 = tRanking:GetCellInt('Tps1', i);
 		local tps2 = tRanking:GetCellInt('Tps2', i);
 		local tps_min = math.min(tps1, tps2);
+		local code_epreuve = tRanking:GetCellInt('Code_epreuve', i);
+		if not tEpreuves[code_epreuve] then
+			table.insert(tEpreuves, {NbRows = 0, Epreuve = code_epreuve, LeaderRow = 0, LeaderTps = 0, LeaderIdentite = '', LastRowBibo = 0, Bibo = 0, NbClasses = 0});
+		end
 		if tps_min < 0 then
-			tRanking:SetCell('Tps_M1M2', i, tps_min);
+			tRanking:SetCell('Tps', i, tps_min);
 		else
-			tRanking:SetCell('Tps_M1M2', i, tps1 + tps2);
+			tRanking:SetCell('Tps', i, tps1 + tps2);
+			tEpreuves[code_epreuve].NbClasses = tEpreuves[code_epreuve].NbClasses + 1;
+		end
+	end
+	for i = 1, #tEpreuves do
+		if tEpreuves[i].NbClasses > bibo then
+			tEpreuves[i].Bibo = bibo;
+		else
+			tEpreuves[i].Bibo = tEpreuves[i].NbClasses;
 		end
 	end
 	if reponse == msgBoxStyle.YES then
-		tRanking:Filter("$(Tps_M1M2) ~= 'Abs'", true);
+		tRanking:Filter("$(Tps) ~= 'Abs'", true);
 	else
-		tRanking:Filter("$(Tps_M1M2) ~= 'Abs' and $(Tps_M1M2) ~= 'Abd' and $(Tps_M1M2) ~= 'Dsq'", true);
-		local cmd = 'Delete From Resultat_Manche Where Code_evenement = '..params.code_evenement.." And Code_manche = 3 And Medaille = '0'";
-		base:Query(cmd);
-	end
-	tRanking:SetRanking('Cltc', 'Tps_M1M2', 'Sexe');
-	tRanking:OrderBy('Sexe, Cltc, Dossard DESC');
-	local tps_first = 0;
-	local tRows = {};
-	tRows['M'] = {}
-	tRows['M'].FirstRow = nil;
-	tRows['F'] = {}
-	tRows['F'].FirstRow = nil;
-	for i = 0, tRanking:GetNbRows() -1 do
-		local code_coureur = tRanking:GetCell('Code_coureur', i);
-		local sexe = tRanking:GetCell('Sexe', i);
-		local cltc = tRanking:GetCellInt('Cltc', i);
-		local diff = 0;
-		if not tRows[sexe].FirstRow then
-			tRows[sexe].FirstRow  = i;
-			tRows[sexe].NbRows = 1;
-		else
-			tRows[sexe].LastRow  = i;
-			tRows[sexe].NbRows = tRows[sexe].NbRows + 1;
-		end
-			
-		if cltc > 0 then
-			if cltc <= bibo then
-				tRows[sexe].LastRowBibo = i;
-				if cltc == 1 then
-					tps_first = tRanking:GetCellInt('Tps_M1M2', i);
-				end
-			end
-			tRows[sexe].LastRowClt = i;
-		end
-		if tRanking:GetCellInt('Tps_M1M2', i) > 0 then
-			diff = tRanking:GetCellInt('Tps_M1M2', i) - tps_first;
-		else
-			diff = tRanking:GetCellInt('Tps_M1M2', i);
-		end
-		tRanking:SetCell('Diff', i, diff);
+		tRanking:Filter("$(Tps) ~= 'Abs' and $(Tps) ~= 'Abd' and $(Tps) ~= 'Dsq'", true);
 	end
 	local rang = 0;
-	if tRows['F'].FirstRow then
-		for row = tRows['F'].LastRowBibo, tRows['F'].FirstRow, -1 do
-			rang = rang + 1;
-			tRanking:SetCell('Rang3', row, rang);
+	for code_epreuve = 1, #tEpreuves do
+		tRanking_Copy = tRanking:Copy();
+		local filter = "$(Code_epreuve):In("..code_epreuve ..')';
+		tRanking_Copy:Filter(filter, true);
+		tRanking_Copy:SetRanking('Clte', 'Tps', '');
+		tRanking_Copy:OrderBy('Clte, Dossard DESC');
+		for row = tRanking_Copy:GetNbRows() -1, 0, -1 do
+			if tRanking_Copy:GetCellInt('Clte', row) == tEpreuves[code_epreuve].Bibo then
+				tEpreuves[code_epreuve].LastRowBibo = row;
+				break;
+			end
 		end
-		for row = tRows['F'].LastRowBibo + 1, tRows['F'].LastRowClt do
+		tEpreuves[code_epreuve].LeaderTps = tRanking_Copy:GetCellInt('Tps', 0);
+		for row = tEpreuves[code_epreuve].LastRowBibo, 0, -1 do
+			local code_coureur = tRanking_Copy:GetCell('Code_coureur', row);
+			local clte = tRanking_Copy:GetCellInt('Clte', row)
+			local diff = tRanking_Copy:GetCellInt('Tps')
 			rang = rang + 1;
-			tRanking:SetCell('Rang3', row, rang);
+			local r = tRanking:GetIndexRow('Code_coureur', code_coureur);
+			if r >= 0 then
+				tRanking:SetCell('Rang', r, rang);
+				tRanking:SetCell('Clte', r, clte);
+				if tRanking_Copy:GetCellInt('Tps', row) > 0 then
+					tRanking:SetCell('Diff', r, tRanking_Copy:GetCellInt('Tps', row) - tEpreuves[code_epreuve].LeaderTps);
+				end
+			end
 		end
-	end
-	
-	if tRows['M'].FirstRow then
-		for row = tRows['M'].LastRowBibo, tRows['M'].FirstRow, -1 do
-			rang = rang + 1;
-			tRanking:SetCell('Rang3', row, rang);
-		end
-		for row = tRows['M'].LastRowBibo + 1, tRows['M'].LastRowClt do
-			rang = rang + 1;
-			tRanking:SetCell('Rang3', row, rang);
+		for row = tEpreuves[code_epreuve].LastRowBibo +1, tRanking_Copy:GetNbRows() -1 do
+			local code_coureur = tRanking_Copy:GetCell('Code_coureur', row);
+			local clte = tRanking_Copy:GetCellInt('Clte', row)
+			-- if clte > 0 then
+				rang = rang + 1;
+				local r = tRanking:GetIndexRow('Code_coureur', code_coureur);
+				if r >= 0 then
+					tRanking:SetCell('Rang', r, rang);
+					tRanking:SetCell('Clte', r, clte);
+					if tRanking_Copy:GetCellInt('Tps', row) > 0 then
+						tRanking:SetCell('Diff', r, tRanking_Copy:GetCellInt('Tps', row) - tEpreuves[code_epreuve].LeaderTps);
+					end
+				end
+			-- else
+				-- break;
+			-- end
 		end
 	end
 	-- les Abd Dsq
-	for i = 0, tRanking:GetNbRows() -1 do
-		if tRanking:GetCellInt('Cltc', i) == 0 then
-			rang = rang + 1;
-			tRanking:SetCell('Rang3', i, rang);
-		end
-	end
-	tRanking:OrderBy('Rang3');
+	-- tRanking:OrderBy('Code_epreuve, Dossard DESC');
+	-- for i = 0, tRanking:GetNbRows() -1 do
+		-- if tRanking:GetCellInt('Clte', i) <= 0 then
+			-- rang = rang + 1;
+			-- tRanking:SetCell('Rang', i, rang);
+		-- end
+	-- end
+	-- tRanking:Snapshot('tRanking.db3');
+	cmd = 'Select * From Resultat_Manche Where Code_evenement = '..params.code_evenement..' And Code_manche = 3';
+	base:TableLoad(tResultat_Manche, cmd);
+	
+	-- adv.Alert('cl√© primaire : '..tResultat_Manche:OrderByPrimary()..', Name = '..tResultat_Manche:GetName());
+	local rResultat_Manche = tResultat_Manche:GetRecord();
 	for i = 0, tRanking:GetNbRows() -1 do
 		local code_coureur = tRanking:GetCell('Code_coureur', i);
-		local rang = tRanking:GetCellInt('Rang3', i);
-		local cltc = tRanking:GetCellInt('Cltc', i);
-		cltc = tostring(math.floor(cltc));
-		local diff = tRanking:GetCellInt('Diff', i);
-		local tpsm1m2 = tRanking:GetCellInt('Tps_M1M2', i);
-		local cmd = 'Select * From Resultat_Manche Where Code_evenement = '..params.code_evenement.." And Code_manche = 3 And Code_coureur = '"..code_coureur.."'";
-		base:TableLoad(tResultat_Manche, cmd);
-		local rowx = 0;
-		local ajouter = false;
-		if tResultat_Manche:GetNbRows() == 0 then
-			ajouter = true;
-			rowx = tResultat_Manche:AddRow();
-		end
-		tResultat_Manche:SetCell('Code_evenement', rowx, params.code_evenement);
-		tResultat_Manche:SetCell('Code_manche', rowx, 3);
-		tResultat_Manche:SetCell('Code_coureur', rowx, code_coureur);
-		tResultat_Manche:SetCell('Info', rowx, 'M1_M2');
-		tResultat_Manche:SetCell('Tps_bonus', rowx, tpsm1m2);
-		tResultat_Manche:SetCell('Tps_penalite', rowx, diff);
-		tResultat_Manche:SetCell('Medaille', rowx, cltc);
-		tResultat_Manche:SetCell('Rang', rowx, rang);
-		if ajouter == true then
-			base:TableInsert(tResultat_Manche, rowx);
-		else
-			base:TableUpdate(tResultat_Manche, rowx);
-		end
+		local rang = tRanking:GetCellInt('Rang', i);
+		rResultat_Manche:Set('Code_evenement', params.code_evenement);
+		rResultat_Manche:Set('Code_coureur', code_coureur);
+		rResultat_Manche:Set('Code_manche', 3);
+		rResultat_Manche:Set('Rang', rang);
+		rResultat_Manche:Set('Info', 'M1_M2');
+		base:TableFlush(tResultat_Manche, -1, 'Code_evenement, Code_coureur, Code_manche, Rang')
 	end
-	local msg = "La liste de dÈpart en manche 3 est prÍte pour l'Èdition.";
-	app.GetAuiFrame():MessageBox(msg, "CrÈation de la liste de dÈpart en manche 3"
-		, msgBoxStyle.OK+msgBoxStyle.ICON_INFORMATION);
+	PrintM3();
 end
 
 function ValideOption2(clef1, option1, option2)
 	local seloption1 = dlgConfig:GetWindowName('option1'):GetSelection();
 	local seloption2 = dlgConfig:GetWindowName('option2'):GetSelection();
+	if string.find(option2, '6%.') then
+		dlgConfig:GetWindowName('clef1'):SetSelection(3);
+		dlgConfig:GetWindowName('option1'):SetSelection(0);
+		dlgConfig:GetWindowName('course2'):Enable(false);
+		dlgConfig:GetWindowName('course2_nom'):Enable(false);
+		return;
+	end
 	if string.find(option1, '1%.') or string.find(option1, '3%.') then
 		if seloption2 > 2 then 
 			dlgConfig:GetWindowName('option2'):SetSelection(4);
@@ -561,11 +566,46 @@ function ValideOption2(clef1, option1, option2)
 	if string.find(option2, '3%.') and #tBibo > 1 then
 		dlgConfig:GetWindowName('clef1'):SetSelection(0);
 	end
+
+end
+
+function OnCopyRang()
+	tResultat:OrderBy('Rang');
+	local code_evenement = tResultat:GetCellInt('Code_evenement', 0);
+	if tResultat:GetCellInt('Rang', 0) == 0 then
+		local msg = "Voulez-vous effacer les rangs de d√©part pour la manche 1 ?";
+		if app.GetAuiFrame():MessageBox(msg, "Attention !!!"
+			, msgBoxStyle.YES_NO+msgBoxStyle.NO_DEFAULT+msgBoxStyle.ICON_WARNING) == msgBoxStyle.YES then
+		end
+		local cmd = 'Update Resultat_Manche Set Rang = Null where Code_evenement = '..code_evenement..' And Code_manche = 1';
+		base:Query(cmd);
+		return;
+	end
+	for i = 0, tResultat:GetNbRows() -1 do
+		local code_coureur = tResultat:GetCell('Code_coureur', i);
+		local rang = tResultat:GetCellInt('Rang', i);
+		if rang > 0 then
+			local cmd = 'Select * From Resultat_Manche where Code_evenement = '..code_evenement.." And Code_manche = 1 And Code_coureur = '"..code_coureur.."'";
+			base:TableLoad(tResultat_Manche, cmd);
+			if tResultat_Manche:GetNbRows() == 0 then
+				local row = tResultat_Manche:AddRow();
+				tResultat_Manche:SetCell('Code_evenement', row, code_evenement);
+				tResultat_Manche:SetCell('Code_manche', row, 1);
+				tResultat_Manche:SetCell('Code_coureur', row, code_coureur);
+				tResultat_Manche:SetCell('Rang', row, rang);
+				base:TableInsert(tResultat_Manche, row);
+			else
+				tResultat_Manche:SetCell('Rang', 0, rang);
+				base:TableUpdate(tResultat_Manche, row);
+			end
+		end			
+	end
+	
 end
 
 function OnTirageManche1()
 	if params.dossard1 > 0 then
-		local msg = "Les dossards ont dÈj‡ ÈtÈ tirÈs.\nVoulez-vous les remplacer ?\nTous les rangs de tirage antÈrieurs seront supprimÈs \nainsi que tous les temps des manches Èventuels.";
+		local msg = "Les dossards ont d√©j√† √©t√© tir√©s.\nVoulez-vous les remplacer ?\nTous les rangs de tirage ant√©rieurs seront supprim√©s \nainsi que tous les temps des manches √©ventuels.";
 		if app.GetAuiFrame():MessageBox(msg, "Attention !!!"
 			, msgBoxStyle.YES_NO+msgBoxStyle.NO_DEFAULT+msgBoxStyle.ICON_WARNING) == msgBoxStyle.NO then
 			return;
@@ -578,7 +618,7 @@ function OnTirageManche1()
 	local intercaler = 0;
 
 	if dlgConfig:GetWindowName('clef1'):GetSelection() > 0 and dlgConfig:GetWindowName('clef1'):GetSelection() < 3 then
-		local msg = "Voulez-vous tirer les dames avant les hommes ?\nEn rÈpondant non, le tirage sera fait en intercalant\nles dames et les hommes selon le tri choisi.";
+		local msg = "Voulez-vous tirer les dames avant les hommes ?\nEn r√©pondant non, le tirage sera fait en intercalant\nles dames et les hommes selon le tri choisi.";
 		if app.GetAuiFrame():MessageBox(msg, "Attention !!!"
 			, msgBoxStyle.YES_NO+msgBoxStyle.NO_DEFAULT+msgBoxStyle.ICON_WARNING) == msgBoxStyle.NO then
 			intercaler = 1;
@@ -593,7 +633,7 @@ function OnTirageManche1()
 	params.bibo = 15;
 	base:TableLoad(tResultat, 'Select * From Resultat Where Code_evenement = '..params.code_evenement..' Order By Rang, Dossard');
 	for i = 1, #tBibo do
-		tResultat:OrderRandom();		-- ordre par dÈfaut ‡ la mÍlÈe
+		tResultat:OrderRandom();		-- ordre par d√©faut √† la m√™l√©e
 		params.bib_first = 1;
 		-- table.insert(tBibo, {Sexe = 'M', NbRows = tResultat:GetCounterValue('Sexe', 'M'), RowFirst = row_first, RowEnd = row_end, PtsBibo = 0, LastRowBibo = -1, LastRowPts = -1, Reserves = {}});
 		local tReserves = {};
@@ -748,7 +788,7 @@ function OnTirageManche2Special()
 	tResultat_Manche:OrderBy('Rang DESC');
 	local rangx = tResultat_Manche:GetCellInt('Rang', 0);
 	if rangx > 0 then
-		local msg = "Les rangs de dÈpart de la manche 2 ont dÈj‡ ÈtÈ tirÈs.\nVoulez-vous les remplacer ?";
+		local msg = "Les rangs de d√©part de la manche 2 ont d√©j√† √©t√© tir√©s.\nVoulez-vous les remplacer ?";
 		if app.GetAuiFrame():MessageBox(msg, "Attention aux erreurs !!!"
 			, msgBoxStyle.YES_NO+msgBoxStyle.NO_DEFAULT+msgBoxStyle.ICON_WARNING) == msgBoxStyle.NO then
 			return;
@@ -798,7 +838,7 @@ function OnTirageManche2Special()
 		local dossard = tCoureur[code_coureur].Dossard;
 		tResultat_Manche1:SetCell('Dossard', i, dossard);
 	end
-	-- la colonne Reserve de la manche 1 est fixÈe
+	-- la colonne Reserve de la manche 1 est fix√©e
 	cmd = 'Select * From Resultat_Manche Where Code_evenement = '..params.code_evenement..' And Code_manche = 2';
 	base:TableLoad(tResultat_Manche, cmd);
 	local rang = 0;
@@ -853,7 +893,7 @@ function BuildTableTirage2(tablex, bib_first)
 		local r = tResultat:GetIndexRow('Code_coureur', code_coureur);
 		tResultat:SetCell('Dossard', r, dossard);
 		tResultat:SetCell('Rang', r, dossard);
-		-- adv.Alert('dossard mis ‡ jour : '..dossard);
+		-- adv.Alert('dossard mis √† jour : '..dossard);
 	end
 end
 
@@ -946,10 +986,10 @@ function SetDossardBackOffice(course, nbGroupes)
 	end
 	
 	-- on fera toujours un double tirage des dossards en manche 1 de la course 1
-	-- params.tableDossards1 est brassÈe par la fonction Shuffle du fichier functionPG.lua
-	-- tTableTirage1 est brassÈe par la mÈthode OrderRandom de skiFFS
-	-- des groupes seront constituÈs selon le back office
-	-- la colonne Reserve sera mise ‡ jour selon les diffÈrents groupes
+	-- params.tableDossards1 est brass√©e par la fonction Shuffle du fichier functionPG.lua
+	-- tTableTirage1 est brass√©e par la m√©thode OrderRandom de skiFFS
+	-- des groupes seront constitu√©s selon le back office
+	-- la colonne Reserve sera mise √† jour selon les diff√©rents groupes
 	if course == 1 or params.bib_skip == 0 then
 		for i = 1, #tBibo do
 			tBibo[i].Reserves = {};
@@ -1047,23 +1087,23 @@ function OnTirageBackOffice(course, paramsManche, manche_start)
 end
 
 function OnTirageGroupe(code_evenement, manche, reserve, sens, rang)
-	-- sens = 0 -> ‡ la mÍlÈe
+	-- sens = 0 -> √† la m√™l√©e
 	-- sens = 1 -> par ordre croissant
-	-- sens = 2 -> par ordre dÈcroissant
+	-- sens = 2 -> par ordre d√©croissant
 	local rang_tirage = rang;
 	local tResultat_Copy = tResultat:Copy();
 	local filter = '$(Reserve):In('..reserve..')';
-	-- adv.Alert('OnTirageGroupe(code_evenement = '..code_evenement..', manche = '..manche..', reserve = '..reserve..', sens = '..sens..', rang = '..rang..')'..', tResultat_Copy filtrÈ :GetNbRows()  = '..tResultat_Copy:GetNbRows());
+	-- adv.Alert('OnTirageGroupe(code_evenement = '..code_evenement..', manche = '..manche..', reserve = '..reserve..', sens = '..sens..', rang = '..rang..')'..', tResultat_Copy filtr√© :GetNbRows()  = '..tResultat_Copy:GetNbRows());
 	tResultat_Copy:Filter(filter, true);
 	if sens == 0 then
 		tResultat_Copy:OrderRandom();
-		-- adv.Alert('tirage ‡ la mÍlÈe');
+		-- adv.Alert('tirage √† la m√™l√©e');
 	elseif sens == 1 then
 		tResultat_Copy:OrderBy('Rang, Dossard');
 		-- adv.Alert('tirage par ordre croissant');
 	elseif sens == 2 then
 		tResultat_Copy:OrderBy('Rang DESC, Dossard DESC');
-		-- adv.Alert('tirage par ordre dÈcroissant');
+		-- adv.Alert('tirage par ordre d√©croissant');
 	else
 		return;
 	end
@@ -1096,27 +1136,77 @@ function OnTirageGroupe(code_evenement, manche, reserve, sens, rang)
 	return rang_tirage;
 end
 
+function PrintM3()
+	tRanking:OrderBy('Rang, Dossard DESC');
+	local txtCateg = 'Toutes Cat√©gories';
+	local txtSexe = ''
+	if params.code_epreuve > 0 then
+		for i = 0, tEpreuve:GetNbRows() -1 do
+			local code_epreuve = tEpreuve:GetCellInt('Code_epreuve', i);
+			if code_epreuve == params.code_epreuve then
+				txtCateg = tEpreuve:GetCell('Code_categorie', i);
+				if tEpreuve:GetCell('Sexe', i) == 'M' then
+					txtSexe = ' - Hommes';
+				elseif tEpreuve:GetCell('Sexe', i) == 'F' then
+					txtSexe = ' - Dames';
+				end
+			end
+		end
+	end
+	report = wnd.LoadTemplateReportXML({
+		xml = './process/dossard_TirageOptions.xml',
+		node_name = 'root/panel',
+		node_attr = 'id',
+		node_value = 'M3_Bibo',
+		title = 'Edition de la Liste de D√©part en Manche 3',
+		base = base,
+		body = tRanking, 
+		margin_first_top = 150,
+		margin_first_left = 100,
+		margin_first_right = 100,
+		margin_first_bottom = 100,
+		margin_top = 150,
+		margin_left = 100, 
+		margin_right = 100,
+		margin_bottom = 100,
+		paper_orientation = 'portrait',
+		params = {Entite = tEvenement:GetCell('Code_entite', 0), CategSexe = txtCateg..txtSexe}
+	});
+
+end
+
 function main(params_c)
-	params = {};
-	params.code_evenement = params_c.code_evenement;
+	params = params_c;
+	-- adv.Alert('main');
+	-- for k,v in pairs(params) do
+		-- adv.Alert('Key '..k..'='..tostring(v));
+		-- if type(v) == 'table' then
+			-- for i,j in pairs(v) do
+				-- adv.Alert('Key '..i..'='..tostring(j));
+				-- adv.Alert('type de '..i..' = '..type(j));
+			-- end
+		-- end
+		-- adv.Alert('\n');
+	-- end
+	-- do return end
+	params.code_evenement = tonumber(params.code_evenement) or -1;
 	if params.code_evenement < 0 then
 		return;
 	end
-	params.faire = params_c.faire or '';
+	params.faire = params.faire or '';
 	params.width = (display:GetSize().width * 2) / 3;
 	params.height = display:GetSize().height / 2;
 	params.x = (display:GetSize().width - params.width) / 2;
 	params.y = 200;
 	
-	scrip_version = "3.6"; 
-	-- vÈrification de l'existence d'une version plus rÈcente du script.
+	script_version = "4.2"; 
+	-- v√©rification de l'existence d'une version plus r√©cente du script.
 	-- Ex de retour : LiveDraw=5.94,Matrices=5.92,TimingReport=4.2,DoubleTirage=3.2,TirageOptions=3.3,TirageER=1.7,ListeMinisterielle=2.3,KandaHarJunior=2.0
-	if app.GetVersion() >= '4.4c' then 
+	if app.GetVersion() >= '4.4c' then 		-- d√©but d'implementation de la fonction UpdateRessource
 		indice_return = 5;
 		local url = 'https://agilsport.fr/bta_alpin/versionsPG.txt'
 		version = curl.AsyncGET(wnd.GetParentFrame(), url);
 	end
-
 	local updatefile = './tmp/updatesPG.txt';
 	if app.FileExists(updatefile) then
 		local f = io.open(updatefile, 'r')
@@ -1131,6 +1221,7 @@ function main(params_c)
 	base = base or sqlBase.Clone();
 	tEvenement = base:GetTable('Evenement');
 	base:TableLoad(tEvenement, 'Select * From Evenement Where Code = '..params.code_evenement);
+	Interrogation();
 	tResultat = base:GetTable('Resultat');
 	tResultat_Copy = tResultat:Copy();
 	ReplaceTableEnvironnement(tResultat_Copy, '_Resultat_Copy');
@@ -1167,7 +1258,7 @@ function main(params_c)
 	params.code_saison = tEvenement:GetCell("Code_saison", 0);
 	params.code_grille_categorie = tEpreuve:GetCell("Code_grille_categorie", 0);
 	if params.code_entite ~= 'FFS' then
-		local msg = "Ce scÈnario n'est valable que pour les courses FFS !!";
+		local msg = "Ce sc√©nario n'est valable que pour les courses FFS !!";
 		app.GetAuiFrame():MessageBox(msg, "Attention aux erreurs !!!", msgBoxStyle.OK+msgBoxStyle.ICON_ERROR);
 		return;
 	end
@@ -1201,7 +1292,7 @@ function main(params_c)
 	params.doc = xmlDocument.Create(XML);
 	if params.faire == 'M1_M2' then
 		clef1 = '1. Par Sexe';
-		option1 = '7. BIBO en manche 3 / rÈsultat des 2 premiËres';
+		option1 = '7. BIBO en manche 3 / r√©sultat des 2 premi√®res';
 		option2 = '3. Gestion du BIBO';
 		OnTirageM3Seule();
 		return true;
@@ -1212,7 +1303,7 @@ function main(params_c)
 		height = params.height,
 		x = params.x,
 		y = params.y,
-		label='Configuration du tirage - script version '..scrip_version, 
+		label='Configuration du tirage - script version '..script_version, 
 		icon='./res/32x32_ffs.png'
 		});
 	dlgConfig:LoadTemplateXML({ 
@@ -1223,6 +1314,7 @@ function main(params_c)
 		niveau = params.code_niveau
 	});
 
+	wnd.GetParentFrame():Bind(eventType.CURL, OnCurlReturn);
 	-- Toolbar Principale ...
 	local tbconfig = dlgConfig:GetWindowName('tbconfig');
 	assert(tbconfig ~= nil);
@@ -1239,8 +1331,8 @@ function main(params_c)
 	local message = app.GetAuiMessage();
 	dlgConfig:GetWindowName('clef1'):Clear();
 	dlgConfig:GetWindowName('clef1'):Append('1. Par Sexe');
-	dlgConfig:GetWindowName('clef1'):Append('2. Par Sexe et par CatÈgorie');
-	dlgConfig:GetWindowName('clef1'):Append('3. Par Sexe et par AnnÈe');
+	dlgConfig:GetWindowName('clef1'):Append('2. Par Sexe et par Cat√©gorie');
+	dlgConfig:GetWindowName('clef1'):Append('3. Par Sexe et par Ann√©e');
 	dlgConfig:GetWindowName('clef1'):Append('4. Sans objet');
 		
 	dlgConfig:GetWindowName('option1'):Clear();
@@ -1250,14 +1342,15 @@ function main(params_c)
 	dlgConfig:GetWindowName('option1'):Append('4. Tirage pour des courses de 3 manches');
 	dlgConfig:GetWindowName('option1'):Append("5. Tirage pour des courses de 4 manches");
 	dlgConfig:GetWindowName('option1'):Append("6. Tirage pour des courses de 2 manches");
-	dlgConfig:GetWindowName('option1'):Append("7. BIBO en manche 3 / rÈsultat des 2 premiËres");
+	dlgConfig:GetWindowName('option1'):Append("7. BIBO en manche 3 / r√©sultat des 2 premi√®res");
 	
 	dlgConfig:GetWindowName('option2'):Clear();
 	dlgConfig:GetWindowName('option2'):Append("1. Pas d'inversion des dossards dans les groupes de tirage");
 	dlgConfig:GetWindowName('option2'):Append('2. Inversion des dossards dans les groupes de tirage');
 	dlgConfig:GetWindowName('option2'):Append('3. Gestion du BIBO');
-	dlgConfig:GetWindowName('option2'):Append('4. Selon le paramÈtrage du Back Office');
+	dlgConfig:GetWindowName('option2'):Append('4. Selon le param√©trage du Back Office');
 	dlgConfig:GetWindowName('option2'):Append('5. Sans objet');
+	dlgConfig:GetWindowName('option2'):Append('6. Copie du Rang de d√©part pour la manche 1');
 
 	dlgConfig:GetWindowName('course1'):SetValue(params.code_evenement);
 	if params.course2 > 0 then
@@ -1283,7 +1376,6 @@ function main(params_c)
 	ValideClef1(clef1, option1, option2);
 	ValideOption1(clef1, option1, option2);
 	ValideOption2(clef1, option1, option2);
-	wnd.GetParentFrame():Bind(eventType.CURL, OnCurlReturn);
 	dlgConfig:Bind(eventType.TEXT, 
 		function(evt) 
 			local code_evenement1 = tonumber(dlgConfig:GetWindowName('course1'):GetValue()) or -1;
@@ -1403,12 +1495,16 @@ function main(params_c)
 		end
 		
 		if string.find(option1, '1%.') then
-			OnTirageManche1();
+			if not string.find(option2, '6%.') then
+				OnTirageManche1();
+			else
+				OnCopyRang();
+			end
 		elseif string.find(option1, '2%.') then
 			base:TableLoad(tEpreuve, 'Select * From Epreuve Where Code_evenement = '..params.code_evenement..' And Code_epreuve = 1');
 			params.nb_manche = tEpreuve:GetCellInt('Nombre_de_manche', 0);
 			if params.nb_manche ~= 2 then
-				local msg = "Le nombre de manche doit Ítre Ègal ‡ 2 !!";
+				local msg = "Le nombre de manche doit √™tre √©gal √† 2 !!";
 				app.GetAuiFrame():MessageBox(msg, "ATTENTION !!!"
 					, msgBoxStyle.OK+msgBoxStyle.ICON_ERROR);
 				return;
@@ -1419,12 +1515,12 @@ function main(params_c)
 			OnTirageManche2Special()
 		elseif string.find(option1, '7%.') then
 			OnTirageM3Seule();
-			-- on lance le report avec un body spÈcial;
+			-- on lance le report avec un body sp√©cial;
 		else
 			base:TableLoad(tResultat, 'Select * From Resultat Where Code_evenement = '..params.course1..' And Dossard > 0');
 			if tResultat:GetNbRows() > 0 then
-				local msg = "Les dossards ont dÈj‡ ÈtÈ tirÈs.\nVoulez-vous les remplacer ?\nTous les rangs de tirage antÈrieurs seront supprimÈs \nainsi que tous les temps des manches Èventuels.";
-				if app.GetAuiFrame():MessageBox(msg, "VÈrification !!!"
+				local msg = "Les dossards ont d√©j√† √©t√© tir√©s.\nVoulez-vous les remplacer ?\nTous les rangs de tirage ant√©rieurs seront supprim√©s \nainsi que tous les temps des manches √©ventuels.";
+				if app.GetAuiFrame():MessageBox(msg, "V√©rification !!!"
 					, msgBoxStyle.YES_NO+msgBoxStyle.NO_DEFAULT+msgBoxStyle.ICON_WARNING) == msgBoxStyle.NO then
 					return false;
 				end
@@ -1470,6 +1566,10 @@ function main(params_c)
 	end
 	if params.doc then params.doc:Delete(); end
 	if params.doc_config then params.doc_config:Delete(); end
+	params.course1 = params.course1 or -1;
+	params.course2 = params.course2 or -1;
+	local cmd = 'Update Resultat Set Reserve = NULL Where Code_evenement IN('..params.course1..','..params.course2..')';
+	base:Query(cmd);
 	
 	return true;
 end

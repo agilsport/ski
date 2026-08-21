@@ -1,8 +1,8 @@
--- Calcul d'un temps manuel (avec 10 avant ou avec dÈcalage)
+-- Calcul d'un temps manuel (avec 10 avant ou avec d√©calage)
 dofile('./edition/functionPG.lua');
 
 function GetMenuName()
-	return "Double Tirage au sort des dossards (RIS)";
+	return "FIS : Double Tirage au sort des dossards (RIS)";
 end
 
 function GetActivite()
@@ -21,7 +21,7 @@ function OnPrintDoubleTirage(groupe)
 	end
 	if tResultat_Info_Bibo:GetNbRows() == 0 then
 		if groupe == 1 then
-			app.GetAuiFrame():MessageBox("Il n'y a rien ‡ imprimer dans ce contexte",
+			app.GetAuiFrame():MessageBox("Il n'y a rien √† imprimer dans ce contexte",
 							"Impression", 
 							msgBoxStyle.OK+msgBoxStyle.ICON_WARNING
 							);
@@ -49,11 +49,11 @@ function OnPrintDoubleTirage(groupe)
 			margin_bottom = 100,
 			layers = {file = './edition/layer.xml', id = 'ffs-fis', page = '*'}, 
 			paper_orientation = 'portrait',
-			params = {Nom = params.evenementNom, tableDossards1 = params.tableDossards1, tableDossards2 = params.tableDossards2, Draw = 1, Version = scrip_version, NbGroupe1 = 0, NC = 1}
+			params = {Nom = params.evenementNom, tableDossards1 = params.tableDossards1, tableDossards2 = params.tableDossards2, Draw = 1, Version = script_version, NbGroupe1 = 0, NC = 1}
 		});
 	elseif groupe == 2 then
 		local editor = report:GetEditor();
-		editor:PageBreak(); -- Saut de Page entre les 2 Èditions ...
+		editor:PageBreak(); -- Saut de Page entre les 2 √©ditions ...
 
 		wnd.LoadTemplateReportXML({
 			xml = './process/dossard_DoubleTirage.xml',
@@ -73,7 +73,7 @@ function OnPrintDoubleTirage(groupe)
 			margin_bottom = 100,
 			layers = {file = './edition/layer.xml', id = 'ffs-fis', page = '*'}, 
 			paper_orientation = 'portrait',
-			params = {Nom = params.evenementNom, tableDossards1 = params.tableDossards1, tableDossards2 = params.tableDossards2, Draw = 2, Version = scrip_version, NbGroupe1 = params.nb_groupe_1, NC = 1}
+			params = {Nom = params.evenementNom, tableDossards1 = params.tableDossards1, tableDossards2 = params.tableDossards2, Draw = 2, Version = script_version, NbGroupe1 = params.nb_groupe_1, NC = 1}
 		});
 	end
 end
@@ -81,7 +81,8 @@ end
 function GetBibo()
 	params.pts_7 = tResultat:GetCellDouble('Point', 6);
 	params.pts_15 = tResultat:GetCellDouble('Point', 14);
-	params.last_row_bibo = nil; params.row_pts7 = nil;
+	params.last_row_bibo = nil; 
+	params.row_pts7 = nil;
 
 	params.nb_bibo = 0;
 	params.nb_classes = 0;
@@ -89,22 +90,15 @@ function GetBibo()
 	params.first_row_non_classe = nil;
 	for row = 0, tResultat:GetNbRows() -1 do
 		local point = tResultat:GetCellDouble('Point', row, -1);
-		if point == params.pts_15 then
-			if not params.last_row_bibo then
-				params.last_row_bibo = row;
-			end
-		end
-		if point == params.pts_7 then
-			if not params.row_pts7 then
+		if point >= 0 then
+			if point == params.pts_7 then
 				params.row_pts7 = row;
 			end
-		end
-		if point >= 0 then
 			if point <= params.pts_15 then
+				params.last_row_bibo = row;
 				params.nb_bibo = params.nb_bibo + 1;
-			else
-				params.nb_classes = params.nb_classes + 1;
 			end
+			params.nb_classes = params.nb_classes + 1;
 		else
 			if not params.first_row_non_classe then
 				params.first_row_non_classe = row;
@@ -114,40 +108,60 @@ function GetBibo()
 	end	
 end
 
-function CheckExaequo();
-	params.row_exaequo = {};
-	resultat = {};
-	resultat.row_nepastirer = {};
-	local rang_tirage = 0;
-	local exaequo_ajoute = 0;
-	local nb_exeaquo = 0;
-	tNePasTirer = {};
-	params.tExaequo = {};
+function CheckExaequo()
+	-- EC tech 1,2 = bibo, 3 = 450+, WC
+	local groupe_en_cours = nil;
+	params.exaequo_groupe = 101;
+	local groupe_mini_exaequo = 2;
+	
 	for i = 0, tResultat:GetNbRows() -1 do
-		local point = tResultat:GetCellDouble('Point', i, -1);
-		if point >= 0 and point > params.pts_15 then
-			if nb_exeaquo == 0 then
-				rang_tirage = rang_tirage + 1 + exaequo_ajoute;
-				tResultat:SetCell('Rang', i, rang_tirage);
-				exaequo_ajoute = 0;
+		tResultat:SetCell('Exaequo_groupe', i, 0);
+		tResultat:SetCell('Rang_tirage', i, i+1)
+		if params.pts_7 then
+			groupe_mini_exaequo = 3;
+			if tResultat:GetCellDouble('Point', i) <=  params.pts_7 then
+				tResultat:SetCell('Groupe_tirage', i, 1);
+			elseif tResultat:GetCellDouble('Point', i) <=  params.pts_15 then
+				tResultat:SetCell('Groupe_tirage', i, 2);
+			end
+		else
+			local pts =  tResultat:GetCellDouble('Point', i, 9999)
+			if pts >= 0 and pts < 9999 then
+				tResultat:SetCell('Groupe_tirage', i, 2);
 			else
-				exaequo_ajoute = exaequo_ajoute + 1;
-				nb_exeaquo = nb_exeaquo - 1;
-			end
-			if tResultat:GetCellDouble('Point', i+1) == point and rang_tirage > params.last_row_bibo then
-				tNePasTirer[rang_tirage] = {};
-				params.row_exaequo[rang_tirage] = {};
-				nb_exeaquo = nb_exeaquo + 1;
-				if params.tExaequo[#params.tExaequo] ~= rang_tirage then
-					table.insert(params.tExaequo, rang_tirage);
-				end
-			end
-			if tNePasTirer[rang_tirage] then
-				tResultat:SetCell('Rang', i, rang_tirage);
+				tResultat:SetCell('Groupe_tirage', i, 3);
 			end
 		end
 	end
-	base:TableBulkUpdate(tResultat, 'Rang', 'Resultat');
+	for i = 0, tResultat:GetNbRows() -1 do
+		if tResultat:GetCellInt('Groupe_tirage', i) >= groupe_mini_exaequo then
+			local exaequo = false;
+			if i <= tResultat:GetNbRows() -1 then
+				local pts_fis_next = tResultat:GetCellDouble('Point', i+1);
+				if pts_fis_next == pts_fis then
+					if groupe_en_cours == nil then
+						params.exaequo_groupe = params.exaequo_groupe + 1;
+						groupe_en_cours = params.exaequo_groupe;
+					end
+					tResultat:SetCell('Exaequo_groupe', i, params.exaequo_groupe);
+					tResultat:SetCell('Exaequo_groupe', i+1, params.exaequo_groupe);
+					-- adv.Alert(tDraw:GetCell('Identite', i)..', √©galit√© au rang de tirage  '..tDraw:GetCellInt('Rang_tirage', i)..' et '..tDraw:GetCellInt('Rang_tirage', i+1)..', draw.exaequo_groupe = '..draw.exaequo_groupe);
+				else
+					groupe_en_cours = nil;
+				end
+			end
+		end
+	end
+	tResultat:SetCounter('Exaequo_groupe');
+	-- if draw.exaequo_groupe > 0 then
+		-- for i = 0, tDraw:GetCounter('Exaequo_groupe'):GetNbRows() -1 do
+			-- local id_groupe = tonumber(tDraw:GetCounter('Exaequo_groupe'):GetCell(0,i)) or 0;
+			-- if id_groupe > 0 then
+				-- adv.Alert(' groupe : '..id_groupe..', nombre : '..tDraw:GetCounter('Exaequo_groupe'):GetCell(1,i));
+			-- end
+		-- end			
+	-- end
+	tResultat:OrderBy('Rang_tirage');
 end
 
 function BuildTableTirageSplit(bib_first, last_row_groupe_bibo)
@@ -155,14 +169,15 @@ function BuildTableTirageSplit(bib_first, last_row_groupe_bibo)
 	for row = 0, last_row_groupe_bibo  do
 		table.insert(params.tableDossards1, bib_first + row);
 	end
-	params.tableDossards1 = Shuffle(params.tableDossards1, false);
+	params.tableDossards1 = Shuffle(params.tableDossards1);
 	tTableTirage1:RemoveAllRows();
 	for row = 0, last_row_groupe_bibo do
 		local new_row1 = tTableTirage1:AddRow();
+		local aleatoire = randomFloat(1, 2);
 		tTableTirage1:SetCell('Row', new_row1, row+1);
+		tTableTirage1:SetCell('Aleatoire', new_row1, aleatoire);
 	end
-	tTableTirage1:OrderBy('Row');
-	tTableTirage1:OrderRandom('Row');
+	tTableTirage1:OrderRandom('Aleatoire');
 	for i = 0, tTableTirage1:GetNbRows() -1 do
 		local ligne = tTableTirage1:GetCellInt('Row', i);
 		local dossard = params.tableDossards1[ligne];
@@ -170,8 +185,12 @@ function BuildTableTirageSplit(bib_first, last_row_groupe_bibo)
 	end
 end
 
+function randomFloat(a, b)
+    return a + (b - a) * math.random()
+end
 
 function BuildTableTirage(row_first, row_last, rang_tirage, bib_first, shuffle);
+	-- adv.Alert('BuildTableTirage row_first = '..tostring(row_first)..', row_last = '..tostring(row_last)..', rang_tirage = '..tostring(rang_tirage)..', bib_first = '..tostring(bib_first)..', shuffle = '..tostring(shuffle));
 	tResultat_Copy = tResultat:Copy();
 	ReplaceTableEnvironnement(tResultat_Copy, '_Resultat_Copy');
 	shuffle = shuffle or false;
@@ -182,6 +201,9 @@ function BuildTableTirage(row_first, row_last, rang_tirage, bib_first, shuffle);
 	
 	row_first = row_first or 0;
 	row_last = row_last or tResultat:GetNbRows() -1;
+	if row_last < 0 then
+		row_last = tResultat:GetNbRows() -1;
+	end
 	bib_first = bib_first or 1;
 	if rang_tirage then
 		for row = tResultat_Copy:GetNbRows() -1, 0, -1 do
@@ -200,16 +222,18 @@ function BuildTableTirage(row_first, row_last, rang_tirage, bib_first, shuffle);
 		bib = bib + 1;
 	end
 	if shuffle then
-		params.tableDossards1 = Shuffle(params.tableDossards1, false);
+		params.tableDossards1 = Shuffle(params.tableDossards1);
 	end
 	tTableTirage1:RemoveAllRows();
 	local rang_fictif = 0;
 	for row = 1, #params.tableDossards1 do
+		local aleatoire = randomFloat(1, 2);
 		local new_row1 = tTableTirage1:AddRow();
 		tTableTirage1:SetCell('Row', new_row1, row);	-- setCell du rang fictif en lien avec  params.tableDossards1
-		tTableTirage1:OrderRandom();
+		tTableTirage1:SetCell('Aleatoire', new_row1, aleatoire);
 	end
 	
+	tTableTirage1:OrderRandom('Aleatoire');
 	for row = 0, tTableTirage1:GetNbRows() -1 do
 		local row_coureur = row + row_first;
 		local rang_fictif = tTableTirage1:GetCellInt('Row', row);
@@ -229,19 +253,104 @@ function BuildTableTirage(row_first, row_last, rang_tirage, bib_first, shuffle);
 	end
 end
 
+function OnTirageEgalite(groupe)
+	tResultatTirageAuto = tResultat:Copy();
+	local filter = "$(Exaequo_groupe):In("..groupe..")";
+	tResultatTirageAuto:Filter(filter, true);
+	local bib_first = tResultatTirageAuto:GetCellInt('Rang_tirage', 0);
+
+	params.tableDossards1 = {};
+	for row = 0, tResultatTirageAuto:GetNbRows() -1  do
+		table.insert(params.tableDossards1, bib_first + row);
+	end
+	params.tableDossards1 = Shuffle(params.tableDossards1);
+	tTableTirage1:RemoveAllRows();
+	for row = 0, tResultatTirageAuto:GetNbRows() -1 do
+		local new_row1 = tTableTirage1:AddRow();
+		tTableTirage1:SetCell('Row', new_row1, row+1);
+	end
+	tTableTirage1:OrderBy('Row');
+	tTableTirage1:OrderRandom();
+	for i = 0, tTableTirage1:GetNbRows() -1 do
+		local ligne = tTableTirage1:GetCellInt('Row', i);
+		local dossard = params.tableDossards1[ligne];
+		tResultatTirageAuto:SetCell('Dossard', i, dossard);
+		local identite = tResultatTirageAuto:GetCell('Nom', i)..' '..tResultatTirageAuto:GetCell('Prenom', i);
+		local code_coureur = tResultatTirageAuto:GetCell('Code_coureur', i);
+		local r = tResultat:GetIndexRow('Code_coureur', code_coureur)
+		if r >= 0 then
+			tResultat:SetCell('Dossard', r, dossard);
+		end
+	end
+	base:TableFlush(tResultat)
+	assert(tTableTirage1:GetNbRows() > 0);
+	for row = 0, tTableTirage1:GetNbRows() -1 do
+		base:TableLoad(tResultat_Info_Bibo, 'Select * From Resultat_Info_Bibo Where Code_evenement = '..draw.code_evenement);
+		local idx = row + 1;
+		local tTable1 = {};
+		local tTable2 = {};
+		table.insert(tTable1, {Col1 = 'Dossard du rang fictif '..idx, Col2 = params.tableDossards1[idx]});
+		local xTable1 = {Table1 = tTable1};
+		local jsontxt1 = table.ToStringJSON(xTable1, false);
+		
+		local rang_fictif = tTableTirage1:GetCellInt('Row', row);
+		local code_coureur = '';
+		local identite = '';
+		local pts = '';
+		local dossard = params.tableDossards1[rang_fictif] or '';
+		code_coureur = tResultatTirageAuto:GetCell('Code_coureur', row);
+		identite = tResultatTirageAuto:GetCell('Nom', row)..' '..tResultatTirageAuto:GetCell('Prenom', row);
+		pts = tResultatTirageAuto:GetCellDouble('Point', row);
+		local col1 = identite;
+		local col2 = pts;
+		local col3 = rang_fictif;
+		local col4 = dossard;
+		table.insert(tTable2, {Identite = col1, Pts = col2, RangFictif = col3, Dossard = col4});
+		local xTable2 = {Table2 = tTable2};
+		local jsontxt2 = table.ToStringJSON(xTable2, false);
+		local rowsql = tResultat_Info_Bibo:AddRow();
+		-- adv.Alert('OnTirageEgalite clef primaire = '..draw.code_evenement..', '..groupe..', '..idx);
+		tResultat_Info_Bibo:SetCell('Code_evenement', rowsql, draw.code_evenement);
+		tResultat_Info_Bibo:SetCell('Groupe', rowsql, groupe);
+		-- adv.Alert('jsontxt1 = '..jsontxt1);
+		-- adv.Alert('jsontxt2 = '..jsontxt2);
+		tResultat_Info_Bibo:SetCell('Ligne', rowsql, idx);
+		tResultat_Info_Bibo:SetCell('Table1', rowsql, jsontxt1);
+		tResultat_Info_Bibo:SetCell('Table2', rowsql, jsontxt2);
+		base:TableInsert(tResultat_Info_Bibo, rowsql);
+	end
+	base:TableFlush(tResultat_Info_Bibo);
+end
+
 function main(params_c)
 	if params_c == nil then
 		return false;
 	end
+	local seed = os.time() + os.clock() * 1000000;
+	math.randomseed(seed)	
 	params = params_c;
+		-- for k,v in pairs(params) do
+			-- adv.Alert('Key '..k..'='..tostring(v));
+			-- if type(v) == 'table' then
+				-- for i,j in pairs(v) do
+					-- adv.Alert('Key '..i..'='..tostring(j));
+					-- adv.Alert('type de '..i..' = '..type(j));
+				-- end
+			-- end
+			-- adv.Alert('\n');
+		-- end
 	
-	scrip_version = "3.2"; 
-	-- vÈrification de l'existence d'une version plus rÈcente du script.
+	tEvenement = base:GetTable('Evenement');
+	base:TableLoad(tEvenement, 'Select * From Evenement Where Code = '..params.code_evenement);
+	Interrogation();
+	script_version = "4.01"; 
+	-- v√©rification de l'existence d'une version plus r√©cente du script.
 	-- Ex de retour : LiveDraw=5.94,Matrices=5.92,TimingReport=4.2,DoubleTirage=3.2,TirageOptions=3.3,TirageER=1.7,ListeMinisterielle=2.3,KandaHarJunior=2.0
 	if app.GetVersion() >= '4.4c' then 
 		indice_return = 4;
 		local url = 'https://agilsport.fr/bta_alpin/versionsPG.txt'
 		version = curl.AsyncGET(wnd.GetParentFrame(), url);
+		local url = 'https://agilsport.fr/bta_alpin/versionsPG.txt'
 	end
 
 	local updatefile = './tmp/updatesPG.txt';
@@ -268,8 +377,8 @@ function main(params_c)
 	base:TableLoad(tResultat, 'Select * From Resultat Where Code_evenement = '..params.code_evenement..' Order By Dossard');
 	tResultat:SetCounter('Sexe');
 	if tResultat:GetCounterCount('Sexe') > 1 then
-		msg = 'ScÈnario incompatible avec des courses mixtes.\n\n'..
-			'Choisissez le scÈnario : Tirage des dossards ou des rangs de dÈpart avec options de tirage';
+		msg = 'Sc√©nario incompatible avec des courses mixtes.\n\n'..
+			'Choisissez le sc√©nario : Tirage des dossards ou des rangs de d√©part avec options de tirage';
 		local reponse =  app.GetAuiFrame():MessageBox(msg,
 						"Lancer le tirage", 
 						msgBoxStyle.OK+msgBoxStyle.ICON_WARNING
@@ -280,13 +389,57 @@ function main(params_c)
 	if tResultat:GetCellInt('Dossard', 0) > 0 then
 		params.bolDossardExiste = true;;
 	end
-	if not params.bolDossardExiste then
-		local cmd = 'Delete From Resultat_Info_Bibo Where Code_evenement = '..params.code_evenement;
-		base:Query(cmd);
+	-- if not params.bolDossardExiste then
+		-- local cmd = 'Delete From Resultat_Info_Bibo Where Code_evenement = '..params.code_evenement;
+		-- base:Query(cmd);
+	-- end
+	dlgConfig = wnd.CreateDialog({
+		
+		width = display:GetSize().width * 2 / 3,
+		height = display:GetSize().height / 2,
+		x = display:GetSize().width / 6,
+		y = 100,
+		style=wndStyle.RESIZE_BORDER+wndStyle.CAPTION+wndStyle.CLOSE_BOX,
+		label='Double tirage au sort des dossards : '..script_version , 
+		icon='./res/32x32_ffs.png'
+		});
+	
+	dlgConfig:LoadTemplateXML({ 
+		xml = './process/verification_competition.xml',
+		node_name = 'root/panel', 
+		node_attr = 'name',
+		node_value = 'config'
+		});
+
+	dlgConfig:GetWindowName('race_name'):SetValue('Comp√©tition \n\n'..tEvenement:GetCell('Nom', 0));
+	
+	-- Toolbar Principale ...
+	local tbconfig = dlgConfig:GetWindowName('tbconfig');
+	tbconfig:AddStretchableSpace();
+	local config_btnClose = tbconfig:AddTool("Continuer", "./res/32x32_save.png");
+	tbconfig:AddStretchableSpace();
+	local config_btnQuitter = tbconfig:AddTool("Quitter", "./res/32x32_exit.png");
+	tbconfig:AddStretchableSpace();
+
+	tbconfig:Realize();
+	wnd.GetParentFrame():Bind(eventType.CURL, OnCurlReturn);
+
+	dlgConfig:Bind(eventType.MENU, 
+		function(evt) 
+			dlgConfig:EndModal(idButton.OK) 
+		 end,  config_btnClose);
+
+	dlgConfig:Bind(eventType.MENU, 
+		function(evt) 
+			dlgConfig:EndModal(idButton.CANCEL) 
+		 end,  config_btnQuitter);
+		 
+	if dlgConfig:ShowModal() ~= idButton.OK then
+		return;
 	end
+
 	tEvenement = base:GetTable('Evenement');
 	base:TableLoad(tEvenement, 'Select * From Evenement Where Code = '..params.code_evenement);
-	params.evenementNom = tEvenement:GetCell('Nom', 0);
 	params.evenementNom = tEvenement:GetCell('Nom', 0);
 	tEpreuve = base:GetTable('Epreuve');
 	base.TableLoad(tEpreuve, 'Select * From Epreuve Where Code_evenement = '..params.code_evenement);
@@ -295,14 +448,17 @@ function main(params_c)
 	if tResultat_Info_Bibo == nil then
 		CreateTableResultat_Info_Bibo();
 	end
+	
 	tTableTirage1 = sqlTable.Create('_TableTirage1');
 	tTableTirage1:AddColumn({ name = 'Row', type = sqlType.LONG, style = sqlStyle.NULL });
+	tTableTirage1:AddColumn({ name = 'Aleatoire', type = sqlType.DOUBLE, style = sqlStyle.NULL });
 	ReplaceTableEnvironnement(tTableTirage1, '_TableTirage1');
+	
 	local cmd = 'Select * From Resultat_Info_Bibo Where Code_evenement = '..params.code_evenement;
 	base:TableLoad(tResultat_Info_Bibo, cmd);
 	tResultat_Info_Bibo:OrderBy('Groupe, Ligne');
-	params.print_alone = nil;
 	params.skip_question = false;
+	params.print_alone = false;
 	if tEpreuve:GetCell('Code_entite', 0) == 'FIS' and tEpreuve:GetCell('Code_niveau', 0):In('EC', 'NC') and tEpreuve:GetCell('Code_discipline', 0):In('SG','DH') then
 		params.print_alone = true;
 		params.skip_question = true;
@@ -313,10 +469,10 @@ function main(params_c)
 	end
 	if tResultat_Info_Bibo:GetNbRows() > 0 then
 		if not params.skip_question then
-			local msg = "Le double tirage au sort des dossards a dÈj‡ ÈtÈ rÈalisÈ. \n"..
-						"Voulez-vous rÈÈditer la feuille du tirage fait prÈcÈdemment? \n"..
-						"ATTENTION, si vous cliquez sur Non, tous les dossards seront alors effacÈs et remplacÈs par ceux du nouveau tirage.\n\n"..
-						"OUI = rÈÈdition des dossards\n"..
+			local msg = "Le double tirage au sort des dossards a d√©j√† √©t√© r√©alis√©. \n"..
+						"Voulez-vous r√©√©diter la feuille du tirage fait pr√©c√©demment? \n"..
+						"ATTENTION, si vous cliquez sur Non, tous les dossards seront alors effac√©s et remplac√©s par ceux du nouveau tirage.\n\n"..
+						"OUI = r√©√©dition des dossards\n"..
 						"Non = retirage des dossards\n";
 			local reponse =  app.GetAuiFrame():MessageBox(msg,
 							"Lancer le tirage", 
@@ -326,14 +482,17 @@ function main(params_c)
 				return ;
 			elseif reponse == msgBoxStyle.YES then
 				params.print_alone = true;
+			else
+				params.print_alone = false;;
 			end
 		end
 	else
+		params.print_alone = false;;
 		tResultat:OrderBy('Dossard DESC');
 		if tResultat:GetCell('Dossard', 0):len() > 0 then
-			local msg = "ATTENTION : Les dossards ont dÈj‡ ÈtÈ tirÈs pour cette course !!!\n"..
+			local msg = "ATTENTION : Les dossards ont d√©j√† √©t√© tir√©s pour cette course !!!\n"..
 						"Confirmez-vous le double tirage au sort des dossards?\n"..
-						"Les dossards prÈsents seront alors effacÈs et remplacÈs par ceux du nouveau tirage.";
+						"Les dossards pr√©sents seront alors effac√©s et remplac√©s par ceux du nouveau tirage.";
 			local reponse =  app.GetAuiFrame():MessageBox(msg,
 						"Lancer le tirage", 
 						msgBoxStyle.YES+msgBoxStyle.NO+msgBoxStyle.NO_DEFAULT+msgBoxStyle.ICON_WARNING
@@ -343,14 +502,14 @@ function main(params_c)
 			end
 		end
 	end
-	
+
 	bolSplitBibo = false;
 	if tEpreuve:GetCell('Code_entite', 0) == 'FIS' then
 		if tEpreuve:GetCell('Code_niveau', 0):In('EC', 'NC') then
 			if tEpreuve:GetCell('Code_discipline', 0):In('SL','GS') then
 				bolSplitBibo = true;
 			else
-				local msg = "ATTENTION, ce script n'est valable que pour les Èpreuves techniques.";
+				local msg = "ATTENTION, ce script n'est valable que pour les √©preuves techniques.";
 				app.GetAuiFrame():MessageBox(msg,
 							"ATTENTION", 
 						msgBoxStyle.OK+msgBoxStyle.ICON_WARNING
@@ -359,29 +518,34 @@ function main(params_c)
 			end
 		end
 	end
-	
 	tResultat:OrderBy('Point');
-	params.pts_7 = tResultat:GetCellDouble('Point', 6);
+	if bolSplitBibo == true then
+		params.pts_7 = tResultat:GetCellDouble('Point', 6);
+	end
 	params.pts_15 = tResultat:GetCellDouble('Point', 14);
 	if params.bibo then
 		params.pts_bibo_jeunes = tResultat:GetCellDouble('Point', params.bibo -1);
 	end
 	params.last_row_bibo = nil; params.row_pts7 = nil;
 	GetBibo();
-	if not params.print_alone then
+	if params.print_alone == false then
 		local cmd = 'Delete From Resultat_Info_Bibo Where Code_evenement = '..params.code_evenement;
 		base:Query(cmd);
 		cmd = 'Update Resultat Set Dossard = Null, Rang = NULL, Critere = Null Where Code_evenement = '..params.code_evenement;
 		base:Query(cmd);
-		if params.first_row_non_classe then		-- tirage des non classÈs
+		if params.first_row_non_classe then		-- tirage des non class√©s
 			local cmd = 'Update Resultat Set Rang = '..(params.first_row_non_classe + 1)..' Where Code_evenement = '..params.code_evenement..' And Point Is Null';
 			base:Query(cmd);
 		end
 		base:TableLoad(tResultat, 'Select * From Resultat Where Code_evenement = '..params.code_evenement);
+		tResultat:AddColumn({ name = 'Rang_tirage', type = sqlType.LONG, style = sqlStyle.NULL });
+		tResultat:AddColumn({ name = 'Groupe_tirage', type = sqlType.LONG, style = sqlStyle.NULL });
+		tResultat:AddColumn({ name = 'Exaequo_groupe', type = sqlType.LONG, style = sqlStyle.NULL });
+		
 		tResultat:OrderBy('Point');
 
 		CheckExaequo();
-		-- valeurs dÈfinies apres GetBibo
+		-- valeurs d√©finies apres GetBibo
 		-- params.pts15 
 		-- resultat.pts15 
 		-- params.nb_bibo
@@ -389,11 +553,13 @@ function main(params_c)
 		-- params.nb_non_classes 
 		-- params.first_row_non_classe;
 		-- function BuildTableTirage(row_first, row_last, rang_tirage, bib_first, shuffle);
-		for i = 1, #params.tExaequo do
-			if params.tExaequo[i] < tResultat:GetNbRows() then
-				BuildTableTirage(params.tExaequo[i]+1, nil, params.tExaequo[i] ,nil, false) -- tirage des exaequo ayants des points
+			for i = 0, tResultat:GetCounter('Exaequo_groupe'):GetNbRows() -1 do
+				local id_groupe = tonumber(tResultat:GetCounter('Exaequo_groupe'):GetCell(0,i)) or 0;
+				if id_groupe > 0 then	-- on fait le double tirage pour le groupe de tirage concern√©
+					local nombre = tonumber(tResultat:GetCounter('Exaequo_groupe'):GetCell(1,i));
+					OnTirageEgalite(id_groupe);
+				end
 			end
-		end
 		-- base:TableBulkUpdate(tResultat, 'Dossard, Rang', 'Resultat');
 		-- base:TableLoad(tResultat, 'Select * From Resultat Where Code_evenement = '..params.code_evenement);
 		local limite = nil;
@@ -435,6 +601,10 @@ function main(params_c)
 	end
 	base:TableBulkUpdate(tResultat, 'Dossard, Rang', 'Resultat');
 	local cmd = 'Update Resultat Set Rang = NULL Where Code_evenement = '..params.code_evenement;
+	base:Query(cmd);
+	local cmd = 'Update Resultat Set Groupe = NULL Where Code_evenement = '..params.code_evenement;
+	base:Query(cmd);
+	local cmd = 'Update Resultat Set Reserve = NULL Where Code_evenement = '..params.code_evenement;
 	base:Query(cmd);
 
 	if not bolSplitBibo then

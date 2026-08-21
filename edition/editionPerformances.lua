@@ -6,7 +6,7 @@ function alert(txt)
 	app.GetAuiMessage():AddLine(txt);
 end
 
-function ChoixManche()	-- boîte de dialogue pour la sélection de la params.code_manche.
+function ChoixManche()	-- boÃ®te de dialogue pour la sÃ©lection de la params.code_manche.
 	dlgManche = wnd.CreateDialog(
 		{
 		width = 300,
@@ -63,7 +63,7 @@ function main(paramsc)
 	params.need = tostring(params.need):gsub(',','.')..'cm';
 	params.orientation = 'portrait';
 	params.code_manche = 1;
-	-- Prise du numéro de manche 
+	-- Prise du numÃ©ro de manche 
 	if params.nombre_de_manche > 1 then
 		params.code_manche = ChoixManche();
 	end
@@ -79,7 +79,7 @@ function main(paramsc)
 	-- avec 2 temps inter, on a 3 secteurs 
 	-- secteur 1 = inter1 - 0 
 	-- secteur 2 = inter2 - inter1 
-	-- secteur 3 = arrivée - inter 2 
+	-- secteur 3 = arrivÃ©e - inter 2 
 	tRanking:OrderBy('Clt');
 		
 	local tps1 = 0; local tps2 = 0;
@@ -119,7 +119,7 @@ function main(paramsc)
 	-- avec 2 temps inter, on a 3 secteurs 
 	-- secteur 1 = inter1 - 0 
 	-- secteur 2 = inter2 - inter1 
-	-- secteur 3 = arrivée - inter 2 
+	-- secteur 3 = arrivÃ©e - inter 2 
 	for i = 1, params.nb_temps_inter +1 do 
 		tRanking:SetRanking('Secteur'..i..'_clt', 'Secteur'..i..'_tps'); 
 		tRanking:OrderBy('Secteur'..i..'_clt');

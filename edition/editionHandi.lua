@@ -9,7 +9,7 @@ function SortTable(array)	-- tri des tables
 	end)
 end
 
-function ReplaceTableEnvironnement(t, name)		-- replace la table créée dans l'environnement de la base de donnée pour éviter les memory leaks
+function ReplaceTableEnvironnement(t, name)		-- replace la table crÃ©Ã©e dans l'environnement de la base de donnÃ©e pour Ã©viter les memory leaks
 	if type(t) ~= 'userdata' then
 		return;
 	end
@@ -45,17 +45,17 @@ function ConfigHandi()
 	dlgConfig:GetWindowName('mode'):SetValue(handi.mode);
 	
 	dlgConfig:GetWindowName('language'):Clear();
-	dlgConfig:GetWindowName('language'):Append('Français');
+	dlgConfig:GetWindowName('language'):Append('FranÃ§ais');
 	dlgConfig:GetWindowName('language'):Append('Anglais');
 	if language == 'fr' then
-		dlgConfig:GetWindowName('language'):SetValue('Français');
+		dlgConfig:GetWindowName('language'):SetValue('FranÃ§ais');
 	else
 		dlgConfig:GetWindowName('language'):SetValue('Anglais');
 	end
 
 	dlgConfig:Bind(eventType.TEXT, 
 		function(evt)
-			if dlgConfig:GetWindowName('language'):GetValue() == 'Français' and dlgConfig:GetWindowName('mode'):GetValue() == 'WPAS' then
+			if dlgConfig:GetWindowName('language'):GetValue() == 'FranÃ§ais' and dlgConfig:GetWindowName('mode'):GetValue() == 'WPAS' then
 				dlgConfig:GetWindowName('language'):SetValue('Anglais');
 			end
 		end,
@@ -63,7 +63,7 @@ function ConfigHandi()
 
 	dlgConfig:Bind(eventType.TEXT, 
 		function(evt)
-			if dlgConfig:GetWindowName('language'):GetValue() == 'Français' and dlgConfig:GetWindowName('mode'):GetValue() == 'WPAS' then
+			if dlgConfig:GetWindowName('language'):GetValue() == 'FranÃ§ais' and dlgConfig:GetWindowName('mode'):GetValue() == 'WPAS' then
 				dlgConfig:GetWindowName('language'):SetValue('Anglais');
 			end
 		end,
@@ -82,7 +82,7 @@ function ConfigHandi()
 	tb:Realize();
 	dlgConfig:Fit();
 	if dlgConfig:ShowModal() == idButton.OK then
-		if dlgConfig:GetWindowName('language'):GetValue() == 'Français' then
+		if dlgConfig:GetWindowName('language'):GetValue() == 'FranÃ§ais' then
 			language = 'fr';
 		else
 			language = 'en';
@@ -95,10 +95,10 @@ function ConfigHandi()
 	end
 end
 
-function PageBreak()	-- boîte de dialogue pour le saut de page à la rupture
+function PageBreak()	-- boÃ®te de dialogue pour le saut de page Ã  la rupture
 	page_break = 0;
 	if app.GetAuiFrame():MessageBox(
-		"Voulez-vous un saut de page à chaque rupture ?", 
+		"Voulez-vous un saut de page Ã  chaque rupture ?", 
 		"Saut de page Oui / Non",
 		msgBoxStyle.YES_NO + msgBoxStyle.ICON_INFORMATION
 		) == msgBoxStyle.YES then
@@ -107,7 +107,7 @@ function PageBreak()	-- boîte de dialogue pour le saut de page à la rupture
 	return page_break;
 end
 
-function ChoixManche()	-- boîte de dialogue pour la sélection de la manche.
+function ChoixManche()	-- boÃ®te de dialogue pour la sÃ©lection de la manche.
 	dlgManche = wnd.CreateDialog(
 		{
 		width = 300,
@@ -216,7 +216,7 @@ function main(cparams)
 		
 		if tps_status == 'zero'then
 			app.GetAuiFrame():MessageBox(
-				"Edition impossible, tous les coureurs\nn'ont pas été traités !!", 
+				"Edition impossible, tous les coureurs\nn'ont pas Ã©tÃ© traitÃ©s !!", 
 				"ATTENTION",
 				msgBoxStyle.OK + msgBoxStyle.ICON_WARNING)
 			return false;
@@ -224,7 +224,7 @@ function main(cparams)
 		tRanking:SetCell('Tps_status', row, tps_status);
 		groupe = tRanking:GetCell('Groupe', row);
 		if groupe:In('B1','B2','B3') then
-			local label = traduction(language, 'Déficient Visuel');
+			local label = traduction(language, 'DÃ©ficient Visuel');
 			-- tRanking:SetCell('Id_group', row, 1);
 			tRanking:SetCell('Reserve', row, 1);
 			tRanking:SetCell('Label_group', row, label);
@@ -236,7 +236,7 @@ function main(cparams)
 			tRanking:SetCell('Label_group', row, label);
 			tRanking:SetCell('Tps_g2', row, tps_status);
 		elseif groupe:In('LW0') then
-			local label = traduction(language, 'Déficient Auditif');
+			local label = traduction(language, 'DÃ©ficient Auditif');
 			-- tRanking:SetCell('Id_group', row, 3);
 			tRanking:SetCell('Reserve', row, 3);
 			tRanking:SetCell('Label_group', row, label);
@@ -367,7 +367,7 @@ function GetParamsXML()
 				local pts_rank = child:GetAttribute('rank'..i);
 				pts_rank = tonumber(pts_rank) or 0;
 				tRanked[idx][i].Pts = pts_rank;
-				-- idx = nombre de classés, i = classement
+				-- idx = nombre de classÃ©s, i = classement
 			end
 		end	
 		child = child:GetNext();

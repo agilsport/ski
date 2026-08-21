@@ -5,6 +5,7 @@
 		<menu title="Editions Supplémentaires" image="./res/32x32_options.png">
 			<menu title="Edition du Timing Report FIS" image="./res/16x16_fis.png" id="timing_report" lua="./edition/editionTR_FIS.lua" />
 			<menu title="Calcul d'un temps manuel" image="./res/16x16_calc.png" id="temps_manuel" lua="./edition/tempsManuel.lua" />
+			<menu title="Calcul d'un temps manuel en ligne" image="./res/16x16_calc.png" id="temps_manuel_online" filter="none" lua="./edition/tempsManuel_online.lua" />
 			<menu title="formulaire d'inscription FIS" image="./res/16x16_fis.png">
 				<menu title="Gestion des officiels" image="./res/16x16_fis.png" impression="0" gestion="1" lua="./edition/entryFIS_ALP.lua" />
 				<menu title="Edition du formulaire" image="./res/16x16_fis.png" impression="1" gestion="0" lua="./edition/entryFIS_ALP.lua" />
@@ -12,8 +13,11 @@
 			<menu title="Rapport d'accident" image="./res/16x16_pdf.png" action="open ./edition/Rapport_Accident.pdf" />
 		</menu>
 		<menu title="Outils - Scripts LUA spécifiques" image="./res/32x32_options.png">
+			<menu title="Vérification de la compétition" image="./res/32x32_official.png" filter="none" tartempion="je suis Tartempion" origine="edition" lua="./process/verification_competition.lua"/>
+			<menu title="Edition des coureurs d'une liste FIS" image="./res/16x16_ranking.png" lua="./process/coureurListe.lua"/>
 			<menu title="Double Tirage au sort des dossards (RIS)" origine="edition" image="./res/32x32_ranking.png" lua="./process/dossard_DoubleTirage.lua" />
 			<menu title="Regroupement de coureurs" image="./res/32x32_official.png" lua="./process/regroupementALP.lua" />
+			<menu title="Tirage des dossards (et/ou rangs) avec options de tirage" image="./res/32x32_ranking.png" lua="./process/dossard_TirageOptions.lua" />
 			<menu title="Liste de départ en Manche 3 avec BIBO sur M1 + M2" faire="M1_M2" image="./res/32x32_ranking.png" lua="./process/dossard_TirageOptions.lua" />
 			<menu title="Marquage des Equipes" origine="edition" image="./res/32x32_ranking.png" lua="./process/marquageEquipe.lua" />
 			<menu title="Résultats du Kandahar Junior" image="./res/16x16_ranking.png" lua="./process/kandahar_junior.lua"/>

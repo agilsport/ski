@@ -1,104 +1,77 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <root>
 	<panel name="config">
-		<lua>dofile('./interface/adv.lua');
-		</lua>
+		<lua>dofile('./interface/adv.lua');</lua>
 		<padding all="3px"/>
-		<col value="1"/>
-		<font color="black" size="9" weight="bold"/>
-		<matrix row="auto">
-			<col value="1,200px,200px,200px,200px,200px,1"/>
-			<background mode="solid" color="ltgray"/><font size="11"/>
-			<padding all="1px"/>
-			<textctrl row="70px" col_start="2" col_end="5" style="TE_CENTER|TE_READONLY|TE_MULTILINE" name="race_name" />
-			<wndtext col_start="6" align="center">'le '..params.Date..'\n'..params.Station</wndtext>
-			<row value="5px"/>
-		</matrix>
-		<matrix row="auto">
-			<col value="1"/>
-			<!-- <font color="black" size_step="1" weight="bold"/> -->
-			<matrix row="auto" col_start = "1">
-				<col value="1,200px,200px,200px,200px,200px,1"/>
-				<padding all="1px"/>
-				<statictext row="auto" col_start="2" style="ALIGN_RIGHT" font_weight="bold" label="Nombre d\'inscrits : "/>
-				<textctrl col_start="3" style="TE_CENTER|TE_READONLY" name="inscrits"/>
-				<statictext col_start="4" style="ALIGN_RIGHT" font_weight="bold" label="Nombre de français : "/>
-				<textctrl col_start="5" style="TE_CENTER|TE_READONLY" name="francais"/>
-				<statictext row="auto" col_start="2" style="ALIGN_RIGHT" font_weight="bold" label="Nombre d\'étrangers : "/>
-				<textctrl col_start="3" style="TE_CENTER|TE_READONLY" name="etrangers"/>
-				<statictext col_start="4" style="ALIGN_RIGHT" font_weight="bold" label="Nb.français maxi: "/>
-				<textctrl col_start="5" style="TE_CENTER|TE_READONLY" name="nb_francais_maxi"/>
-				<background mode="solid" color="ltgray"/><font size="11"/>
-				<wndtext col_start="6" row_start="-1" row_end="0" align="center">'Codex : \n'..params.Codex</wndtext>
+		<col value="1,200px,200px,200px,200px,200px,200px,1"/>
+		<font color="black" size="11" weight="bold"/>
+		<background mode="solid" color="ltgray"/>
+		<padding all="1px"/>
+		<textctrl row="70px" col_start="2" col_end="5" style="TE_CENTER|TE_READONLY|TE_MULTILINE" name="race_name" />
+		<wndtext col_start="6" col_end="7" align="center">'le '..params.Date..'\n'..params.Station</wndtext>
+		<row value="5px"/>
+		<statictext row="auto" col_start="2" style="ALIGN_RIGHT" label="Nombre d\'inscrits : "/>
+		<textctrl col_start="3" style="TE_CENTER|TE_READONLY" name="inscrits"/>
+		<statictext col_start="4" style="ALIGN_RIGHT" label="Nombre de français : "/>
+		<textctrl col_start="5" style="TE_CENTER|TE_READONLY" name="francais"/>
+		<statictext row="auto" col_start="2" style="ALIGN_RIGHT" label="Nombre d\'étrangers : "/>
+		<textctrl col_start="3" style="TE_CENTER|TE_READONLY" name="etrangers"/>
+		<statictext col_start="4" style="ALIGN_RIGHT" label="Nb.français maxi: "/>
+		<textctrl col_start="5" style="TE_CENTER|TE_READONLY" name="nb_francais_maxi"/>
+		<background mode="solid" color="ltgray"/>
+		<wndtext col_start="6" row_start="-1" row_end="0" align="center">'Codex : \n'..params.Codex</wndtext>
+		<row value="5px" />
+		<wndtext row="60px" col_start="2" align="center">"Comité"</wndtext>
+		<wndtext col_start="3" align="center">"Quotas\nde base"</wndtext>
+		<wndtext col_start="4" align="center">"Pourcentage\nd\'utilisation"</wndtext>
+		<wndtext col_start="5" align="center">"Inscrits"</wndtext>
+		<wndtext col_start="6" align="center">"Quotas\ncalculés"</wndtext>
+		<lua>for ligne = 1, params.lignes do
+				status = params.tableau[ligne].Status;
+				participation = params.tableau[ligne].Participation</lua>
+				<background color="(params.RGB[1])" mode="transparent" cond="status == 0 or participation == 0"/>
+				<background color="(params.RGB[2][1])" mode="solid" cond="status == 1"/>
+				<font color="black" size="9"/>
+				<textctrl row="auto" col_start="2" style="TE_CENTER|TE_READONLY" name="('comite'..ligne)"/>
+				<textctrl col_start="3" style="TE_CENTER|TE_READONLY" name="('quota_base'..ligne)"/>
+				<textctrl col_start="4" style="TE_CENTER|TE_READONLY" name="('quota_base2'..ligne)"/>
+				<textctrl col_start="5" style="TE_CENTER|TE_READONLY" name="('participation'..ligne)"/>
+				<background color="(params.RGB[2][2])" mode="solid" cond="status == 1"/>
+				<font color="white" cond="status == 1"/>
+				<textctrl col_start="6" style="TE_CENTER|TE_READONLY" cond="participation == 0" name="('quota_calcule'..ligne)"/>
+				<textctrl col_start="6" style="TE_CENTER" cond="participation ~= 0" name="('quota_calcule'..ligne)"/>
+		<lua>end</lua> -->
+		<font color="black" size="10"/>
+		<wndtext row="30px" col_start="2" font_size_step="1" align="center"><background mode="solid" color="ltgray"/>'Places C.R. : '</wndtext>
+		<textctrl col_start="3" style="TE_CENTER" name="cr_orga2"/>
+		<!-- <textctrl col_start="4" style="TE_CENTER" name="cr_orga3"/> -->
+		<textctrl col_start="6" style="TE_CENTER" name="cr_orga"/>
+		<wndtext row="30px" col_start="2" font_size_step="1" align="center"><background mode="solid" color="ltgray"/>'Places Club : '</wndtext>
+		<textctrl col_start="3" style="TE_CENTER" name="club_orga2"/>
+		<!-- <textctrl col_start="4" style="TE_CENTER" name="club_orga3"/> -->
+		<textctrl col_start="6" style="TE_CENTER" name="club_orga"/>
+		<wndtext row="30px" col_start="2" font_size_step="1" align="center"><background mode="solid" color="ltgray"/>'  Wild Card : '</wndtext>
+		<textctrl col_start="3" style="TE_CENTER" name="wild_cards2"/>
+		<!-- <textctrl col_start="4" style="TE_CENTER" name="wild_cards3"/> -->
+		<textctrl col_start="6" style="TE_CENTER" name="wild_cards"/>
+		<background color="LtGray" mode="solid"/>
+		<wndtext row="auto" col_start="2" font_size_step="1" align="center">'TOTAUX : '</wndtext>
+		<textctrl col_start="3" style="TE_CENTER|TE_READONLY" name="somme_quota_base"/>
+		<textctrl col_start="4" style="TE_CENTER|TE_READONLY" name="somme_quota_base2"/>
+		<textctrl col_start="5" style="TE_CENTER|TE_READONLY" name="somme_participation"/>
+		<textctrl col_start="6" style="TE_CENTER" name="somme_quota_calcule"/>
 
-			</matrix>
-			<row value="5px" />
-			<matrix row="auto" col_start="1">
-				<col value="1,200px,200px,200px,200px,200px,1"/>
-				<padding all="1px"/>
-				<pen border="all" size="1"/>
-				<!-- <font color="black" size_step="1" weight="bold"/> -->
-				<background color="LtGray" mode="solid"/>
-				<wndtext row="60px" col_start="2" align="center">"Comité"</wndtext>
-				<wndtext col_start="3" align="center">"Quotas\nde base"</wndtext>
-				<wndtext col_start="4" align="center">"Quotas\neffectifs"</wndtext>
-				<wndtext col_start="5" align="center">"Inscrits"</wndtext>
-				<wndtext col_start="6" align="center">"Quotas\ncalculés"</wndtext>
-				<lua>for ligne = 1, params.lignes do
-						status = params.tableau[ligne].Status;
-						participation = params.tableau[ligne].Participation</lua>
-						<background color="(params.RGB[1])" mode="transparent" cond="status == 0 or participation == 0"/>
-						<background color="(params.RGB[2][1])" mode="solid" cond="status == 1"/>
-						<!-- <background color="LtYellow" mode="solid" cond="status == 1"/> -->
-						<font color="black" weight="bold"/>
-						<textctrl row="auto" col_start="2" style="TE_CENTER|TE_READONLY" font_weight="bold" name="('comite'..ligne)"/>
-						<textctrl col_start="3" style="TE_CENTER|TE_READONLY" name="('quota_base'..ligne)"/>
-						<textctrl col_start="4" style="TE_CENTER|TE_READONLY" name="('quota_base2'..ligne)"/>
-						<textctrl col_start="5" style="TE_CENTER|TE_READONLY" name="('participation'..ligne)"/>
-						<background color="(params.RGB[2][2])" mode="solid" cond="status == 1"/>
-						<font color="white" weight="bold" cond="status == 1"/>
-						<textctrl col_start="6" style="TE_CENTER|TE_READONLY" cond="participation == 0" name="('quota_calcule'..ligne)"/>
-						<textctrl col_start="6" style="TE_CENTER" cond="participation ~= 0" name="('quota_calcule'..ligne)"/>
-				<lua>end</lua> -->
-			</matrix>
-			<matrix row_start="0" row="auto" col_start="1">
-				<col value="1,200px,200px,200px,200px,200px,1"/>
-				<row value="auto" count="8"/>
-				<padding all="1px"/>
-				<pen border="all" size="1"/>
-				<font color="black" size_step="1" weight="bold"/>
-				<background color="LtGray" mode="solid"/>
-				<wndtext row_start="1" col_start="2" font_size_step="-1" align="center">'TOTAUX : '</wndtext>
-
-				<wndtext row_start="2" col_start="5" font_size_step="-1" align="right">'CR Organisateur : '</wndtext>
-				<wndtext row_start="3" col_start="5" font_size_step="-1" align="right">'Club organisateur : '</wndtext>
-				<wndtext row_start="4" col_start="5" font_size_step="-1" align="right">'Wild Cards : '</wndtext>
-				<wndtext row_start="5" col_start="5" font_size_step="-1" align="right">'Nb coureurs EQ : '</wndtext>
-				<wndtext row_start="6" col_start="5" font_size_step="-1" align="right">'Nb étrangers : '</wndtext>
-				<wndtext row_start="7" col_start="5" font_size_step="-1" align="right">'TOTAL : '</wndtext>
-				<wndtext row_start="8" col_start="5" font_size_step="-1" align="right">'Différence : '</wndtext>
-
-				<textctrl row_start="1" col_start="3" style="TE_CENTER|TE_READONLY" name="somme_quota_base"/>
-				<textctrl row_start="1" col_start="4" style="TE_CENTER|TE_READONLY" name="somme_quota_base2"/>
-				<textctrl row_start="1" col_start="5" style="TE_CENTER|TE_READONLY" name="somme_participation"/>
-				<textctrl row_start="1" col_start="6" style="TE_CENTER" name="somme_quota_calcule"/>
-
-				<textctrl row_start="2" col_start="6" style="TE_CENTER" name="cr_orga"/>
-				<textctrl row_start="3" col_start="6" style="TE_CENTER" name="club_orga"/>
-				<textctrl row_start="4" col_start="6" style="TE_CENTER" name="wild_cards"/>
-				<textctrl row_start="5" col_start="6" style="TE_CENTER|TE_READONLY" font_weight="bold" name="equipe"/>
-				<textctrl row_start="6" col_start="6" style="TE_CENTER|TE_READONLY" name="etrangers2"/>			
-				<textctrl row_start="7" col_start="6" style="TE_CENTER" name="total"/>
-								
-				<textctrl row_start="8" col_start="6" style="TE_CENTER" name="difference"/>
-				<matrix row_start="2" row_end="7" col_start="2" col_end="4">
-					<col value="1" />
-					<wndtext row="80px" align="center" cond="params.filter:len() ~= 0">'Filtre utilisé pour le filtrage des coureurs :\n'..params.filter</wndtext>
-					<toolbar row="70px" name="tbconfig" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
-					<row value="1"/>
-				</matrix>
-			</matrix>
-		</matrix>
+		<wndtext row="auto" col_start="5" font_size_step="1" align="right">'Nb EQ ou CNE: '</wndtext>
+		<textctrl col_start="6" style="TE_CENTER|TE_READONLY" name="equipe"/>
+		<wndtext row="auto" col_start="5" font_size_step="1" align="right">'Nb étrangers : '</wndtext>
+		<textctrl col_start="6" style="TE_CENTER" name="etrangers2"/>			
+		<wndtext row="auto" col_start="5" font_size_step="1" align="right">'TOTAL : '</wndtext>
+		<textctrl col_start="6" style="TE_CENTER" name="total"/>
+		<wndtext row="auto" col_start="5" font_size_step="1" align="right">'Différence : '</wndtext>
+		<textctrl col_start="6" style="TE_CENTER" name="difference"/>
+		<!-- <wndtext row="80px" col_start="2" col_end="4" align="center" cond="params.filter:len() ~= 0">'Filtre utilisé pour le filtrage des coureurs :\n'..params.filter</wndtext> -->
+		<wndtext row_start="-3" row_end="0" col_start="2" col_end="4" align="center" cond="params.filter:len() ~= 0">'Filtre utilisé pour le filtrage des coureurs :\n'..params.filter</wndtext>
+		<toolbar row_start="3" row_end="-5" col_start="7" name="tbconfig" style="TB_FLAT|TB_VERTICAL|TB_TEXT"/>
 	</panel>
 	<panel name="backoffice">
 		<lua>dofile('./interface/adv.lua');</lua>
@@ -107,45 +80,69 @@
 		<row value="10px"/>
 		<background mode="solid" color="ltgray"/>
 		<matrix row="auto">
-			<col value="1,200px,200px,200px,60px,1"/>
+			<col value="1,200px,200px,200px,100px,1"/>
 			<row value="10px"/>
 			<pen size="1" border="all"/>
 			<!-- <padding all="1px"/> -->
-			<wndtext row="50px" col_start="2" col_end="4" font_size="11" font_weight="bold" align="center">"Gestion des valeurs de configuration\nChoix du Code Regroupement pour le BackOffice"</wndtext>
+			<wndtext row="50px" col_start="2" col_end="4" font_size="11" font_weight="bold" align="center">"Gestion des valeurs de configuration\nChoix du Code Regroupement à utiliser"</wndtext>
 			<wndtext row="35px" col_start="2" col_end="3" font_size="11" font_weight="bold" align="right">"Sélectionnez le code regroupement : "</wndtext>
 			<combobox col_start="4" font_size="10" font_weight="bold" style="CB_READONLY" name="combo_regroupement" />	
 		</matrix>s
 		<row value="10px"/>
 		<!-- <row value="10px"/> -->
 		<matrix row="auto">
-			<col value="1,200px,200px,200px,60px,1"/>
+			<col value="1,200px,200px,200px,100px,1"/>
 			<pen size="1" border="all"/>
 			<padding all="2px"/>
 			<wndtext row="50px" col_start="2" font_weight="bold" font_size="11" align="center">"Comité"</wndtext>
 			<wndtext col_start="3" font_weight="bold" font_size="11" align="center">"Ancien quota"</wndtext>
 			<wndtext col_start="4" font_weight="bold" font_size="11" align="center">"Nouveau quota"</wndtext>
-			<lua>for ligne = 1, #params.tableau do</lua>
+			<lua>for ligne = 1, 14 do</lua>
 					<background color="LtGray" mode="transparent"/>
 					<font color="black" weight="normal"/>
 					<textctrl row="auto" col_start="2" style="TE_CENTER|TE_READONLY" font_weight="bold" name="('comite'..ligne)"/>
 					<textctrl col_start="3" style="TE_CENTER|TE_READONLY" name="('old_quota_base'..ligne)"/>
 					<textctrl font_weight="bold" col_start="4" style="TE_CENTER" name="('new_quota_base'..ligne)"><background mode="transparent" color="white"/></textctrl>
 			<lua>end</lua>
+			<wndtext row="35px" col_start="2" font_size="11" align="right"><pen size="1" border="all"/><background mode="solid"/>"Places C.R. : "</wndtext>
+			<textctrl col_start="3" style="TE_READONLY|TE_CENTER" name="place_comite_organisateur"><background mode="solid"/></textctrl>
+			<textctrl col_start="4" font_weight="bold"  style="TE_CENTER" name="place_comite_organisateur_new"><background mode="transparent" color="white"/></textctrl>
+			<wndtext row="35px" col_start="2" font_size="11" align="right"><pen size="1" border="all"/><background mode="solid"/>"Places Club : "</wndtext>
+			<textctrl col_start="3" style="TE_READONLY|TE_CENTER" name="place_club_organisateur"><background mode="solid"/></textctrl>
+			<textctrl col_start="4" font_weight="bold"  style="TE_CENTER" name="place_club_organisateur_new"><background mode="transparent" color="white"/></textctrl>
+			<wndtext row="35px" col_start="2" font_size="11" align="right"><pen size="1" border="all"/><background mode="solid"/>"Wild Cards : "</wndtext>
+			<textctrl col_start="3" style="TE_READONLY|TE_CENTER" name="wild_card"><background mode="solid"/></textctrl>
+			<textctrl col_start="4" font_weight="bold"  style="TE_CENTER" name="wild_card_new"><background mode="transparent" color="white"/></textctrl>
 			<wndtext row="35px" col_start="2" font_weight="bold"  font_size="11" align="right"><pen size="1" border="all"/><background mode="solid"/>"Total sur 100 : "</wndtext>
 			<textctrl col_start="3" style="TE_CENTER" name="total_base" />
 			<textctrl col_start="4" font_weight="bold" style="TE_CENTER" name="total_base2" />
-			<wndtext row="35px" col_start="2" col_end="3" font_size="11" align="right"><pen size="1" border="all"/><background mode="solid"/>"Places Comité organisateur : "</wndtext>
-			<textctrl col_start="4" font_weight="bold"  style="TE_CENTER" name="place_comite_organisateur"><background mode="transparent" color="white"/></textctrl>
-			<wndtext row="35px" col_start="2" col_end="3" font_size="11" align="right"><pen size="1" border="all"/><background mode="solid"/>"Places Club organisateur : "</wndtext>
-			<textctrl col_start="4" font_weight="bold"  style="TE_CENTER" name="place_club_organisateur"><background mode="transparent" color="white"/></textctrl>
-			<wndtext row="35px" col_start="2" col_end="3" font_size="11" align="right"><pen size="1" border="all"/><background mode="solid"/>"Wild Cards distribuées : "</wndtext>
-			<textctrl col_start="4" font_weight="bold"  style="TE_CENTER" name="wild_card"><background mode="transparent" color="white"/></textctrl>
-			<wndtext row="35px" col_start="2" col_end="3" font_size="11" align="right"><pen size="1" border="all"/><background mode="solid"/>"Remplacer EQ par le Comité d'origine : "</wndtext>
+			<wndtext row="35px" col_start="2" col_end="3" font_size="11" align="right"><pen size="1" border="all"/><background mode="solid"/>"Remplacer EQ/CNE par le Comité d'origine : "</wndtext>
 			<combobox col_start="4" font_weight="bold"  name="comboComiteOrigine" style="CB_READONLY"/>	
 			<wndtext row="35px" col_start="2" col_end="3" font_size="11" align="right"><pen size="1" border="all"/><background mode="solid"/>"Places réservées proportionnelles : "</wndtext>
 			<combobox col_start="4" font_weight="bold"  name="comboVariable" style="CB_READONLY"/>	
-			<toolbar row="auto" col_start="2" col_end="4" name="tbbackoffice" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
+			<toolbar row_start="1" row_end="0" col_start="5" name="tbbackoffice" style="TB_FLAT|TB_VERTICAL|TB_TEXT"/>
 		</matrix>
+		<row value="10px" />
+	</panel>
+	<panel name="get_epreuve">
+		<lua>dofile('./interface/adv.lua');</lua>
+		<!-- <padding all="3px"/> -->
+		<col value="1"/>
+		<row value="10px"/>
+		<background mode="solid" color="ltgray"/>
+		<matrix row="auto">
+			<col value="1,200px,500px,1"/>
+			<row value="10px"/>
+			<pen size="1" border="all"/>
+			<!-- <padding all="1px"/> -->
+			<wndtext row="50px" col_start="2" col_end="3" font_weight="bold" font_size="11" align="center">"Sur quelle épreuve voulez-vous travailler ?"</wndtext>
+			<row value="10px"/>
+			<wndtext row="35px" col_start="2" font_weight="bold" font_size="10" align="center">"N° de l'épreuve :"</wndtext>
+			<combobox col_start="3" style="TE_LEFT" font_weight="bold" font_size="10" name="num_epreuve" ><background mode="transparent" color="white"/></combobox>
+			<toolbar row="auto" col_start="2" col_end="3" name="tbgetepreuve" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
+			<!-- <row value="10px"/> -->
+		</matrix>
+		<row value="10px"/>
 	</panel>
 	<panel name="get_valeur">
 		<lua>dofile('./interface/adv.lua');</lua>
@@ -161,52 +158,61 @@
 			<wndtext row="50px" col_start="2" col_end="3" font_weight="bold" font_size="11" align="center">"Prise de la valeur des places à répartir"</wndtext>
 			<row value="10px"/>
 			<wndtext row="35px" col_start="2" font_weight="bold" font_size="10" align="center">"Places à répartir :"</wndtext>
-			<textctrl col_start="3" style="TE_LEFT" font_weight="bold" font_size="10" name="val_140" />
+			<textctrl col_start="3" style="TE_LEFT" font_weight="bold" font_size="10" name="val_140" ><background mode="transparent" color="white"/></textctrl>
 			<toolbar row="auto" col_start="2" col_end="4" name="tbgetvalue" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
 			<!-- <row value="10px"/> -->
 		</matrix>
-		<!-- <row value="10px"/> -->
+		<row value="10px"/>
 	</panel>
 	<panel name="calculatrice">
 		<lua>dofile('./interface/adv.lua');</lua>
 		<!-- <padding all="3px"/> -->
 		<col value="1"/>
-		<row value="10px"/>
 		<matrix row="auto">
-			<col value="1,100px,200px,200px,200px,200px,80px,1"/>
-			<padding all="2px"/>
+			<col value="1,150px,200px,200px,200px,200px,100px,1"/>
+			<padding all="1px"/>
 			<pen size="1" border="all"/>
 			<background mode="solid" color="ltgray"/>
 			<wndtext row="60px" col_start="2" col_end="6" font_size="11" font_weight="bold" align="center">"Calculatrice de Quota\nChoix du Code Regroupement pour le calcul"</wndtext>
 			<wndtext row="35px" col_start="2" col_end="5" font_size="11" font_weight="bold" align="right">"Sélectionnez le code regroupement : "</wndtext>
 			<combobox col_start="6" font_size="10" font_weight="bold" style="CB_READONLY" name="combo_regroupement" ><background mode="solid" color="white"/></combobox>
-			<wndtext row="40px" col_start="2" col_end="5" font_weight="bold" font_size="11" align="right">"Saisir le nombre total de places allouées à répartir : "</wndtext>
+			<wndtext row="38px" col_start="2" col_end="5" font_weight="bold" font_size="11" align="right">"Saisir le nombre total de places allouées à répartir : "</wndtext>
 			<textctrl col_start="6" style="TE_CENTER" font_weight="bold" name="a_repartir"><background mode="solid" color="white"/></textctrl>
-			<wndtext row="40px" col_start="2" font_weight="bold" font_size="11" align="center">"Comité"</wndtext>
+			<wndtext row="38px" col_start="2" font_weight="bold" font_size="11" align="center">"Comité"</wndtext>
 			<wndtext col_start="3" font_weight="bold" font_size="11" align="center">"Quota de base"</wndtext>
 			<textctrl col_start="4" font_weight="bold" font_size="11" style="TE_READONLY|TE_CENTER" name="label_quota" />
 			<wndtext col_start="5" font_weight="bold" font_size="11" align="center">"Places demandées"</wndtext>
 			<wndtext col_start="6" font_weight="bold" font_size="11" align="center">"Places obtenues"</wndtext>
-			<lua>for i = 1, #params.tableau do</lua>
+			<lua>for i = 1, 14 do</lua>
 					<background color="LtGray" mode="transparent"/>
 					<font color="black" weight="normal"/>
 					<checkbox row="auto" col_start="2" border="all" name="('chk'..i)" style="CHK_2STATE|ALIGN_RIGHT"/>
 					<textctrl col_start="3" style="TE_CENTER|TE_READONLY" name="('quota_base'..i)"/>
-					<textctrl font_weight="bold" col_start="4" style="TE_CENTER" name="('quota_maximum'..i)" ><background mode="transparent" color="white"/>'?'</textctrl>
+					<textctrl font_weight="bold" col_start="4" style="TE_CENTER|TE_READONLY" name="('quota_maximum'..i)" ><background mode="transparent" color="white"/>'?'</textctrl>
 					<textctrl font_weight="bold" col_start="5" style="TE_CENTER" name="('places_demandees'..i)" ><background mode="transparent" color="white"/>'?'</textctrl>
 					<textctrl font_weight="bold" col_start="6" style="TE_CENTER" name="('places_obtenues'..i)" ><background mode="transparent" color="white"/>'?'</textctrl>
 			<lua>end</lua>
 			<background mode="solid" color="ltgray"/>
-			<wndtext row="35px" col_start="2" font_weight="bold" font_size="11" align="center">"Total"</wndtext>
+			<wndtext row="35px" col_start="2" font_weight="bold" font_size="10" align="center">"Total"</wndtext>
 			<textctrl col_start="3" style="TE_CENTER" name="total_base" />
 			<textctrl col_start="4" font_weight="bold" style="TE_CENTER" name="total_base2" />
 			<textctrl col_start="5" font_weight="bold" style="TE_CENTER" name="total_places_demandees" />
 			<textctrl col_start="6" font_weight="bold" style="TE_CENTER" name="total_places_obtenues" />
-			<wndtext row="40px" col_start="4" col_end="5" font_weight="bold" font_size="9" align="right">'Plus places réservées : '</wndtext>
+			<wndtext row="35px" col_start="4" col_end="5" font_weight="bold" font_size="10" align="center" name="CR">"Places C.R. : "</wndtext>
+			<textctrl col_start="6" style="TE_CENTER" font_weight="bold" name="place_CR2" />
+			<wndtext row="35px" col_start="4" col_end="5" font_weight="bold" font_size="10" align="center" name="CLUB">"Places Club : "</wndtext>
+			<textctrl col_start="6" style="TE_CENTER" font_weight="bold" name="place_CLUB2"/>
+			<wndtext row="35px" col_start="4" col_end="5" font_weight="bold" font_size="10" align="center" name="WC">"Wild Cards : "</wndtext>
+			<textctrl col_start="6" style="TE_CENTER" font_weight="bold" name="wild_card2"/>
+
+			<wndtext row="38px" col_start="4" col_end="5" font_weight="bold" font_size="9" align="right">'Total des places C.R., Club, WC : '</wndtext>
 			<textctrl col_start="6" font_weight="bold" style="TE_CENTER" name="places_ffs" ><background color="white" mode="transparent" /></textctrl>
-			<wndtext row="40px" col_start="4" col_end="5" font_weight="bold" font_size="9" align="right">'Différence : '</wndtext>
+			<wndtext row="38px" col_start="4" col_end="5" font_weight="bold" font_size="9" align="right">'Coureurs EQ ou CNE : '</wndtext>
+			<textctrl col_start="6" font_weight="bold" style="TE_CENTER" name="places_france" ><background color="white" mode="transparent" /></textctrl>
+			<wndtext row="38px" col_start="4" col_end="5" font_weight="bold" font_size="9" align="right">'Différence : '</wndtext>
 			<textctrl col_start="6" font_weight="bold" style="TE_CENTER|TE_READONLY" name="difference" ><background color="white" mode="transparent" /></textctrl>
 			<toolbar row_start="1" row_end="0" col_start="7" name="tbbackoffice" style="TB_FLAT|TB_VERTICAL|TB_TEXT"/>
+			<row value="10px"/>
 		</matrix>
 	</panel>
 	<panel id="print">
@@ -218,127 +224,172 @@
 			<pen border="none"/>
 			<font name="Calibri" size="12" adjust="width" weight="bold"/>
 			<col value="1,2cm,2cm,2cm,2cm,2cm,1"/>
-			<text row="2cm" col_start="2" col_end="6" align="center">params.Titre</text>
+			<text row="4cm" col_start="2" col_end="6" align="center">params.Titre</text>
 			<text row="0.3cm"/>
  		</header>
 		<footer/>
 		<first_header />
 		<end>
-			<col value="1,2cm,2cm,2cm,2cm,2cm,1"/>
+			<col value="1,2.5cm,2.5cm,2.5cm,2.5cm,1"/>
 			<pen border="all" size="1"/>
 			<font name="Calibri" size="9" adjust="width" weight="bold" color="black"/>
 			<background color="ltgray" mode="solid"/>
+
+			<text row="0.5cm" col_start="2" align="center" cond="params.Variable == 1">'Places CR'</text>
+			<text col_start="3" align="center" cond="params.Variable == 1">params.CR_node..' %'</text>
+			<text col_start="5" align="center" cond="params.Variable == 1">params.CR</text>
+
+			<text row="0.5cm" col_start="2" align="center" cond="params.Variable == 1">'Places Club'</text>
+			<text col_start="3" align="center" cond="params.Variable == 1">params.CLUB_node..' %'</text>
+			<text col_start="5" align="center" cond="params.Variable == 1">params.CLUB</text>
+
+			<text row="0.5cm" col_start="2" align="center" cond="params.Variable == 1 and params.WC ~= 0">'Wild Cards'</text>
+			<text col_start="3" align="center" cond="params.Variable == 1 and params.WC ~= 0">params.WC_node..' %'</text>
+			<text col_start="5" align="center" cond="params.Variable == 1 and params.WC ~= 0">params.WC</text>
+
 			<text row="0.5cm" col_start="2" align="center">"Total"</text>
 			<text col_start="3" align="center">params.Somme_base</text>
-			<text col_start="4" align="center">params.Somme_base2</text>
-			<text col_start="5" align="center">params.Inscrits</text>
-			<text col_start="6" align="center">params.Total_Calcule</text>
+			<!-- <text col_start="4" align="center">params.Somme_base2</text> -->
+			<text col_start="4" align="center">params.Inscrits</text>
+			<text col_start="5" align="center">params.Total_Calcule</text>
 			
-			<text row="0.5cm" col_start="5" align="center" cond="params.Place_CR ~= 0">'Places CR'</text>
-			<text col_start="6" align="center" cond="params.Place_CR ~= 0">params.Place_CR</text>
+			<text row="0.5cm" col_start="4" align="center" cond="params.Variable == 0 and params.Place_CR ~= 0">'Places CR'</text>
+			<text col_start="5" align="center" cond="params.Variable == 0 and params.Place_CR ~= 0">params.Place_CR</text>
 			
-			<text row="0.5cm" col_start="5" align="center" cond="params.Place_Club ~= 0">"Places Club"</text>
-			<text col_start="6" align="center" cond="params.Place_Club ~= 0">params.Place_Club</text>
+			<text row="0.5cm" col_start="4" align="center" cond="params.Variable == 0 and params.Place_Club ~= 0">"Places Club"</text>
+			<text col_start="5" align="center" cond="params.Variable == 0 and params.Place_Club ~= 0">params.Place_Club</text>
 
-			<text row="0.5cm" col_start="5" align="center" cond="params.Place_WC ~= 0">"Wild Cards"</text>
-			<text col_start="6" align="center" cond="params.Place_WC ~= 0">params.Place_WC</text>
+			<text row="0.5cm" col_start="4" align="center" cond="params.Variable == 0 and params.Place_WC ~= 0">"Wild Cards"</text>
+			<text col_start="5" align="center" cond="params.Variable == 0 and params.Place_WC ~= 0">params.Place_WC</text>
 			
-			<text row="0.5cm" col_start="5" align="center" cond="params.Nb_Equipe ~= 0">"Nb 'Equipe'"</text>
-			<text col_start="6" align="center" cond="params.Nb_Equipe ~= 0">params.Nb_Equipe</text>
+			<text row="0.5cm" col_start="4" align="center" cond="params.Nb_Equipe ~= 0">"Nb 'Equipe'"</text>
+			<text col_start="5" align="center" cond="params.Nb_Equipe ~= 0">params.Nb_Equipe</text>
 			
-			<text row="0.5cm" col_start="5" align="center" >"Etrangers"</text>
-			<text col_start="6" align="center" >params.Etrangers</text>
+			<text row="0.5cm" col_start="4" align="center" >"Etrangers"</text>
+			<text col_start="5" align="center" >params.Etrangers</text>
 
-			<text row="0.5cm" col_start="5" align="center" >'Total'</text>
-			<text col_start="6" align="center" >params.Total_General</text>
+			<text row="0.5cm" col_start="4" align="center" >'Total'</text>
+			<text col_start="5" align="center" >params.Total_General</text>
 
 			<background mode="transparent"/>
 			<pen border="none"/>
-			<text row="auto" col_start="2" col_end="6" align="center">''</text>
-			<lua>txt = app.GetName()..' Version '..app.GetVersion()..' / FFS / Agil Informatique  /  Philippe Guérindon  '..os.date(' / Edition du %d-%m-%Y à %H:%M:%S')</lua>
+			<text row="auto" col_start="2" col_end="5" align="center">''</text>
+			<lua>txt = app.GetName()..' Version '..app.GetVersion()..' / Philippe Guérindon\n'..os.date('Edition du %d-%m-%Y à %H:%M:%S')</lua>
 			<font name="Calibri" size="8" adjust="width"/>
 			<text row="auto" col_start="1" col_end="0" font_size_step="1" align="center">txt</text>
 		</end>
 		<layers/>
 		<label>
-			<col value="1,2cm,2cm,2cm,2cm,2cm,1"/>
+			<col value="1,2.5cm,2.5cm,2.5cm,2.5cm,1"/>
 			<pen border="all" size="1"/>
 			<background color="ltgray" mode="solid"/>
 			<font name="Calibri" size="9" adjust="width" weight="bold" color="black"/>
 			<text row="1cm" col_start="2" align="center">"Comité"</text>
 			<text col_start="3" align="center">"Quotas\nde base"</text>
-			<text col_start="4" align="center">"Quotas\neffectifs"</text>
-			<text col_start="5" align="center">"Inscrits"</text>
-			<text col_start="6" align="center">"Quotas\ncalculés"</text>
+			<!-- <text col_start="4" align="center">"Quotas\neffectifs"</text> -->
+			<text col_start="4" align="center">"Inscrits"</text>
+			<text col_start="5" align="center">"Places\ncalculés"</text>
 		</label>
 		<body>
 			<pen border="all" size="1"/>
-			<col value="1,2cm,2cm,2cm,2cm,2cm,1"/>
+			<col value="1,2.5cm,2.5cm,2.5cm,2.5cm,1"/>
 			<font name="Calibri" size="9" adjust="width" weight="bold"/>
 			<text row="0.5cm" col_start="2" align="center"><background mode="solid" color="(params.RGB[1])" cond="body:GetCellInt('Status', row) ~= 1"/><background mode="solid" color="(params.RGB[2][1])" cond="body:GetCellInt('Status', row) == 1"/>$(Comite)</text>
-			<text col_start="3" align="center"><background mode="solid" color="(params.RGB[1])" cond="body:GetCellInt('Status', row) ~= 1"/><background mode="solid" color="(params.RGB[2][1])" cond="body:GetCellInt('Status', row) == 1"/>$(Quota_base)..'%'</text>
-			<text col_start="4" align="center"><background mode="solid" color="(params.RGB[1])" cond="body:GetCellInt('Status', row) ~= 1"/><background mode="solid" color="(params.RGB[2][1])" cond="body:GetCellInt('Status', row) == 1"/>Round(body:GetCellDouble('Quota_base2', row), 2)..'%'</text>
-			<text col_start="5" align="center"><background mode="solid" color="(params.RGB[1])" cond="body:GetCellInt('Status', row) ~= 1"/><background mode="solid" color="(params.RGB[2][1])" cond="body:GetCellInt('Status', row) == 1"/>$(Participation)</text>
-			<text col_start="6" align="center"><background mode="solid" color="(params.RGB[1])" cond="body:GetCellInt('Status', row) ~= 1"/><background mode="solid" color="(params.RGB[2][2])" cond="body:GetCellInt('Status', row) == 1"/><font color="white" cond="body:GetCellInt('Status', row) == 1"/>$(Quota_calcule)</text>
+			<text col_start="3" align="center"><background mode="solid" color="(params.RGB[1])" cond="body:GetCellInt('Status', row) ~= 1"/><background mode="solid" color="(params.RGB[2][1])" cond="body:GetCellInt('Status', row) == 1"/>$(Quota_base)..' %'</text>
+			<!-- <text col_start="4" align="center"><background mode="solid" color="(params.RGB[1])" cond="body:GetCellInt('Status', row) ~= 1"/><background mode="solid" color="(params.RGB[2][1])" cond="body:GetCellInt('Status', row) == 1"/>Round(body:GetCellDouble('Quota_base2', row), 2)..'%'</text> -->
+			<text col_start="4" align="center"><background mode="solid" color="(params.RGB[1])" cond="body:GetCellInt('Status', row) ~= 1"/><background mode="solid" color="(params.RGB[2][1])" cond="body:GetCellInt('Status', row) == 1"/>$(Participation)</text>
+			<text col_start="5" align="center"><background mode="solid" color="(params.RGB[1])" cond="body:GetCellInt('Status', row) ~= 1"/><background mode="solid" color="(params.RGB[2][2])" cond="body:GetCellInt('Status', row) == 1"/><font color="white" cond="body:GetCellInt('Status', row) == 1"/>$(Quota_calcule)</text>
 		</body>
 	</panel>
 	<panel id="printcalculette">
-		<lua>dofile('./interface/adv.lua'); </lua>
 		<lua>dofile('./edition/functionPG.lua'); </lua>
+		<lua>pourcent = " %";
+			if params.Variable == 0 then
+				pourcent = ""
+			end
+		</lua>
 		<header>
 			<spacing all="0"/>
 			<padding all="0"/>
 			<pen border="none"/>
 			<font name="Calibri" size="12" adjust="width" weight="bold"/>
-			<col value="1,2cm,2cm,2cm,2cm,2cm,1"/>
-			<text row="auto" col_start="2" col_end="6" align="center">params.Titre</text>
+			<col value="1"/>
+			<lua>if params.ImprimerPD == 1 then</lua>
+				<text row="4cm" align="center">params.Titre</text>
+			<lua>else</lua>
+				<text row="1.5cm" align="center">params.Titre</text>
+			<lua>end</lua>
 			<text row="0.3cm"/>
  		</header>
 		<footer/>
 		<first_header />
 		<layers/>
 		<end>
-			<col value="1,2cm,2cm,2cm,2cm,2cm,1"/>
+			<lua>if params.ImprimerPD == 1 then</lua>
+				<col value="1,2.5cm,2.5cm,2.5cm,2.5cm,1"/>
+			<lua>else</lua>
+				<col value="1,2.5cm,2.5cm,0cm,2.5cm,1"/>
+			<lua>end</lua>
 			<pen border="all" size="1"/>
 			<background color="ltgray" mode="solid"/>
-			<font name="Calibri" size="12" adjust="width" weight="bold" color="black"/>
+			<font name="Calibri" size="11" adjust="width" weight="bold" color="black"/>
 			<text row="0.7cm" col_start="2" align="right">"Totaux : "</text>
-			<text col_start="3" align="center">params.Total_base..'%'</text>
-			<text col_start="4" align="center">params.Total_base2..'%'</text>
-			<text col_start="5" align="center">params.Total_participation</text>
-			<text col_start="6" align="center">params.Total_calcule</text>
-			<text row="0.7cm" col_start="2" col_end="5" align="right">"Places réservées : "</text>
-			<text col_start="6" align="center">params.Places_ffs</text>
-			<text row="0.7cm" col_start="2" col_end="5" align="right">"Total réparti : "</text>
-			<text col_start="6" align="center">params.Total_reparti</text>
+			<text col_start="3" align="center">params.Total_base..' %'</text>
+			
+			<text col_start="4" align="center" cond="params.ImprimerPD == 1">params.Total_participation</text>
+			<text col_start="5" align="center">params.Total_calcule</text>
+			<text row="0.7cm" col_start="2" align="right" font_color="yellow" cond="params.Place_CR2 ~= 0"><background color="black" mode="solid"/>"Places C.R. : "</text>
+			<text col_start="5" align="center" cond="params.Place_CR2 ~= 0">params.Place_CR2</text>
+			<text row="0.7cm" col_start="2" align="right" font_color="yellow" cond="params.Place_CLUB2 ~= 0"><background color="black" mode="solid"/>"Places Club : "</text>
+			<text col_start="5" align="center" cond="params.Place_CLUB2 ~= 0">params.Place_CLUB2</text>
+			<text row="0.7cm" col_start="2" align="right" cond="params.Place_WC ~= 0" font_color="yellow"><background color="black" mode="solid"/>"Wild Card : "</text>
+			<text col_start="3" align="center" cond="params.Place_WC ~= 0"><background color="ltyellow" mode="solid"/>params.Place_WC..pourcent</text>
+			<text col_start="5" align="center" cond="params.Place_WC ~= 0">params.Place_WC2</text>
+			<text row="0.7cm" col_start="2" col_end="4" align="right" cond="params.Places_france ~= 0">"Coureurs EQ ou CNE : "</text>
+			<text col_start="5" align="center" cond="params.Places_france ~= 0">params.Places_france</text>
+			<text row="0.7cm" col_start="2" col_end="4" align="right">"Total réparti : "</text>
+			<text col_start="5" align="center">params.Total_reparti</text>
 			<background mode="transparent"/>
 			<pen border="none"/>
-			<text row="auto" col_start="2" col_end="6" align="center">''</text>
-			<lua>txt = app.GetName()..' Version '..app.GetVersion()..' / FFS / Agil Informatique  /  Philippe Guérindon  '..os.date(' / Edition du %d-%m-%Y à %H:%M:%S')</lua>
+			<text row="auto" col_start="2" col_end="5" align="center">''</text>
+			<lua>txt = app.GetName()..' v'..app.GetVersion()..' / Ph. Guérindon  '..os.date(' / Edition du %d-%m-%Y à %H:%M:%S')</lua>
 			<font name="Calibri" size="8" adjust="width"/>
 			<text row="auto" col_start="1" col_end="0" font_size_step="1" align="center">txt</text>
 		</end>
 		<label>
-			<col value="1,2cm,2cm,2cm,2cm,2cm,1"/>
+			<lua>if params.ImprimerPD == 1 then</lua>
+				<col value="1,2.5cm,2.5cm,2.5cm,2.5cm,1"/>
+			<lua>else</lua>
+				<col value="1,2.5cm,2.5cm,0cm,2.5cm,1"/>
+			<lua>end</lua>
 			<pen border="all" size="1"/>
 			<background color="ltgray" mode="solid"/>
 			<font name="Calibri" size="12" adjust="width" weight="bold" color="black"/>
 			<text row="1cm" col_start="2" align="center">"Comité"</text>
 			<text col_start="3" align="center">"Quotas\nde base"</text>
-			<text col_start="4" align="center">"Quotas\neffectifs"</text>
-			<text col_start="5" align="center">"Places\ndemandées"</text>
-			<text col_start="6" align="center">"Quotas\nattribués"</text>
+			<!-- <text col_start="4" align="center">"Quotas\neffectifs"</text> -->
+			<text col_start="4" align="center">"Places\ndemandées"</text>
+			<text col_start="5" align="center">"Places\nattribués"</text>
 		</label>
 		<body>
 			<pen border="all" size="1"/>
-			<col value="1,2cm,2cm,2cm,2cm,2cm,1"/>
+			<lua>if params.ImprimerPD == 1 then</lua>
+				<col value="1,2.5cm,2.5cm,2.5cm,2.5cm,1"/>
+			<lua>else</lua>
+				<col value="1,2.5cm,2.5cm,0cm,2.5cm,1"/>
+			<lua>end
+				demande = tonumber($(Participation)) or 0;
+				calcule = Round(body:GetCellDouble('Quota_calcule', row),0);
+			</lua>
 			<font name="Calibri" size="10" adjust="width" weight="bold"/>
 			<lua>if tonumber($(Participation)) ~= 0 then</lua>
-				<text row="0.7cm" col_start="2" align="center">$(Comite)</text>
-				<text col_start="3" align="center">$(Quota_base)..'%'</text>
-				<text col_start="4" align="center">$(Quota_base2)..'%'</text>
-				<text col_start="5" align="center">$(Participation)</text>
-				<text col_start="6" align="center">Round(body:GetCellDouble('Quota_calcule', row),0)</text>
+				<text row="0.7cm" col_start="2" align="center" font_color="blue">$(Comite)</text>
+				<text col_start="3" align="center"><background color="cyan" mode="solid"/>$(Quota_base)..'%'</text>
+				<!-- <text col_start="4" align="center">$(Quota_base2)..'%'</text> -->
+				<text col_start="4" align="center">$(Participation)</text>
+				<background color="white" mode="transparent" cond="calcule == demande"/>
+				<background color="(params.RGB[2][1])" mode="solid" cond="calcule ~= demande"/>
+				<text col_start="5" align="center">Round(body:GetCellDouble('Quota_calcule', row),0)</text>
 			<lua>end</lua>
 		</body>
 	</panel>
