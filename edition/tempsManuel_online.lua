@@ -1,6 +1,6 @@
 -- Calcul d'un temps manuel (avec 10 avant ou avec décalage)
-
 dofile('./edition/functionPG.lua');
+
 local EEP_VERSION = "1.2"
 local EET_VERSION = "1.24"
 
@@ -585,10 +585,13 @@ function OnSaisieDlg1()
 	tbh:AddSeparator();
 	local btnRecherche = tbh:AddTool("Recherche de vos calculs", "./res/32x32_search.png");
 	tbh:AddSeparator();
+	local btnVisu = tbh:AddTool("Voir le calcul en ligne", "./res/32x32_calc.png");
+	tbh:AddSeparator();
 	local btnClose = tbh:AddTool("Fermer", "./res/32x32_quit.png");
 	tbh:AddStretchableSpace();
 	tbh:Realize();
 	
+	tbh:EnableTool(btnVisu:GetId(), false);
 	wnd.GetParentFrame():Bind(eventType.CURL, OnCurlLive);
 
 	dlgPage1:Bind(eventType.TEXT, 
@@ -614,6 +617,17 @@ function OnSaisieDlg1()
 			dlgPage1:GetWindowName('identite_precedente'):SetValue(identite);
 		end,  
 		dlgPage1:GetWindowName('dossard_precedent'));
+	dlgPage1:Bind(eventType.TEXT, 
+		function(evt) 
+			local calculation_id = dlgPage1:GetWindowName('calcul_id'):GetValue();
+			if calculation_id:len() == 6 then
+				tbh:EnableTool(btnVisu:GetId(), true);
+			else
+				tbh:EnableTool(btnVisu:GetId(), false);
+			end
+		end,  
+		dlgPage1:GetWindowName('calcul_id'));
+
 	dlgPage1:Bind(eventType.COMBOBOX, 
 		function(evt)
 			TM.dossard = dlgPage1:GetWindowName('dossard'):GetValue();
@@ -674,6 +688,18 @@ function OnSaisieDlg1()
 			ChargerDocuments()
 		end, 
 		btnRecherche)
+
+	tbh:Bind(eventType.MENU, 
+		function(evt) 
+			local calculation_id = dlgPage1:GetWindowName('calcul_id'):GetValue();
+			if params.mode_localhost == true then
+				url = 'http://localhost:5000/api/calculation/'..calculation_id;
+			else
+				url = 'https://pg-chrono.fr/api/calculation/'..calculation_id;
+			end
+			app.LaunchDefaultBrowser(url);
+		end, 
+		btnVisu)
 
 	tbh:Bind(eventType.MENU, 
 		function(evt) 
