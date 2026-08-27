@@ -2,7 +2,7 @@
 dofile('./edition/functionPG.lua');
 
 local EEP_VERSION = "1.2"
-local EET_VERSION = "1.24"
+local EET_VERSION = "1.25"
 
 function OnSendJson()
 	local impulse = 'START';
@@ -64,10 +64,7 @@ function OnSendJson()
 		rc, txtData = curl.POST_BINARY_JSON('https://pg-chrono.fr/api/eep', params.json_out);
 	end
 	if rc then
-		-- adv.Alert('SUCCESS : '..txtData);
 		ReadRetour(txtData);
-	else
-		-- adv.Alert('ERROR : '..txtData);
 	end
 
 end
@@ -526,14 +523,6 @@ function OnSynchroCalculs()
 	end
 end
 
-function OnCurlLive(evt)
-    if evt:GetInt() == 1 then
-        ReadRetour(evt:GetString())
-    else
-        adv.Alert("Erreur de communication :\n" .. evt:GetString())
-    end
-end
-
 function OnSaisieDlg1()
 	local widthMax = display:GetSize().width;
 	local widthControl = math.floor((widthMax*3)/4);
@@ -592,7 +581,7 @@ function OnSaisieDlg1()
 	tbh:Realize();
 	
 	tbh:EnableTool(btnVisu:GetId(), false);
-	wnd.GetParentFrame():Bind(eventType.CURL, OnCurlLive);
+	wnd.GetParentFrame():Bind(eventType.CURL, OnCurlReturn);
 
 	dlgPage1:Bind(eventType.TEXT, 
 		function(evt) 
@@ -865,13 +854,17 @@ function main(params_c)
 
 	base = base or sqlBase.Clone();
 	params = params_c;
-	params.version = 1.0;
 	OK = true;
 	params.mode_localhost = false;
 	params.code_manche = 1;
 	params.nb_manche = 1;
 	params.fmt = "%2h:%2m:%2s.%3f";
 	doublage = 0;
+	script_version = "2027.02"; 
+	indice_return = 16;
+	local url = 'https://agilsport.fr/bta_alpin/versionsPG.txt'
+	version = curl.AsyncGET(wnd.GetParentFrame(), url);
+
 
 	TM = {};
 	TM.ligne = {};

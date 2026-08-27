@@ -101,7 +101,7 @@
 			</wndtext>
       <textctrl row="auto" col_start="1" style="TE_READONLY|TE_CENTER" name="code"/>
       <textctrl col_start="2" style="TE_CENTER" name="groupe"/>
-      <textctrl col_start="3" name="nom"/>
+	  <searchctrl col_start="3" name="nom" />
       <textctrl col_start="4" name="prenom"/>
       <textctrl col_start="5" style="TE_CENTER" name="sexe"/>
       <textctrl col_start="6" style="TE_CENTER" name="an"/>
@@ -169,7 +169,7 @@
 			</wndtext>
       <textctrl row="auto" col_start="1" style="TE_READONLY|TE_CENTER" name="code"/>
       <textctrl col_start="2" style="TE_CENTER" name="groupe"/>
-      <textctrl col_start="3" name="nom"/>
+	  <searchctrl col_start="3" name="nom" />
       <textctrl col_start="4" name="prenom" style="TE_READONLY"/>
       <textctrl col_start="5" style="TE_CENTER" name="an"/>
       <textctrl col_start="6" style="TE_CENTER" name="nation"/>
@@ -237,7 +237,7 @@
 			</wndtext>
       <textctrl row="auto" col_start="1" style="TE_READONLY|TE_CENTER" name="code"/>
       <textctrl col_start="2" style="TE_CENTER"  name="groupe"/>
-      <textctrl col_start="3" name="nom"/>
+	  <searchctrl col_start="3" name="nom" />
       <textctrl col_start="4" name="prenom"/>
       <textctrl col_start="5" style="TE_CENTER" name="an"/>
       <textctrl col_start="6" style="TE_CENTER" name="nation"/>
@@ -262,13 +262,6 @@
       <staticbox row_start="1" row_end="0" col_start="1" col_end="0" label="Informations sur la communication avec la FIS"/>
     </matrix>
     <toolbar row="auto" col_start="1" col_end="0" name="tbtableau" style="TB_FLAT|TB_HORIZONTAL|TB_TEXT"/>
-    <row value="10px"/>
-  </panel>
-  <panel name="coureur">
-    <padding all="2px"/>
-    <col value="50px,1,50px"/>
-    <row value="10px"/>
-    <grid row="1" col_start="2" name="coureur"/>
     <row value="10px"/>
   </panel>
    <panel name="fislist">

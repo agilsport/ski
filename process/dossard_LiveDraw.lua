@@ -152,10 +152,6 @@ function OnClose()
 	if config.doc ~= nil then
 		config.doc:SaveFile();
 	end
-	if dlgCoureur then
-		dlgCoureur:Close();
-		dlgCoureur = nil;
-	end
 	
 	if draw.timer ~= nil then
 		draw.timer:Delete();
@@ -359,80 +355,71 @@ function DoRazColOverAll(saison)
 	end
 end
 
-function ChargeECSL(filename)
-	local idxcolFiscode = -1;
-	local idxcolPtsECSL = -1;
-	local idxcolCltECSL = -1;
-	local idxcolPtsSOA = -1;
+function InitTableauCoureur(fiscode)
+	tTableauCoureur[fiscode] = {};
+	tTableauCoureur[fiscode].FIS_pts = 0;
+	tTableauCoureur[fiscode].FIS_clt = 0;
+	tTableauCoureur[fiscode].FIS_VIT_pts = 0;
+	tTableauCoureur[fiscode].FIS_VIT_clt = 0;
+	tTableauCoureur[fiscode].ECSL_points = 0;
+	tTableauCoureur[fiscode].ECSL_rank = 0;
+	tTableauCoureur[fiscode].ECSL_overall_points = 0;
+	tTableauCoureur[fiscode].ECSL_overall_rank = 0;
+	tTableauCoureur[fiscode].ECSL_overall_points_0 = 0;
+	tTableauCoureur[fiscode].ECSL_overall_rank_0 = 0;
+	tTableauCoureur[fiscode].ECSL_overall_points_n = 0;
+	tTableauCoureur[fiscode].ECSL_overall_rank_n = 0;
+	tTableauCoureur[fiscode].WCSL_points = 0;
+	tTableauCoureur[fiscode].WCSL_rank = 0;
+end
 
-	draw.tECSL = draw.tECSL or {};
+function ChargeECSL(filename)
 	local header = true;
 	local utf8 = true;
+	local tcols = {};
 	local tEcsl = sqlTable.ImportCSV(filename, ',', header, utf8);
 	if tEcsl ~= nil then
+		for i = 0, tEcsl:GetNbColumns() -1 do
+			local colname = tEcsl:GetColumnName(i);
+			if colname:Trim() == 'Fiscode' then
+				tcols.Fiscode = i;
+			end
+			if colname:Trim() == draw.discipline..'points' then
+				tcols.Pts = i;
+			end
+			if colname:Trim() == draw.discipline..'pos' then
+				tcols.Rank = i;
+			end
+		end
+		for i = 0, tEcsl:GetNbRows() -1 do
+			local fiscode = 'FIS'..tEcsl:GetCell(tcols.Fiscode, i);
+			if not tTableauCoureur[fiscode] then
+				InitTableauCoureur(fiscode);
+			end
+			local pts = tonumber(tEcsl:GetCell(tcols.Pts, i)) or 0;
+			local rank = tonumber(tEcsl:GetCell(tcols.Rank, i)) or 0;
+			tTableauCoureur[fiscode].ECSL_points = pts;
+			tTableauCoureur[fiscode].ECSL_rank = rank;
+		end
+		
 		for i = 0, tDraw:GetNbRows() -1 do
+			local fiscode = tDraw:GetCell('Code_coureur', i);
+			if not tTableauCoureur[fiscode] then
+				InitTableauCoureur(fiscode);
+			end
 			tDraw:SetCellNull('ECSL_points', i);
 			tDraw:SetCellNull('ECSL_rank', i);
 			if draw.finale_ce == 'Oui' or draw.finale_ce == 'Yes' then
 				tDraw:SetCellNull('ECSL_overall_points', i);
 				tDraw:SetCellNull('ECSL_overall_rank', i);
 			end
-		end
-		for i = 0, tEcsl:GetNbColumns() -1 do
-			local colname = tEcsl:GetColumnName(i);
-			if colname:Trim() == 'Fiscode' then
-				idxcolFiscode = i;
-			end
-			if colname:Trim() == draw.discipline..'points' then
-				idxcolPtsECSL = i;
-			end
-			if colname:Trim() == draw.discipline..'pos' then
-				idxcolCltECSL = i;
-			end
-			if colname:Trim() == 'ALLpoints' then
-				idxcolPtsSOA = i;
+			if tTableauCoureur[fiscode].ECSL_points > 0 then
+				tDraw:SetCell('ECSL_points', i, tTableauCoureur[fiscode].ECSL_points);
+				tDraw:SetCell('ECSL_rank', i, tTableauCoureur[fiscode].ECSL_rank);
 			end
 		end
-		if draw.finale_ce == 'Non' or draw.finale_ce == 'No' then 
-			idxcolPtsSOA = -1;
-		end
-		for i = 0, tEcsl:GetNbRows() -1 do
-			local fiscode = 'FIS'..	tEcsl:GetCell(idxcolFiscode,i);
-			draw.tECSL[fiscode] = draw.tECSL[fiscode] or {};
-			draw.tECSL[fiscode].Point = 0;
-			draw.tECSL[fiscode].Clt = 0;
-			draw.tECSL[fiscode].PtsOA = 0;
-			if idxcolPtsECSL >= 0 then
-				local pts = tonumber(tEcsl:GetCell(idxcolPtsECSL, i)) or 0;
-				local clt = tonumber(tEcsl:GetCell(idxcolCltECSL, i)) or 0;
-				if pts > 0 and clt > 0 then
-					draw.tECSL[fiscode].Point = pts;
-					draw.tECSL[fiscode].Clt = clt;
-				end
-			end
-
-			if idxcolPtsSOA >= 0 then
-				local pts = tonumber(tEcsl:GetCell(idxcolPtsSOA, i)) or 0;
-				if pts > 0 then
-					draw.tECSL[fiscode].PtsOA = pts;
-				end
-			end
-			local r = tDraw:GetIndexRow('Code_coureur', fiscode);
-			if r and r >= 0 then
-				-- adv.Alert(fiscode..' trouvé, ECSL Pts = '..tostring(draw.tECSL[fiscode].Point));
-				if draw.tECSL[fiscode].Point > 0 then
-					tDraw:SetCell('ECSL_points', r, draw.tECSL[fiscode].Point);
-					tDraw:SetCell('ECSL_rank', r, draw.tECSL[fiscode].Clt);
-				end
-				if draw.tECSL[fiscode].PtsOA and draw.tECSL[fiscode].PtsOA >= 450 then
-					if draw.tECSL[fiscode].PtsOA > tDraw:GetCellInt('ECSL_overall_points', r) then
-						tDraw:SetCell('ECSL_overall_points', r, draw.tECSL[fiscode].PtsOA);
-					end
-				end
-			end
-		end
-		tEcsl:Delete();
 	end
+	draw.ECSL_done = true;
 	RefreshGrid();
 end
 
@@ -460,55 +447,46 @@ function ReadECSL()
 end
 
 function ChargeECPrevious(filename)
-	local idxcolFiscode = -1
-	local idxcolPtsPREVIOUS = -1;
-	local idxcolPosPREVIOUS = -1; 
-	local idxcolPtsSTANDING = -1;
-	local idxcolPosSTANDING = -1;
-	draw.tECSL = draw.tECSL or {};
 	if draw.finale_ce == 'Oui' or draw.finale_ce == 'Yes' then
 		return;
 	end
-
 	local header = true;
 	local utf8 = true;
-	local tEcsl = sqlTable.ImportCSV(filename, ',', header, utf8);
-	if tEcsl ~= nil then
-		for i = 0, tEcsl:GetNbColumns() -1 do
-			local colname = tEcsl:GetColumnName(i);
+	local tcols = {};
+	local tAllPrevious = sqlTable.ImportCSV(filename, ',', header, utf8);
+	if tAllPrevious ~= nil then
+		for i = 0, tAllPrevious:GetNbColumns() -1 do
+			local colname = tAllPrevious:GetColumnName(i);
 			if colname:Trim() == 'Fiscode' then
-				idxcolFiscode = i;
+				tcols.Fiscode = i;
 			end
 			if colname:Trim() == 'ALLpoints' then
-				idxcolPtsPREVIOUS = i;
+				tcols.Allpoints = i;
 			end
 			if colname:Trim()== 'ALLpos' then
-				idxcolPosPREVIOUS = i;
+				tcols.Allpos = i;
 			end
 		end
-		for i = 0, tEcsl:GetNbRows() -1 do
-			local pts = 0;
-			local fiscode = 'FIS'..	tEcsl:GetCell(idxcolFiscode,i);
-			draw.tECSL[fiscode] = draw.tECSL[fiscode] or {};
-			draw.tECSL[fiscode].CupPointPrevious = 0;
-			draw.tECSL[fiscode].CupPosPrevious = 0;
-			if idxcolPtsPREVIOUS >= 0 then
-				pts = tonumber(tEcsl:GetCell(idxcolPtsPREVIOUS,i)) or 0;
-				local pos = tonumber(tEcsl:GetCell(idxcolPosPREVIOUS,i)) or 0;
-				if pts >= 450 then
-					draw.tECSL[fiscode].CupPointPrevious = pts;
-					draw.tECSL[fiscode].CupPosPrevious = pos;
-				end
+		for i = 0, tAllPrevious:GetNbRows() -1 do
+			local fiscode = 'FIS'..	tAllPrevious:GetCell(tcols.Fiscode,i);
+			if not tTableauCoureur[fiscode] then
+				InitTableauCoureur(fiscode);
 			end
-			local r = tDraw:GetIndexRow('Code_coureur', fiscode);
-			if r and r >= 0 then
-				if draw.tECSL[fiscode].CupPointPrevious > 0 then
-					tDraw:SetCell('ECSL_overall_points_0', r, draw.tECSL[fiscode].CupPointPrevious);
-					tDraw:SetCell('ECSL_overall_pos_0', r, draw.tECSL[fiscode].CupPosPrevious);
-				end
+			local pts = tonumber(tAllPrevious:GetCell(tcols.Allpoints,i)) or 0;
+			local rank = tonumber(tAllPrevious:GetCell(tcols.Allpos)) or 0;
+			tTableauCoureur[fiscode].ECSL_overall_points_0 = pts;
+		end
+		for i = 0, tDraw:GetNbRows() -1 do
+			local fiscode = tDraw:GetCell('Code_coureur', i);
+			local pts_n = tDraw:GetCellInt('ECSL_overall_points', i);
+			local pts_0 = tTableauCoureur[fiscode].ECSL_overall_points_0;
+			tDraw:SetCell('ECSL_overall_points_0', i, pts_0);
+			local maxPts = math.max(pts_n, pts_0);
+			if maxPts >= 450 then
+				tDraw:SetCell('ECSL_overall_points', i, maxPts);
 			end
 		end
-		tEcsl:Delete();
+		tAllPrevious:Delete();
 	end
 	RefreshGrid();
 end
@@ -541,47 +519,46 @@ function ReadECPrevious()
 end
 
 function ChargeWCSL(filename)
-	idxcolFiscode = -1;
-	idxcolPtsWCSL = -1;
-	idxcolCltWCSL = -1;
-	draw.tWCSL = {};
 	local header = true;
 	local utf8 = true;
+	local tColsWCSL = {};
 	local tWcsl = sqlTable.ImportCSV(filename, ',', header, utf8);
 	if tWcsl ~= nil then
 		for i = 0, tWcsl:GetNbColumns() -1 do
 			local colname = tWcsl:GetColumnName(i);
 			if colname:Trim() == 'Fiscode' then
-				idxcolFiscode = i;
+				tColsWCSL.Fiscode = i;
 			end
 			if colname:Trim() == draw.discipline..'points_value' then
-				idxcolPtsWCSL = i;
+				tColsWCSL.Pts = i;
 			end
 			if colname:Trim() == draw.discipline..'pos' then
-				idxcolCltWCSL = i;
+				tColsWCSL.Rank = i;
 			end
 		end
-		if idxcolPtsWCSL >= 0 and idxcolCltWCSL >= 0 then
-			for i = 0, tDraw:GetNbRows() -1 do
-				tDraw:SetCellNull('WCSL_points', i);
-				tDraw:SetCellNull('WCSL_rank', i);					
+		for i = 0, tWcsl:GetNbRows() -1 do
+			local fiscode = 'FIS'..tWcsl:GetCell(tColsWCSL.Fiscode, i);
+			if not tTableauCoureur[fiscode] then
+				InitTableauCoureur(fiscode);
 			end
-			for i = 0 , tWcsl:GetNbRows() -1 do
-				local fiscode = 'FIS'..	tWcsl:GetCell(idxcolFiscode,i);
-				draw.tWCSL[fiscode] = {};
-				draw.tWCSL[fiscode].Point = tonumber(tWcsl:GetCell(idxcolPtsWCSL, i)) or 0;
-				draw.tWCSL[fiscode].Clt = tonumber(tWcsl:GetCell(idxcolCltWCSL, i)) or 0;
-				local r = tDraw:GetIndexRow('Code_coureur', fiscode);
-				if r and r >= 0 then
-					if draw.tWCSL[fiscode].Point > 0 then
-						tDraw:SetCell('WCSL_points', r, draw.tWCSL[fiscode].Point);
-						tDraw:SetCell('WCSL_rank', r, draw.tWCSL[fiscode].Clt);
-					end
-				end
+				
+			local pts = tonumber(tWcsl:GetCell(tColsWCSL.Pts, i)) or 0;
+			local rank = tonumber(tWcsl:GetCell(tColsWCSL.Rank, i)) or 0;
+			tTableauCoureur[fiscode].WCSL_points = pts;
+			tTableauCoureur[fiscode].WCSL_rank = rank;
+		end
+		
+		for i = 0, tDraw:GetNbRows() -1 do
+			local fiscode = tDraw:GetCell('Code_coureur', i);
+			tDraw:SetCellNull('WCSL_points', i);
+			tDraw:SetCellNull('WCSL_rank', i);
+			if tTableauCoureur[fiscode].WCSL_rank > 0 and tTableauCoureur[fiscode].WCSL_rank <= 30 then
+				tDraw:SetCell('WCSL_points', i, tTableauCoureur[fiscode].WCSL_points);
+				tDraw:SetCell('WCSL_rank', i, tTableauCoureur[fiscode].WCSL_rank);
 			end
 		end
-		tWcsl:Delete();
 	end
+	draw.WCSL_done = true;
 	RefreshGrid();
 end
 
@@ -1922,7 +1899,7 @@ function CommandSendList(bolSendDrawOrder)
 		local ecsl_points = tDraw:GetCell('ECSL_points', i);
 		local ecsl_rank = tDraw:GetCell('ECSL_rank', i);
 		local ecsl_overall_points = tDraw:GetCell('ECSL_overall_points', i);
-		-- local ecsl_overall_rank = tDraw:GetCell('ECSL_overall_rank', i);
+		local ecsl_overall_rank = tDraw:GetCell('ECSL_overall_rank', i);
 		local ecsl_overall_rank = '';
 		local winner_points = tDraw:GetCell('Winner_CC', i);
 		local winner_rank = '';
@@ -2350,7 +2327,8 @@ function OnSupprimerCoureur(code_coureur, rang_tirage_selected)
 	CommandSendMessage();
 end
 
-function OnAjouterCoureur(code_coureur)
+function OnAjouterCoureur()
+	local fiscode = dlgTableau:GetWindowName('code'):GetValue();
 	if not draw.trouve_coureur_liste then
 		local msg = traduction(draw.language, 'Le coureur ne figure pas sur la liste ')..draw.code_liste..'\n'..
 					traduction(draw.language, "Voulez-vous l'ajouter tout de même ?");
@@ -2362,71 +2340,35 @@ function OnAjouterCoureur(code_coureur)
 			return;
 		end
 	end
-	local code_fis = code_coureur;
-	code_coureur = 'FIS'..code_fis;
-	local point, clt, pts_SG, rank_SG = GetRank(code_coureur);
+	local point, clt, pts_SG, rank_SG = GetRank(fiscode);
 	
 	local groupe = tonumber(dlgTableau:GetWindowName('groupe'):GetValue()) or 9;
 	local nom = dlgTableau:GetWindowName('nom'):GetValue();
 	local prenom = dlgTableau:GetWindowName('prenom'):GetValue();
 	local sexe = draw.sexe;
 	local an = tonumber(dlgTableau:GetWindowName('an'):GetValue()) or 0;
-	local nation = dlgTableau:GetWindowName('nation'):GetValue();
+	local categ = GetCateg(an);
+	local nation = '';
 	local comite = '';
-	local wcsl_rank = nil;
-	local wcsl_points = nil;
-	local ecsl_rank = nil;
-	local ecsl_points = nil;
-	local ecsl_all_rank = nil;
-	local ecsl_all_points = nil;	
-	local ecsl_all_rank0 = nil;
-	local ecsl_all_points0 = nil;	
-	local ecsl_all_rankn = nil;
-	local ecsl_all_pointsn = nil;	
-	if config.script_level == 4 then
-		if type(draw.tECSL[code_coureur]) == 'table' then
-			ecsl_points = draw.tECSL[code_coureur].Point or 0;
-			ecsl_rank = draw.tECSL[code_coureur].Clt or 0;
-			ecsl_all_points = draw.tECSL[code_coureur].AllPoint or 0;
-			ecsl_all_rank = draw.tECSL[code_coureur].AllClt or 0;
-			ecsl_all_points0 = draw.tECSL[code_coureur].CupPointPrevious or 0;
-			ecsl_all_rank0 = draw.tECSL[code_coureur].CupPosPrevious or 0;
-			ecsl_all_pointsn = draw.tECSL[code_coureur].CupPointStanding or 0;
-			ecsl_all_rankn = draw.tECSL[code_coureur].CupPosStanding or 0;
-			if ecsl_all_points0 > ecsl_all_points then
-				ecsl_all_points = ecsl_all_points0;
-			end
-			if ecsl_all_pointsn > ecsl_all_points then
-				ecsl_all_points = ecsl_all_pointsn;
-			end
-		end
-		if type(draw.tWCSL[code_coureur]) == 'table' then
-			wcsl_points = draw.tWCSL[code_coureur].Point or 0;
-			wcsl_rank = draw.tWCSL[code_coureur].Clt or 0;
-		end
+	local club = '';
+	if dlgTableau:GetWindowName('nation') then
+		nation = dlgTableau:GetWindowName('nation'):GetValue();
 	end
 	if dlgTableau:GetWindowName('comite') then
 		comite = dlgTableau:GetWindowName('comite'):GetValue();
+	end
+	if dlgTableau:GetWindowName('club') then
 		club = dlgTableau:GetWindowName('club'):GetValue();
 	end
 	local modif_manuel = nil;
-	if tCoureur:GetNbRows() == 1 then
-		code_coureur = tCoureur:GetCell('Code_coureur', 0);
-		nom = tCoureur:GetCell('Nom', 0);
-		prenom = tCoureur:GetCell('Prenom', 0);
-		sexe = tCoureur:GetCell('Sexe', 0);
-		an = tCoureur:GetCell('Naissance', 0, '%4Y');
-		nation = tCoureur:GetCell('Code_nation', 0);
-	end
-	local categ = GetCateg(an);
 	
-	local r = tDraw:GetIndexRow('Code_coureur', code_coureur);
+	local r = tDraw:GetIndexRow('Code_coureur', fiscode);
 	if r < 0 then		-- on ajoute le coureur dans la table source
 		draw.build_table = true;
 		draw.skip_question = true;
-		draw.ajouter_code = code_coureur;
+		draw.ajouter_code = fiscode;
 		tDraw:GetRecord():Set('Code_evenement', draw.code_evenement);
-		tDraw:GetRecord():Set('Code_coureur', code_coureur);
+		tDraw:GetRecord():Set('Code_coureur', fiscode);
 		tDraw:GetRecord():Set('Nom', nom);
 		tDraw:GetRecord():Set('Prenom', prenom);
 		tDraw:GetRecord():Set('Sexe', sexe);
@@ -2444,45 +2386,50 @@ function OnAjouterCoureur(code_coureur)
 		tDraw:GetRecord():SetNull('WCSL_rank');
 		tDraw:GetRecord():SetNull('WCSL_points');
 		tDraw:GetRecord():SetNull('Winner_CC');
-		tDraw:GetRecord():SetNull('ECSL_overall_rank0');
+		tDraw:GetRecord():SetNull('ECSL_overall_rank_0');
 		tDraw:GetRecord():SetNull('ECSL_overall_points_0');
-		tDraw:GetRecord():SetNull('ECSL_overall_rankn');
+		tDraw:GetRecord():SetNull('ECSL_overall_rank_n');
 		tDraw:GetRecord():SetNull('ECSL_overall_points_n');
 
 		if config.script_level == 4 then
-			if ecsl_points and ecsl_points > 0 then
-				tDraw:GetRecord():Set('ECSL_rank', ecsl_rank);
-				tDraw:GetRecord():Set('ECSL_points', ecsl_points);
+			if tTableauCoureur[fiscode] then
+				if tTableauCoureur[fiscode].ECSL_points > 0 then
+					tDraw:GetRecord():Set('ECSL_rank', tTableauCoureur[fiscode].ECSL_rank);
+					tDraw:GetRecord():Set('ECSL_points', tTableauCoureur[fiscode].ECSL_points);
+				end
+				if tTableauCoureur[fiscode].ECSL_overall_points_n > 0 then
+					tDraw:GetRecord():Set('ECSL_overall_points_n', tTableauCoureur[fiscode].ECSL_overall_points_n);
+					tDraw:GetRecord():Set('ECSL_overall_rank_n', tTableauCoureur[fiscode].ECSL_overall_rank_n);
+				end
+				if tTableauCoureur[fiscode].ECSL_overall_points > 0 then
+					tDraw:GetRecord():Set('ECSL_overall_points', tTableauCoureur[fiscode].ECSL_overall_points);
+					tDraw:GetRecord():Set('ECSL_overall_rank', tTableauCoureur[fiscode].ECSL_overall_rank);
+				end
+				if tTableauCoureur[fiscode].ECSL_overall_points_0 >= 450 then
+					tDraw:GetRecord():Set('ECSL_overall_points_0', tTableauCoureur[fiscode].ECSL_overall_points_0);
+					tDraw:GetRecord():Set('ECSL_overall_rank_0', tTableauCoureur[fiscode].ECSL_overall_rank_0);
+					tDraw:GetRecord():Set('ECSL_overall_points', tTableauCoureur[fiscode].ECSL_overall_points_0);
+					tDraw:GetRecord():Set('ECSL_overall_rank', tTableauCoureur[fiscode].ECSL_overall_rank_0);
+				end
+				if tTableauCoureur[fiscode].WCSL_rank > 0 then
+					tDraw:GetRecord():Set('WCSL_points', tTableauCoureur[fiscode].WCSL_points);
+					tDraw:GetRecord():Set('WCSL_rank', tTableauCoureur[fiscode].WCSL_rank);
+				end
 			end
-			if ecsl_all_points and ecsl_all_points > 0 then
-				tDraw:GetRecord():Set('ECSL_overall_rank', ecsl_all_rank);
-				tDraw:GetRecord():Set('ECSL_overall_points', ecsl_all_points);
-			end
-			if wcsl_points and wcsl_points > 0 then
-				tDraw:GetRecord():Set('WCSL_rank', wcsl_rank);
-				tDraw:GetRecord():Set('WCSL_points', wcsl_points);
-			end
-			if ecsl_all_points0 and ecsl_all_points0 > 0 then
-				tDraw:GetRecord():Set('ECSL_overall_points_0', ecsl_all_points0);
-				tDraw:GetRecord():Set('ECSL_overall_pos_0', ecsl_all_rank0);
-			end
-			if ecsl_all_pointsn and ecsl_all_pointsn > 0 then
-				tDraw:GetRecord():Set('ECSL_overall_points_n', ecsl_all_pointsn);
-				tDraw:GetRecord():Set('ECSL_overall_pos_n', ecsl_all_rankn);
-			end
+
 		end
-		if point > 0 and clt > 0 then
+		if point and point >= 0 then
 			tDraw:GetRecord():Set('FIS_pts', point);
 			tDraw:GetRecord():Set('FIS_clt', clt);
 		end
 		if draw.discipline == 'DH' then
-			if pts_SG > 0 and pts_SG > 0 then
+			if pts_SG and pts_SG >= 0 then
 				tDraw:GetRecord():Set('FIS_VIT_pts', pts_SG);
 				tDraw:GetRecord():Set('FIS_VIT_clt', rank_SG);
 			end
 		end
 		tDraw:AddRow();
-		table.insert(draw.tModifs_tableau, {Code_coureur = code_coureur:sub(4), Nom = nom, Prenom = prenom, Nation = nation, Status = 'AD'});
+		table.insert(draw.tModifs_tableau, {Code_coureur = fiscode:sub(4), Nom = nom, Prenom = prenom, Nation = nation, Status = 'AD'});
 		-- OnOrder()
 	end
 	draw.build_table = true;
@@ -2492,7 +2439,7 @@ function OnAjouterCoureur(code_coureur)
 	CommandSendMessage();
 	local row = tResultat:AddRow();
 	tResultat:SetCell('Code_evenement', row, draw.code_evenement);
-	tResultat:SetCell('Code_coureur', row, code_coureur);
+	tResultat:SetCell('Code_coureur', row, fiscode);
 	tResultat:SetCellNull('Dossard', row);
 	tResultat:SetCellNull('Rang', row);
 	tResultat:SetCell('Nom', row, nom);
@@ -2511,7 +2458,7 @@ function OnAjouterCoureur(code_coureur)
 	
 	row = tResultat_Info_Tirage:AddRow();
 	tResultat_Info_Tirage:SetCell('Code_evenement', row, draw.code_evenement);
-	tResultat_Info_Tirage:SetCell('Code_coureur', row, code_coureur);
+	tResultat_Info_Tirage:SetCell('Code_coureur', row, fiscode);
 	tResultat_Info_Tirage:SetCell('Groupe_tirage', row, groupe);
 	tResultat_Info_Tirage:SetCellNull('Rang_tirage', row);
 	tResultat_Info_Tirage:SetCell('ECSL_points', row, ecsl_points);
@@ -2519,32 +2466,31 @@ function OnAjouterCoureur(code_coureur)
 	tResultat_Info_Tirage:SetCell('FIS_pts', row, point);
 	tResultat_Info_Tirage:SetCell('FIS_clt', row, clt);
 	tResultat_Info_Tirage:SetCell('Statut', row, 'CF');
-	if ecsl_points then
-		tResultat_Info_Tirage:SetCell('ECSL_points', row, ecsl_points);
-		tResultat_Info_Tirage:SetCell('ECSL_rank', row, ecsl_rank);
+	if tTableauCoureur[fiscode].ECSL_points then
+		tResultat_Info_Tirage:SetCell('ECSL_points', row, tTableauCoureur[fiscode].ECSL_points);
+		tResultat_Info_Tirage:SetCell('ECSL_rank', row, tTableauCoureur[fiscode].ECSL_rank);
 	end
-	if wcsl_points then
-		tResultat_Info_Tirage:SetCell('WCSL_points', row, wcsl_points);
-		tResultat_Info_Tirage:SetCell('WCSL_rank', row, wcsl_rank);
+	if tTableauCoureur[fiscode].WCSL_points then
+		tResultat_Info_Tirage:SetCell('WCSL_points', row, tTableauCoureur[fiscode].WCSL_points);
+		tResultat_Info_Tirage:SetCell('WCSL_rank', row, tTableauCoureur[fiscode].WCSL_rank);
 	end
-	if ecsl_all_points then
-		tResultat_Info_Tirage:SetCell('ECSL_overall_points', row, ecsl_all_points);
-		tResultat_Info_Tirage:SetCell('ECSL_overall_rank', row, ecsl_all_rank);
-	end
-	if ecsl_all_points0 then
-		tResultat_Info_Tirage:SetCell('ECSL_overall_points_0', row, ecsl_all_points0);
-		tResultat_Info_Tirage:SetCell('ECSL_overall_rank_0', row, ecsl_all_rank0);
-	end
-	if ecsl_all_pointsn then
+	if tTableauCoureur[fiscode].ECSL_overall_points then
+		tResultat_Info_Tirage:SetCell('ECSL_overall_points', row, tTableauCoureur[fiscode].ECSL_overall_points);
+		tResultat_Info_Tirage:SetCell('ECSL_overall_rank', row, tTableauCoureur[fiscode].ECSL_overall_rank);
 		tResultat_Info_Tirage:SetCell('ECSL_overall_points_n', row, ecsl_all_pointsn);
 		tResultat_Info_Tirage:SetCell('ECSL_overall_rank_n', row, ecsl_all_rankn);
 	end
+	if tTableauCoureur[fiscode].ECSL_overall_points_0 then
+		tResultat_Info_Tirage:SetCell('ECSL_overall_points_0', row, tTableauCoureur[fiscode].ECSL_overall_points_0);
+		tResultat_Info_Tirage:SetCell('ECSL_overall_rank_0', row, tTableauCoureur[fiscode].ECSL_overall_rank_0);
+	end
+
 	base:TableInsert(tResultat_Info_Tirage, row);
 	
 	if tResultat_Paiement and tResultat_Paiement:GetNbRows() > 0 then
 		row = tResultat_Paiement:AddRow();
 		tResultat_Paiement:SetCell('Code_evenement', row, draw.code_evenement);
-		tResultat_Paiement:SetCell('Code_coureur', row, code_coureur);
+		tResultat_Paiement:SetCell('Code_coureur', row, fiscode);
 		tResultat_Paiement:SetCell('Epreuve_selection'..(draw.row_epreuve + 1), row, 'X');
 		base:TableInsert(tResultat_Paiement, row);
 	end
@@ -2555,10 +2501,10 @@ function OnAjouterCoureur(code_coureur)
 	local tSource = grid_tableau:GetTableSrc();
 	if tSource and tView then
 		if tView:GetNbRows() ~= tSource:GetNbRows() then
-			r = tView:GetIndexRow('Code_coureur', code_coureur);
+			r = tView:GetIndexRow('Code_coureur', fiscode);
 			grid_tableau:SynchronizeRowsView();
 		else
-			r = tSource:GetIndexRow('Code_coureur', code_coureur);
+			r = tSource:GetIndexRow('Code_coureur', fiscode);
 			grid_tableau:SynchronizeRowsSrc();
 		end
 	end
@@ -2572,14 +2518,11 @@ function OnAjouterCoureur(code_coureur)
 	dlgTableau:GetWindowName('nom'):SetValue('');
 	dlgTableau:GetWindowName('prenom'):SetValue('');
 	dlgTableau:GetWindowName('an'):SetValue('');
+	dlgTableau:GetWindowName('sexe'):SetValue('');
 	dlgTableau:GetWindowName('nation'):SetValue('');
 	dlgTableau:GetWindowName('points'):SetValue('');
 	dlgTableau:GetWindowName('classement'):SetValue('');
-	if config.script_level == 4 then
-		dlgTableau:GetWindowName('code'):SetValue('');
-		-- dlgTableau:GetWindowName('ecsl_rank'):SetValue('');
-		-- dlgTableau:GetWindowName('ecsl_points'):SetValue('');
-	else
+	if config.script_level ~= 4 then
 		dlgTableau:GetWindowName('comite'):SetValue('');
 		dlgTableau:GetWindowName('club'):SetValue('');
 	end
@@ -2915,6 +2858,9 @@ function OnTirageRangsPtsNull(rang_first, rang_last)
 end
 
 function GetRank(code_coureur)
+	if not tTableauCoureur[code_coureur] then
+		InitTableauCoureur(code_coureur)
+	end
 	local pts = nil;
 	local rank = nil;
 	local pts_SG = nil;
@@ -2945,6 +2891,11 @@ function GetRank(code_coureur)
 		pts_SG = nil;
 		rank_SG = nil;
 	end
+	tTableauCoureur[code_coureur].FIS_pts = pts;
+	tTableauCoureur[code_coureur].FIS_clt = clt;
+	tTableauCoureur[code_coureur].FIS_VIT_pts = pts_SG;
+	tTableauCoureur[code_coureur].FIS_VIT_clt = rank_SG;
+	
 	return pts, rank, pts_SG, rank_SG;
 end
 
@@ -3345,7 +3296,7 @@ function SetuptDraw()
 		end
 		if tDraw:GetCellInt('ECSL_overall_points', i, -1) < 0 then
 			tDraw:SetCellNull('ECSL_overall_rank', i);
-			tDraw:SetCellNull('ECSL_overall_points', i);
+			-- tDraw:SetCellNull('ECSL_overall_points', i);
 		end
 		if tDraw:GetCell('Winner_CC', i):len() == 0 then
 			tDraw:SetCellNull('Winner_CC', i);
@@ -4564,37 +4515,79 @@ function ValidetDraw(row_epreuve)
 	end
 end
 
-function OnRowSelected(evt)
-	draw.trouve_coureur_liste = false;
-	local row = evt:GetRow();
-	local col = evt:GetCol();
-	local t = grid_coureur:GetTable();
-	local colName = t:GetColumnName(t:GetVisibleColumnsIndex(col));
-	grid_coureur:SelectRow(row);
-	local code_coureur = t:GetCell('Code_coureur', row);
-	local nom = t:GetCell('Nom', row);
-	local prenom = t:GetCell('Prenom', row);
-	local an = t:GetCell('Naissance', row, '%4Y');
-	local nation = t:GetCell('Code_nation', row);
-	dlgTableau:GetWindowName('code'):SetValue(code_coureur:sub(4));
-	dlgTableau:GetWindowName('nom'):SetValue(nom);
-	dlgTableau:GetWindowName('prenom'):SetValue(prenom);
-	dlgTableau:GetWindowName('sexe'):SetValue(draw.sexe);
-	dlgTableau:GetWindowName('an'):SetValue(an);
-	dlgTableau:GetWindowName('nation'):SetValue(nation);
-	local cmd = "Select * From Classement_Coureur Where Code_coureur = '"..code_coureur.."' And Code_liste = "..draw.code_liste;
-	base:TableLoad(tClassement_Coureur, cmd);
-	if tClassement_Coureur:GetNbRows() > 0 then
-		draw.trouve_coureur_liste = true;
-		local pts, rank, pts_SG, rank_SG = GetRank(code_coureur);
-		base:TableLoad(tCoureur, "SELECT * FROM Coureur WHERE Code_coureur = '"..code_coureur.."'");
-		if pts then
-			dlgTableau:GetWindowName('points'):SetValue(pts);
-			dlgTableau:GetWindowName('classement'):SetValue(rank);
+function OnAutoCompleteSearch(evt)
+	local str = evt:GetString();
+	if config.script_level == 4  then
+		local ok = true;
+		if not draw.ECSL_done then
+			ok = false;
+			local msg = traduction(draw.language, "Veuillez charger le fichier ECSL (.csv) en premier.");
+			app.GetAuiFrame():MessageBox(msg, traduction(draw.language, "ATTENTION !!"), msgBoxStyle.OK+msgBoxStyle.ICON_WARNING);
+		end
+		if draw.finale_ce:In('No','Non') and not draw.WCSL_done then
+			ok = false;
+			local msg = traduction(draw.language, "Veuillez charger le fichier WCSL (.csv) en premier.");
+			app.GetAuiFrame():MessageBox(msg, traduction(draw.language, "ATTENTION !!"), msgBoxStyle.OK+msgBoxStyle.ICON_WARNING);
+		end
+		if ok == false then
+			return;
 		end
 	end
-	dlgCoureur:Close();
-	dlgCoureur = nil;
+	local str = evt:GetString();
+	if string.len(str) == 0  then
+		dlgTableau:GetWindowName('code'):SetValue('');
+		dlgTableau:GetWindowName('prenom'):SetValue('');
+		dlgTableau:GetWindowName('sexe'):SetValue('');
+		dlgTableau:GetWindowName('an'):SetValue('');
+		dlgTableau:GetWindowName('nation'):SetValue('');
+		dlgTableau:GetWindowName('points'):SetValue('');
+		dlgTableau:GetWindowName('classement'):SetValue('');
+		autoCompleteFrame:Hide();
+	else
+		local cmd = "SELECT * From Coureur Where Sexe = '"..draw.sexe.."' " ;
+		if tonumber(str) then
+			-- par n° licence
+			cmd = cmd .." AND Code_coureur LIKE 'FIS"..str.."%' ORDER BY Code_coureur ";
+		else
+			if str:find(',') then
+				-- nom + prenom
+				local tstr = str:Split(',')
+				cmd = cmd .." AND Code_coureur LIKE 'FIS%' AND Nom LIKE '"..tstr[1].."%' AND Prenom LIKE '"..tstr[2].."%' ORDER BY Nom, Prenom ";
+			else
+				-- nom
+				cmd = cmd .." AND Code_coureur LIKE 'FIS%' AND Nom LIKE '"..str.."%' ORDER BY Nom ";
+			end
+		end
+		cmd = cmd.." LIMIT 30";
+		base:TableLoad(tCoureur, cmd);
+		tCoureur:SetVisibleColumns("Code_coureur, Nom, Prenom, Code_nation");
+	
+		autoCompleteFrame:SetSearching(true);
+	
+		autoCompleteFrame:SetTable(tCoureur, 'Nom');
+		autoCompleteFrame:ShowBest();
+
+		autoCompleteFrame:SetSearching(false);
+	end
+end
+
+function OnAutoCompleteSelection(evt)
+	local row = evt:GetInt();
+	local code_coureur = tCoureur:GetCell('Code_coureur', row);
+	dlgTableau:GetWindowName('code'):SetValue(code_coureur)
+	dlgTableau:GetWindowName('prenom'):SetValue(tCoureur:GetCell('Prenom', row));
+	dlgTableau:GetWindowName('sexe'):SetValue(tCoureur:GetCell('Sexe', row));
+	dlgTableau:GetWindowName('an'):SetValue(tCoureur:GetCell('Naissance', row, '%4Y'));
+	dlgTableau:GetWindowName('nation'):SetValue(tCoureur:GetCell('Code_nation', row));
+	
+	draw.trouve_coureur_liste = false;
+	local pts, rank, pts_SG, rank_SG = GetRank(code_coureur);
+	if pts then
+		draw.trouve_coureur_liste = true;
+		dlgTableau:GetWindowName('points'):SetValue(pts);
+		dlgTableau:GetWindowName('classement'):SetValue(rank);
+	end
+	dlgTableau:SetFocus();
 end
 
 function OnAfficheTableau()
@@ -4679,7 +4672,7 @@ function OnAfficheTableau()
 	tDraw:SetColumn('Prenom', { label = traduction(draw.language,'Prénom'), width = 12 });
 	tDraw:SetColumn('Nation', { label = 'Nat.', width = 5 });
 	tDraw:SetColumn('ECSL_points', { label = 'ECSL', width = 6 });
-	tDraw:SetColumn('ECSL_rank', { label = 'EC Rk', width = 6 });
+	tDraw:SetColumn('ECSL_rank', { label = 'ECSL Rk', width = 6 });
 	tDraw:SetColumn('WCSL_points', { label = 'WCSL', width = 6 });
 	tDraw:SetColumn('WCSL_rank', { label = 'WCSL Rk', width = 7 });
 	tDraw:SetColumn('ECSL_overall_points', { label = 'OA Pts', width = 6 });
@@ -4712,10 +4705,6 @@ function OnAfficheTableau()
 				tDraw:SetCellNull('WCSL_rank', i);
 				tDraw:SetCellNull('WCSL_points', i);
 			end
-			if tDraw:GetCellInt('ECSL_overall_points', i, -1) < 0 then
-				tDraw:SetCellNull('ECSL_overall_rank', i);
-				tDraw:SetCellNull('ECSL_overall_points', i);
-			end
 			if draw.discipline == 'DH' then
 				local code_coureur = tDraw:GetCell('Code_coureur', i);
 				if tRankSG[code_coureur] then
@@ -4732,6 +4721,7 @@ function OnAfficheTableau()
 				-- focus_cell_highlight = true,
 				label_tracking = true,
 				sortable = true,
+				filterable = true,
 				enable_editing = true
 			});
 		else
@@ -4743,6 +4733,7 @@ function OnAfficheTableau()
 					-- focus_cell_highlight = true,
 					label_tracking = true,
 					sortable = true,
+					filterable = true,
 					enable_editing = true
 				});
 			else
@@ -4753,6 +4744,7 @@ function OnAfficheTableau()
 					-- focus_cell_highlight = true,
 					label_tracking = true,
 					sortable = true,
+					filterable = true,
 					enable_editing = true
 				});
 			end
@@ -4784,6 +4776,7 @@ function OnAfficheTableau()
 				-- focus_cell_highlight = true,
 				label_tracking = true,
 				sortable = true,
+				filterable = true,
 				enable_editing = true
 			});
 		else
@@ -4794,12 +4787,13 @@ function OnAfficheTableau()
 				-- focus_cell_highlight = true,
 				label_tracking = true,
 				sortable = true,
+				filterable = true,
 				enable_editing = true
 			});
 		end
 	end
 
-	grid_tableau:AddColumnLabel(3);
+	-- grid_tableau:AddColumnLabel(3);
     grid_tableau:AddRowLabel(1, 48);
 
 -- Initialisation des Controles
@@ -4898,52 +4892,14 @@ function OnAfficheTableau()
 			end
 		end
 		DoRazColOverAll(0);
-		DoRazColOverAll(1);
-		if draw.finale_ce == 'Non' or draw.finale_ce == 'No' then
-			if nodelivedraw:HasAttribute('EC_PREVIOUS_'..draw.sexe) then
-				local path = nodelivedraw:GetAttribute('EC_PREVIOUS_'..draw.sexe);
-				if app.FileExists(path) then
-					if draw.bolChargerCsv == true then
-						ChargeECPrevious(path);
-					end
-				else
-					nodelivedraw:DeleteAttribute('EC_PREVIOUS_'..draw.sexe);
-					config.doc:SaveFile();
-				end
-			end
-		end
-	end
-	if config.script_level == 4 then
-		for i = 0, tDraw:GetNbRows() -1 do
-			local code_coureur = tDraw:GetCell('Code_coureur')
-			if type(draw.tECSL[code_coureur]) == 'table' then
-				local ecsl_points = draw.tECSL[code_coureur].Point or 0;
-				local ecsl_rank = draw.tECSL[code_coureur].Clt or 0;
-				local ecsl_all_points = draw.tECSL[code_coureur].AllPoint or 0;
-				local ecsl_all_rank = draw.tECSL[code_coureur].AllClt or 0;
-				local ecsl_all_points0 = draw.tECSL[code_coureur].CupPointPrevious or 0;
-				local ecsl_all_rank0 = draw.tECSL[code_coureur].CupPosPrevious or 0;
-				local ecsl_all_pointsn = draw.tECSL[code_coureur].CupPointStanding or 0;
-				local ecsl_all_rankn = draw.tECSL[code_coureur].CupPosStanding or 0;
-				if ecsl_all_points0 > ecsl_all_points then
-					ecsl_all_points = ecsl_all_points0;
-				end
-				if ecsl_all_pointsn > ecsl_all_points then
-					ecsl_all_points = ecsl_all_pointsn;
-				end
-				tDraw:SetCell('ECSL_points', i, ecsl_points);
-				tDraw:SetCell('ECSL_rank', i, ecsl_rank);
-				tDraw:SetCell('ECSL_overall_points', i, ecsl_all_points);
-				tDraw:SetCell('ECSL_overall_rank', i, ecsl_all_rank);
-				tDraw:SetCell('ECSL_overall_points_0', i, ecsl_all_points0);
-				tDraw:SetCell('ECSL_overall_rank_0', i, ecsl_all_rank0);
-				tDraw:SetCell('ECSL_overall_rank_n', i, ecsl_all_rankn);
-			end
-			if type(draw.tWCSL[code_coureur]) == 'table' then
-				local wcsl_points = draw.tWCSL[code_coureur].Point or 0;
-				local wcsl_rank = draw.tWCSL[code_coureur].Clt or 0;
-				tDraw:SetCell('WCSL_points', i, wcsl_points);
-				tDraw:SetCell('WCSL_rank', i, wcsl_rank);
+		-- DoRazColOverAll(1);
+		if nodelivedraw:HasAttribute('EC_PREVIOUS_'..draw.sexe) then
+			local path = nodelivedraw:GetAttribute('EC_PREVIOUS_'..draw.sexe);
+			if app.FileExists(path) then
+				ChargeECPrevious(path);
+			else
+				nodelivedraw:DeleteAttribute('EC_PREVIOUS_'..draw.sexe);
+				config.doc:SaveFile();
 			end
 		end
 	end
@@ -4969,6 +4925,18 @@ function OnAfficheTableau()
 	dlgTableau:Bind(eventType.MENU, OnSendMessage, btnSendMessage);
 
 	dlgTableau:Bind(eventType.MENU, OnAide, btnAideCE);
+	
+	searchctrl = dlgTableau:GetWindowName('nom');
+	if searchctrl ~= nil then
+		searchctrl:SetDescriptiveText(traduction(draw.language, 'recherche par Nom, Prénom ou Code FIS'));
+		autoCompleteFrame = wnd.CreateAutoCompleteFrame({
+			parent = searchctrl, 
+			label = "AutoCompleteFrame - Test", 
+		});
+		autoCompleteFrame:Bind(eventType.AUTOCOMPLETE_SEARCH, OnAutoCompleteSearch);
+		searchctrl:Bind(eventType.AUTOCOMPLETE_SELECTION, OnAutoCompleteSelection);
+	end
+
 	dlgTableau:Bind(eventType.MENU, 
 		function(evt)
 			local cmd = 'Delete From Resultat_Info_Bibo Where Abs(Code_evenement) = '..draw.code_evenement;
@@ -4989,76 +4957,9 @@ function OnAfficheTableau()
 		end
 		, dlgTableau:GetWindowName('tableau'));
 		
-	dlgTableau:Bind(eventType.TEXT, 
-		function(evt)
-			if config.script_level == 4  then
-				local ok = true;
-				if not draw.tECSL then
-					ok = false;
-					local msg = traduction(draw.language, "Veuillez charger le fichier ECSL (.csv) en premier.");
-					app.GetAuiFrame():MessageBox(msg, traduction(draw.language, "ATTENTION !!"), msgBoxStyle.OK+msgBoxStyle.ICON_WARNING);
-				end
-				if draw.finale_ce:In('No','Non') and not draw.tWCSL then
-					ok = false;
-					local msg = traduction(draw.language, "Veuillez charger le fichier WCSL (.csv) en premier.");
-					app.GetAuiFrame():MessageBox(msg, traduction(draw.language, "ATTENTION !!"), msgBoxStyle.OK+msgBoxStyle.ICON_WARNING);
-				end
-				if ok == false then
-					return;
-				end
-			end
-			draw.cherche_nom = dlgTableau:GetWindowName('nom'):GetValue();
-			if draw.cherche_nom:len() == 0 then
-				if dlgCoureur then
-					dlgCoureur:Close();
-					dlgCoureur = nil;
-				end
-				return;
-			end
-			draw.code_coureur = nil;			
-			draw.cherche_coureur = "Select * From Coureur Where Code_coureur Like 'FIS%' And Nom Like '"..draw.cherche_nom.."%' And Sexe = '"..draw.sexe.."' Order By Nom, Prenom";
-			base:TableLoad(tCoureur, draw.cherche_coureur);
-			if not dlgCoureur then
-				dlgCoureur = wnd.CreateDialog({
-					style=wndStyle.RESIZE_BORDER+wndStyle.CAPTION+wndStyle.STAY_ON_TOP+wndStyle.CLOSE_BOX,
-					icon = "./res/32x32_message.png",
-					label = traduction(draw.language,"Recherche de coureurs"),
-					width = 1000,
-					height = 650
-				});
-				
-				dlgCoureur:LoadTemplateXML({ 
-					xml = './process/dossard_LiveDraw.xml',
-					node_name = 'root/panel',
-					node_attr = 'name',
-					node_value = 'coureur'
-					});
-					
-				grid_coureur = dlgCoureur:GetWindowName('coureur');
-				grid_coureur:Set({
-					table_base = tCoureur,
-					columns = 'Code_coureur, Nom, Prenom, Naissance, Code_nation, Code_comite, Club',
-					selection_mode = gridSelectionModes.ROWS,
-					label_tracking = true,
-					sortable = true,
-					enable_editing = true
-				});
-				
-				grid_coureur:Bind(eventType.GRID_SELECT_CELL, OnRowSelected);
-				dlgCoureur:Show();
-			end
-			dlgCoureur:Refresh();
-			if tCoureur:GetNbRows() < 20 then
-				grid_coureur:SetFocus();
-			else
-				dlgTableau:GetWindowName('nom'):SetFocus();
-			end
-		end
-		, dlgTableau:GetWindowName('nom'));
-
 	dlgTableau:Bind(eventType.BUTTON, 
 		function(evt)
-			local fiscode = 'FIS'..dlgTableau:GetWindowName('code'):GetValue();
+			local fiscode = dlgTableau:GetWindowName('code'):GetValue();
 			local r = tDraw:GetIndexRow('Code_coureur', fiscode);
 			if r > -1 then
 				local msg = traduction(draw.language, 'Ce coureur est déjà présent dans la course !!');
@@ -5081,8 +4982,8 @@ function OnAfficheTableau()
 				tDraw:SetCellNull('Reserve', i);
 			end
 			RefreshGrid();
-			if dlgTableau:GetWindowName('code'):GetValue():len() > 0 then
-				OnAjouterCoureur(dlgTableau:GetWindowName('code'):GetValue());
+			if dlgTableau:GetWindowName('code'):GetValue():len() > 3 then
+				OnAjouterCoureur();
 			end
 		end
 		, dlgTableau:GetWindowName('ajouter'));
@@ -5090,10 +4991,6 @@ function OnAfficheTableau()
 	dlgTableau:Bind(eventType.MENU, 
 		function(evt) 
 			OnClose();
-			if dlgCoureur then
-				dlgCoureur:Close();
-				dlgCoureur = nil;
-			end
 			dlgTableau:EndModal(idButton.CANCEL);
 		 end,  btnClose);
 
@@ -5137,8 +5034,8 @@ function SetLabelConfig()
 		local tb = dlgConfig:GetWindowName('tbconfig');
 		tb:FindById(config_btnSave:GetId()):SetLabel(traduction(draw.language, "Sauvegarder"));
 		tb:FindById(config_btnSave:GetId()):SetShortHelp(traduction(draw.language, "Sauvegarder"));
-		tb:FindById(config_btnSOS:GetId()):SetLabel(traduction(draw.language, "Mode d'emploi du sript"));
-		tb:FindById(config_btnSOS:GetId()):SetShortHelp(traduction(draw.language, "Mode d'emploi du sript"));
+		tb:FindById(config_btnSOS:GetId()):SetLabel(traduction(draw.language, "Mode d'emploi du script"));
+		tb:FindById(config_btnSOS:GetId()):SetShortHelp(traduction(draw.language, "Mode d'emploi du script"));
 		tb:FindById(config_btnClose:GetId()):SetLabel(traduction(draw.language, "Quitter"));
 		tb:FindById(config_btnClose:GetId()):SetShortHelp(traduction(draw.language, "Quitter"));
 	end
@@ -5341,8 +5238,7 @@ function main(params_c)
 	end
 	config = {};
 	draw = {};
-	draw.tWCSL = {};
-	draw.tECSL = {};
+	tTableauCoureur = {};
 	params = {};
 	draw.code_evenement = params_c.code_evenement or -1;
 	if draw.code_evenement < 0 then
@@ -5360,7 +5256,7 @@ function main(params_c)
 	config.height = display:GetSize().height - 50;
 	config.x = 0;
 	config.y = 0;
-	script_version = "2027.01"; 
+	script_version = "2027.02"; 
 	-- Ouverture Document XML 
 	draw.finale_ce = 'Non';
 	config.doc = app.GetXML();
