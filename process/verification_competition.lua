@@ -16,7 +16,7 @@ function main(cparams)
 					msgBoxStyle.YES+msgBoxStyle.NO+msgBoxStyle.NO_DEFAULT+msgBoxStyle.ICON_WARNING
 					);
 			if reponse == msgBoxStyle.YES then
-				app.AutoUpdateResource('https://agilsport.fr/bta_alpin/UpdateScript.zip');
+				app.AutoUpdateResource('https://agilsport.fr/bta_alpin/UpdateScriptUtf8.zip');
 			end
 			return;
 		end

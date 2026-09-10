@@ -159,8 +159,8 @@ function OnCurlReturn(evt)
 	table.insert(tNomSVersionDoc, '');									-- Entry FIS
 	table.insert(tNomSVersionDoc, '');									-- youngFIS=1.1
 	table.insert(tNomSVersionDoc, '');									-- tempsManuel
-	table.insert(tNomSVersionDoc, '');									-- verification_competition
-	table.insert(tNomSVersionDoc, '');									-- licences Comite
+	table.insert(tNomSVersionDoc, '');									-- tempsManuel_online
+	table.insert(tNomSVersionDoc, '');									-- nada
 	table.insert(tNomSVersionDoc, '');									-- nada
 	table.insert(tNomSVersionDoc, '');									-- nada
 	if evt:GetInt() == 1 then
@@ -192,7 +192,7 @@ function OnCurlReturn(evt)
 					f:write(chaine);
 					f:close();
 				end
-				local reponse = app.AutoUpdateResource('https://agilsport.fr/bta_alpin/UpdateScript.zip');
+				local reponse = app.AutoUpdateResource('https://agilsport.fr/bta_alpin/UpdateScriptUtf8.zip');
 				script_version = last_version;
 				if dlgConfig then
 					dlgConfig:EndModal(idButton.CANCEL);
