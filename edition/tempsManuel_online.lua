@@ -524,6 +524,7 @@ function OnSynchroCalculs()
 end
 
 function OnSaisieDlg1()
+	OnSynchroCalculs();
 	local widthMax = display:GetSize().width;
 	local widthControl = math.floor((widthMax*3)/4);
 	local x = math.floor((widthMax-widthControl)/2);
@@ -668,7 +669,6 @@ function OnSaisieDlg1()
 			-- if TM.calcul_id:len() == 0 then
 			-- end
 			OnSendJson();
-			OnSynchroCalculs();
 		end, 
 		btnSend)
 		
@@ -859,8 +859,7 @@ function main(params_c)
 	params.code_manche = 1;
 	params.nb_manche = 1;
 	params.fmt = "%2h:%2m:%2s.%3f";
-	doublage = 0;
-	script_version = "2027.02"; 
+	script_version = "2027.03"; 
 	indice_return = 16;
 	local url = 'https://agilsport.fr/bta_alpin/versionsPG.txt'
 	version = curl.AsyncGET(wnd.GetParentFrame(), url);
