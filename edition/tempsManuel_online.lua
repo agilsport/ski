@@ -577,6 +577,8 @@ function OnSaisieDlg1()
 	tbh:AddSeparator();
 	local btnVisu = tbh:AddTool("Voir le calcul en ligne", "./res/32x32_calc.png");
 	tbh:AddSeparator();
+	local btnTuto = tbh:AddTool("Voir le tutoriel en ligne", "./res/vpe32x32_help.png");
+	tbh:AddSeparator();
 	local btnClose = tbh:AddTool("Fermer", "./res/32x32_quit.png");
 	tbh:AddStretchableSpace();
 	tbh:Realize();
@@ -689,6 +691,13 @@ function OnSaisieDlg1()
 			app.LaunchDefaultBrowser(url);
 		end, 
 		btnVisu)
+
+	tbh:Bind(eventType.MENU, 
+		function(evt) 
+			url = 'https://agilsport.fr/bta_alpin/tuto/Calcul_EET_en_ligne.pdf';
+			app.LaunchDefaultBrowser(url);
+		end, 
+		btnTuto)
 
 	tbh:Bind(eventType.MENU, 
 		function(evt) 
@@ -859,7 +868,7 @@ function main(params_c)
 	params.code_manche = 1;
 	params.nb_manche = 1;
 	params.fmt = "%2h:%2m:%2s.%3f";
-	script_version = "2027.03"; 
+	script_version = "2027.04"; 
 	indice_return = 16;
 	local url = 'https://agilsport.fr/bta_alpin/versionsPG.txt'
 	version = curl.AsyncGET(wnd.GetParentFrame(), url);
